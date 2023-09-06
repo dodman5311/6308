@@ -1,6 +1,6 @@
 # Orthogonal Games Framework
 
-This project is a bare-bones implementation with not modules of the framework that our studio uses to develop games. The purpose of this project is to be copied as a basis for creating new projects for more rapid studio production.
+This project is a bare-bones implementation of the framework that our studio uses to develop games. The purpose of this project is to be copied as a basis for creating new projects for more rapid studio production.
 
 # Dependencies
 
