@@ -39,3 +39,8 @@ These are instructions for installing this framework to be used with your own pr
 2. Open your folder in command line.
 3. Type `git clone https://github.com/username/reponame.git`
 4. Done
+
+# VS-Code Snippets
+
+- globals: Inserts ReplicatedStorage and path to Globals module.
+- newmod: Inserts boiler plate code for new Services/Controllers.
