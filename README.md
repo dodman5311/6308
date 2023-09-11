@@ -44,3 +44,4 @@ These are instructions for installing this framework to be used with your own pr
 
 - globals: Inserts ReplicatedStorage and path to Globals module.
 - newmod: Inserts boiler plate code for new Services/Controllers.
+- package: Shortcut to insert variables for packages.

@@ -42,5 +42,13 @@
 			"return $1"
 		],
 		"description": "Generic Service/Controller boiler plate code."
+	},
+	"package": {
+		"scope": "lua,luau",
+		"prefix": "package",
+		"body": [
+			"local $1 = require(Globals.Packages.$1)"
+		],
+		"description": "Shortcut for requiring packages, Requires Globals above it."
 	}
 }
