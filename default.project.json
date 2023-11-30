@@ -7,6 +7,10 @@
       "Shared": {
         "$path": "src/ReplicatedStorage"
       },
+      "Gui": {
+        "$path": "src/Gui"
+      },
+
       "Packages": {
         "$path": "Packages"
       },

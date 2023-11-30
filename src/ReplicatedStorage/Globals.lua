@@ -14,4 +14,5 @@ return {
 	Assets = ReplicatedStorage.Assets,
 	Config = require(ReplicatedStorage.Shared.Config),
 	Enums = require(ReplicatedStorage.Shared.Enums),
+	Signals = ReplicatedStorage.Shared.Signals,
 }

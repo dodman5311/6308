@@ -3,9 +3,14 @@
 registry = "test"
 
 [[package]]
+name = "brittonfischer/camerashaker"
+version = "0.1.0"
+dependencies = []
+
+[[package]]
 name = "dylan/pogogame"
 version = "0.1.0"
-dependencies = [["Janitor", "howmanysmall/janitor@1.15.6"], ["Net", "sleitnick/net@0.1.0"], ["ProfileService", "surnautica/profileservice@1.0.0"], ["Promise", "evaera/promise@4.0.0"], ["Signal", "sleitnick/signal@1.5.0"]]
+dependencies = [["CameraShaker", "brittonfischer/camerashaker@0.1.0"], ["Janitor", "howmanysmall/janitor@1.15.6"], ["Net", "sleitnick/net@0.1.0"], ["ProfileService", "surnautica/profileservice@1.0.0"], ["Promise", "evaera/promise@4.0.0"], ["Signal", "sleitnick/signal@1.5.0"]]
 
 [[package]]
 name = "evaera/promise"

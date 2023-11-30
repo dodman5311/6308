@@ -1,9 +1,41 @@
 local modules = {}
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local Promise = require(Globals.Packages.Promise)
+local signals = require(Globals.Signals)
+
+local player = Players.LocalPlayer
+
+local allSignals = {
+	"DoUiAction",
+	"DoWeaponAction",
+}
+
+for _, signal in ipairs(allSignals) do
+	signals:addSignal(signal)
+end
+
+local function connectOnSpawn(mod, character)
+	local humanoid = character:WaitForChild("Humanoid")
+
+	if mod["OnSpawn"] then
+		mod:OnSpawn(character, humanoid)
+	end
+
+	if not humanoid then
+		return
+	end
+
+	humanoid.Died:Connect(function()
+		if not mod["OnDied"] then
+			return
+		end
+		mod:OnDied(character)
+	end)
+end
 
 local function InitModules()
 	local inits = {}
@@ -26,6 +58,14 @@ local function InitModules()
 					if mod.GameInit then
 						mod:GameInit()
 					end
+
+					if player.Character then
+						connectOnSpawn(mod, player.Character)
+					end
+
+					player.CharacterAdded:Connect(function(character)
+						connectOnSpawn(mod, character)
+					end)
 
 					table.insert(modules, mod)
 				end)
