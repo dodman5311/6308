@@ -21,7 +21,7 @@ local function doCommand(player, commandIndex, ...)
 	if not command["ExecuteServer"] then
 		return
 	end
-	command.ExecuteServer(player, ...)
+	command:ExecuteServer(player, ...)
 end
 
 --// Main //--

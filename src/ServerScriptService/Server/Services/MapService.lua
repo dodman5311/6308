@@ -9,6 +9,7 @@ local Globals = require(replicatedStorage.Shared.Globals)
 --// requirements
 local util = require(Globals.Vendor.Util)
 local spawners = require(Globals.Server.Services.Spawners)
+local signals = require(Globals.Signals)
 
 --// instances
 local map = workspace.Map
@@ -272,5 +273,21 @@ newStart.Parent = map
 doUnitFunction("OnPlaced", newStart)
 
 module.loadMap(10)
+
+local function clearMap()
+	for _, unit in ipairs(map:GetChildren()) do
+		if unit.Name == "Start" or not unit:IsA("Model") then
+			continue
+		end
+
+		unit:Destroy()
+	end
+end
+
+signals["GenerateMap"]:Connect(function(Size)
+	print("Size")
+	clearMap()
+	module.loadMap(Size)
+end)
 
 return module

@@ -5,6 +5,16 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local Promise = require(Globals.Packages.Promise)
 
+local Signals = require(Globals.Signals)
+
+local allSignals = {
+	"GenerateMap",
+}
+
+for _, signal in ipairs(allSignals) do
+	Signals:addSignal(signal)
+end
+
 local function InitModules()
 	local inits = {}
 

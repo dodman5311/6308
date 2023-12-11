@@ -47,7 +47,7 @@ local function doCommand(commandIndex, ...)
 	if not command["ExecuteClient"] then
 		return
 	end
-	command.ExecuteClient(...)
+	command:ExecuteClient(...)
 end
 
 local function setUpGui()
@@ -61,7 +61,7 @@ local function setUpGui()
 end
 
 local function reset()
-	for index, commandFrame in pairs(fullGui.Commands:GetChildren()) do
+	for _, commandFrame in pairs(fullGui.Commands:GetChildren()) do
 		if not commandFrame:IsA("Frame") or not commandFrame:FindFirstChild("ParamsFrame") then
 			continue
 		end
@@ -132,7 +132,7 @@ local function animateParameterButtonEntry(button)
 	end)
 end
 
-local function createParameterFrame(parent, command, parameter)
+local function createParameterFrame(parent, parameter)
 	local signals = {}
 	local selectedParameter
 	local selectedParameterButton
@@ -201,10 +201,10 @@ local function enterCommand(parent, index, command)
 
 	local currentParent = parent
 
-	for index, parameter in ipairs(command.Parameters) do
+	for _, parameter in ipairs(command.Parameters()) do
 		local value
 
-		value, currentParent = createParameterFrame(currentParent, command, parameter)
+		value, currentParent = createParameterFrame(currentParent, parameter)
 		table.insert(parameters, value)
 	end
 
@@ -217,7 +217,7 @@ local function enterCommand(parent, index, command)
 	inCommand = nil
 end
 
-local function createcommandButton(index, command)
+local function createcommandButton(index)
 	local newButton = objects.Command:Clone()
 	newButton.Parent = fullGui.Commands
 	newButton.Visible = true
@@ -242,7 +242,7 @@ local function loadCommandButtons()
 	local signals = {}
 
 	for index, command in pairs(commands) do
-		local newButton = createcommandButton(index, commands)
+		local newButton = createcommandButton(index)
 		local button = newButton.CommandButton.Button
 
 		table.insert(
@@ -295,7 +295,7 @@ UserInputService.InputBegan:Connect(function(input, gpe)
 		return
 	end
 
-	if input.KeyCode == Enum.KeyCode.Backquote then
+	if input.KeyCode == Enum.KeyCode.Tab then
 		if inGui then
 			closeGui()
 		else

@@ -13,6 +13,7 @@ local signals = require(Globals.Signals)
 
 function module:OnSpawn(character, humanoid)
 	signals.DoUiAction:Fire("HUD", "UpdatePlayerHealth", true, humanoid.Health, humanoid.MaxHealth)
+	signals.DoUiAction:Fire("HUD", "UpdatePlayerHealth", true, humanoid.Health, humanoid.MaxHealth)
 
 	humanoid.HealthChanged:Connect(function(health)
 		signals.DoUiAction:Fire("HUD", "UpdatePlayerHealth", true, health, humanoid.MaxHealth)

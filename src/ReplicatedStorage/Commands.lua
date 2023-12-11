@@ -1,5 +1,4 @@
 local Players = game:GetService("Players")
-local Teams = game:GetService("Teams")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Globals = require(ReplicatedStorage.Shared.Globals)
 
@@ -7,24 +6,28 @@ local signals = require(Globals.Shared.Signals)
 
 local commands = {
 	Give_Weapon = {
-		Parameters = {
-			{ Name = "Weapon", Options = Globals.Assets.Models.Weapons:GetChildren() },
-		},
+		Parameters = function()
+			return {
+				{ Name = "Weapon", Options = Globals.Assets.Models.Weapons:GetChildren() },
+			}
+		end,
 
-		ExecuteClient = function(Weapon)
+		ExecuteClient = function(_, Weapon)
 			signals.DoWeaponAction:Fire("EquipWeapon", Weapon.Name)
 		end,
 	},
 
 	Set_Player_Health = {
 
-		Parameters = {
-			{ Name = "Player", Options = Players:GetPlayers() },
-			{ Name = "Set Max", Options = { true, false } },
-			{ Name = "Amount", Options = { "_Input" } },
-		},
+		Parameters = function()
+			return {
+				{ Name = "Player", Options = Players:GetPlayers() },
+				{ Name = "Set Max", Options = { true, false } },
+				{ Name = "Amount", Options = { "_Input" } },
+			}
+		end,
 
-		ExecuteServer = function(_, Player, setMax, Value)
+		ExecuteServer = function(_, _, Player, setMax, Value)
 			if not Player.Character then
 				return Player.Name .. "'s character does not exist"
 			end
@@ -43,13 +46,18 @@ local commands = {
 		end,
 	},
 
-	LoadMap = {
+	God_Mode = {
 
-		Parameters = {
-			{ Name = "Map Size", Options = { "_Input" } },
-		},
+		Parameters = function()
+			return {
+				{ Name = "Player", Options = Players:GetPlayers() },
+				{ Name = "Enable", Options = { true, false } },
+			}
+		end,
 
-		ExecuteServer = function(_, Player, setMax, Value)
+		PlayersWithGodMode = {},
+
+		ExecuteServer = function(self, _, Player, Value)
 			if not Player.Character then
 				return Player.Name .. "'s character does not exist"
 			end
@@ -58,13 +66,28 @@ local commands = {
 				return Player.Name .. " missing humanoid"
 			end
 
-			if setMax then
-				humanoid.MaxHealth = tonumber(Value)
+			if Value then
+				self.PlayersWithGodMode[Player] = humanoid.HealthChanged:Connect(function()
+					humanoid.Health = humanoid.MaxHealth
+				end)
+				print("God mode enabled for " .. Player.Name)
+			elseif self.PlayersWithGodMode[Player] then
+				self.PlayersWithGodMode[Player]:Disconnect()
+				print("God mode disabled for " .. Player.Name)
 			end
+		end,
+	},
 
-			humanoid.Health = tonumber(Value)
+	LoadMap = {
 
-			print(Player.Name .. "'s health set to " .. Value)
+		Parameters = function()
+			return {
+				{ Name = "Map Size", Options = { "_Input" } },
+			}
+		end,
+
+		ExecuteServer = function(_, _, size)
+			signals["GenerateMap"]:Fire(tonumber(size))
 		end,
 	},
 }
