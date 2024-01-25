@@ -1,4 +1,7 @@
-local module = {}
+local module = {
+	CurrentStage = 1,
+	CurrentLevel = 1,
+}
 --// services
 local serverStorage = game:GetService("ServerStorage")
 local replicatedStorage = game:GetService("ReplicatedStorage")
@@ -13,13 +16,14 @@ local signals = require(Globals.Signals)
 
 --// instances
 local map = workspace.Map
-local startUnit = serverStorage.Start
-local units = serverStorage.Units
-local caps = serverStorage.Caps
+local startUnit
+local units
+local caps
+local exit
 
 --// values
 local showHitboxes = false
-local newStart = startUnit:Clone()
+local newStart
 local links = {}
 
 local unitModules = {}
@@ -79,6 +83,9 @@ local function removeLink(unit)
 end
 
 local function checkLink(link)
+	if not link:FindFirstChild("LinkedTo") then
+		return
+	end
 	return link.LinkedTo.Value == nil or link.LinkedTo.Value.Parent == nil
 end
 
@@ -103,9 +110,51 @@ local function showHitbox(cframe, size)
 	--end)
 end
 
+local function Shuffle(tabl)
+	for i = 1, #tabl - 1 do
+		local ran = math.random(i, #tabl)
+		tabl[i], tabl[ran] = tabl[ran], tabl[i]
+	end
+
+	return tabl
+end
+
+local function getAssets()
+	local assets = serverStorage:FindFirstChild("Stage_" .. module.CurrentStage)
+	startUnit = assets.Start
+	units = assets.Units
+	caps = assets.Caps
+	exit = assets.Exit
+end
+
 -----------------------------------------// Important Functions //-----------------------------------------
 
 --// Unit functions
+
+local function clearMap()
+	for _, unit in ipairs(map:GetChildren()) do
+		-- if unit.Name == "Start" or not unit:IsA("Model") then
+		-- 	continue
+		-- end
+
+		if unit:IsA("Model") then
+			removeLink(unit)
+		end
+
+		unit:Destroy()
+	end
+
+	--map:ClearAllChildren()
+
+	for _, enemy in ipairs(collectionService:GetTagged("Enemy")) do
+		enemy:Destroy()
+	end
+
+	for _, weapon in ipairs(collectionService:GetTagged("Weapon")) do
+		weapon:Destroy()
+	end
+end
+
 local function setLinks(baseLink, unit)
 	for _, link in ipairs(unit.Links:GetChildren()) do
 		link.Transparency = 1
@@ -127,6 +176,8 @@ local function placeUnit(baseLink, unit, unitLink)
 	newUnit:PivotTo(unitPosition)
 	newUnit.Parent = map
 
+	newUnit:AddTag("Unit")
+
 	setLinks(baseLink, newUnit)
 
 	doUnitFunction("OnPlaced", newUnit)
@@ -135,8 +186,19 @@ local function placeUnit(baseLink, unit, unitLink)
 end
 
 local function placeCap(baseLink)
+	local partsTouching = workspace:GetPartsInPart(baseLink)
+	for _, part in ipairs(partsTouching) do
+		if part.Name ~= "Link" then
+			continue
+		end
+
+		baseLink.LinkedTo.Value = part
+		return
+	end
+
 	local getCaps = caps:GetChildren()
 	local cap = getCaps[math.random(1, #getCaps)]:Clone()
+	cap:AddTag("Cap")
 	cap.Parent = baseLink.Parent
 	cap:PivotTo(baseLink.CFrame * CFrame.Angles(0, math.rad(180), 0))
 
@@ -144,9 +206,9 @@ local function placeCap(baseLink)
 end
 
 local function checkPlacable(baseLink, unit, unitLink)
-	local leeway = 4
+	local leeway = 5
 
-	local size = unit:GetExtentsSize() - (Vector3.new(1, 1, 1) * leeway)
+	local size = unit:GetExtentsSize() - (Vector3.new(1, -1, 1) * leeway)
 	local pos = calculatePlacePosition(baseLink, unit, unitLink)
 
 	local hitbox = showHitboxes and showHitbox(pos, size)
@@ -157,26 +219,25 @@ local function checkPlacable(baseLink, unit, unitLink)
 		if part.Parent ~= unit and part:FindFirstAncestor(map.Name) then
 			canPlace = false
 
-			if hitbox then
-				hitbox:Destroy()
-			end
 			break
 		end
+	end
+
+	if hitbox then
+		task.wait(0.1)
+		hitbox:Destroy()
 	end
 
 	return canPlace
 end
 
 local function addRandomUnit(baseLink)
-	local unitToPlace = util.getRandomChild(units)
-	local placeLink = util.getRandomChild(unitToPlace.Links)
+	local unitToPlace
+	local placeLink
 
-	if checkPlacable(baseLink, unitToPlace, placeLink) then -- if the unit can be placed, then return
-		return placeUnit(baseLink, unitToPlace, placeLink)
-	end
+	local getUnits = Shuffle(units:GetChildren())
 
-	unitToPlace = nil
-	for _, unit in ipairs(units:GetChildren()) do -- if the unit cannot be placed, then loop through units until one can be.
+	for _, unit in ipairs(getUnits) do -- if the unit cannot be placed, then loop through units until one can be.
 		if unit == unitToPlace then
 			continue
 		end
@@ -231,23 +292,107 @@ function module.generateUnitsForLinks()
 	end
 end
 
-function module.generateUnit()
-	for _, link in ipairs(links) do
+function module.generateUnit(linkList)
+	for _, link in ipairs(linkList) do
 		if not checkLink(link) then
 			continue
 		end
 
-		addRandomUnit(link)
-		return
+		local placedUnit = addRandomUnit(link)
+		if not placedUnit then
+			continue
+		end
+
+		return placedUnit
 	end
 end
 
+local function getFurthestCap()
+	local furthestDistance, furthestCap = 0
+
+	for _, cap in ipairs(collectionService:GetTagged("Cap")) do
+		local distance = (newStart:GetPivot().Position - cap:GetPivot().Position).Magnitude
+
+		if distance <= furthestDistance then
+			continue
+		end
+
+		furthestDistance = distance
+		furthestCap = cap
+	end
+
+	return furthestCap, furthestDistance
+end
+
+function module.placeExit()
+	local cap = getFurthestCap()
+	local newExit = exit:Clone()
+	newExit.Parent = cap.Parent
+	newExit:PivotTo(cap:GetPivot())
+
+	cap:Destroy()
+
+	doUnitFunction("OnPlaced", newExit)
+end
+
+function module.placeStartUnit()
+	newStart = startUnit:Clone()
+	newStart.Parent = map
+end
+
+function module.setupMap()
+	clearMap()
+	loadModules()
+	getAssets()
+
+	for _, v in ipairs(units:GetDescendants()) do
+		if not v:IsA("BasePart") then
+			continue
+		end
+		v.CollisionGroup = "Map"
+	end
+
+	module.placeStartUnit()
+	doUnitFunction("OnPlaced", newStart)
+end
+
 function module.loadMap(size)
+	module.setupMap()
+
 	for _ = 1, size do
-		module.generateUnit()
+		module.generateUnit(links)
 	end
 
 	placeCaps()
+	module.placeExit()
+
+	spawners.spawnEnemies()
+	spawners.spawnWeapons()
+
+	for _, unit in ipairs(map:GetChildren()) do
+		doUnitFunction("OnLoaded", unit)
+	end
+end
+
+function module.loadLinearMap(size)
+	module.setupMap()
+
+	local currentUnit = newStart
+
+	for _ = 1, math.ceil(size / 2) do
+		if not currentUnit then
+			return
+		end
+		currentUnit = module.generateUnit(currentUnit.Links:GetChildren())
+	end
+
+	for _, unit in ipairs(map:GetChildren()) do
+		module.generateUnit(unit.Links:GetChildren())
+	end
+
+	placeCaps()
+	module.placeExit()
+
 	spawners.spawnEnemies()
 	spawners.spawnWeapons()
 
@@ -257,37 +402,32 @@ function module.loadMap(size)
 end
 
 -------------------------------------------------------------------
-for _, v in ipairs(units:GetDescendants()) do
-	if not v:IsA("BasePart") then
-		continue
-	end
-	v.CollisionGroup = "Map"
-end
-
-loadModules()
 
 map.ChildAdded:Connect(addLink)
 map.ChildRemoved:Connect(removeLink)
 
-newStart.Parent = map
-doUnitFunction("OnPlaced", newStart)
+module.loadLinearMap(module.CurrentLevel * 5)
+--module.loadLinearMap(50)
 
-module.loadMap(10)
-
-local function clearMap()
-	for _, unit in ipairs(map:GetChildren()) do
-		if unit.Name == "Start" or not unit:IsA("Model") then
-			continue
-		end
-
-		unit:Destroy()
+signals["GenerateMap"]:Connect(function(Style, Size)
+	if not Style or not Size or not tonumber(Size) then
+		return
 	end
-end
+	if Style == "Linear" then
+		module.loadLinearMap(Size)
+	else
+		module.loadMap(Size)
+	end
+end)
 
-signals["GenerateMap"]:Connect(function(Size)
-	print("Size")
-	clearMap()
-	module.loadMap(Size)
+signals["ProceedToNextLevel"]:Connect(function()
+	module.CurrentLevel += 1
+	if module.CurrentLevel > 5 then
+		module.CurrentLevel = 1
+		module.CurrentStage += 1
+	end
+
+	module.loadLinearMap(module.CurrentLevel * 5)
 end)
 
 return module

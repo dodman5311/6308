@@ -257,9 +257,9 @@ local function loadCommandButtons()
 end
 
 local function openGui()
-	if player.UserId ~= 72859198 then
-		return
-	end
+	-- if player.UserId ~= 72859198 then
+	-- 	return
+	-- end
 
 	local ti = TweenInfo.new(0.1, Enum.EasingStyle.Quad)
 	buttonSignals = loadCommandButtons()

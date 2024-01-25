@@ -1,5 +1,11 @@
 local module = { animations = {} }
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Globals = require(ReplicatedStorage.Shared.Globals)
+
+local janitor = require(Globals.Packages.Janitor)
+
 --// Functions
 function module:loadAnimations(subject, animationsFolder)
 	local animationController = subject:FindFirstChildOfClass("Humanoid")
@@ -7,6 +13,9 @@ function module:loadAnimations(subject, animationsFolder)
 	if not animationController then
 		return
 	end
+
+	local subjectJanitor = janitor.new()
+	subjectJanitor:LinkToInstance(subject)
 
 	if not self.animations[subject] then
 		self.animations[subject] = {}
@@ -17,6 +26,10 @@ function module:loadAnimations(subject, animationsFolder)
 	for _, animation in ipairs(animsList) do
 		self.animations[subject][animation.Name] = animationController.Animator:LoadAnimation(animation)
 	end
+
+	subjectJanitor:Add(function()
+		self.animations[subject] = nil
+	end)
 end
 
 function module:getAnimation(subject, animationName)

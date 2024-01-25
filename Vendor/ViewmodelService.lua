@@ -33,16 +33,34 @@ local function HandleBaseOffsets(viewModel, baseC0)
 	end
 end
 
+local function roundVector(vector, factor)
+	if not factor then
+		factor = 50
+	end
+
+	if typeof(vector) == "Vector2" then
+		return Vector2.new(math.round(vector.X * factor) / factor, math.round(vector.Y * factor) / factor)
+	elseif typeof(vector) == "Vector3" then
+		return Vector3.new(
+			math.round(vector.X * factor) / factor,
+			math.round(vector.Y * factor) / factor,
+			math.round(vector.Z * factor) / factor
+		)
+	else
+		return math.round(vector * factor) / factor
+	end
+end
+
 local function PositionViewModel(viewModel)
 	local delta = uis:GetMouseDelta()
 	viewModel.SwaySpring.Target = delta * viewModel.SwayAmount
 
 	local swaySpring = viewModel.SwaySpring
-	viewModel.swayFrame = CFrame.new(
-		math.rad(-swaySpring.Position.X * 2),
-		math.rad(swaySpring.Position.Y * 2),
-		math.rad(swaySpring.Position.Y)
-	) * CFrame.Angles(math.rad(-swaySpring.Position.Y), math.rad(-swaySpring.Position.X), 0)
+	local swayPos = roundVector(swaySpring.Position, 1)
+
+	viewModel.swayFrame = CFrame.new(math.rad(-swayPos.X * 2), math.rad(swayPos.Y * 2), math.rad(swayPos.Y))
+		* CFrame.Angles(math.rad(-swayPos.Y), math.rad(-swayPos.X), 0)
+
 	if viewModel.LockSway then
 		viewModel.swayFrame = CFrame.new()
 	end
@@ -61,14 +79,14 @@ local function PositionViewModel(viewModel)
 		local fullSpring = spring.Spring
 
 		if spring.Type == "Position" then
-			frame = CFrame.new(fullSpring.Position)
+			local springPosition = roundVector(fullSpring.Position)
+
+			frame = CFrame.new(springPosition)
 		elseif spring.Type == "Rotation" then
+			local springPosition = roundVector(fullSpring.Position)
+
 			frame = CFrame.new()
-				* CFrame.Angles(
-					math.rad(fullSpring.Position.X),
-					math.rad(fullSpring.Position.Y),
-					math.rad(fullSpring.Position.Z)
-				)
+				* CFrame.Angles(math.rad(springPosition.X), math.rad(springPosition.Y), math.rad(springPosition.Z))
 		end
 
 		goal *= frame
@@ -82,7 +100,7 @@ function module.new()
 		Model = assets.Models.ViewModel:Clone(),
 		SwaySpring = spring.new(Vector2.new(0, 0)),
 		SwayFrame = CFrame.new(),
-		SwayAmount = 0.1,
+		SwayAmount = 0.25,
 		LockSway = false,
 
 		CameraBoneDamper = {
@@ -96,8 +114,8 @@ function module.new()
 
 	local baseC0 = viewModel.Model.PrimaryPart.RootJoint.C0
 
-	viewModel.SwaySpring.Speed = 10
-	viewModel.SwaySpring.Damper = 0.65
+	viewModel.SwaySpring.Speed = 15
+	viewModel.SwaySpring.Damper = 0.525
 
 	function viewModel:Run()
 		viewModel.Model.Parent = camera

@@ -84,6 +84,15 @@ function module:newQueue()
 	return {
 		timerQueue = {},
 		new = module["new"],
+
+		DestroyAll = function(self)
+			for _, timer in self.timerQueue do
+				if not timer["Destroy"] then
+					continue
+				end
+				timer:Destroy()
+			end
+		end,
 	}
 end
 

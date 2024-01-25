@@ -16,6 +16,7 @@ local sounds = assets.Sounds
 local util = require(Globals.Vendor.Util)
 local acts = require(Globals.Vendor.Acts)
 local UiAnimator = require(Globals.Vendor.UIAnimationService)
+local SoulsService = require(Globals.Client.Services.SoulsService)
 
 --// Values
 local frameDelay = 0.045
@@ -62,7 +63,7 @@ local function getObjectInCenter(center, player)
 			raycastParams
 		)
 
-		if not ray or ray.Instance:FindFirstAncestor(model) and onScreen then
+		if (not ray or ray.Instance:FindFirstAncestor(model)) and onScreen then
 			if distanceToCenter < leastDistance then
 				leastDistance = distanceToCenter
 				getObject = model
@@ -99,18 +100,19 @@ function module.Init(player, ui, frame)
 
 		if not value then
 			module.HideEnemyHealthBar(player, ui, frame)
+			frame.Souls.DropChance.Visible = false
 			return
 		end
 
 		local humanoid = value:FindFirstChildOfClass("Humanoid")
 
-		module.SetUpEnemyHealth(player, ui, frame, humanoid.MaxHealth)
-		module.UpdateEnemyHealth(player, ui, frame, humanoid.Health, humanoid.MaxHealth)
-
+		module.SetUpEnemyHealth(player, ui, frame, humanoid.MaxHealth, value.Name)
+		module.UpdateEnemyHealth(player, ui, frame, humanoid.Health, humanoid.MaxHealth, value.Name, true)
+		module.showSoulChance(player, ui, frame, humanoid.MaxHealth)
 		module.ShowEnemyHealthBar(player, ui, frame)
 
 		currentHealthChanged = humanoid.HealthChanged:Connect(function(Health)
-			module.UpdateEnemyHealth(player, ui, frame, Health, humanoid.MaxHealth)
+			module.UpdateEnemyHealth(player, ui, frame, Health, humanoid.MaxHealth, value.Name)
 		end)
 	end)
 end
@@ -136,7 +138,7 @@ function module.HideEnemyHealthBar(player, ui, frame)
 	end)
 end
 
-local function updateHealthBar(health, bar)
+local function updateHealthBar(health, bar, noAnim)
 	local units = bar.Units
 
 	for i = #units:GetChildren() - 1, 1, -1 do
@@ -148,7 +150,12 @@ local function updateHealthBar(health, bar)
 			unit:SetAttribute("IsEmpty", false)
 		elseif not unit:GetAttribute("IsEmpty") then
 			unit:SetAttribute("IsEmpty", true)
-			UiAnimator.PlayAnimation(unit, frameDelay, false, true)
+
+			if noAnim then
+				unit.Image.Position = UDim2.fromScale(-3, -1)
+			else
+				UiAnimator.PlayAnimation(unit, frameDelay, false, true)
+			end
 		end
 	end
 end
@@ -211,7 +218,8 @@ function module.SetUpPlayerHealth(_, _, frame, maxHealth)
 	setUpHealthBar(maxHealth, frame.HealthBar, frame.PlayerHealthUnit)
 end
 
-function module.SetUpEnemyHealth(_, _, frame, maxHealth)
+function module.SetUpEnemyHealth(_, _, frame, maxHealth, enemyName)
+	frame.EnemyName.Text = enemyName
 	setUpHealthBar(maxHealth, frame.EnemyHealthBar, frame.EnemyHealthUnit)
 end
 
@@ -236,14 +244,20 @@ function module.UpdatePlayerHealth(_, ui, frame, health, maxHealth)
 	end
 end
 
-function module.UpdateEnemyHealth(_, _, frame, health, maxHealth)
+function module.UpdateEnemyHealth(_, _, frame, health, maxHealth, enemyName, noAnim)
 	local healthBar = frame.EnemyHealthBar
 
 	if #healthBar.Units:GetChildren() - 1 ~= maxHealth then
-		module.SetUpEnemyHealth(_, _, frame, maxHealth)
+		module.SetUpEnemyHealth(_, _, frame, maxHealth, enemyName)
 	end
 
-	updateHealthBar(health, healthBar)
+	updateHealthBar(health, healthBar, noAnim)
+end
+
+function module.showSoulChance(_, _, frame, maxHealth)
+	local Chance = SoulsService.CalculateDropChance(maxHealth)
+	frame.Souls.DropChance.Text = math.round(Chance) .. "% Chance"
+	frame.Souls.DropChance.Visible = true
 end
 
 return module

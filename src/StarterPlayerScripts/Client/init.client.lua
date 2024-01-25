@@ -12,6 +12,10 @@ local player = Players.LocalPlayer
 local allSignals = {
 	"DoUiAction",
 	"DoWeaponAction",
+	"AddSoul",
+	"RemoveSoul",
+	"AddGift",
+	"AddAmmo",
 }
 
 for _, signal in ipairs(allSignals) do

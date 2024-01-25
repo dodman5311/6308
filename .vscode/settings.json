@@ -12,5 +12,6 @@
     },
     "robloxLsp.diagnostics.globals": [
         "version"
-    ]
+    ],
+    "stylua.targetReleaseVersion": "latest"
 }

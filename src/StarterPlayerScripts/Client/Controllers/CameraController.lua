@@ -47,7 +47,7 @@ local function calculateViewmodelWalkSway()
 	lastBobStep = os.clock()
 
 	if isWalking then
-		i += dt * 45
+		i += dt * 35
 		p += Vector3.new(math.sin(i / 4) * 0.8, math.sin(i / 2 - 0.4)) / 8 / damp / 10
 		r += Vector3.new(math.sin(i / 2) / 5, math.cos(i / 4 - 0.3) / 4, math.sin(i / 4 - 0.4) / 3) / 20 / (damp * 5)
 	else
@@ -56,9 +56,11 @@ local function calculateViewmodelWalkSway()
 		r = Vector3.new()
 	end
 
+	local magnitude = 1.25
+
 	local viewmodel = ViewmodelService.viewModels[1]
-	viewmodel:UpdateSpring("bobbingPositionSpring", "Target", p)
-	viewmodel:UpdateSpring("bobbingRotationSpring", "Target", r * 1.25)
+	viewmodel:UpdateSpring("bobbingPositionSpring", "Target", p * magnitude)
+	viewmodel:UpdateSpring("bobbingRotationSpring", "Target", (r * 2) * magnitude)
 end
 
 local function bobbing()
@@ -143,7 +145,7 @@ function module:OnSpawn()
 	RunService:BindToRenderStep("runCamera", Enum.RenderPriority.Camera.Value + 1, runCamera)
 
 	player.CameraMode = Enum.CameraMode.LockFirstPerson
-	camera.FieldOfView = 90
+	camera.FieldOfView = 70
 end
 
 function module:OnDied()

@@ -76,6 +76,15 @@ function util.getNearestEnemy(position, maxDistance, parent)
 	return enemy, closest, enemyPosition
 end
 
+function util.ShuffleTable(tabl)
+	for i = 1, #tabl - 1 do
+		local ran = math.random(i, #tabl)
+		tabl[i], tabl[ran] = tabl[ran], tabl[i]
+	end
+
+	return tabl
+end
+
 function util.circleCurve(t)
 	return math.sqrt(1 - (2 * t - 1) ^ 2)
 end
@@ -265,7 +274,8 @@ end
 
 function util.getRandomChild(Parent)
 	local children = Parent:GetChildren()
-	return children[math.random(1, #children)]
+	local i = rng:NextInteger(1, #children)
+	return children[i]
 end
 
 function util.loadToTable(Parent: Instance, LoadTo: Animator)

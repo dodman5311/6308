@@ -24,17 +24,24 @@ function module.PlayAnimation(frame, frameDelay, loop, stayOnLastFrame)
 
 	local frames = image:GetAttribute("Frames") or image.Size.X.Scale * image.Size.Y.Scale
 	local currentFrames = image:GetAttribute("Frames") or image.Size.X.Scale * image.Size.Y.Scale
+	local currentFrame = 0
 
 	local newAnimation = {
 		Connection = nil,
 
 		RunAnimation = function(self)
+			if not frame or not frame.Parent then
+				module.StopAnimation(frame)
+				return
+			end
+
 			if os.clock() - lastFrameStep < frameDelay then
 				return
 			end
 
 			x += 1
 			currentFrames -= 1
+			currentFrame += 1
 
 			if x > image.Size.X.Scale - 1 then
 				y += 1
@@ -43,12 +50,13 @@ function module.PlayAnimation(frame, frameDelay, loop, stayOnLastFrame)
 
 			if currentFrames <= 0 then
 				currentFrames = frames
+				currentFrame = 0
 				x = 0
 				y = 0
 
 				if not loop then
 					if self.OnEnded.func then
-						task.spawn(self.OnEnded.func, self)
+						task.spawn(self.OnEnded.func)
 					end
 
 					if not stayOnLastFrame then
@@ -63,10 +71,21 @@ function module.PlayAnimation(frame, frameDelay, loop, stayOnLastFrame)
 
 			image.Position = UDim2.fromScale(-x, -y)
 
+			if self.OnFrame.func then
+				task.spawn(self.OnFrame.func, currentFrame)
+			end
+
 			lastFrameStep = os.clock()
 		end,
 
 		OnEnded = {
+			func = nil,
+			Connect = function(self, callBack)
+				self.func = callBack
+			end,
+		},
+
+		OnFrame = {
 			func = nil,
 			Connect = function(self, callBack)
 				self.func = callBack
@@ -86,10 +105,15 @@ function module.StopAnimation(frame)
 	if not animations[frame] then
 		return
 	end
-	frame.Image.Position = UDim2.fromScale(0, 0)
 
 	animations[frame].Connection:Disconnect()
 	animations[frame] = nil
+
+	if not frame or not frame.Parent then
+		return
+	end
+
+	frame.Image.Position = UDim2.fromScale(0, 0)
 end
 
 return module

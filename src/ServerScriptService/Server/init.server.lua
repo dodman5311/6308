@@ -6,10 +6,17 @@ local Globals = require(ReplicatedStorage.Shared.Globals)
 local Promise = require(Globals.Packages.Promise)
 
 local Signals = require(Globals.Signals)
+local net = require(Globals.Packages.Net)
 
 local allSignals = {
 	"GenerateMap",
+	"NpcHeartbeat",
+	"ProceedToNextLevel",
 }
+
+net:RemoteEvent("ReplicateEffect")
+net:RemoteEvent("Damage")
+net:RemoteEvent("DropSoul")
 
 for _, signal in ipairs(allSignals) do
 	Signals:addSignal(signal)
