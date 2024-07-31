@@ -107,6 +107,12 @@ local module = {
 			Catagories = { "Soul" },
 			Desc = "Armor now has more resistance. (+200% Armor Resistance)",
 		},
+
+		Burn_Hell = {
+			Icon = "rbxassetid://18731039717",
+			Catagories = { "Arsenal", "Soul" },
+			Desc = "Any damage, not dealt by a weapon, now has a chance to set enemies of fire. (50% chance)",
+		},
 	},
 
 	Upgrades = {
@@ -270,8 +276,7 @@ local module = {
 		Brick_Hook = {
 			Icon = "rbxassetid://16465803959",
 			Catagories = { "Tactical" },
-			Desc = [[Grapple onto any surface and pull yourself towards it. 
-The grapple has a cooldown of 1 second.
+			Desc = [[Grapple onto any surface and pull yourself towards it. Grappling an enemy will deal 1 damage and give you 1 second on invincibility. 1 second cooldown.
 (Left Shift to grapple)]],
 		},
 

@@ -1,6 +1,7 @@
 local module = {}
 
 --// Services
+local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
@@ -28,6 +29,7 @@ local janitor = require(Globals.Packages.Janitor)
 
 local net = require(Globals.Packages.Net)
 local lessHealth = false
+local hampterMode = false
 
 --local onHeartbeat = Signals["NpcHeartbeat"]
 local beats = {}
@@ -47,6 +49,36 @@ local onHeartbeat = {
 }
 
 --// Functions
+
+local function makeEnemyHampter(enemy)
+	if not enemy.PrimaryPart then
+		return
+	end
+
+	local newHampterPart = ReplicatedStorage.Hampter:Clone()
+	newHampterPart.Parent = enemy
+	local weld = Instance.new("Weld")
+	weld.Parent = newHampterPart
+	weld.Part0 = enemy.PrimaryPart
+	weld.Part1 = newHampterPart
+
+	for _, part in ipairs(enemy:GetDescendants()) do
+		if not part:IsA("BasePart") then
+			continue
+		end
+
+		part.Transparency = 1
+	end
+end
+
+function module.enableHampterMode()
+	hampterMode = true
+
+	for _, enemy in ipairs(CollectionService:GetTagged("Enemy")) do
+		makeEnemyHampter(enemy)
+	end
+end
+
 local function unpackNpcInstance(npc)
 	return npc.Instance, npc.Instance:FindFirstChild("Humanoid")
 end
@@ -323,6 +355,10 @@ function module.new(NPCType)
 	function Npc:Spawn(position) -- will place into the world and run
 		self:Place(position)
 		self:Run()
+
+		if hampterMode then
+			makeEnemyHampter(self.Instance)
+		end
 
 		return self.Instance
 	end

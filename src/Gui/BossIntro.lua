@@ -75,36 +75,36 @@ local intros = {
 	},
 
 	["Visage Of False Hope"] = {
-		{
-			Text = "Nullam vitae suscipit est. Animam combure... Libera me.",
-			Sound = "rbxassetid://18265912532",
-			Wait = 1,
-		},
-		{
-			Text = "Ne dubita. non titubare.",
-			Sound = "rbxassetid://18265913774",
-			Wait = 0.75,
-		},
-		{
-			Text = "Ferite furore, odiis.",
-			Sound = "rbxassetid://18265912200",
-			Wait = 0.65,
-		},
-		{
-			Text = "Monstrum esto volunt vos esse.",
-			Sound = "rbxassetid://18265913455",
-			Wait = 1,
-		},
-		{
-			Text = "Accipe",
-			Sound = "rbxassetid://18265913173",
-			Wait = 0.5,
-		},
-		{
-			Text = "anima eius.",
-			Sound = "rbxassetid://18265912929",
-			Wait = 2,
-		},
+		-- {
+		-- 	Text = "How are you alive? Your soul. It's... unweathered.",
+		-- 	Sound = "rbxassetid://18719900837",
+		-- 	Wait = 1,
+		-- },
+		-- {
+		-- 	Text = "You truly are a monster, aren't you?",
+		-- 	Sound = "rbxassetid://18719900367",
+		-- 	Wait = 0.75,
+		-- },
+		-- {
+		-- 	Text = "It does not matter to me.",
+		-- 	Sound = "rbxassetid://18719901267",
+		-- 	Wait = 0.65,
+		-- },
+		-- {
+		-- 	Text = "For I am all. I am stronger than Iron, than light, than all that is.",
+		-- 	Sound = "rbxassetid://18719901054",
+		-- 	Wait = 1,
+		-- },
+		-- {
+		-- 	Text = "Kneel monster.",
+		-- 	Sound = "rbxassetid://18719900541",
+		-- 	Wait = 0.5,
+		-- },
+		-- {
+		-- 	Text = "For your penance... is upon you.",
+		-- 	Sound = "rbxassetid://18719901540",
+		-- 	Wait = 2,
+		-- },
 	},
 }
 --rbxassetid://18265555247

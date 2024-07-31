@@ -52,6 +52,16 @@ local function emitObject(part)
 	end
 end
 
+function module.VisageFire(model, value)
+	for _, barrel in ipairs(model.Apature:GetChildren()) do
+		if barrel.Name ~= "Barrel" then
+			continue
+		end
+
+		barrel.Attachment.Fire.Enabled = value
+	end
+end
+
 function module.GhoulTeleport(position)
 	local effect = effects.GhoulTeleport:Clone()
 	effect.Parent = workspace

@@ -163,11 +163,13 @@ end
 
 function module.HideBossBar(player, ui, frame)
 	frame.BossBar.Visible = false
+	frame.Ammo.Visible = true
 end
 
 function module.reload(player, ui, frame, reloadTime)
 	UiAnimator.PlayAnimation(frame.Reloading, 0.05, true)
 	frame.Reloading.Visible = true
+	frame.Ammo.Visible = false
 
 	local ti = TweenInfo.new(reloadTime, Enum.EasingStyle.Linear)
 
@@ -175,6 +177,7 @@ function module.reload(player, ui, frame, reloadTime)
 	util.tween(frame.Reloading.Image.Prog, ti, { Offset = Vector2.new(0, 0) }, false, function()
 		UiAnimator.StopAnimation(frame)
 		frame.Reloading.Visible = false
+		frame.Ammo.Visible = true
 	end, Enum.PlaybackState.Completed)
 end
 

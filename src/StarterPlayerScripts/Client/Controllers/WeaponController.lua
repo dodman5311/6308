@@ -702,7 +702,7 @@ local function awardKill(model, position)
 	end
 end
 
-local function dealDamage(cframe, subject, damage, source, element)
+function module.dealDamage(cframe, subject, damage, source, element)
 	if not subject or Players:GetPlayerFromCharacter(subject) then
 		return
 	end
@@ -776,6 +776,14 @@ local function dealDamage(cframe, subject, damage, source, element)
 
 		if element and not ChanceService.checkChance(35, true) then
 			element = nil
+		end
+
+		local sourceIsWeapon = module.currentWeapon and source == module.currentWeapon.Name or source == "Default"
+
+		if GiftsService.CheckGift("Burn_Hell") and ChanceService.checkChance(50, true) then
+			if not sourceIsWeapon and source ~= "ThrownWeapon" then
+				net:RemoteEvent("Damage"):FireServer(model, 0, "Fire")
+			end
 		end
 
 		local serverHumanoid, preHealth, postHealth = net:RemoteFunction("Damage")
@@ -1001,7 +1009,7 @@ function module.FireBullet(damage, spread, distance, result, source, element)
 		end
 	end
 
-	local hitHumanoid, subject, damageResult = dealDamage(hitCframe, result.Instance, damage, source, element)
+	local hitHumanoid, subject, damageResult = module.dealDamage(hitCframe, result.Instance, damage, source, element)
 
 	if not hitHumanoid then
 		HitPart(result)
@@ -1362,7 +1370,7 @@ local function ThrowWeapon()
 			for _, hit in ipairs(hits) do
 				local hitCframe = CFrame.new(hit.Position) * camera.CFrame.Rotation
 
-				local humanoid = dealDamage(hitCframe, hit, 2, "ThrownWeapon")
+				local humanoid = module.dealDamage(hitCframe, hit, 2, "ThrownWeapon")
 
 				if not humanoid or humanoid.Health <= 0 then
 					continue
@@ -1783,6 +1791,10 @@ end)
 explosionService.explosiveHit:Connect(function(subject, preHealth, postHealth, damageDelt)
 	if preHealth > 0 then
 		signals.DoUiAction:Fire("HUD", "ShowHit", true)
+
+		if GiftsService.CheckGift("Burn_Hell") and ChanceService.checkChance(50, true) then
+			net:RemoteEvent("Damage"):FireServer(subject, 0, "Fire")
+		end
 	end
 
 	if preHealth > 0 and postHealth <= 0 then -- kill awarded

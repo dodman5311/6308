@@ -19,6 +19,7 @@ local animationService = require(Globals.Vendor.AnimationService)
 local Net = require(Globals.Packages.Net)
 local GiftsService = require(Globals.Client.Services.GiftsService)
 local signals = require(Globals.Signals)
+local timer = require(Globals.Vendor.Timer)
 
 --// Instances
 
@@ -134,10 +135,11 @@ local function startGrapple(c, position, item)
 	return
 end
 
-local function dealDamage(characterHit)
-	-- if not characterHit then
-	-- 	return
-	-- end
+local function dealDamage(characterHit, part)
+	print(characterHit)
+	if not characterHit then
+		return
+	end
 
 	-- local humanoid = characterHit:FindFirstChildOfClass("Humanoid")
 
@@ -150,6 +152,16 @@ local function dealDamage(characterHit)
 	-- 	return
 	-- end
 	-- signals["registerHit"]:Fire(enemyHumanoid, dmgDelt)
+
+	Net:RemoteEvent("SetInvincible", true)
+	signals.DoWeaponAction:Fire("dealDamage", part.CFrame, characterHit, 1, "Brick_Hook")
+
+	signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Brick_Hook")
+	signals.DoUiAction:Fire("HUD", "CooldownGift", true, "Brick_Hook", 1)
+
+	timer.wait(1)
+
+	Net:RemoteEvent("SetInvincible", false)
 end
 
 local function endGrapple()
@@ -191,26 +203,26 @@ local function endGrapple()
 end
 
 local function detectHit(partHit, launchedPart, item)
-	local characterHit --util.getHuman(partHit)
+	local _, characterHit = util.checkForHumanoid(partHit)
+
+	if not partHit:FindFirstAncestor("Map") then
+		print(not characterHit, characterHit == player.Character)
+		if not characterHit or characterHit == player.Character then
+			return
+		end
+	end
 
 	if
-		(
-			not partHit:FindFirstAncestor("Map")
-			and (not characterHit or characterHit == player.Character or not characterHit:FindFirstChild("Humanoid"))
-		)
-		or not partHit.CanCollide
+		not partHit.CanCollide
 		or not partHit.CanQuery
 		or partHit.Transparency >= 0.95
-		or partHit:FindFirstAncestor("Ignore")
 		or partHit:FindFirstAncestor("Camera")
 		or not launchedPart
 	then
 		return
 	end
 
-	task.spawn(function()
-		dealDamage(characterHit)
-	end)
+	task.spawn(dealDamage, characterHit, launchedPart)
 
 	launchedPart.Weld.Part0 = partHit
 
@@ -297,7 +309,7 @@ function module.Activate(item)
 	end)
 end
 
-local cooldown = 0.2
+local cooldown = 1
 
 uis.InputBegan:Connect(function(input, gameProcessedEvent)
 	if gameProcessedEvent or onCooldown then

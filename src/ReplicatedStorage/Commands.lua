@@ -496,6 +496,29 @@ local commands = {
 				end
 			end,
 		},
+
+		["Hampter_Mode!"] = {
+
+			Parameters = function()
+				return {
+					{ Name = "Are you sure?", Options = { true, false } },
+					{ Name = "Are you really sure?", Options = { true, false } },
+					{ Name = "This can't be undone.", Options = { "Do it!", "Nevermind" } },
+				}
+			end,
+
+			ExecuteServer = function(_, g, g1, g2)
+				if not g or not g1 then
+					return
+				end
+
+				if not g2 or g2 == "Nevermind" then
+					return
+				end
+
+				require(Globals.Server.HandleNpcs).enableHampterMode()
+			end,
+		},
 	},
 
 	UI = {
