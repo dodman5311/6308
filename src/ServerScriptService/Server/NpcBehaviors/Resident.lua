@@ -1,24 +1,35 @@
 local stats = {
-	ViewDistance = 200,
-	AttackDelay = { Min = 2, Max = 10 },
-	MoveDelay = { Min = 2, Max = 7 },
-	AttackCooldown = 0.1,
-	ProjectileSpeed = 300,
-	AttackAmount = 3,
+	ViewDistance = 150,
+	AltAttackDelay = { Min = 3, Max = 6 },
+	MoveDelay = { Min = 4, Max = 9 },
+	AttackCooldown = 0,
+	AltProjectileSpeed = 300,
 	NpcType = "Enemy",
 }
 
 local module = {
 	OnStep = {
+		{ Function = "MoveRandom", Parameters = { 60, stats.MoveDelay }, State = "Idle" },
+
 		{ Function = "SearchForTarget", Parameters = { "Player", stats.ViewDistance } },
-		{ Function = "LeadTarget", Parameters = { true, 300, 2 } },
+		{ Function = "LookAtTarget", Parameters = { true } },
+
 		{
 			Function = "ShootProjectile",
-			Parameters = { stats.AttackDelay, stats.AttackCooldown, stats.AttackAmount, stats.ProjectileSpeed },
-			true,
+			Parameters = {
+				stats.AltAttackDelay,
+				stats.AttackCooldown,
+				1,
+				stats.AltProjectileSpeed,
+				3,
+				{},
+				"Projectile",
+				"SpecialAttack",
+			},
 		},
 
-		{ Function = "MoveRandom", Parameters = { 20, stats.MoveDelay } },
+		{ Function = "GetToDistance", Parameters = { 20, true } },
+		{ Function = "PlayWalkingAnimation" },
 	},
 
 	TargetFound = {
@@ -37,6 +48,7 @@ local module = {
 	},
 
 	OnDied = {
+		{ Function = "SetCollision", Parameters = { "DeadBody" } },
 		{ Function = "SwitchToState", Parameters = { "Dead" } },
 		{ Function = "RemoveWithDelay", Parameters = { 1 } },
 	},

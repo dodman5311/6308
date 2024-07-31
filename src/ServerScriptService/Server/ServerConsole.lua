@@ -15,8 +15,13 @@ local doCommandEvent = net:RemoteEvent("DoCommand")
 --// Values
 
 --// Functions
-local function doCommand(player, commandIndex, ...)
-	local command = commands[commandIndex]
+local function doCommand(player, catagory, commandIndex, ...)
+	if not catagory then
+		warn("Not in catagory")
+		return
+	end
+
+	local command = commands[catagory][commandIndex]
 
 	if not command["ExecuteServer"] then
 		return

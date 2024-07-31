@@ -41,6 +41,14 @@ function module:getAnimation(subject, animationName)
 	return animation
 end
 
+function module:getLoadedAnimations(subject)
+	local animList = self.animations[subject]
+	if not animList then
+		return
+	end
+	return animList
+end
+
 function module:playAnimation(subject, animationName, priority, noReplay, ...)
 	local animation = self:getAnimation(subject, animationName)
 

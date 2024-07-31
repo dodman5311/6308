@@ -2,6 +2,7 @@ local module = {}
 
 --// Services
 local Players = game:GetService("Players")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local CollectionService = game:GetService("CollectionService")
@@ -22,8 +23,11 @@ local Net = require(Globals.Packages.Net)
 
 --// Values
 
+local enemiesInCombat = {}
+
 local createProjectileRemote = Net:RemoteEvent("CreateProjectile")
 local rng = Random.new()
+local canFear = false
 
 --// Library Functions
 
@@ -68,6 +72,10 @@ local function getNearest(npc, maxDistance, entityType)
 	if entityType == "Player" then
 		for _, player in ipairs(Players:GetPlayers()) do
 			table.insert(getList, player.Character)
+		end
+
+		for _, player in ipairs(CollectionService:GetTagged("Commrad")) do
+			table.insert(getList, player)
 		end
 	else
 		getList = CollectionService:GetTagged(entityType)
@@ -115,7 +123,62 @@ local function MoveToRandomPosition(npc, MaxDistance, onStep)
 	module.MoveTowardsPoint(npc, PositonToMoveTo, onStep)
 end
 
+local function getTimer(npc, timerName)
+	local foundTimer = npc.Timers[timerName]
+
+	if not foundTimer then
+		npc.Timers[timerName] = npc.Timer:new(timerName)
+		return npc.Timers[timerName]
+	end
+
+	return foundTimer
+end
+
+local function checkFear(npc)
+	local target = npc:GetTarget()
+
+	if not target then
+		return
+	end
+
+	local player = Players:GetPlayerFromCharacter(target)
+	if not player then
+		return
+	end
+
+	local chance
+
+	if canFear then
+		chance = Net:RemoteFunction("CheckChance"):InvokeClient(player, 15, true)
+
+		if chance then
+			Net:RemoteEvent("DoUiAction"):FireClient(player, "Notify", "ShowFeared", true, npc.Instance)
+		end
+
+		return chance
+	end
+
+	if npc.StatusEffects["Electricity"] then
+		chance = Net:RemoteFunction("CheckChance"):InvokeClient(player, 50, true)
+
+		return chance
+	end
+
+	if npc.StatusEffects["Ice"] then
+		return 110
+	end
+end
+
 --// NPC ACTIONS //--
+
+function module.SetCollision(npc, groupName)
+	for _, part in ipairs(npc.Instance:GetDescendants()) do
+		if not part:IsA("BasePart") then
+			continue
+		end
+		part.CollisionGroup = groupName
+	end
+end
 
 function module.AddTag(npc, Tag)
 	npc.Instance:AddTag(Tag)
@@ -130,7 +193,7 @@ function module.MoveToRandomUnit(npc)
 		--local point = getUnit:GetPivot().Position
 
 		local rp = RaycastParams.new()
-		rp.FilterType = Enum.RaycastFilterType.Whitelist
+		rp.FilterType = Enum.RaycastFilterType.Include
 		rp.FilterDescendantsInstances = { map }
 
 		local origin = getUnit:GetPivot()
@@ -190,11 +253,19 @@ function module.PlayAnimation(npc, animationName, priority, noReplay, ...)
 	AnimationService:playAnimation(npc.Instance, animationName, priority, noReplay, ...)
 end
 
-local function createProjectile(speed, cframe, spread)
-	createProjectileRemote:FireAllClients(speed, cframe, spread)
+local function createProjectile(speed, cframe, spread, info, modelName, sender)
+	createProjectileRemote:FireAllClients(speed, cframe, spread, nil, nil, nil, info, sender, modelName)
 end
 
-local function Shoot(npc, cooldown, amount, speed, bulletCount)
+local function createHitCast(npc, damage, cframe, distance, spread)
+	Net:RemoteEvent("CreateBeam"):FireAllClients(npc.Instance, damage, cframe, distance, spread)
+end
+
+function module.Shoot(npc, cooldown, amount, speed, bulletCount, info, visualModel, sender)
+	if npc:GetState() == "Dead" or checkFear(npc) then
+		return
+	end
+
 	if typeof(amount) == "table" then
 		amount = math.random(amount.Min, amount.Max)
 	end
@@ -203,44 +274,96 @@ local function Shoot(npc, cooldown, amount, speed, bulletCount)
 		bulletCount = 1
 	end
 
-	task.spawn(function()
-		for _ = 1, amount do
-			if npc:GetState() == "Dead" then
-				return
-			end
-
-			AnimationService:playAnimation(npc.Instance, "Attack", Enum.AnimationPriority.Action3)
-			if npc.Instance.PrimaryPart:FindFirstChild("Attack") then
-				npc.Instance.PrimaryPart.Attack:Play()
-			end
-
-			local cframe = npc.Instance:GetPivot() * CFrame.new(0, 0, -1)
-
-			for _ = 1, bulletCount do
-				createProjectile(speed, cframe, bulletCount - 1)
-			end
-
-			task.wait(cooldown)
+	for _ = 1, amount do
+		if npc:GetState() == "Dead" then
+			return
 		end
-	end)
+
+		AnimationService:playAnimation(npc.Instance, "Attack", Enum.AnimationPriority.Action3)
+		if npc.Instance.PrimaryPart:FindFirstChild("Attack") then
+			npc.Instance.PrimaryPart.Attack:Play()
+		end
+
+		local cframe = npc.Instance:GetPivot() * CFrame.new(0, 0, -1)
+
+		for _ = 1, bulletCount do
+			createProjectile(speed, cframe, bulletCount - 1, info, visualModel, sender)
+		end
+
+		task.wait(cooldown)
+	end
+
+	if npc.Instance.PrimaryPart and npc.Instance.PrimaryPart:FindFirstChild("AttackEnd") then
+		npc.Instance.PrimaryPart.AttackEnd:Play()
+	end
 end
 
-function module.ShootProjectile(npc, shotDelay, cooldown, amount, speed, bulletCount)
-	if npc.Instance:GetAttribute("State") ~= "Attacking" then
+function module.ShootBeam(npc, damage, chargeTime, distance, bulletCount)
+	if npc:GetState() == "Dead" or checkFear(npc) then
 		return
 	end
 
-	local AttackTimer = npc.Timers.Attack
+	if not bulletCount then
+		bulletCount = 1
+	end
 
-	AttackTimer.WaitTime = shotDelay
-	AttackTimer.Function = Shoot
-	AttackTimer.Parameters = { npc, cooldown, amount, speed, bulletCount }
+	local primaryPart = npc.Instance.PrimaryPart
+	local attackSound = primaryPart:FindFirstChild("ChargedAttack")
+	local chargeSound = primaryPart:FindFirstChild("ChargeUp")
+	local laser = primaryPart:FindFirstChild("ChargedLaser")
+	local Beam = primaryPart:FindFirstChild("ChargedBeam")
 
-	AttackTimer:Run()
+	AnimationService:playAnimation(npc.Instance, "ChargedAttack", Enum.AnimationPriority.Action3)
+
+	if laser then
+		laser.Enabled = true
+	end
+
+	if chargeSound then
+		chargeSound:Play()
+	end
+
+	local beamTimer = getTimer(npc, "RemoveBeam")
+
+	beamTimer.WaitTime = 0.1
+	beamTimer.Function = function()
+		if not Beam then
+			return
+		end
+
+		for i = 0.5, 1, 0.05 do
+			task.wait(0.05)
+			Beam.Transparency = NumberSequence.new(i)
+		end
+
+		Beam.Enabled = false
+	end
+
+	task.wait(chargeTime)
+
+	if laser then
+		laser.Enabled = false
+	end
+
+	if Beam then
+		Beam.Enabled = true
+		Beam.Transparency = NumberSequence.new(0)
+		beamTimer:Run()
+	end
+
+	if attackSound then
+		attackSound:Play()
+	end
+
+	local cframe = npc.Instance:GetPivot()
+
+	for _ = 1, bulletCount do
+		createHitCast(npc, damage, cframe, distance, bulletCount - 1)
+	end
 end
 
 local function swing(npc, distance, stopMovement)
-	if npc:GetState() == "Dead" then
+	if npc:GetState() == "Dead" or checkFear(npc) then
 		return
 	end
 
@@ -261,7 +384,7 @@ local function swing(npc, distance, stopMovement)
 
 	local raycastParams = RaycastParams.new()
 	raycastParams.FilterDescendantsInstances = { npc }
-	raycastParams.CollisionGroup = "Npcs"
+	raycastParams.CollisionGroup = "NpcBullet"
 
 	local shapecast = workspace:Spherecast(cframe.Position, 2, cframe.LookVector * distance, raycastParams)
 
@@ -277,12 +400,70 @@ local function swing(npc, distance, stopMovement)
 	hitHumanoid:TakeDamage(1)
 end
 
+function module.ShootProjectile(npc, shotDelay, cooldown, amount, speed, bulletCount, info, visualModel, timerIndex)
+	if npc.Instance:GetAttribute("State") ~= "Attacking" then
+		return
+	end
+
+	local AttackTimer = getTimer(npc, timerIndex or "ShootAttack")
+
+	AttackTimer.WaitTime = shotDelay
+	AttackTimer.Function = module.Shoot
+	AttackTimer.Parameters = { npc, cooldown, amount, speed, bulletCount, info, visualModel }
+
+	AttackTimer:Run()
+end
+
+function module.ShootPlayerProjectile(
+	npc,
+	shotDelay,
+	cooldown,
+	amount,
+	speed,
+	bulletCount,
+	info,
+	visualModel,
+	timerIndex
+)
+	if npc.Instance:GetAttribute("State") ~= "Attacking" then
+		return
+	end
+
+	local AttackTimer = getTimer(npc, timerIndex or "ShootAttack")
+
+	AttackTimer.WaitTime = shotDelay
+	AttackTimer.Function = module.Shoot
+	AttackTimer.Parameters =
+		{ npc, cooldown, amount, speed, bulletCount, info, visualModel, Players:FindFirstChildOfClass("Player") }
+
+	AttackTimer:Run()
+end
+
+function module.ShootCharge(npc, shotDelay, damage, chargeTime, distance, bulletCount, amount, cooldown)
+	if npc.Instance:GetAttribute("State") ~= "Attacking" then
+		return
+	end
+
+	local AttackTimer = getTimer(npc, "ChargedAttack")
+
+	AttackTimer.WaitTime = shotDelay
+	AttackTimer.Function = function()
+		for _ = 1, amount or 1 do
+			module.ShootBeam(npc, damage, chargeTime, distance, bulletCount)
+			task.wait(cooldown or 0)
+		end
+	end
+	--AttackTimer.Parameters = { npc, damage, chargeTime, distance, bulletCount, cooldown, amount }
+
+	AttackTimer:Run()
+end
+
 function module.AttackInMelee(npc, distance, swingDelay, stopMovement)
 	if npc.Instance:GetAttribute("State") ~= "Attacking" then
 		return
 	end
 
-	local AttackTimer = npc.Timers.Attack
+	local AttackTimer = getTimer(npc, "MeleeAttack")
 
 	AttackTimer.WaitTime = swingDelay
 	AttackTimer.Function = swing
@@ -292,7 +473,7 @@ function module.AttackInMelee(npc, distance, swingDelay, stopMovement)
 end
 
 function module.MoveRandom(npc, MaxDistance, delay)
-	local MoveTimer = npc.Timers.MoveRandom
+	local MoveTimer = getTimer(npc, "MoveRandom")
 
 	MoveTimer.WaitTime = delay
 	MoveTimer.Function = MoveToRandomPosition
@@ -362,6 +543,8 @@ function module.MoveTowardsPoint(npc, point, onStep)
 		return
 	end
 
+	local startState = npc:GetState()
+
 	npc.Janitor:Add(
 		npc.Path.Blocked:Connect(function()
 			npc.Path:Run(point)
@@ -382,6 +565,10 @@ function module.MoveTowardsPoint(npc, point, onStep)
 		npc.Path.Error:Connect(function()
 			npc.Acts:removeAct("OnPath")
 			npc.Janitor:Remove("Pathfind")
+
+			if startState == "Chasing" and npc:IsState("Chasing") then
+				module.SwitchToState(npc, "Idle")
+			end
 		end),
 		"Disconnect",
 		"Pathfinding"
@@ -391,6 +578,10 @@ function module.MoveTowardsPoint(npc, point, onStep)
 		npc.Path.Reached:Connect(function()
 			npc.Acts:removeAct("OnPath")
 			npc.Janitor:Remove("Pathfind")
+
+			if startState == "Chasing" and npc:IsState("Chasing") then
+				module.SwitchToState(npc, "Idle")
+			end
 		end),
 		"Disconnect",
 		"Pathfinding"
@@ -403,6 +594,19 @@ end
 
 function module.SwitchToState(npc, state)
 	npc.Instance:SetAttribute("State", state)
+
+	if state ~= "Idle" and state ~= "Dead" and not table.find(enemiesInCombat, npc) then
+		table.insert(enemiesInCombat, npc)
+		workspace:SetAttribute("EnemiesInCombat", #enemiesInCombat)
+
+		return
+	end
+
+	local getEnemyIndex = table.find(enemiesInCombat, npc)
+	if getEnemyIndex then
+		table.remove(enemiesInCombat, getEnemyIndex)
+		workspace:SetAttribute("EnemiesInCombat", #enemiesInCombat)
+	end
 end
 
 function module.SearchForTarget(npc, targetType, maxDistance)
@@ -431,23 +635,33 @@ function module.LookAtTarget(npc, includeY, doLerp, lerpAlpha)
 	lookAtPostition(npc, position, includeY, doLerp, lerpAlpha)
 end
 
-function module.LeadTarget(npc, includeY, shotSpeed, randomness)
+function module.LeadTarget(npc, includeY, shotSpeed, randomness, ignoreDistance)
 	local target = npc.Target.Value
 	if not target then
 		return
 	end
 
 	local position = target:GetPivot().Position
-	local distance = (position - npc.Instance:GetPivot().Position).Magnitude
+	local distance = 0
+
+	if not ignoreDistance then
+		distance = (position - npc.Instance:GetPivot().Position).Magnitude
+	end
 
 	local randomVector = Vector3.new(
 		rng:NextNumber(-randomness, randomness),
 		rng:NextNumber(-randomness, randomness),
 		rng:NextNumber(-randomness, randomness)
 	)
-	position += ((target.PrimaryPart.AssemblyLinearVelocity * (distance / shotSpeed)) * 1.5) + randomVector
+
+	if not npc.StatusEffects["Electricity"] then
+		position += ((target.PrimaryPart.AssemblyLinearVelocity * (distance / shotSpeed)) * 1.5) + randomVector
+	else
+		position += randomVector
+	end
 
 	lookAtPostition(npc, position, includeY)
+	return position
 end
 
 function module.RemoveWithDelay(npc, delay)
@@ -456,6 +670,26 @@ function module.RemoveWithDelay(npc, delay)
 	end)
 end
 
+function module.SetLeader(npc, leader)
+	npc["Leader"] = leader
+end
+
+function module.Custom(npc, func, ...)
+	return func(npc, ...)
+end
+
 --// Main //--
+
+Net:Connect("GiftAdded", function(player, gift)
+	if gift == "Sierra_6308" then
+		canFear = true
+	end
+end)
+
+Net:Connect("GiftRemoved", function(player, gift)
+	if gift == "Sierra_6308" then
+		canFear = false
+	end
+end)
 
 return module

@@ -2,6 +2,7 @@ local module = {}
 
 --// Services
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local collectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
@@ -13,11 +14,135 @@ local Effects = Assets.Effects
 --// Modules
 local Net = require(Globals.Packages.Net)
 local util = require(Globals.Vendor.Util)
+local signals = require(Globals.Shared.Signals)
+local signal = require(Globals.Packages.Signal)
+
+local explosionService = require(Globals.Client.Services.ExplosionService)
 
 local damageRemote = Net:RemoteEvent("Damage")
 
 --// Values
 local Projectiles = {}
+local isPaused = false
+module.projectileHit = signal.new()
+
+export type Projectile = {
+	["Instance"]: Instance,
+	["Speed"]: number,
+	["LifeTime"]: number,
+	["Age"]: number,
+	["Sender"]: Instance,
+	["Info"]: table,
+	["Damage"]: number,
+	["Piercing"]: number,
+}
+
+module.Presets = {
+	SmartProjectile = {
+		Speed = 200,
+		LifeTime = 5,
+		Info = { Seeking = 0, SeekProgression = 0.2, Size = 0 },
+		Damage = 1,
+		Piercing = 0,
+		Model = "SmartProjectile",
+	},
+
+	SmartSawBlade = {
+		Speed = 100,
+		LifeTime = 5,
+		Info = {
+			SeekProgression = -0.1,
+			Seeking = 1,
+			Dropping = 0.75,
+			Bouncing = true,
+			Size = 0.5,
+		},
+		Damage = 1,
+		Piercing = 3,
+		Model = "BladeProjectile",
+	},
+
+	SmartPellet = {
+		Speed = 200,
+		LifeTime = 5,
+		Info = { Seeking = 0, SeekProgression = 0.025, Size = 0 },
+		Damage = 1,
+		Piercing = 1,
+		Model = "SmartProjectile",
+	},
+
+	SmartLockingProjectile = {
+		Speed = 300,
+		LifeTime = 5,
+		Info = { Seeking = 0, SeekProgression = 0.1, Locked = nil },
+		Damage = 1,
+		Piercing = 0,
+		Model = "SmartProjectile",
+	},
+
+	Bullet = {
+		Speed = 500,
+		LifeTime = 5,
+		Info = {},
+		Damage = 1,
+		Piercing = 0,
+		Model = "PlayerProjectile",
+	},
+
+	Plasma = {
+		Speed = 400,
+		LifeTime = 5,
+		Info = { Size = 2, SplashRange = 8, SplashDamage = 1, ExplosiveColor = Color3.fromRGB(255, 82, 226) },
+		Damage = 1,
+		Piercing = 0,
+		Model = "PlasmaProjectile",
+	},
+
+	AssaultProjectile = {
+		Speed = 500,
+		LifeTime = 5,
+		Info = {},
+		Damage = 1,
+		Piercing = 0,
+		Model = "PlayerProjectile",
+	},
+
+	Harpoon = {
+		Speed = 250,
+		LifeTime = 5,
+		Info = { Dropping = 0.25, Size = 2 },
+		Damage = 2,
+		Piercing = 2,
+		Model = "HarpoonProjectile",
+	},
+
+	ShotgunProjectile = {
+		Speed = 200,
+		LifeTime = 8,
+		Info = {},
+		Damage = 1,
+		Piercing = 0,
+		Model = "RocketProjectile",
+	},
+
+	ExplosivePellet = {
+		Speed = 200,
+		LifeTime = 8,
+		Info = { SplashRange = 10, SplashDamage = 1 },
+		Damage = 1,
+		Piercing = 0,
+		Model = "RocketProjectile",
+	},
+
+	Rocket = {
+		Speed = 300,
+		LifeTime = 10,
+		Info = { SplashRange = 15, SplashDamage = 1 },
+		Damage = 1,
+		Piercing = 0,
+		Model = "RocketProjectile",
+	},
+}
 
 --// Functions
 local function checkPlayer(subject)
@@ -34,28 +159,72 @@ local function checkPlayer(subject)
 		return
 	end
 
-	if not Players:GetPlayerFromCharacter(model) then
+	if not Players:GetPlayerFromCharacter(model) and not model:HasTag("Commrad") then
 		return
 	end
 
 	return model
 end
 
-local function createProjectile(speed, cframe, spread)
+function module.createFromPreset(cframe, spread, presetName, DamageOverride, infoAddition, sender, source)
+	local getPreset = module.Presets[presetName]
+	if not getPreset then
+		warn("There is no such projectile preset by the name of: ", presetName)
+		return
+	end
+
+	local damage = DamageOverride or getPreset.Damage
+	local info = table.clone(getPreset.Info)
+
+	if infoAddition then
+		for i, v in pairs(infoAddition) do
+			info[i] = v
+		end
+	end
+
+	return module.createProjectile(
+		getPreset.Speed,
+		cframe,
+		spread,
+		damage,
+		getPreset.LifeTime,
+		getPreset.Piercing,
+		info,
+		sender,
+		getPreset.Model,
+		source
+	)
+end
+
+function module.createProjectile(speed, cframe, spread, dmg, LifeTime, piercing, extraInfo, sender, model, source)
+	spread *= 1.2
+
 	local offset = CFrame.Angles(util.randomAngle(spread), util.randomAngle(spread), util.randomAngle(spread))
 
-	local newInstance = Effects.EnemyBullet:Clone()
+	local newInstance = model and Effects:FindFirstChild(model):Clone() or Effects.Projectile:Clone()
 	newInstance.Parent = workspace.Ignore
 	newInstance.CFrame = cframe * offset
+
+	local localScript = newInstance:FindFirstChildOfClass("LocalScript")
+	if localScript then
+		localScript.Enabled = true
+	end
 
 	local newProjectile = {
 		Instance = newInstance,
 		Speed = speed,
-		LifeTime = 5,
+		LifeTime = LifeTime or 5,
 		Age = 0,
+		Sender = sender,
+		Info = extraInfo or {},
+		Damage = dmg or 1,
+		Piercing = piercing or 0,
+		Source = source,
+		RecentHits = {},
 	}
 
 	table.insert(Projectiles, newProjectile)
+	return newProjectile
 end
 
 local function checkRaycast(projectile, raycastDistance)
@@ -66,33 +235,163 @@ local function checkRaycast(projectile, raycastDistance)
 	local cframe = projectile.Instance.CFrame
 
 	local rp = RaycastParams.new()
-	rp.CollisionGroup = "NpcBullet"
+	rp.FilterDescendantsInstances = projectile.RecentHits
+	rp.FilterType = Enum.RaycastFilterType.Exclude
+	rp.CollisionGroup = "Bullet"
 
-	local newRaycast = workspace:Spherecast(cframe.Position, 0.5, cframe.LookVector * raycastDistance, rp)
+	if not projectile.Sender then
+		rp.CollisionGroup = "NpcBullet"
+	end
+
+	local newRaycast
+
+	local size = projectile.Info["Size"]
+
+	if size == 0 then
+		newRaycast = workspace:Raycast(cframe.Position, cframe.LookVector * raycastDistance, rp)
+	else
+		newRaycast = workspace:Spherecast(cframe.Position, size or 0.25, cframe.LookVector * raycastDistance, rp)
+	end
 
 	return newRaycast
 end
 
+local function fireBeam(npc, damage, cframe, distance, spread)
+	local offset = CFrame.Angles(util.randomAngle(spread), util.randomAngle(spread), util.randomAngle(spread))
+	cframe *= offset
+
+	local raycastParams = RaycastParams.new()
+	raycastParams.FilterDescendantsInstances = { npc }
+	raycastParams.CollisionGroup = "NpcBullet"
+
+	local raycast = workspace:Spherecast(cframe.Position, 0.75, cframe.LookVector * distance, raycastParams)
+
+	if not raycast then
+		return
+	end
+
+	damageRemote:FireServer(raycast.Instance, damage)
+end
+
 --// Main //--
 
-Net:Connect("CreateProjectile", createProjectile)
+Net:Connect("CreateProjectile", module.createProjectile)
+Net:Connect("CreateBeam", fireBeam)
 
 local lastRenderStep = os.clock()
 
-RunService.RenderStepped:Connect(function()
-	for _, projectile in ipairs(Projectiles) do
+local function processStep(timePassed, projectile: Projectile)
+	local distanceMoved = timePassed * projectile.Speed
+	projectile.Instance.CFrame *= CFrame.new(0, 0, -(distanceMoved + 0.1))
+
+	--- extra ---
+
+	if projectile.Info["Dropping"] then
+		local angle = projectile.Instance.CFrame:ToOrientation()
+		if angle > -1.4 then
+			projectile.Instance.CFrame *= CFrame.Angles(-math.rad(projectile.Info["Dropping"]), 0, 0)
+		end
+	end
+
+	if projectile.Info["Slowing"] then
+		projectile.Speed = math.clamp(projectile.Speed - projectile.Info["Slowing"], 0, math.huge)
+	end
+
+	if projectile.Info["Seeking"] then
+		local list
+
+		if projectile.Sender and projectile.Sender:IsA("Player") then
+			list = collectionService:GetTagged("Enemy")
+		else
+			list = {}
+			for _, plr in ipairs(Players:GetPlayers()) do
+				table.insert(list, plr.Character)
+			end
+		end
+
+		local nearestEnemy, enemyDistance, position
+
+		if projectile.Info["Locked"] then
+			nearestEnemy = projectile.Info["Locked"]
+			position = nearestEnemy:GetPivot().Position
+		else
+			nearestEnemy, enemyDistance, position =
+				util.getNearestEnemy(projectile.Instance.Position, projectile.Info["SeekDistance"] or 40, list, true)
+		end
+
+		if nearestEnemy then
+			local rp = RaycastParams.new()
+
+			rp.FilterType = Enum.RaycastFilterType.Include
+			rp.FilterDescendantsInstances = { workspace.Map }
+
+			local projectilePosition = projectile.Instance.Position
+
+			if workspace:Raycast(projectilePosition, position - projectilePosition, rp) then
+				return distanceMoved
+			end
+
+			projectile.Instance.CFrame = projectile.Instance.CFrame:Lerp(
+				CFrame.lookAt(projectilePosition, position),
+				math.clamp(projectile.Info["Seeking"], 0, 1)
+			)
+
+			projectile.Info["Seeking"] += projectile.Info["SeekProgression"] or 0
+
+			if projectile.Info["SeekSpeeding"] then
+				projectile.Speed = math.clamp(projectile.Speed + projectile.Info["SeekSpeeding"], 0, math.huge)
+			end
+		end
+	end
+
+	return distanceMoved
+end
+
+local function removeProjectileInstance(projectile)
+	projectile.Instance.Transparency = 1
+
+	for _, effect in ipairs(projectile.Instance:GetChildren()) do
+		if not (effect:IsA("PointLight") or effect:IsA("ParticleEmitter") or effect:IsA("Trail")) then
+			continue
+		end
+
+		effect.Enabled = false
+	end
+
+	task.delay(projectile.Instance:GetAttribute("RemoveDelay") or 0, function()
+		projectile.Instance:Destroy()
+	end)
+end
+
+function module.reflectProjectile(projectile, result)
+	if not projectile.Instance then
+		return
+	end
+
+	local cframe = projectile.Instance.CFrame
+	local direction = cframe.LookVector
+	local reflectedDirection = direction - (2 * direction:Dot(result.Normal) * result.Normal)
+	local newCFrame = CFrame.new(cframe.Position, cframe.Position + reflectedDirection)
+
+	projectile.Instance.CFrame = newCFrame
+end
+
+RunService.Heartbeat:Connect(function()
+	if isPaused then
+		return
+	end
+
+	for _, projectile: Projectile in ipairs(Projectiles) do
 		if projectile.Age >= projectile.LifeTime then
 			projectile.Instance:Destroy()
 			table.remove(Projectiles, table.find(Projectiles, projectile))
 			continue
 		end
 
-		local timePassed = lastRenderStep - os.clock()
-
+		local timePassed = os.clock() - lastRenderStep
 		projectile.Age += timePassed
 
-		local distanceMoved = -timePassed * projectile.Speed
-		projectile.Instance.CFrame *= CFrame.new(0, 0, -(distanceMoved + 0.1))
+		local distanceMoved = processStep(timePassed, projectile)
 
 		local raycast = checkRaycast(projectile, distanceMoved)
 
@@ -100,16 +399,60 @@ RunService.RenderStepped:Connect(function()
 			continue
 		end
 
-		local hitModel = checkPlayer(raycast.Instance)
-		if hitModel then
-			damageRemote:FireServer(hitModel, 1)
+		local isMap = raycast.Instance:FindFirstAncestor("Map")
+
+		if projectile.Info["Bouncing"] and isMap then
+			module.reflectProjectile(projectile, raycast)
+			continue
 		end
 
-		projectile.Instance:Destroy()
+		local hitModel = checkPlayer(raycast.Instance)
+
+		if projectile.Sender and projectile.Sender:IsA("Player") then
+			hitModel = raycast.Instance:FindFirstAncestorOfClass("Model")
+			if hitModel and (hitModel:HasTag("Commrad") or Players:GetPlayerFromCharacter(hitModel)) then
+				continue
+			end
+
+			module.projectileHit:Fire(raycast, projectile)
+		elseif hitModel then
+			damageRemote:FireServer(hitModel, projectile.Damage)
+		end
+
+		if projectile.Info["SplashRange"] then
+			explosionService.createExplosion(
+				raycast.Position,
+				projectile.Info.SplashRange,
+				projectile.Info["SplashDamage"] or 1,
+				projectile.Sender,
+				projectile.Info.ExplosiveColor
+			)
+		end
+
+		table.insert(projectile.RecentHits, hitModel)
+
+		if not hitModel or hitModel.Name == "Map" then
+			projectile.Piercing -= 1
+		end
+
+		if projectile.Piercing > 0 then
+			projectile.Piercing -= 1
+			continue
+		end
+
+		removeProjectileInstance(projectile)
 		table.remove(Projectiles, table.find(Projectiles, projectile))
 	end
 
 	lastRenderStep = os.clock()
+end)
+
+signals.PauseGame:Connect(function()
+	isPaused = true
+end)
+
+signals.ResumeGame:Connect(function()
+	isPaused = false
 end)
 
 return module

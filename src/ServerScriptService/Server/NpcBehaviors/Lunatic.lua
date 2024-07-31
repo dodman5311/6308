@@ -2,7 +2,7 @@ local stats = {
 	ViewDistance = 100,
 
 	AttackDistance = 5,
-	AttackDelay = { Min = 0.4, Max = 1 },
+	AttackDelay = 0.4,
 
 	NpcType = "Enemy",
 }
@@ -43,6 +43,7 @@ local module = {
 	},
 
 	OnDied = {
+		{ Function = "SetCollision", Parameters = { "DeadBody" } },
 		{ Function = "SwitchToState", Parameters = { "Dead" } },
 		{ Function = "RemoveWithDelay", Parameters = { 1 } },
 	},

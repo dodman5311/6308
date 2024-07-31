@@ -1,6 +1,7 @@
 local module = {
 	shakeCFrame = CFrame.new(),
 	globalSway = Vector2.new(),
+	viewBobbingEnabled = true,
 }
 
 local players = game:GetService("Players")
@@ -17,6 +18,9 @@ local cameraShaker = require(Globals.Packages.CameraShaker)
 local util = require(Globals.Vendor.Util)
 local spring = require(Globals.Vendor.Spring)
 local ViewmodelService = require(Globals.Vendor.ViewmodelService)
+local signals = require(Globals.Signals)
+
+local Acts = require(Globals.Vendor.Acts)
 
 local maxTiltAngle = 50
 
@@ -32,9 +36,13 @@ local r = Vector3.new()
 local lastBobStep = os.clock()
 
 local isWalking = false
+local isPaused = false
+local pauseStep
 
 local function ShakeCamera(shakeCf)
-	module.shakeCFrame = shakeCf
+	if not isPaused then
+		module.shakeCFrame = shakeCf
+	end
 	camera.CFrame = camera.CFrame * shakeCf
 end
 
@@ -46,7 +54,7 @@ local function calculateViewmodelWalkSway()
 	local dt = os.clock() - lastBobStep
 	lastBobStep = os.clock()
 
-	if isWalking then
+	if isWalking and not Acts:checkAct("slide") then
 		i += dt * 35
 		p += Vector3.new(math.sin(i / 4) * 0.8, math.sin(i / 2 - 0.4)) / 8 / damp / 10
 		r += Vector3.new(math.sin(i / 2) / 5, math.cos(i / 4 - 0.3) / 4, math.sin(i / 4 - 0.4) / 3) / 20 / (damp * 5)
@@ -63,8 +71,14 @@ local function calculateViewmodelWalkSway()
 	viewmodel:UpdateSpring("bobbingRotationSpring", "Target", (r * 2) * magnitude)
 end
 
+-- function module.ShakeCamera(presetName)
+-- 	local preset = cameraShaker.Presets[presetName]
+
+-- 	module.camShake:Shake()
+-- end
+
 local function bobbing()
-	if isWalking then
+	if isWalking and module.viewBobbingEnabled then
 		module.camShake:ShakeSustain(cameraShaker.Presets["WalkBobbing"])
 	else
 		module.camShake:StopSustained(0.2)
@@ -128,15 +142,15 @@ local function runCameraTilt()
 	camera.CFrame *= CFrame.new() * CFrame.Angles(0, 0, tilt)
 end
 
-local function runCamera(dt)
+local function runCamera()
 	runCameraSway()
 	runCameraTilt()
 
 	checkWalking()
-	calculateViewmodelWalkSway(dt)
+	calculateViewmodelWalkSway()
 end
 
-function module:OnSpawn()
+function module:OnSpawn(character)
 	local viewmodel = ViewmodelService.viewModels[1]
 
 	viewmodel:SetSpring("bobbingRotationSpring", "Rotation", Vector3.zero, 20, 0.4)
@@ -145,11 +159,42 @@ function module:OnSpawn()
 	RunService:BindToRenderStep("runCamera", Enum.RenderPriority.Camera.Value + 1, runCamera)
 
 	player.CameraMode = Enum.CameraMode.LockFirstPerson
-	camera.FieldOfView = 70
+	camera.CameraType = Enum.CameraType.Custom
+	camera.CameraSubject = character:WaitForChild("Humanoid")
+
+	camera.FieldOfView = 100
+	local ti = TweenInfo.new(0.5, Enum.EasingStyle.Exponential)
+
+	util.tween(camera, ti, { FieldOfView = 70 })
 end
 
 function module:OnDied()
 	RunService:UnbindFromRenderStep("runCamera")
 end
+
+signals.PauseGame:Connect(function()
+	if pauseStep then
+		return
+	end
+
+	local logCFrame = camera.CFrame
+	isPaused = true
+	camera.CameraType = Enum.CameraType.Scriptable
+
+	pauseStep = RunService.RenderStepped:Connect(function()
+		camera.CFrame = logCFrame
+	end)
+end)
+
+signals.ResumeGame:Connect(function()
+	if not pauseStep then
+		return
+	end
+
+	isPaused = false
+	camera.CameraType = Enum.CameraType.Custom
+	pauseStep:Disconnect()
+	pauseStep = nil
+end)
 
 return module

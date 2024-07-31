@@ -12,11 +12,34 @@ local allSignals = {
 	"GenerateMap",
 	"NpcHeartbeat",
 	"ProceedToNextLevel",
+	"StartArena",
 }
 
 net:RemoteEvent("ReplicateEffect")
 net:RemoteEvent("Damage")
 net:RemoteEvent("DropSoul")
+net:RemoteEvent("SetBlocking")
+net:RemoteEvent("SetInvincible")
+net:RemoteEvent("CreateBeam")
+net:RemoteFunction("GetMaxCombo")
+net:RemoteEvent("StopMusic")
+net:RemoteEvent("BossExit")
+net:RemoteEvent("UpdatePlayerHealth")
+
+net:RemoteEvent("PauseGame")
+net:RemoteEvent("ResumeGame")
+
+net:RemoteEvent("GiftAdded")
+net:RemoteEvent("GiftRemoved")
+net:RemoteEvent("DoUiAction")
+net:RemoteEvent("OpenKiosk")
+net:RemoteEvent("SetArmor")
+net:RemoteEvent("CreateExplosion")
+
+net:RemoteEvent("DropArmor")
+net:RemoteEvent("PickupWeapon")
+
+net:RemoteFunction("CheckChance")
 
 for _, signal in ipairs(allSignals) do
 	Signals:addSignal(signal)

@@ -1,5 +1,6 @@
 local module = {
 	fullUi = {},
+	isLoaded = false,
 }
 
 --// Services
@@ -19,6 +20,7 @@ local player = players.LocalPlayer
 --// Modules
 local signals = require(Globals.Signals)
 local acts = require(Globals.Vendor.Acts)
+local net = require(Globals.Packages.Net)
 
 --// Values
 local uiMods = {}
@@ -47,6 +49,8 @@ function module.getFullUi()
 			module.fullUi[ui.Name][uiElement.Name] = uiElement
 		end
 	end
+
+	module.isLoaded = true
 end
 
 function module.doUiAction(uiName, action, doWithoutAct, ...)
@@ -63,13 +67,13 @@ function module.doUiAction(uiName, action, doWithoutAct, ...)
 
 	local args = { ... }
 
-	if doWithoutAct then
-		return getModule[action](player, module.fullUi, module.fullUi[uiName], ...)
-	else
-		return acts:createTempAct(uiName .. "_" .. action, function()
-			return getModule[action](player, module.fullUi, module.fullUi[uiName], table.unpack(args))
-		end)
-	end
+	--if doWithoutAct then
+	return getModule[action](player, module.fullUi, module.fullUi[uiName], ...)
+	-- else
+	-- 	return acts:createTempAct(uiName .. "_" .. action, function()
+	-- 		return getModule[action](player, module.fullUi, module.fullUi[uiName], table.unpack(args))
+	-- 	end)
+	-- end
 end
 
 function module.CleanUp(uiToClean)
@@ -97,5 +101,6 @@ end
 
 starterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
 signals.DoUiAction:Connect(module.doUiAction)
+net:Connect("DoUiAction", module.doUiAction)
 
 return module

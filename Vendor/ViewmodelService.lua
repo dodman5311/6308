@@ -16,9 +16,12 @@ local camera = workspace.CurrentCamera
 
 --// Modules
 local spring = require(vendor.Spring)
+local signals = require(globals.Shared.Signals)
 
 --// Values
 local currentCameraOffset = CFrame.new()
+
+local isPaused = false
 
 --// Functions
 local function HandleBaseOffsets(viewModel, baseC0)
@@ -35,7 +38,7 @@ end
 
 local function roundVector(vector, factor)
 	if not factor then
-		factor = 50
+		factor = 25
 	end
 
 	if typeof(vector) == "Vector2" then
@@ -92,7 +95,11 @@ local function PositionViewModel(viewModel)
 		goal *= frame
 	end
 
-	viewModel.Model:PivotTo(goal * currentCameraOffset:Inverse())
+	if not isPaused then
+		viewModel.Goal = goal
+	end
+
+	viewModel.Model:PivotTo(viewModel.Goal * currentCameraOffset:Inverse())
 end
 
 function module.new()
@@ -198,6 +205,14 @@ RunService:BindToRenderStep("RunViewmodels", Enum.RenderPriority.Character.Value
 	end
 
 	camera.CFrame *= currentCameraOffset
+end)
+
+signals.PauseGame:Connect(function()
+	isPaused = true
+end)
+
+signals.ResumeGame:Connect(function()
+	isPaused = false
 end)
 
 --// Main //--

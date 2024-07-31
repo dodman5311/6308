@@ -51,16 +51,23 @@ local function tween(instance, tweenInfo, propertyTable)
 	return newTween
 end
 
-function util.getNearestEnemy(position, maxDistance, parent)
+function util.getNearestEnemy(position, maxDistance, list)
 	local closest = math.huge
 	local enemy
 	local enemyPosition
 
-	for _, foundEnemy in ipairs(parent:GetChildren()) do
+	for _, foundEnemy: Model in ipairs(list) do
 		local distance = (position - foundEnemy:GetPivot().Position).Magnitude
 		if distance > maxDistance then
 			continue
 		end
+
+		local hasPart = foundEnemy:FindFirstChildOfClass("Part")
+
+		if not hasPart then
+			continue
+		end
+
 		local humanoid = foundEnemy:FindFirstChildOfClass("Humanoid")
 		if not humanoid or humanoid.Health <= 0 then
 			continue
@@ -89,7 +96,7 @@ function util.circleCurve(t)
 	return math.sqrt(1 - (2 * t - 1) ^ 2)
 end
 
-function util.tween(instance, tweenInfo, propertyTable, yield, endingFunction, endingState)
+function util.tween(instance, tweenInfo, propertyTable, yield, endingFunction, endingState: Enum.PlaybackState)
 	local createdTween
 
 	if typeof(instance) == "table" then

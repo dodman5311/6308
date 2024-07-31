@@ -1,5 +1,6 @@
 local module = {}
 
+local signal = require(script.signal)
 local RunService = game:GetService("RunService")
 
 local animations = {}
@@ -30,6 +31,11 @@ function module.PlayAnimation(frame, frameDelay, loop, stayOnLastFrame)
 		Connection = nil,
 
 		RunAnimation = function(self)
+			if self.Paused then
+				lastFrameStep = os.clock()
+				return
+			end
+
 			if not frame or not frame.Parent then
 				module.StopAnimation(frame)
 				return
@@ -55,9 +61,7 @@ function module.PlayAnimation(frame, frameDelay, loop, stayOnLastFrame)
 				y = 0
 
 				if not loop then
-					if self.OnEnded.func then
-						task.spawn(self.OnEnded.func)
-					end
+					self.OnEnded:Fire()
 
 					if not stayOnLastFrame then
 						image.Position = UDim2.fromScale(x, y)
@@ -71,26 +75,34 @@ function module.PlayAnimation(frame, frameDelay, loop, stayOnLastFrame)
 
 			image.Position = UDim2.fromScale(-x, -y)
 
-			if self.OnFrame.func then
-				task.spawn(self.OnFrame.func, currentFrame)
+			for _, v in ipairs(self.framesToHit) do
+				if currentFrame ~= v[1] then
+					continue
+				end
+				v[2]:Fire(currentFrame, image.Position)
 			end
 
 			lastFrameStep = os.clock()
 		end,
 
-		OnEnded = {
-			func = nil,
-			Connect = function(self, callBack)
-				self.func = callBack
-			end,
-		},
+		framesToHit = {},
 
-		OnFrame = {
-			func = nil,
-			Connect = function(self, callBack)
-				self.func = callBack
-			end,
-		},
+		OnEnded = signal.new(),
+
+		OnFrameRached = function(self, Frame: number)
+			local reachedSignal = signal.new()
+			table.insert(self.framesToHit, { Frame, reachedSignal })
+
+			return reachedSignal
+		end,
+
+		Pause = function(self)
+			self.Paused = true
+		end,
+
+		Resume = function(self)
+			self.Paused = false
+		end,
 	}
 
 	newAnimation.Connection = RunService.Heartbeat:Connect(function()

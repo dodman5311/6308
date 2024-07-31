@@ -52,6 +52,37 @@ local function emitObject(part)
 	end
 end
 
+function module.GhoulTeleport(position)
+	local effect = effects.GhoulTeleport:Clone()
+	effect.Parent = workspace
+	effect.Position = position
+	effect.ParticleEmitter:Emit(effect.ParticleEmitter:GetAttribute("EmitCount"))
+	DEBRIS:AddItem(effect, 2)
+end
+
+function module.ElectrifyPart(part)
+	part.Smoke.Enabled = true
+	task.wait(1.1)
+	part.Electricity.Enabled = true
+	task.wait(5)
+	part.Electricity.Enabled = false
+	part.Smoke.Enabled = false
+end
+
+function module.EnemySpawned(position)
+	local spawnEffect = effects.SpawnEnemy:Clone()
+	DEBRIS:AddItem(spawnEffect, 5)
+
+	spawnEffect.Parent = workspace
+	spawnEffect.Position = position + Vector3.new(0, -5, 0)
+
+	local ti = TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.In)
+	util.tween(spawnEffect.Beam, ti, { Width1 = 0 })
+
+	util.PlaySound(sounds.Teleport, spawnEffect, 0.15)
+	util.PlaySound(sounds.Voices, spawnEffect, 0.1)
+end
+
 function module.Dash(subject, goal)
 	local newEffect = effects.DashEffect:Clone()
 	newEffect.Parent = workspace
@@ -115,6 +146,50 @@ function module.Explode(position, size)
 	end)
 
 	module.shakeFromExplosion(position, size)
+end
+
+function module.AddElementalEffect(elementName, npcModel: Model)
+	if npcModel:FindFirstChild(elementName) then
+		return
+	end
+
+	local newEffect = assets.Effects.Elements:FindFirstChild(elementName):Clone()
+	newEffect.Parent = npcModel
+	newEffect.Name = elementName
+
+	local primaryPart = npcModel.PrimaryPart or npcModel:FindFirstChild("Hitbox")
+
+	if not primaryPart then
+		newEffect.Anchored = true
+		newEffect.CFrame = npcModel:GetPivot()
+		return
+	end
+
+	local newWeld = Instance.new("Weld")
+	newWeld.Parent = newEffect
+	newWeld.Part0 = primaryPart
+	newWeld.Part1 = newEffect
+
+	newEffect.Size = npcModel:GetExtentsSize()
+end
+
+function module.RemoveElementalEffect(elementName, npcModel)
+	local element = npcModel:FindFirstChild(elementName)
+
+	if not element then
+		return
+	end
+
+	element.Name = "EffectMarkedForRemoval"
+	DEBRIS:AddItem(element, 5)
+
+	for _, particle in ipairs(element:GetChildren()) do
+		if not particle:IsA("ParticleEmitter") then
+			continue
+		end
+
+		particle.Enabled = false
+	end
 end
 
 function module.createEffect(effectName, sender, replicated, ...)

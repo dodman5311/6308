@@ -12,6 +12,7 @@ local camera = workspace.CurrentCamera
 
 local assets = ReplicatedStorage.Assets
 local sounds = assets.Sounds
+local sfx = sounds.DeliverEffects
 
 --// Modules
 local util = require(Globals.Vendor.Util)
@@ -19,10 +20,15 @@ local acts = require(Globals.Vendor.Acts)
 local UiAnimator = require(Globals.Vendor.UIAnimationService)
 local MouseOver = require(Globals.Vendor.MouseOverModule)
 local Signals = require(Globals.Shared.Signals)
+local Signal = require(Globals.Packages.Signal)
 local Gifts = require(Globals.Shared.Gifts)
 local GiftsService = require(Globals.Client.Services.GiftsService)
+local SoulsService = require(Globals.Client.Services.SoulsService)
+local net = require(Globals.Packages.Net)
+local musicService = require(Globals.Client.Services.MusicService)
 
 local deliveryAmount = 0
+module.onHidden = Signal.new()
 
 --// Values
 
@@ -45,6 +51,8 @@ local function updateDeliveryText(frame)
 end
 
 local function increaseDelivery(frame)
+	sfx.Select:Play()
+
 	deliveryAmount += 0.5
 
 	if deliveryAmount > 1 then
@@ -55,6 +63,8 @@ local function increaseDelivery(frame)
 end
 
 local function decreaseDelivery(frame)
+	sfx.Select:Play()
+
 	deliveryAmount -= 0.5
 
 	if deliveryAmount < 0 then
@@ -84,21 +94,24 @@ function module.Init(player, ui, frame)
 	frame.IncreaseButton.MouseButton1Click:Connect(function()
 		increaseDelivery(frame)
 	end)
+
+	local enter, leave = MouseOver.MouseEnterLeaveEvent(frame.DeliveryAmount)
+
+	enter:Connect(function()
+		frame.DeliveryAmount.TextColor3 = Color3.fromRGB(0, 255, 225)
+		frame.DeliveryAmount.UIStroke.Color = Color3.fromRGB(13, 82, 60)
+	end)
+
+	leave:Connect(function()
+		frame.DeliveryAmount.TextColor3 = Color3.fromRGB(255, 255, 255)
+		frame.DeliveryAmount.UIStroke.Color = Color3.fromRGB(82, 82, 82)
+	end)
 end
 
 function module.Cleanup(player, ui, frame) end
 
 function module.UpdateSouls(_, _, frame, amount)
-	local soulsFrame = frame.Souls
-	local label = soulsFrame.Count
-
-	local loggedAmount = label.Text
-
-	if tonumber(loggedAmount) < amount then
-		UiAnimator.PlayAnimation(soulsFrame, 0.045)
-	end
-
-	label.Text = amount
+	frame.Souls.Count.Text = amount
 end
 
 local function getRandomGiftFromDictionary(type)
@@ -121,13 +134,61 @@ local function getRandomGiftFromDictionary(type)
 	return selectedKey, dictionary[selectedKey]
 end
 
-function module.ShowScreen(player, ui, frame, souls)
+function module.fakeScreen(player, ui, frame)
+	local ti = TweenInfo.new(0.25, Enum.EasingStyle.Linear)
+
+	util.tween(frame.Fade, ti, { BackgroundTransparency = 0 })
+	task.wait(1)
+	util.tween(frame.Fade, ti, { BackgroundTransparency = 1 })
+
+	--musicService.playMusic()
+	task.delay(0.1, function()
+		module.onHidden:Fire()
+	end)
+	return module.onHidden
+end
+
+local function causeHunger(player, ui, frame)
+	local maxHealth = player.Character.Humanoid.MaxHealth
+
+	if deliveryAmount > 0 and SoulsService.Souls > 0 then
+		if maxHealth >= 5 then
+			return
+		end
+
+		net:RemoteEvent("UpdatePlayerHealth"):FireServer(maxHealth + 1)
+		module.showDescription(frame, { Desc = "Drav's hunger is partially restored. (+1 Max HP)" })
+
+		return
+	end
+
+	if maxHealth > 1 then
+		net:RemoteEvent("UpdatePlayerHealth"):FireServer(maxHealth - 1)
+		module.showDescription(frame, { Desc = "Drav is starved. (-1 Max HP)" })
+	else
+		Signals.ClearGifts:Fire()
+		Signals.AddGift:Fire("Drav_Is_Dead")
+		ui.HUD.Frame.Souls.Image.ImageColor3 = Color3.new(0.35, 0.35, 0.35)
+		ui.HUD.Frame.Souls.Count.TextColor3 = Color3.new(0.35, 0.35, 0.35)
+		SoulsService.RemoveSoul(SoulsService.Souls)
+		module.showDescription(frame, { Desc = "Drav has starved to death. (You've killed your friend)" })
+	end
+end
+
+function module.ShowScreen(player, ui, frame)
+	if GiftsService.CheckGift("Drav_Is_Dead") then
+		return module.fakeScreen(player, ui, frame)
+	end
+
+	musicService.playTrack("Delivery", 1)
+
+	sfx.Open_Deliver:Play()
+	sfx.Open_Growl:Play()
+
 	module.emptyGiftSlot(player, ui, frame)
 
-	local clickDeliver
-
 	deliveryAmount = 0
-	module.UpdateSouls(player, ui, frame, souls)
+	module.UpdateSouls(player, ui, frame, SoulsService.Souls)
 
 	local ti = TweenInfo.new(0.25, Enum.EasingStyle.Linear)
 	frame.Cursor.Visible = true
@@ -142,6 +203,9 @@ function module.ShowScreen(player, ui, frame, souls)
 	frame.Demon.Visible = true
 	frame.Box.Visible = true
 	frame.Gift.Visible = true
+
+	frame.LeftButton.Visible = true
+	frame.RightButton.Visible = true
 
 	frame.Label.ImageTransparency = 0
 
@@ -163,17 +227,25 @@ function module.ShowScreen(player, ui, frame, souls)
 
 	task.wait(0.25)
 
-	clickDeliver = frame.DeliveryAmount.MouseButton1Click:Connect(function()
-		clickDeliver:Disconnect()
-
+	frame.DeliveryAmount.MouseButton1Click:Once(function()
+		sfx.Deliver:Play()
 		local giftType = "Perks"
 
 		if deliveryAmount > 0.5 then
 			giftType = "Upgrades"
 		end
 
-		if deliveryAmount <= 0 or souls <= 1 or not getRandomGiftFromDictionary(giftType) then
-			frame.Fade.BackgroundTransparency = 0
+		if deliveryAmount <= 0 or SoulsService.Souls <= 1 or not getRandomGiftFromDictionary(giftType) then
+			frame.Cursor.Visible = false
+
+			util.tween(frame.Fade, ti, { BackgroundTransparency = 0 }, true)
+
+			causeHunger(player, ui, frame)
+
+			if SoulsService.Souls == 1 then
+				SoulsService.RemoveSoul(1)
+				module.UpdateSouls(player, ui, frame, SoulsService.Souls)
+			end
 
 			frame.Frame.Visible = false
 			frame.Background.Visible = false
@@ -181,15 +253,18 @@ function module.ShowScreen(player, ui, frame, souls)
 
 			util.tween(frame.Fade, ti, { BackgroundTransparency = 1 })
 
+			module.onHidden:Fire()
 			return
 		end
 
-		module.UpdateSouls(player, ui, frame, math.round(souls - (souls * deliveryAmount)))
-		Signals.RemoveSoul:Fire((souls * deliveryAmount))
+		SoulsService.RemoveSoul(SoulsService.Souls * deliveryAmount)
+		module.UpdateSouls(player, ui, frame, SoulsService.Souls)
 
 		local chosenGift = module.chooseRandomGift(player, ui, frame, giftType)
 		module.TakeDelivery(player, ui, frame, chosenGift)
 	end)
+
+	return module.onHidden
 end
 
 local function loadToGiftsSlot(frame, type)
@@ -239,9 +314,11 @@ function module.chooseRandomGift(player, ui, frame, type)
 
 	Signals.AddGift:Fire(name)
 
-	frame.GiftName.Text = name
+	frame.GiftName.Text = string.gsub(name, "_", " ")
 
 	task.wait(0.5)
+
+	sfx.Unlocked_Perk:Play()
 
 	util.tween(frame.GiftName, ti, { TextTransparency = 0 })
 	util.tween(frame.GiftName.UIStroke, ti, { Transparency = 0 }, true)
@@ -256,7 +333,7 @@ function module.chooseRandomGift(player, ui, frame, type)
 	return randomGift
 end
 
-local function showDescription(frame, gift)
+function module.showDescription(frame, gift)
 	local ti = TweenInfo.new(1, Enum.EasingStyle.Linear)
 
 	frame.Fade.BackgroundTransparency = 0
@@ -264,26 +341,52 @@ local function showDescription(frame, gift)
 	frame.Desc.Text = gift.Desc
 
 	util.tween(frame.Fade, ti, { BackgroundTransparency = 1 }, true)
-	util.tween(frame.Desc, ti, { TextTransparency = 0 }, true)
 
-	task.wait(3)
+	sfx.Show_Description:Play()
+
+	util.tween(frame.Desc, ti, { TextTransparency = 0 }, true)
+	util.tween(frame.ClickPrompt, ti, { TextTransparency = 0 })
+
+	local skipKeyPressed = false
+
+	local keyPressed = UserInputService.InputBegan:Connect(function(input)
+		if
+			input.UserInputType == Enum.UserInputType.MouseButton1
+			or input.UserInputType == Enum.UserInputType.Touch
+			or input.KeyCode == Enum.KeyCode.ButtonX
+		then
+			skipKeyPressed = true
+		end
+	end)
+
+	repeat
+		task.wait()
+	until skipKeyPressed
+	keyPressed:Disconnect()
 
 	util.tween(frame.Fade, ti, { BackgroundTransparency = 0 }, true)
 	frame.Desc.TextTransparency = 1
+	frame.ClickPrompt.TextTransparency = 1
+
+	frame.Frame.Visible = false
 end
 
 function module.TakeDelivery(player, ui, frame, gift)
 	local ti = TweenInfo.new(1, Enum.EasingStyle.Linear)
 	local ti_1 = TweenInfo.new(0.5, Enum.EasingStyle.Linear)
 
+	frame.Eat.Visible = true
+
 	frame.IncreaseButton.Visible = false
 	frame.DecreaseButton.Visible = false
 	frame.DeliveryAmount.Visible = false
 	frame.Cursor.Visible = false
 
-	frame.Eat.Visible = true
 	frame.Demon.Visible = false
 	frame.Box.Visible = false
+
+	frame.LeftButton.Visible = false
+	frame.RightButton.Visible = false
 
 	util.tween(frame.Label, ti_1, { ImageTransparency = 1 })
 
@@ -291,20 +394,45 @@ function module.TakeDelivery(player, ui, frame, gift)
 
 	local animation = UiAnimator.PlayAnimation(frame.Eat, 0.065)
 
+	sfx.Build_Growl:Play()
+	animation:OnFrameRached(6):Once(function()
+		sfx.Perk_Take:Play()
+		sfx.Perk_Take_Metal:Play()
+		sfx.Perk_Take_Metal_2:Play()
+		sfx.Chain_Movement:Play()
+	end)
+
+	animation:OnFrameRached(14):Once(function()
+		sfx.Bite_Effect:Play()
+		task.delay(0.25, function()
+			sfx.After_Growl:Play()
+		end)
+	end)
+
 	animation.OnEnded:Connect(function()
-		showDescription(frame, gift)
+		module.showDescription(frame, gift)
+
+		local maxHealth = player.Character.Humanoid.MaxHealth
+		if maxHealth < 5 then
+			if deliveryAmount == 1 then
+				net:RemoteEvent("UpdatePlayerHealth"):FireServer(5)
+				module.showDescription(frame, { Desc = "Drav's hunger is satiated. (5 Max HP)" })
+			else
+				net:RemoteEvent("UpdatePlayerHealth"):FireServer(maxHealth + 1)
+				module.showDescription(frame, { Desc = "Drav's hunger is partially restored. (+1 Max HP)" })
+			end
+		end
 
 		frame.Background.Visible = false
 		frame.Cursor.Visible = false
 
-		util.tween(frame.Fade, ti, { BackgroundTransparency = 1 }, true)
+		util.tween(frame.Fade, ti, { BackgroundTransparency = 1 })
+
+		--musicService.playMusic()
+		module.onHidden:Fire()
 	end)
 
-	animation.OnFrame:Connect(function(currentFrame)
-		if currentFrame ~= 6 then
-			return
-		end
-
+	animation:OnFrameRached(6):Connect(function()
 		frame.Gift.Visible = false
 	end)
 end

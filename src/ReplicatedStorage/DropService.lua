@@ -32,9 +32,11 @@ function module.CreateDrop(position, dropType)
 	newDrop.CFrame = CFrame.new(position)
 	newDrop.AssemblyLinearVelocity = Vector3.new(math.random(-30, 30), math.random(40, 50), math.random(-30, 30))
 
+	newDrop.CollisionGroup = "Drop"
 	newDrop:SetAttribute("DropType", dropType)
 	task.delay(0.1, function()
 		CollectionService:AddTag(newDrop, "Drop")
+		CollectionService:AddTag(newDrop, "Pickup")
 	end)
 
 	return newDrop

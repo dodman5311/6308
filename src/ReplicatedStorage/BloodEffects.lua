@@ -5,6 +5,7 @@ local SERVER_STORAGE = game:GetService("ServerStorage")
 local RUN_SERVICE = game:GetService("RunService")
 local PLAYERS = game:GetService("Players")
 local DEBRIS = game:GetService("Debris")
+local collectionService = game:GetService("CollectionService")
 
 --// Instances
 local assets = REPLICATED_STORAGE.Assets
@@ -20,41 +21,91 @@ local map = workspace.Map
 --// Modules
 local util = require(Globals.Vendor.Util)
 local net = require(Globals.Packages.Net)
+local rng = Random.new()
+
+local splatters = {}
+local lastSplat = os.clock()
+local splatsInInstant = 0
 
 --// Values
 
 -- MAKE REMOVE BASED ON PART COUNT
 
-function module.createSplatter(cframe)
-	local splatterTime = 120
+local function checkLimit()
+	if #splatters > 75 then
+		local toRemove = splatters[1]
+		toRemove:Destroy()
+
+		table.remove(splatters, 1)
+	end
+end
+
+function module.createSplatter(cframe, ignoreInstantLimit)
+	if not ignoreInstantLimit then
+		if os.clock() - lastSplat < 0.05 then
+			splatsInInstant += 1
+		else
+			splatsInInstant = 0
+		end
+
+		if splatsInInstant > 4 then
+			return
+		end
+	end
+
+	local splatterTime = 10
 
 	local rp = RaycastParams.new()
 	rp.FilterType = Enum.RaycastFilterType.Include
 
 	rp.FilterDescendantsInstances = { map }
-	local FloorRay =
-		workspace:Raycast(cframe.Position, (cframe * CFrame.Angles(math.rad(-45), 0, 0)).LookVector * 10, rp)
-	local wallRay = workspace:Raycast(cframe.Position, cframe.LookVector * 12, rp)
+	local FloorRay = workspace:Raycast(cframe.Position, CFrame.new(cframe.Position).UpVector * -10, rp)
+	local wallRay = workspace:Raycast(cframe.Position, cframe.LookVector * 30, rp)
 
 	if FloorRay then
 		local getSplatter = util.callFromCache(util.getRandomChild(goreEffects.FloorSplatter))
 		util.addToCache(getSplatter, splatterTime)
 
+		getSplatter:AddTag("Blood")
+		getSplatter.CollisionGroup = "Blood"
 		getSplatter.Parent = map
 		getSplatter.CFrame = cframe
-		getSplatter.Position = FloorRay.Position -- + Vector3.new(0,-0.5,0)
-		getSplatter.Size = Vector3.new(4.25 + math.random(-500, 500) / 100, 0.001, 8.75 + math.random(-500, 500) / 100)
+		getSplatter.Position = FloorRay.Position
+		getSplatter.Orientation *= Vector3.new(0, 1, 0)
+		getSplatter.Size = Vector3.new(8 + rng:NextNumber(-2, 2), 0.001, 16 + rng:NextNumber(-2, 2))
+
+		getSplatter.CFrame *= CFrame.new(0, 0, -(getSplatter.Size.Z / 2))
+
+		table.insert(splatters, getSplatter)
+
+		getSplatter.AncestryChanged:Connect(function()
+			table.remove(splatters, table.find(splatters, getSplatter))
+		end)
+
+		checkLimit()
 	end
 
 	if wallRay then
 		local getSplatter = util.callFromCache(util.getRandomChild(goreEffects.WallSplatter))
 		util.addToCache(getSplatter, splatterTime)
 
+		getSplatter:AddTag("Blood")
+		getSplatter.CollisionGroup = "Blood"
 		getSplatter.Parent = map
 		getSplatter.CFrame = CFrame.new(wallRay.Position, wallRay.Position + wallRay.Normal)
 			* CFrame.Angles(0, 0, math.rad(math.random(0, 360)))
-		getSplatter.Size = Vector3.new(5.25 + math.random(-100, 100) / 100, 5.25 + math.random(-100, 100) / 100, 0.001)
+		getSplatter.Size = Vector3.new(8 + rng:NextNumber(-2, 2), 8 + rng:NextNumber(-2, 2), 0.001)
+
+		table.insert(splatters, getSplatter)
+
+		getSplatter.AncestryChanged:Connect(function()
+			table.remove(splatters, table.find(splatters, getSplatter))
+		end)
+
+		checkLimit()
 	end
+
+	lastSplat = os.clock()
 end
 
 function module.bloodSploof(cframe, pos)
@@ -87,7 +138,7 @@ function module.bloodsplosion(position, explosionType)
 	end
 
 	for i = 0, 360, 15 do
-		module.createSplatter(CFrame.new(position) * CFrame.Angles(0, math.rad(i), 0))
+		module.createSplatter(CFrame.new(position) * CFrame.Angles(0, math.rad(i), 0), true)
 	end
 end
 
@@ -128,6 +179,13 @@ function module.explosion(bitCount, velocity, position, part, noSkull, explosion
 end
 
 function module.gibEnemy(enemy)
+	if enemy:IsA("BasePart") then
+		enemy = enemy:FindFirstAncestorOfClass("Model")
+	end
+	if not enemy then
+		return
+	end
+
 	for _, part in ipairs(enemy:GetDescendants()) do
 		if not part:IsA("BasePart") or part:FindFirstAncestor("CurrentWeapon") then
 			continue
@@ -137,5 +195,13 @@ function module.gibEnemy(enemy)
 
 	module.explosion(17, 18, enemy:GetPivot().Position, enemy.PrimaryPart, false, "Gib")
 end
+
+function module.clearBlood()
+	for _, blood in ipairs(collectionService:GetTagged("Blood")) do
+		blood:Destroy()
+	end
+end
+
+net:Connect("ClearBlood", module.clearBlood)
 
 return module

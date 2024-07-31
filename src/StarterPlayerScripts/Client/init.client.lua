@@ -15,7 +15,11 @@ local allSignals = {
 	"AddSoul",
 	"RemoveSoul",
 	"AddGift",
+	"ClearGifts",
 	"AddAmmo",
+	"PauseGame",
+	"ResumeGame",
+	"AddTicket",
 }
 
 for _, signal in ipairs(allSignals) do
@@ -67,10 +71,6 @@ local function InitModules()
 						connectOnSpawn(mod, player.Character)
 					end
 
-					player.CharacterAdded:Connect(function(character)
-						connectOnSpawn(mod, character)
-					end)
-
 					table.insert(modules, mod)
 				end)
 				:catch(function(e)
@@ -79,6 +79,13 @@ local function InitModules()
 				end)
 		)
 	end
+
+	player.CharacterAdded:Connect(function(character)
+		print(character)
+		for _, v in ipairs(modules) do
+			connectOnSpawn(v, character)
+		end
+	end)
 
 	return Promise.allSettled(inits)
 end
@@ -101,3 +108,25 @@ local function StartModules()
 end
 
 Promise.try(InitModules):andThenCall(StartModules):catch(warn)
+
+local coreCall
+do
+	local MAX_RETRIES = 10
+
+	local StarterGui = game:GetService("StarterGui")
+	local RunService = game:GetService("RunService")
+
+	function coreCall(method, ...)
+		local result = {}
+		for _ = 1, MAX_RETRIES do
+			result = { pcall(StarterGui[method], StarterGui, ...) }
+			if result[1] then
+				break
+			end
+			RunService.Stepped:Wait()
+		end
+		return unpack(result)
+	end
+end
+
+assert(coreCall("SetCore", "ResetButtonCallback", false))

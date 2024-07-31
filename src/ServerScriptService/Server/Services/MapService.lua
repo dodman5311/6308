@@ -1,46 +1,65 @@
 local module = {
 	CurrentStage = 1,
 	CurrentLevel = 1,
+	GeneratedAt = 0,
 }
 --// services
 local serverStorage = game:GetService("ServerStorage")
 local replicatedStorage = game:GetService("ReplicatedStorage")
 local collectionService = game:GetService("CollectionService")
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
 
 local Globals = require(replicatedStorage.Shared.Globals)
 
 --// requirements
 local util = require(Globals.Vendor.Util)
-local spawners = require(Globals.Server.Services.Spawners)
+local spawners = require(Globals.Services.Spawners)
 local signals = require(Globals.Signals)
+local net = require(Globals.Packages.Net)
+local arenas = require(Globals.Services.HandleArenas)
+local timer = require(Globals.Vendor.Timer):newQueue()
 
 --// instances
+
 local map = workspace.Map
 local startUnit
 local units
 local caps
 local exit
+local kiosk
+local sky
+local bossRoom
+local miniBossRoom
+local stageFolder
 
 --// values
 local showHitboxes = false
 local newStart
 local links = {}
 
+local leeway = 6
 local unitModules = {}
+local blacklistedUnits = {}
 
---// library functions
+local clearBloodEvent = net:RemoteEvent("ClearBlood")
+net:RemoteEvent("StartExitSequence")
+net:RemoteEvent("ProceedToNextLevel")
+net:RemoteEvent("SpawnBoss")
+net:RemoteEvent("MiniBossExit")
+
 local function doUnitFunction(functionName, unit, ...)
 	local moduleTable = unitModules[unit.Name]
 	if not moduleTable then
 		return
 	end
 
-	for _, module in ipairs(moduleTable) do
-		if not module[functionName] then
+	for _, unitModule in ipairs(moduleTable) do
+		if not unitModule[functionName] then
 			continue
 		end
 
-		task.spawn(module[functionName], unit, ...)
+		task.spawn(unitModule[functionName], unit, module, ...)
 	end
 end
 
@@ -111,20 +130,26 @@ local function showHitbox(cframe, size)
 end
 
 local function Shuffle(tabl)
-	for i = 1, #tabl - 1 do
-		local ran = math.random(i, #tabl)
-		tabl[i], tabl[ran] = tabl[ran], tabl[i]
+	local newTable = table.clone(tabl)
+
+	for i = 1, #newTable - 1 do
+		local ran = math.random(i, #newTable)
+		newTable[i], newTable[ran] = newTable[ran], newTable[i]
 	end
 
-	return tabl
+	return newTable
 end
 
 local function getAssets()
-	local assets = serverStorage:FindFirstChild("Stage_" .. module.CurrentStage)
-	startUnit = assets.Start
-	units = assets.Units
-	caps = assets.Caps
-	exit = assets.Exit
+	stageFolder = serverStorage:FindFirstChild("Stage_" .. module.CurrentStage)
+	startUnit = stageFolder:FindFirstChild("Start_" .. module.CurrentStage)
+	units = stageFolder.Units
+	caps = stageFolder.Caps
+	exit = stageFolder.Exit
+	kiosk = stageFolder.Kiosk
+	sky = stageFolder.Sky
+	bossRoom = stageFolder:FindFirstChild("BossRoom_" .. module.CurrentStage)
+	miniBossRoom = stageFolder:FindFirstChild("MiniBossRoom_" .. module.CurrentStage)
 end
 
 -----------------------------------------// Important Functions //-----------------------------------------
@@ -132,6 +157,8 @@ end
 --// Unit functions
 
 local function clearMap()
+	blacklistedUnits = {}
+
 	for _, unit in ipairs(map:GetChildren()) do
 		-- if unit.Name == "Start" or not unit:IsA("Model") then
 		-- 	continue
@@ -144,20 +171,32 @@ local function clearMap()
 		unit:Destroy()
 	end
 
-	--map:ClearAllChildren()
+	local skyBox = Lighting:FindFirstChild("Sky")
 
-	for _, enemy in ipairs(collectionService:GetTagged("Enemy")) do
-		enemy:Destroy()
+	if skyBox then
+		skyBox:Destroy()
+	end
+
+	map:ClearAllChildren()
+
+	for _, Npc in ipairs(collectionService:GetTagged("Npc")) do
+		Npc:Destroy()
 	end
 
 	for _, weapon in ipairs(collectionService:GetTagged("Weapon")) do
 		weapon:Destroy()
 	end
+
+	clearBloodEvent:FireAllClients()
+	arenas.cancelArenas()
 end
 
 local function setLinks(baseLink, unit)
 	for _, link in ipairs(unit.Links:GetChildren()) do
 		link.Transparency = 1
+		link.CanCollide = false
+		link.CanQuery = false
+		link.CanTouch = false
 		link:FindFirstChild("LineHandleAdornment"):Destroy()
 
 		local distance = (link.Position - baseLink.Position).Magnitude
@@ -175,6 +214,19 @@ local function placeUnit(baseLink, unit, unitLink)
 	local unitPosition = calculatePlacePosition(baseLink, newUnit, unitLink)
 	newUnit:PivotTo(unitPosition)
 	newUnit.Parent = map
+
+	for _, part in ipairs(newUnit:GetChildren()) do
+		if not part:IsA("BasePart") then
+			continue
+		end
+
+		part.Transparency = 1
+
+		if part.Name ~= "Hitbox" then
+			continue
+		end
+		part.CollisionGroup = "PathfindingHitbox"
+	end
 
 	newUnit:AddTag("Unit")
 
@@ -206,8 +258,6 @@ local function placeCap(baseLink)
 end
 
 local function checkPlacable(baseLink, unit, unitLink)
-	local leeway = 5
-
 	local size = unit:GetExtentsSize() - (Vector3.new(1, -1, 1) * leeway)
 	local pos = calculatePlacePosition(baseLink, unit, unitLink)
 
@@ -231,26 +281,39 @@ local function checkPlacable(baseLink, unit, unitLink)
 	return canPlace
 end
 
+local function checkUnit(baseLink, unit)
+	local getLinks = Shuffle(unit.Links:GetChildren())
+
+	for _, link in ipairs(getLinks) do
+		if not checkLink(link) then
+			continue
+		end
+		if checkPlacable(baseLink, unit, link) then
+			return unit, link
+		end
+	end
+end
+
 local function addRandomUnit(baseLink)
 	local unitToPlace
 	local placeLink
 
 	local getUnits = Shuffle(units:GetChildren())
 
-	for _, unit in ipairs(getUnits) do -- if the unit cannot be placed, then loop through units until one can be.
-		if unit == unitToPlace then
+	for _, blacklistedUnit in ipairs(blacklistedUnits) do
+		local unitIndex = table.find(getUnits, blacklistedUnit)
+		if not unitIndex then
 			continue
 		end
+		table.remove(getUnits, unitIndex)
+	end
 
-		for _, link in ipairs(unit.Links:GetChildren()) do
-			if not checkLink(link) then
-				continue
-			end
-			if checkPlacable(baseLink, unit, link) then
-				unitToPlace = unit
-				placeLink = link
-			end
+	for _, unit in ipairs(getUnits) do -- if the unit cannot be placed, then loop through units until one can be.
+		if unit == unitToPlace then
+			return
 		end
+
+		unitToPlace, placeLink = checkUnit(baseLink, unit)
 
 		if unitToPlace then
 			break
@@ -258,9 +321,21 @@ local function addRandomUnit(baseLink)
 	end
 
 	if unitToPlace then
+		if string.match(unitToPlace.Name, "Arena") then
+			table.insert(blacklistedUnits, unitToPlace)
+		end
+
+		if string.match(unitToPlace.Name, "Ambush") then
+			for _, v in ipairs(units:GetChildren()) do
+				if string.match(v.Name, "Ambush") then
+					table.insert(blacklistedUnits, v)
+				end
+			end
+		end
+
 		return placeUnit(baseLink, unitToPlace, placeLink)
-	else
-		placeCap(baseLink)
+		--else
+		--placeCap(baseLink)
 	end
 end
 
@@ -325,6 +400,8 @@ local function getFurthestCap()
 end
 
 function module.placeExit()
+	loadModules()
+
 	local cap = getFurthestCap()
 	local newExit = exit:Clone()
 	newExit.Parent = cap.Parent
@@ -332,7 +409,10 @@ function module.placeExit()
 
 	cap:Destroy()
 
-	doUnitFunction("OnPlaced", newExit)
+	local r = require(exit.Modules.ExitSequence)
+	r.OnPlaced(newExit, module)
+
+	--doUnitFunction("OnPlaced", newExit)
 end
 
 function module.placeStartUnit()
@@ -340,10 +420,12 @@ function module.placeStartUnit()
 	newStart.Parent = map
 end
 
-function module.setupMap()
+function module.setupMap(ignoreStart)
 	clearMap()
 	loadModules()
 	getAssets()
+
+	sky:Clone().Parent = Lighting
 
 	for _, v in ipairs(units:GetDescendants()) do
 		if not v:IsA("BasePart") then
@@ -352,8 +434,25 @@ function module.setupMap()
 		v.CollisionGroup = "Map"
 	end
 
+	if ignoreStart then
+		return
+	end
+
 	module.placeStartUnit()
 	doUnitFunction("OnPlaced", newStart)
+end
+
+local function placeKiosk()
+	local randomLinks = Shuffle(links)
+
+	for _, link in ipairs(randomLinks) do
+		local _, placeLink = checkUnit(link, kiosk)
+		if not placeLink then
+			continue
+		end
+
+		return placeUnit(link, kiosk, placeLink)
+	end
 end
 
 function module.loadMap(size)
@@ -363,15 +462,19 @@ function module.loadMap(size)
 		module.generateUnit(links)
 	end
 
+	placeKiosk()
+
 	placeCaps()
 	module.placeExit()
 
-	spawners.spawnEnemies()
-	spawners.spawnWeapons()
+	spawners.spawnEnemies(module.CurrentLevel)
+	spawners.spawnWeapons(module.CurrentLevel)
 
 	for _, unit in ipairs(map:GetChildren()) do
 		doUnitFunction("OnLoaded", unit)
 	end
+
+	module.GeneratedAt = os.clock()
 end
 
 function module.loadLinearMap(size)
@@ -381,7 +484,7 @@ function module.loadLinearMap(size)
 
 	for _ = 1, math.ceil(size / 2) do
 		if not currentUnit then
-			return
+			continue
 		end
 		currentUnit = module.generateUnit(currentUnit.Links:GetChildren())
 	end
@@ -390,15 +493,51 @@ function module.loadLinearMap(size)
 		module.generateUnit(unit.Links:GetChildren())
 	end
 
+	placeKiosk()
+
 	placeCaps()
+
 	module.placeExit()
 
-	spawners.spawnEnemies()
-	spawners.spawnWeapons()
+	local plusStage = (module.CurrentStage - 1) * 5
+	local level = plusStage + module.CurrentLevel
+	spawners.spawnEnemies(level)
+	spawners.spawnWeapons(level)
+	spawners.spawnHazards(level)
 
 	for _, unit in ipairs(map:GetChildren()) do
 		doUnitFunction("OnLoaded", unit)
 	end
+
+	module.GeneratedAt = os.clock()
+end
+
+function module.loadBossRoom()
+	module.setupMap(true)
+
+	local newRoom
+
+	if module.CurrentLevel > 5 then
+		newRoom = bossRoom:Clone()
+	else
+		newRoom = miniBossRoom:Clone()
+	end
+
+	newRoom.Parent = map
+
+	doUnitFunction("OnPlaced", newRoom)
+
+	while newRoom.Parent do
+		local plusStage = (module.CurrentStage - 1) * 5
+		local level = plusStage + module.CurrentLevel
+
+		spawners.spawnWeapons(level)
+		task.wait(10)
+	end
+end
+
+local function spawnBoss(player, type)
+	spawners.SpawnBoss(stageFolder:GetAttribute(type), map:FindFirstChildOfClass("Model"))
 end
 
 -------------------------------------------------------------------
@@ -406,8 +545,8 @@ end
 map.ChildAdded:Connect(addLink)
 map.ChildRemoved:Connect(removeLink)
 
-module.loadLinearMap(module.CurrentLevel * 5)
---module.loadLinearMap(50)
+--module.loadLinearMap(module.CurrentLevel * 5)
+--module.loadLinearMap(module.CurrentLevel * 5)
 
 signals["GenerateMap"]:Connect(function(Style, Size)
 	if not Style or not Size or not tonumber(Size) then
@@ -420,14 +559,73 @@ signals["GenerateMap"]:Connect(function(Style, Size)
 	end
 end)
 
-signals["ProceedToNextLevel"]:Connect(function()
-	module.CurrentLevel += 1
-	if module.CurrentLevel > 5 then
+function module.proceedToNext(sender)
+	for _, player in ipairs(Players:GetPlayers()) do -- Teleport players to spawn
+		local character = player.Character
+		if not character then
+			return
+		end
+
+		local spawnLocation = workspace:FindFirstChild("SpawnLocation")
+
+		if not spawnLocation then
+			return
+		end
+		character:PivotTo(spawnLocation.CFrame * CFrame.new(0, 3, 0))
+
+		character.Humanoid.Health = character.Humanoid.MaxHealth
+	end
+
+	if module.CurrentLevel == 5 or module.CurrentLevel == 2 then
+		module.CurrentLevel += 0.5
+	else
+		module.CurrentLevel = math.floor(module.CurrentLevel + 1)
+	end
+
+	if module.CurrentLevel > 5.5 then
 		module.CurrentLevel = 1
 		module.CurrentStage += 1
 	end
 
-	module.loadLinearMap(module.CurrentLevel * 5)
-end)
+	workspace:SetAttribute("Level", module.CurrentLevel)
+	workspace:SetAttribute("Stage", module.CurrentStage)
+
+	if math.floor(module.CurrentLevel) ~= module.CurrentLevel then
+		module.loadBossRoom()
+		return
+	end
+	module.loadLinearMap(math.clamp(module.CurrentLevel * 4, 5, 25))
+	--module.loadLinearMap(0)
+
+	if not sender then
+		return
+	end
+end
+
+signals["ProceedToNextLevel"]:Connect(module.proceedToNext)
+
+net:Connect("ProceedToNextLevel", module.proceedToNext)
+net:Connect("SpawnBoss", spawnBoss)
+
+function module.bossExit()
+	local room = map:FindFirstChild("BossRoom_" .. module.CurrentStage)
+	local exitSequence = room.Modules:FindFirstChild("BossExitSequence")
+
+	local exitModule = require(exitSequence)
+
+	exitModule.ExitSequence(room, module)
+end
+
+function module.exitMiniBoss()
+	local room = map:FindFirstChild("MiniBossRoom_" .. module.CurrentStage)
+	local exitSequence = room.Modules:FindFirstChild("MinibossExitSequence")
+
+	local exitModule = require(exitSequence)
+
+	exitModule.ExitSequence(room, module)
+end
+
+net:Connect("BossExit", module.bossExit)
+net:Connect("MiniBossExit", module.exitMiniBoss)
 
 return module

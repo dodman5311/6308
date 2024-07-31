@@ -1,4 +1,5 @@
 --// Services
+local ContentProvider = game:GetService("ContentProvider")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
@@ -14,6 +15,7 @@ local player = Players.LocalPlayer
 local commands = require(Globals.Shared.Commands)
 local util = require(Globals.Vendor.Util)
 local net = require(Globals.Packages.Net)
+local signals = require(Globals.Signals)
 
 --// Values
 
@@ -21,12 +23,21 @@ local fullGui = {}
 local buttonSignals = {}
 local inGui = false
 local inCommand
+local inCatagory
 
 local module = {}
 
 local doCommandEvent = net:RemoteEvent("DoCommand")
 
 --// Functions
+
+local function Length(Table)
+	local counter = 0
+	for _, v in pairs(Table) do
+		counter = counter + 1
+	end
+	return counter
+end
 
 local function displayZeros(number)
 	local Zeros = {}
@@ -39,10 +50,15 @@ local function displayZeros(number)
 	return table.concat(Zeros) .. number
 end
 
-local function doCommand(commandIndex, ...)
-	doCommandEvent:FireServer(commandIndex, ...)
+local function doCommand(catagory, commandIndex, ...)
+	if not catagory then
+		warn("Not in catagory")
+		return
+	end
 
-	local command = commands[commandIndex]
+	doCommandEvent:FireServer(catagory, commandIndex, ...)
+
+	local command = commands[catagory][commandIndex]
 
 	if not command["ExecuteClient"] then
 		return
@@ -60,12 +76,21 @@ local function setUpGui()
 	fullGui.Gui = newGui
 end
 
-local function reset()
+local function reset(cat)
 	for _, commandFrame in pairs(fullGui.Commands:GetChildren()) do
 		if not commandFrame:IsA("Frame") or not commandFrame:FindFirstChild("ParamsFrame") then
 			continue
 		end
-		commandFrame.ParamsFrame:Destroy()
+
+		if cat then
+			commandFrame.ParamsFrame:Destroy()
+			continue
+		end
+
+		local secondParam = commandFrame.ParamsFrame:FindFirstChild("ParamsFrame", true)
+		if secondParam then
+			secondParam:Destroy()
+		end
 	end
 
 	inCommand = nil
@@ -106,9 +131,9 @@ local function animateParametersFrameEntry(frame, optionCount)
 
 	frame.Line1.Size = UDim2.new(0, 0, 0, 1)
 	frame.Line2.Size = UDim2.new(0, 1, 0, 0)
-	frame.Title.Visible = false
+	frame.Title.Visible = true
 
-	util.flickerUi(frame.Title, 0.025, 4, true)
+	--util.flickerUi(frame.Title, 0.025, 4, true)
 
 	local lineSize = ((optionCount * 2) - 1) / 10
 
@@ -122,13 +147,13 @@ local function animateParameterButtonEntry(button)
 	button.Line1.Size = UDim2.new(0, 0, 0, 1)
 	button.Button.Visible = false
 
-	button.Numbers.Text = "OPT_" .. displayZeros(math.random(0, 999))
-
 	util.tween(button.Line1, ti, { Size = UDim2.new(0.2, 0, 0, 1) }, false, function()
 		if not button:FindFirstChild("Button") then
 			return
 		end
-		util.flickerUi(button.Button, 0.025, 4, true)
+
+		button.Button.Visible = true
+		--util.flickerUi(button.Button, 0.025, 4, true)
 	end)
 end
 
@@ -146,8 +171,10 @@ local function createParameterFrame(parent, parameter)
 	animateParametersFrameEntry(newParamsFrame, #parameter.Options)
 
 	for _, option in ipairs(parameter.Options) do
+		local newOption
+
 		if option == "_Input" then
-			local newOption = createInputOptionButton(newParamsFrame.Params)
+			newOption = createInputOptionButton(newParamsFrame.Params)
 			animateParameterButtonEntry(newOption)
 
 			local textBox = newOption.Button
@@ -167,13 +194,17 @@ local function createParameterFrame(parent, parameter)
 				end)
 			end)
 		else
-			local newOption = createOptionButton(newParamsFrame.Params, option)
+			newOption = createOptionButton(newParamsFrame.Params, option)
 			animateParameterButtonEntry(newOption)
 
 			signals[#signals + 1] = newOption.Button.MouseButton1Click:Connect(function()
 				selectedParameter = option
 				selectedParameterButton = newOption
 			end)
+		end
+
+		if parameter["Sub"] then
+			newOption.Sub.Text = parameter.Sub(option)
 		end
 	end
 
@@ -186,7 +217,7 @@ local function createParameterFrame(parent, parameter)
 	return selectedParameter, selectedParameterButton
 end
 
-local function enterCommand(parent, index, command)
+local function enterCommand(parent, catagory, index, command)
 	if inCommand then
 		reset()
 
@@ -208,16 +239,26 @@ local function enterCommand(parent, index, command)
 		table.insert(parameters, value)
 	end
 
-	doCommand(index, table.unpack(parameters))
+	doCommand(catagory, index, table.unpack(parameters))
 
-	parent.ParamsFrame.Visible = true
-	util.flickerUi(parent.ParamsFrame, 0.025, 4)
+	parent.ParamsFrame.Visible = false
+	--util.flickerUi(parent.ParamsFrame, 0.025, 4)
 	parent.ParamsFrame:Destroy()
 
 	inCommand = nil
 end
 
-local function createcommandButton(index)
+local function createCommandButton(parent, name)
+	local newCommandButton = objects.Option:Clone()
+	newCommandButton.Parent = parent
+	newCommandButton.Visible = true
+
+	newCommandButton.Button.Text = name
+
+	return newCommandButton
+end
+
+local function createCatagoryButton(index)
 	local newButton = objects.Command:Clone()
 	newButton.Parent = fullGui.Commands
 	newButton.Visible = true
@@ -231,7 +272,49 @@ local function createcommandButton(index)
 	return newButton
 end
 
-local function loadCommandButtons()
+local function createCommandFrame(parent, catagoryName, catagory)
+	local signals = {}
+	local selectedParameter
+	local selectedParameterButton
+
+	local newParamsFrame = objects.ParamsFrame:Clone()
+	newParamsFrame.Parent = parent
+	newParamsFrame.Visible = true
+
+	newParamsFrame.Title.Text = string.upper(catagoryName)
+
+	animateParametersFrameEntry(newParamsFrame, Length(catagory))
+
+	for index, command in pairs(catagory) do
+		local newCommandButton = createCommandButton(newParamsFrame.Params, index)
+		animateParameterButtonEntry(newCommandButton)
+
+		signals[#signals + 1] = newCommandButton.Button.MouseButton1Click:Connect(function()
+			enterCommand(newCommandButton, catagoryName, index, command)
+		end)
+	end
+
+	return selectedParameter, selectedParameterButton
+end
+
+local function enterCatagory(parent, index, catagory)
+	if inCatagory then
+		reset(true)
+		inCatagory = nil
+
+		if inCatagory == parent then
+			return
+		end
+	end
+
+	inCatagory = parent
+
+	createCommandFrame(parent, index, catagory)
+
+	--inCatagory = nil
+end
+
+local function loadCatagoryButtons()
 	for _, button in ipairs(fullGui.Commands:GetChildren()) do
 		if not button:IsA("Frame") then
 			continue
@@ -241,14 +324,14 @@ local function loadCommandButtons()
 
 	local signals = {}
 
-	for index, command in pairs(commands) do
-		local newButton = createcommandButton(index)
+	for index, catagory in pairs(commands) do
+		local newButton = createCatagoryButton(index)
 		local button = newButton.CommandButton.Button
 
 		table.insert(
 			signals,
 			button.MouseButton1Click:Connect(function()
-				enterCommand(newButton, index, command)
+				enterCatagory(newButton, index, catagory)
 			end)
 		)
 	end
@@ -261,8 +344,11 @@ local function openGui()
 	-- 	return
 	-- end
 
+	--signals.PauseGame:Fire()
+
 	local ti = TweenInfo.new(0.1, Enum.EasingStyle.Quad)
-	buttonSignals = loadCommandButtons()
+
+	buttonSignals = loadCatagoryButtons()
 
 	fullGui.Gui.Enabled = true
 	fullGui.Frame.Position = UDim2.fromScale(0.5, -1)
@@ -280,14 +366,26 @@ local function closeGui()
 	end)
 
 	reset()
+
+	--signals.ResumeGame:Fire()
 end
 
 --// Main //--
 
 function module:GameInit()
-	print("Init Console")
 	setUpGui()
 	closeGui()
+end
+
+local function toggleConsole()
+	if inGui then
+		closeGui()
+	else
+		openGui()
+	end
+
+	inGui = not inGui
+	UserInputService.MouseIconEnabled = inGui
 end
 
 UserInputService.InputBegan:Connect(function(input, gpe)
@@ -295,16 +393,15 @@ UserInputService.InputBegan:Connect(function(input, gpe)
 		return
 	end
 
-	if input.KeyCode == Enum.KeyCode.Tab then
-		if inGui then
-			closeGui()
-		else
-			openGui()
-		end
-
-		inGui = not inGui
-		UserInputService.MouseIconEnabled = inGui
+	if
+		input.KeyCode == Enum.KeyCode.Backquote
+		or input.KeyCode == Enum.KeyCode.DPadDown
+		or input.KeyCode == Enum.KeyCode.Tilde
+	then
+		toggleConsole()
 	end
 end)
+
+signals.ToggleConsole:Connect(toggleConsole)
 
 return module

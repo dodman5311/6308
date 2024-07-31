@@ -13,7 +13,7 @@ local module = {
 		{ Function = "MoveRandom", Parameters = { 60, stats.MoveDelay }, State = "Idle" },
 
 		{ Function = "SearchForTarget", Parameters = { "Player", stats.ViewDistance } },
-		{ Function = "LeadTarget", Parameters = { true, 200, 0 } },
+		{ Function = "LeadTarget", Parameters = { true, 200, 5 } },
 		{
 			Function = "ShootProjectile",
 			Parameters = { stats.AttackDelay, stats.AttackCooldown, stats.AttackAmount, stats.ProjectileSpeed },
@@ -40,6 +40,7 @@ local module = {
 	},
 
 	OnDied = {
+		{ Function = "SetCollision", Parameters = { "DeadBody" } },
 		{ Function = "SwitchToState", Parameters = { "Dead" } },
 		{ Function = "RemoveWithDelay", Parameters = { 1 } },
 	},
