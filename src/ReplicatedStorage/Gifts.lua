@@ -99,7 +99,7 @@ local module = {
 		Heavenly_Fortune = {
 			Icon = "rbxassetid://17590259189",
 			Catagories = { "Luck" },
-			Desc = "You now have more Luck while in the air (+5 Luck)",
+			Desc = "You now have more Luck while in the air (+10 Luck)",
 		},
 
 		Unearthly_Metal = {
@@ -111,7 +111,7 @@ local module = {
 		Burn_Hell = {
 			Icon = "rbxassetid://18731039717",
 			Catagories = { "Arsenal", "Soul" },
-			Desc = "Any damage, not dealt by a weapon, now has a chance to set enemies of fire. (50% chance)",
+			Desc = "Any damage, not dealt by a weapon, now has a chance to deal 1 point of fire damage - lighting the said on fire. (50% chance)",
 		},
 	},
 

@@ -309,7 +309,7 @@ function module.Activate(item)
 	end)
 end
 
-local cooldown = 1
+local cooldown = 0.75
 
 uis.InputBegan:Connect(function(input, gameProcessedEvent)
 	if gameProcessedEvent or onCooldown then

@@ -12,6 +12,8 @@ local signals = require(Globals.Shared.Signals)
 local signal = require(script.signal)
 local net = require(Globals.Packages.Net)
 
+local runningTimers = {}
+
 local isPaused = false
 
 local pauseSignal = signal.new()
@@ -39,7 +41,7 @@ module.new = function(self, timerName, waitTime, Function, ...)
 	end
 
 	local timer = {
-		Connection = nil,
+		IsRunning = false,
 		CallTime = os.clock(),
 		WaitTime = waitTime,
 		["Function"] = Function,
@@ -61,37 +63,15 @@ module.new = function(self, timerName, waitTime, Function, ...)
 
 	timer.OnEnded = signal.new()
 
-	function timer:IsRunning()
-		return self.Connection and true or false
-	end
-
 	function timer:Run()
-		if self.Connection then
+		if self.IsRunning then
 			return
 		end
 
 		self.CallTime = os.clock()
 
-		self.Connection = RUN_SERVICE.Heartbeat:Connect(function()
-			if isPaused then
-				return
-			end
-
-			self.OnTimerStepped:Fire(os.clock() - self.CallTime)
-
-			if (os.clock() - self.CallTime) < self.WaitTime then
-				return
-			end
-
-			self.Connection:Disconnect()
-			self.Connection = nil
-
-			if self.Function then
-				task.spawn(self.Function, table.unpack(self.Parameters))
-			end
-
-			timer.OnEnded:Fire()
-		end)
+		self.IsRunning = true
+		table.insert(runningTimers, self)
 	end
 
 	function timer:Reset()
@@ -112,17 +92,17 @@ module.new = function(self, timerName, waitTime, Function, ...)
 	end
 
 	function timer:Cancel()
-		if not self.Connection then
+		if not self.IsRunning then
 			return
 		end
-		self.Connection:Disconnect()
-		self.Connection = nil
+		table.remove(runningTimers, table.find(runningTimers, self))
+		self.IsRunning = false
 	end
 
 	function timer:Destroy()
-		if self.Connection then
-			self.Connection:Disconnect()
-			self.Connection = nil
+		if self.IsRunning then
+			table.remove(runningTimers, table.find(runningTimers, self))
+			self.IsRunning = false
 		end
 
 		self.OnPaused:Disconnect()
@@ -213,5 +193,30 @@ else
 		isPaused = false
 	end)
 end
+
+RUN_SERVICE.Heartbeat:Connect(function()
+	for _, timer in ipairs(runningTimers) do
+		if isPaused then
+			return
+		end
+
+		timer.OnTimerStepped:Fire(os.clock() - timer.CallTime)
+
+		if (os.clock() - timer.CallTime) < timer.WaitTime then
+			continue
+		end
+
+		table.remove(runningTimers, table.find(runningTimers, timer))
+		timer.IsRunning = false
+
+		timer.OnEnded:Fire()
+
+		if not timer.Function then
+			continue
+		end
+
+		task.spawn(timer.Function, table.unpack(timer.Parameters))
+	end
+end)
 
 return module

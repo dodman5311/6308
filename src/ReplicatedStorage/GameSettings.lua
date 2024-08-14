@@ -15,7 +15,7 @@ local settings = {
 		Name = "Music Volume",
 		Type = "Slider",
 		MaxValue = 100,
-		Value = 0,
+		Value = 100,
 		OnChanged = function(self)
 			game:GetService("SoundService").Music.Volume = self.Value / 100
 		end,

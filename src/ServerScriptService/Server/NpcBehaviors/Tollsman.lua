@@ -51,6 +51,8 @@ local function startTolling(npc)
 	local tollingAnim = animationService:playAnimation(model, "Attack", Enum.AnimationPriority.Action4, true)
 
 	local hitToll = tollingAnim:GetMarkerReachedSignal("CreateAoe"):Connect(function()
+		util.PlaySound(model.PrimaryPart.Toll_Hit, model.PrimaryPart, 0.1)
+		util.PlaySound(model.PrimaryPart.Toll_Ring, model.PrimaryPart, 0.05)
 		damagePart.HitParticle:Emit(300)
 
 		local hitParts = workspace:GetPartsInPart(damagePart)
@@ -128,10 +130,9 @@ local function useToll(npc)
 
 	local tollAnim = animationService:playAnimation(model, "PlaceToll", Enum.AnimationPriority.Action3)
 
-	local a
-	a = tollAnim.Stopped:Connect(function()
-		a:Disconnect()
+	task.delay(0.5, util.PlaySound, model.PrimaryPart.Toll_Down, model.PrimaryPart, 0.1)
 
+	tollAnim.Stopped:Once(function()
 		aoeEffect.Enabled = true
 
 		startTolling(npc)

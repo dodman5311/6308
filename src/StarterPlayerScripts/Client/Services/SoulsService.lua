@@ -128,6 +128,10 @@ Signals.AddSoul:Connect(module.AddSoul)
 Signals.RemoveSoul:Connect(module.RemoveSoul)
 
 net:Connect("DropSoul", module.DropSoul)
+
+net:RemoteFunction("GetSoulCount").OnClientInvoke = function()
+	return module.Souls
+end
 net:Connect("DropArmor", function(position, chance)
 	if chance and not ChanceService.checkChance(chance, true) then
 		return

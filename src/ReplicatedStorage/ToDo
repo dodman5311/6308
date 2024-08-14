@@ -215,8 +215,6 @@ Grapple deals 1 damage and grants invincibility (Cooldown)
 
 ^^-------^^
 
-Add notification sound
-
 Fix riccoshot icon on ground
 
 Make crit sound
@@ -225,20 +223,48 @@ Make soul drop sound?
 
 Make praying altar - lessens visage health - disables a perk
 
-Make variant Vending machines
-
 Add Cutter
 Add 800M
 Add Therma
 Add Dovus Gratana
 
-Sewer ambushes
+Make boss gyser move
+Dudes make a shield on boss. Kill dudes to break shield
 
 Fix shield removing on parry
+
+Make tips and tricks pop up and stop game and start
+
+Make enemies spawn by raycasting down from high point
+
+Acid will cover boss
 
 Add Main boss
 
 --
+
+Add difficulty settings:
+Easy:
+3 lives.
+When dying, you will restart the current stage or bossfight until lives run out.
+-2 combo hit penalty
+
+Normal:
+When dying, you will restart the entire campaign.
+-2 combo hit penalty
+
+Hard:
+When dying, you will restart the entire campaign.
+-3 combo hit penalty
+-1 second combo time
+
+Make variant Vending machines
+
+--
+
+buffed heavenly fortune: 5 to 10 luck buff
+
+upgrade: when at 0 souls, x6 soul chance instead of x4
 
 hover over delivery number now changes color
 

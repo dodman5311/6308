@@ -23,7 +23,7 @@ local CameraController = require(Globals.Client.Controllers.CameraController)
 
 module.explosiveHit = signal.new()
 
-local function hitEnemy(subject, damage, magnitude, sender)
+local function hitEnemy(subject, damage, magnitude, sender, source)
 	task.wait(0.05)
 
 	local serverHumanoid, preHealth, postHealth = Net:RemoteFunction("Damage"):InvokeServer(subject, damage or 1)
@@ -37,10 +37,10 @@ local function hitEnemy(subject, damage, magnitude, sender)
 		return
 	end
 
-	module.explosiveHit:Fire(subject, preHealth, postHealth, math.clamp(damage, 0, math.huge))
+	module.explosiveHit:Fire(subject, preHealth, postHealth, math.clamp(damage, 0, math.huge), source)
 end
 
-function module.createExplosion(position, size, damage, sender, color)
+function module.createExplosion(position, size, damage, sender, color, source)
 	local lightTi = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 
 	local newEffect = ExplodeEffect:Clone()
@@ -101,7 +101,7 @@ function module.createExplosion(position, size, damage, sender, color)
 		end
 
 		local distancePercentage = math.abs((distance / size) - 1)
-		task.spawn(hitEnemy, target, math.ceil(damage * distancePercentage), distancePercentage, sender)
+		task.spawn(hitEnemy, target, math.ceil(damage * distancePercentage), distancePercentage, sender, source)
 	end
 end
 

@@ -35,6 +35,7 @@ net:RemoteEvent("DoUiAction")
 net:RemoteEvent("OpenKiosk")
 net:RemoteEvent("SetArmor")
 net:RemoteEvent("CreateExplosion")
+net:RemoteFunction("GetSoulCount")
 
 net:RemoteEvent("DropArmor")
 net:RemoteEvent("PickupWeapon")

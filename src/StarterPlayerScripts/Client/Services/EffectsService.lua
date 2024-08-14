@@ -62,6 +62,46 @@ function module.VisageFire(model, value)
 	end
 end
 
+function module.IndicateVisageAttack(model, color)
+	local ti = TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
+
+	util.PlaySound(sounds.AttackIndicator, script)
+
+	for _, barrel in ipairs(model.Apature:GetChildren()) do
+		if barrel.Name ~= "Barrel" then
+			continue
+		end
+
+		local flare = barrel.Attachment.AttackIndicator
+
+		flare.Image.Size = UDim2.fromScale(0.25, 0.25)
+		flare.Image.Rotation = 180
+		flare.Image.ImageColor3 = color
+		flare.Enabled = true
+
+		util.tween(flare.Image, ti, { Size = UDim2.fromScale(1, 1), Rotation = 0 }, false, function()
+			flare.Enabled = false
+		end, Enum.PlaybackState.Completed)
+	end
+end
+
+function module.IndicateAttack(model: Model, color)
+	local ti = TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
+
+	util.PlaySound(sounds.AttackIndicator, script)
+
+	local flare = model:FindFirstChild("AttackIndicator", true)
+
+	flare.Image.Size = UDim2.fromScale(0.25, 0.25)
+	flare.Image.Rotation = 180
+	flare.Image.ImageColor3 = color
+	flare.Enabled = true
+
+	util.tween(flare.Image, ti, { Size = UDim2.fromScale(1, 1), Rotation = 0 }, false, function()
+		flare.Enabled = false
+	end, Enum.PlaybackState.Completed)
+end
+
 function module.GhoulTeleport(position)
 	local effect = effects.GhoulTeleport:Clone()
 	effect.Parent = workspace

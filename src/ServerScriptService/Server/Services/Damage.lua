@@ -74,7 +74,7 @@ function module.dealDamage(_, subject, amount, element)
 		end
 
 		net:RemoteEvent("DropSoul")
-			:FireAllClients(subject:GetPivot().Position, math.clamp(humanoid.MaxHealth, 1, 5) + fireChance)
+			:FireAllClients(subject:GetPivot().Position, math.clamp(humanoid.MaxHealth, 1, 7) + fireChance)
 	end
 
 	return humanoid, preHealth, humanoid.Health

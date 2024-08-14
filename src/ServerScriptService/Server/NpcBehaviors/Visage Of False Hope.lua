@@ -1,6 +1,7 @@
 local CollectionService = game:GetService("CollectionService")
 local rng = Random.new()
 
+local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -12,19 +13,41 @@ local util = require(Globals.Vendor.Util)
 local timer = require(Globals.Vendor.Timer)
 
 local vfx = net:RemoteEvent("ReplicateEffect")
+local createProjectileRemote = net:RemoteEvent("CreateProjectile")
 
 local moveChances = {
 	--{ "SinkRoom", 10 },
+	--{ "Geysers", 25 },
 	--{ "Sacrifice", 15 },
-	--{ "SkyLasers", 25 },
 
-	{ "Fire", 100 }, -- 40 },
-	--{ "Rockets", 50 },
-	--{ "Grenades", 100 },
+	{ "Fire", 25 },
+	{ "Grenades", 40 },
+	{ "Rockets", 100 },
 }
 
-local function MoveApatureTo(npc, yAlpha, rotationAngle)
+local function indicateAttack(npc, color)
+	net:RemoteEvent("ReplicateEffect"):FireAllClients("IndicateVisageAttack", "Server", true, npc.Instance, color)
+	timer.wait(0.5)
+end
+
+local function doForBarrels(npc, callback)
+	for _, barrel in ipairs(npc.Instance.Apature:GetChildren()) do
+		if barrel.Name ~= "Barrel" then
+			continue
+		end
+
+		callback(barrel)
+	end
+end
+
+local function MoveApatureTo(npc, yAlpha, rotationAngle, speed)
 	local root = npc.Instance.PrimaryPart
+
+	if speed then
+		npc.Instance.Apature.AlignPosition.MaxVelocity = speed
+	else
+		npc.Instance.Apature.AlignPosition.MaxVelocity = 2500
+	end
 
 	if yAlpha then
 		local yPos = (yAlpha * (75 * 2)) - 75
@@ -37,11 +60,7 @@ local function MoveApatureTo(npc, yAlpha, rotationAngle)
 end
 
 local function shootFireHitboxes(npc)
-	for _, barrel in ipairs(npc.Instance.Apature:GetChildren()) do
-		if barrel.Name ~= "Barrel" then
-			continue
-		end
-
+	doForBarrels(npc, function(barrel)
 		local origin = barrel.Attachment.WorldCFrame
 
 		local newPart = game.ReplicatedStorage.FireHitbox:Clone()
@@ -50,6 +69,8 @@ local function shootFireHitboxes(npc)
 		newPart.Position = origin.Position
 		local goal = origin * CFrame.new(0, 0, -170)
 
+		Debris:AddItem(newPart, 2)
+
 		table.insert(npc.fireHitboxes, {
 			part = newPart,
 			startPosition = origin.Position,
@@ -57,7 +78,7 @@ local function shootFireHitboxes(npc)
 			goal = goal.Position,
 			createdAt = os.clock(),
 		})
-	end
+	end)
 end
 
 local function processHitboxes(npc)
@@ -78,7 +99,7 @@ local function checkHitboxes(npc)
 	local playersHit = {}
 
 	for _, hitbox in ipairs(npc.fireHitboxes) do
-		local part = hitbox.Part
+		local part = hitbox.part
 
 		if not part then
 			continue
@@ -88,6 +109,7 @@ local function checkHitboxes(npc)
 			local humanoid, model = util.checkForHumanoid(partHit)
 
 			local playerHit = Players:GetPlayerFromCharacter(model)
+
 			if not playerHit or table.find(playersHit, playerHit) then
 				continue
 			end
@@ -105,15 +127,10 @@ local function rotateForFire(npc)
 	local alpha = 0
 	local hitBoxAlpha = 0
 
-	local raiseTime = 8
-	local rotateTime = 1.4
+	local raiseTime = 10
+	local rotateTime = 3
 
 	npc.fireHitboxes = {}
-
-	local checkHitboxTimer = npc:GetTimer("CheckHitboxes")
-	checkHitboxTimer.WaitTime = 0.25
-	checkHitboxTimer.Function = checkHitboxes
-	checkHitboxTimer.Parameters = { npc }
 
 	return RunService.Heartbeat:Connect(function()
 		local currentTime = os.clock() - startTime
@@ -125,44 +142,183 @@ local function rotateForFire(npc)
 		MoveApatureTo(npc, alpha, (currentTime * 90) / rotateTime)
 
 		if alpha >= 0.5 then
-			alpha = 0
-		end
-
-		if hitBoxAlpha >= 0.1 then
-			hitBoxAlpha = 0
-			shootFireHitboxes(npc)
+			alpha = -0.05
 		end
 
 		processHitboxes(npc)
-		checkHitboxTimer:Run()
+
+		if hitBoxAlpha >= 0.075 then
+			hitBoxAlpha = 0
+			shootFireHitboxes(npc)
+			checkHitboxes(npc)
+		end
 
 		lastStep = os.clock()
 	end)
 end
 
+local function aimYAxisAtPlayer(npc)
+	return RunService.Heartbeat:Connect(function()
+		local target = npc:GetTarget()
+		if not target then
+			return
+		end
+
+		local root = npc.Instance.PrimaryPart
+
+		local xyP = root.ApatureRoot.WorldPosition * Vector3.new(1, 0, 1)
+		local npcPos2 = npc.Instance:GetPivot().Position * Vector3.new(1, 0, 1)
+		local targetPos2 = target:GetPivot().Position * Vector3.new(1, 0, 1)
+
+		local targetDistance = (npcPos2 - targetPos2).Magnitude
+
+		root.ApatureRoot.WorldPosition = xyP + Vector3.new(0, target:GetPivot().Position.Y + (targetDistance / 3), 0)
+	end)
+end
+
 local moves = {
 	Fire = function(npc)
+		local model = npc.Instance
+
 		npc.Acts:createAct("InAction")
 
 		MoveApatureTo(npc, 0, 0)
 
+		indicateAttack(npc, Color3.fromRGB(255, 175, 100))
+
+		util.PlaySound(model.PrimaryPart.Fire, model.PrimaryPart)
+
 		vfx:FireAllClients("VisageFire", "Server", true, npc.Instance, true)
 		local rotateOnStep = rotateForFire(npc)
+
+		npc.Janitor:Add(rotateOnStep, "Disconnect")
 
 		timer.wait(15)
 
 		vfx:FireAllClients("VisageFire", "Server", true, npc.Instance, false)
-
 		rotateOnStep:Disconnect()
+
+		timer.wait(2)
+
+		MoveApatureTo(npc, 0, 0)
+
+		npc.Acts:removeAct("InAction")
+	end,
+
+	Rockets = function(npc)
+		local model = npc.Instance
+
+		npc.Acts:createAct("InAction")
+
+		indicateAttack(npc, Color3.fromRGB(255, 150, 150))
+
+		MoveApatureTo(npc, 0.8, 0, 250)
+		timer.wait(2)
+
+		for i = 1, 5 do
+			util.PlaySound(model.PrimaryPart.Launch, model.PrimaryPart, 0.1)
+
+			doForBarrels(npc, function(barrel)
+				barrel.Attachment.Flash:Emit(3)
+				barrel.Attachment.Smoke:Emit(3)
+
+				createProjectileRemote:FireAllClients(200, barrel.Attachment.WorldCFrame, 0, 1, 5, 0, {
+					Seeking = rng:NextNumber(0.5, 1),
+					SeekProgression = -0.025,
+					SplashRange = 12,
+					SplashDamage = 3,
+					SeekDistance = 9000,
+					Size = 0,
+				}, nil, "RocketProjectile")
+			end)
+
+			timer.wait(0.5)
+			MoveApatureTo(npc, nil, i * 90)
+			timer.wait(1)
+		end
+
+		timer.wait(2)
+
+		MoveApatureTo(npc, 0, 0)
+
+		npc.Acts:removeAct("InAction")
+	end,
+
+	Grenades = function(npc)
+		local target = npc:GetTarget()
+
+		if not target then
+			return
+		end
+
+		local model = npc.Instance
+
+		npc.Acts:createAct("InAction")
+
+		local aimOnStep = aimYAxisAtPlayer(npc)
+
+		indicateAttack(npc, Color3.fromRGB(230, 100, 255))
+
+		npc.Janitor:Add(aimOnStep, "Disconnect")
+
+		local offset = false
+		for _ = 1, 10 do
+			local npcPos2 = model:GetPivot().Position * Vector3.new(1, 0, 1)
+			local targetPos2 = target:GetPivot().Position * Vector3.new(1, 0, 1)
+
+			local targetDistance = (npcPos2 - targetPos2).Magnitude
+
+			util.PlaySound(model.PrimaryPart.Launch, model.PrimaryPart, 0.1)
+
+			doForBarrels(npc, function(barrel)
+				barrel.Attachment.Flash:Emit(3)
+				barrel.Attachment.Smoke:Emit(3)
+
+				createProjectileRemote:FireAllClients(
+					targetDistance / 1.5,
+					barrel.Attachment.WorldCFrame,
+					0,
+					0,
+					1.5,
+					0,
+					{
+						Dropping = 0.65,
+						Bouncing = true,
+						SplashRange = 50,
+						SplashDamage = 6,
+					},
+					nil,
+					"GrenadeProjectile"
+				)
+			end)
+
+			MoveApatureTo(npc, nil, offset and 0 or 45)
+
+			offset = not offset
+
+			timer.wait(1)
+		end
+
+		timer.wait(1)
+
+		MoveApatureTo(npc, 0, 0)
+		aimOnStep:Disconnect()
 		npc.Acts:removeAct("InAction")
 	end,
 }
 
 local function spawnEnemy(OriginCFrame)
 	local spawnRange = 150
-	local enemyToSpawn = rng:NextNumber(0, 100) <= 10 and "Specimen" or "Tollsman"
+	local enemyToSpawn = "Tollsman"
+
+	if rng:NextNumber(0, 100) <= 5 then
+		enemyToSpawn = "Specimen"
+	elseif rng:NextNumber(0, 100) <= 50 then
+		enemyToSpawn = "Sentinel"
+	end
+
 	local spawnCFrame = OriginCFrame
-		* CFrame.new(rng:NextNumber(-spawnRange, spawnRange), -75, rng:NextNumber(-spawnRange, spawnRange))
+		* CFrame.new(rng:NextNumber(-spawnRange, spawnRange), 2, rng:NextNumber(-spawnRange, spawnRange))
 
 	local enemyModel = spawners.placeNewObject(10, spawnCFrame, "Enemy", enemyToSpawn)
 
@@ -174,6 +330,8 @@ local function spawnEnemy(OriginCFrame)
 end
 
 local function runAttackTimer(npc)
+	npc.Instance.PrimaryPart.Anchored = true
+
 	if npc.Acts:checkAct("Run", "InAttack", "Melee") then
 		return
 	end
@@ -208,9 +366,9 @@ local function spawnEnemies(npc) -- 250 studs
 
 	local spawnTimer = npc:GetTimer("SpawnEnemies")
 
-	spawnTimer.WaitTime = 5
+	spawnTimer.WaitTime = 8
 	spawnTimer.Function = function()
-		if #CollectionService:GetTagged("Enemy") > 6 then
+		if #CollectionService:GetTagged("Enemy") > 7 then
 			return
 		end
 
@@ -230,6 +388,7 @@ local module = {
 	OnStep = {
 		{ Function = "Custom", Parameters = { spawnEnemies } },
 		{ Function = "Custom", Parameters = { runAttackTimer } },
+		{ Function = "SearchForTarget", Parameters = { "Player", math.huge } },
 	},
 
 	OnSpawned = {

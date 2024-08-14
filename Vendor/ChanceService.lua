@@ -24,7 +24,7 @@ function module.getLuck()
 	end
 
 	if module.airluck then
-		result += 5
+		result += 10
 	end
 
 	if giftService.CheckGift("Set_Em_Up") then

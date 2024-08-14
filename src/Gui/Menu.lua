@@ -48,6 +48,7 @@ local weaponIcons = {
 
 local function showAttention(frame)
 	frame.Codex_Lbl.Attention.Visible = false
+
 	for _, v in ipairs(frame.Codex_Menu:GetDescendants()) do
 		if v.Name == "Attention" then
 			v.Visible = false
@@ -59,12 +60,13 @@ local function showAttention(frame)
 			continue
 		end
 
-		frame.Codex_Lbl.Attention.Visible = true
+		if currentMenu ~= "Codex" then
+			frame.Codex_Lbl.Attention.Visible = true
+		end
+
 		frame[entry.Catagory .. "_Lbl"].Attention.Visible = true
 
 		for _, v in ipairs(frame.Codex_Menu.CodexList:GetChildren()) do
-			print(v.Name, index)
-
 			if v.Name == index then
 				v.Attention.Visible = true
 			end
@@ -459,6 +461,8 @@ local function hideAllMenus(frame)
 	util.tween(frame.Settings_Menu, ti, { GroupTransparency = 1 }, false, function()
 		frame.Settings_Menu.Visible = false
 	end, Enum.PlaybackState.Completed)
+
+	showAttention(frame)
 end
 
 local function loadMap(player, frame)
@@ -675,8 +679,13 @@ local function loadArsenal(frame)
 		damageNum.Text = gunStats.Damage - (math.ceil(gunStats.LockAmount / 2) - 1) .. " - " .. damageNum.Text
 	end
 
+	local firerateDisplay = math.round(fireRate)
+	if fireRate < 1 then
+		firerateDisplay = math.round(fireRate * 10) / 10
+	end
+
 	frame.Recoil_Num.Text = math.ceil(recoil)
-	frame.Speed_Num.Text = math.round(fireRate)
+	frame.Speed_Num.Text = firerateDisplay
 	frame.WeaponName.Text = weaponModel.Name
 
 	local icon = weaponIcons[gunStats.Type]

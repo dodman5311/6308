@@ -81,7 +81,6 @@ local function InitModules()
 	end
 
 	player.CharacterAdded:Connect(function(character)
-		print(character)
 		for _, v in ipairs(modules) do
 			connectOnSpawn(v, character)
 		end

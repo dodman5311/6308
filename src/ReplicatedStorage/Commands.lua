@@ -118,6 +118,10 @@ local commands = {
 
 					signals["AddGift"]:Fire(randomGift)
 
+					if level == 3 then
+						signals["AddGift"]:Fire("Master_Scouting")
+					end
+
 					if level == 5 then
 						local r = math.random(1, 3)
 
@@ -129,7 +133,11 @@ local commands = {
 							signals["AddGift"]:Fire("Spiked_Sabatons")
 						end
 
-						signals["AddGift"]:Fire("Master_Scouting")
+						
+					end
+
+					if level == 7 then
+						signals["AddGift"]:Fire("Overcharge")
 					end
 
 					for _ = 1, combatLevel do

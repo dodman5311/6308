@@ -383,6 +383,17 @@ RunService.Heartbeat:Connect(function()
 
 	for _, projectile: Projectile in ipairs(Projectiles) do
 		if projectile.Age >= projectile.LifeTime then
+			if projectile.Info["SplashRange"] then
+				explosionService.createExplosion(
+					projectile.Instance.Position,
+					projectile.Info.SplashRange,
+					projectile.Info["SplashDamage"] or 1,
+					projectile.Sender,
+					projectile.Info.ExplosiveColor,
+					projectile.Source
+				)
+			end
+
 			projectile.Instance:Destroy()
 			table.remove(Projectiles, table.find(Projectiles, projectile))
 			continue
@@ -425,7 +436,8 @@ RunService.Heartbeat:Connect(function()
 				projectile.Info.SplashRange,
 				projectile.Info["SplashDamage"] or 1,
 				projectile.Sender,
-				projectile.Info.ExplosiveColor
+				projectile.Info.ExplosiveColor,
+				projectile.Source
 			)
 		end
 

@@ -782,7 +782,7 @@ function module.dealDamage(cframe, subject, damage, source, element)
 
 		if GiftsService.CheckGift("Burn_Hell") and ChanceService.checkChance(50, true) then
 			if not sourceIsWeapon and source ~= "ThrownWeapon" then
-				net:RemoteEvent("Damage"):FireServer(model, 0, "Fire")
+				net:RemoteEvent("Damage"):FireServer(model, 1, "Fire")
 			end
 		end
 
@@ -1175,8 +1175,8 @@ function module.Fire()
 
 	local maxDistance = weaponData.MaxDistance or 500
 
-	for index = 0, (bulletCount - 1) do
-		local spread = index == 0 and index or bulletCount
+	for index = 1, bulletCount do
+		local spread = index == 1 and 0 or index
 
 		if weaponData.Projectile then
 			module.FireProjectile(weaponData.Projectile, spread, bulletDamage, index, weaponData["Element"])
@@ -1788,12 +1788,16 @@ signals.ResumeGame:Connect(function()
 	end
 end)
 
-explosionService.explosiveHit:Connect(function(subject, preHealth, postHealth, damageDelt)
+explosionService.explosiveHit:Connect(function(subject, preHealth, postHealth, damageDelt, source)
+	local sourceIsWeapon = module.currentWeapon and source == module.currentWeapon.Name or source == "Default"
+
 	if preHealth > 0 then
 		signals.DoUiAction:Fire("HUD", "ShowHit", true)
 
 		if GiftsService.CheckGift("Burn_Hell") and ChanceService.checkChance(50, true) then
-			net:RemoteEvent("Damage"):FireServer(subject, 0, "Fire")
+			if not sourceIsWeapon and source ~= "ThrownWeapon" then
+				net:RemoteEvent("Damage"):FireServer(subject, 1, "Fire")
+			end
 		end
 	end
 

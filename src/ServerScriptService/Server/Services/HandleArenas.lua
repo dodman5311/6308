@@ -129,7 +129,6 @@ local function startArena(unit, level, isAmbush)
 		table.insert(gates, closeGate(link))
 	end
 
-	print(isAmbush)
 	arenaBeginEvent:FireAllClients(isAmbush)
 
 	runArenaPromise = promise.new(function(resolve, reject, onCancel)

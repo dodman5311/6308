@@ -47,6 +47,11 @@ local function getTimer(npc, timerName)
 	return foundTimer
 end
 
+local function indicateAttack(npc, color)
+	net:RemoteEvent("ReplicateEffect"):FireAllClients("IndicateAttack", "Server", true, npc.Instance, color)
+	timer.wait(0.5)
+end
+
 local function checkHitbox(subject: Model, Pos, Size)
 	local hitboxResult = workspace:GetPartBoundsInBox(Pos, Size)
 	local humanoidsHit = {}
@@ -171,7 +176,7 @@ function moves.addArmor(npc)
 		npc.Acts:createTempAct("inStun", stunEnemy, nil, npc)
 	else
 		globalSounds.ArmorGain:Play()
-		humanoid.Health += 25
+		humanoid.Health += 10
 	end
 
 	humanoid.WalkSpeed = 15
@@ -222,9 +227,11 @@ function moves.shootAttack(npc)
 	beam.Enabled = true
 
 	--utility.indicateAttack(subject, 1, firePart)
-	timer.wait(1)
+	timer.wait(0.5)
+	indicateAttack(npc, Color3.fromRGB(255, 135, 135))
 
 	shootAnim:AdjustSpeed(1)
+
 	beam.Enabled = false
 	timer.wait(0.1)
 	showGunFire(subject, rootPart.GunFire)
