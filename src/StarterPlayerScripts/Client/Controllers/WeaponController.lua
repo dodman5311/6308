@@ -657,21 +657,26 @@ local function addToConsecutive(hit)
 	end
 
 	if not overchargeDebounce and hit and GiftsService.CheckGift("Overcharge") and not acts:checkAct("Overcharged") then
-		Overcharge += 1
-		overchargeDebounce = true
+		-- make pistol exlusive
+		if not weaponData or weaponData.Type == "Pistol" then
+			if Overcharge < 20 then
+				Overcharge += 1
+				overchargeDebounce = true
 
-		if Overcharge > 25 then
-			activateOvercharge()
+				signals.DoUiAction:Fire("HUD", "UpdateOvercharge", true, Overcharge / 20)
+
+				task.delay(0.01, function()
+					overchargeDebounce = false
+				end)
+			end
 		else
-			signals.DoUiAction:Fire("HUD", "UpdateOvercharge", true, Overcharge / 25)
+			if Overcharge >= 20 then
+				activateOvercharge()
+			end
 		end
-
-		task.delay(0.01, function()
-			overchargeDebounce = false
-		end)
 	end
 
-	signals.DoUiAction:Fire("HUD", "UpdateGiftProgress", true, "Overcharge", Overcharge / 25)
+	signals.DoUiAction:Fire("HUD", "UpdateGiftProgress", true, "Overcharge", Overcharge / 20)
 	signals.DoUiAction:Fire("HUD", "UpdateGiftProgress", true, "Boring_Bullets", consecutiveHits / 10)
 end
 
@@ -1081,7 +1086,7 @@ local function FireDefault(extraBullet)
 		defaultIndex = 0
 	end
 
-	fireTimer.WaitTime = acts:checkAct("Overcharged") and defaultFireRate / 2 or defaultFireRate
+	fireTimer.WaitTime = acts:checkAct("Overcharged") and defaultFireRate / 1.5 or defaultFireRate
 	fireTimer:Run()
 
 	fireTimer.OnEnded:Wait()
@@ -1274,7 +1279,7 @@ function module.Fire()
 		return
 	end
 
-	fireTimer.WaitTime = acts:checkAct("Overcharged") and weaponData.FireDelay / 2 or weaponData.FireDelay
+	fireTimer.WaitTime = acts:checkAct("Overcharged") and weaponData.FireDelay / 1.5 or weaponData.FireDelay
 	fireTimer:Run()
 
 	fireTimer.OnEnded:Wait()

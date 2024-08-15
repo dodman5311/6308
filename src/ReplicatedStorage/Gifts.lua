@@ -244,7 +244,9 @@ local module = {
 		Overcharge = {
 			Icon = "rbxassetid://18415380600",
 			Catagories = { "Arsenal" },
-			Desc = "Every hit on an enemy, now adds to your <b>overcharge</b> meter. When <b>overcharge</b> is full, you are granted +50% firerate, and infinite ammo for 3 seconds. (30 hits for an <b>overcharge</b>)",
+			Desc = [[pistols damage now adds to <b>overcharge</b>.
+Other weapon damage activates <b>overcharge</b>.
+When active, you gain +50% firerate, and infinite ammo for 3 seconds. (20 hits for an <b>overcharge</b>)]],
 		},
 
 		Sierra_6308 = {
