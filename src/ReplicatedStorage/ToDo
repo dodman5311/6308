@@ -224,9 +224,9 @@ Make soul drop sound?
 Make praying altar - lessens visage health - disables a perk
 
 Add Cutter
-Add 800M
+
 Add Therma
-Add Dovus Gratana
+Add Gratana
 
 Make boss gyser move
 Dudes make a shield on boss. Kill dudes to break shield
@@ -261,6 +261,8 @@ When dying, you will restart the entire campaign.
 Make variant Vending machines
 
 --
+
+Added 800M : Explosive assault rifle *
 
 buffed heavenly fortune: 5 to 10 luck buff
 
@@ -299,6 +301,11 @@ Massively increased locking power (Misses less)
 Lowered bullet speed (Misses even less)
 Ammo reduced to 6
 Fire Rate reduced
+
+Buffed Boom Cannon:
+Heavily increased firerate
+Heavily reduced recoil
+Increased ammo from 10 to 12
 
 Fixed I-Six locking onto ghosts
 

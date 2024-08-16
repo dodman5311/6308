@@ -951,12 +951,18 @@ function module.FireProjectile(projectileType, spread, damage, bulletIndex, elem
 		locked = weaponData.LockedOn[bulletIndex]
 	end
 
+	local info = { Locked = locked, Element = element }
+
+	if weaponData["SplashDamage"] then
+		info.SplashDamage = weaponData.SplashDamage
+	end
+
 	projectileService.createFromPreset(
 		origin,
 		spread,
 		projectileType,
 		damage,
-		{ Locked = locked, Element = element },
+		info,
 		player,
 		module.currentWeapon and module.currentWeapon.Name or "Default"
 	)

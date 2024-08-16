@@ -112,7 +112,7 @@ function module:OnSpawn(character, humanoid)
 			end
 
 			PlayHitEffect()
-			comboService.ReduceCombo(3)
+			comboService.ReduceCombo(2)
 		end
 
 		logHealth = health
