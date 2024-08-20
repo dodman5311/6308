@@ -52,7 +52,11 @@ function module.dealDamage(_, subject, amount, element)
 		amount += 1
 	end
 
-	humanoid:TakeDamage(amount)
+	local fHealth = humanoid.Health - amount
+
+	if fHealth <= humanoid.MaxHealth then
+		humanoid:TakeDamage(amount)
+	end
 
 	if
 		not humanoid:HasTag("Souless")

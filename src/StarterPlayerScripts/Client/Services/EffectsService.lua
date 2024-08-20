@@ -19,6 +19,7 @@ local Globals = require(REPLICATED_STORAGE.Shared.Globals)
 local util = require(Globals.Vendor.Util)
 local net = require(Globals.Packages.Net)
 local cameraShaker = require(Globals.Packages.CameraShaker)
+local timer = require(Globals.Vendor.Timer)
 
 local replicateRemote = net:RemoteEvent("ReplicateEffect")
 
@@ -33,7 +34,22 @@ camShake:Start()
 
 -- Apply explosion shakes every 5 seconds:
 
-local function emitObject(part)
+function module.emitObject(part)
+	if part:IsA("ParticleEmitter") then
+		local emitCount = part:GetAttribute("EmitCount")
+		local emitDelay = part:GetAttribute("EmitDelay")
+
+		if emitDelay and emitDelay > 0 then
+			task.delay(emitDelay, function()
+				part:Emit(emitCount)
+			end)
+		else
+			part:Emit(emitCount)
+		end
+
+		return
+	end
+
 	for _, emitter in ipairs(part:GetChildren()) do
 		if not emitter:IsA("ParticleEmitter") then
 			continue
@@ -49,6 +65,20 @@ local function emitObject(part)
 		else
 			emitter:Emit(emitCount)
 		end
+	end
+end
+
+function module.ShowParticleFor(part, showTime)
+	for _, emitter in ipairs(part:GetChildren()) do
+		if not emitter:IsA("ParticleEmitter") then
+			continue
+		end
+
+		emitter.Enabled = true
+
+		timer.delay(showTime, nil, function()
+			emitter.Enabled = false
+		end)
 	end
 end
 
@@ -85,7 +115,7 @@ function module.IndicateVisageAttack(model, color)
 	end
 end
 
-function module.IndicateAttack(model: Model, color)
+function module.IndicateAttack(model: Instance, color)
 	local ti = TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
 
 	util.PlaySound(sounds.AttackIndicator, script)
@@ -189,7 +219,7 @@ function module.Explode(position, size)
 	DEBRIS:AddItem(explosionPart, 3)
 
 	util.PlaySound(sounds:FindFirstChild(size .. "_Explosion"), explosionPart, 0.15)
-	emitObject(explosionPart)
+	module.emitObject(explosionPart)
 	explosionPart.PointLight.Enabled = true
 	task.delay(0.075, function()
 		explosionPart.PointLight.Enabled = false

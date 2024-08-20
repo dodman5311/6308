@@ -20,6 +20,7 @@ local Net = require(Globals.Packages.Net)
 local GiftsService = require(Globals.Client.Services.GiftsService)
 local signals = require(Globals.Signals)
 local timer = require(Globals.Vendor.Timer)
+local weapons = require(Globals.Client.Controllers.WeaponController)
 
 --// Instances
 
@@ -135,7 +136,7 @@ local function startGrapple(c, position, item)
 	return
 end
 
-local function dealDamage(characterHit, part)
+local function dealDamage(characterHit)
 	print(characterHit)
 	if not characterHit then
 		return
@@ -154,7 +155,7 @@ local function dealDamage(characterHit, part)
 	-- signals["registerHit"]:Fire(enemyHumanoid, dmgDelt)
 
 	Net:RemoteEvent("SetInvincible", true)
-	signals.DoWeaponAction:Fire("dealDamage", part.CFrame, characterHit, 1, "Brick_Hook")
+	--signals.DoWeaponAction:Fire("dealDamage", part.CFrame, characterHit, 1, "Brick_Hook")
 
 	signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Brick_Hook")
 	signals.DoUiAction:Fire("HUD", "CooldownGift", true, "Brick_Hook", 1)
@@ -222,7 +223,7 @@ local function detectHit(partHit, launchedPart, item)
 		return
 	end
 
-	task.spawn(dealDamage, characterHit, launchedPart)
+	--task.spawn(dealDamage, characterHit, launchedPart)
 
 	launchedPart.Weld.Part0 = partHit
 
@@ -273,6 +274,10 @@ function module.Activate(item)
 	ViewModel = viewModelService.viewModels[1].Model
 
 	acts:createTempAct("ability_invasive", function()
+		local _, characterHit = weapons.FireBullet(1, 0, 300, nil, "Brick_Hook")
+
+		task.spawn(dealDamage, characterHit)
+
 		sounds.GrappleActivate:Play()
 		local vm = ViewModel
 
@@ -287,7 +292,6 @@ function module.Activate(item)
 		-- end)
 
 		animationService:playAnimation(vm, "Grapple", Enum.AnimationPriority.Action4.Value, false, 0, 2, 1)
-
 		animation.Stopped:Wait()
 
 		task.wait(0.125)

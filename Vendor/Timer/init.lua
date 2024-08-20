@@ -27,6 +27,19 @@ module.wait = function(sec, index)
 	waitTimer:Destroy()
 end
 
+module.delay = function(sec, index, callback, ...)
+	local params = ...
+
+	local waitTimer = module:new(index or "delayAt_" .. os.clock())
+	waitTimer.WaitTime = sec or 0.01
+	waitTimer.Function = function()
+		callback(params)
+		waitTimer:Destroy()
+	end
+
+	waitTimer:Run()
+end
+
 module.new = function(self, timerName, waitTime, Function, ...)
 	local queue = self
 

@@ -2,6 +2,7 @@ local module = {}
 
 --// Services
 local CollectionService = game:GetService("CollectionService")
+local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
@@ -27,10 +28,12 @@ local ViewmodelService = require(Globals.Vendor.ViewmodelService)
 local ChanceService = require(Globals.Vendor.ChanceService)
 local MusicService = require(Globals.Client.Services.MusicService)
 local codexService = require(Globals.Client.Services.CodexService)
+local Acts = require(Globals.Vendor.Acts)
 
 --// Values
 local logHealth = 0
 local collectedBlood = 0
+local pauseAmnt = 0
 local isPaused = false
 local lastOnGroundPosition = Vector3.zero
 local render
@@ -54,6 +57,24 @@ module.camShake:Start()
 local function PlayHitEffect()
 	signals.DoUiAction:Fire("HUD", "DamagePulse")
 	module.camShake:Shake(cameraShaker.Presets["Hit"])
+end
+
+function module.attemptPause(index)
+	if not Acts:checkAct("DeathPause", "MenuPause", "RegPause") then
+		signals.PauseGame:Fire()
+	end
+
+	Acts:createAct(index)
+end
+
+function module.attemptResume(index)
+	Acts:removeAct(index)
+
+	if Acts:checkAct("DeathPause", "MenuPause", "RegPause") then
+		return
+	end
+
+	signals.ResumeGame:Fire()
 end
 
 function module:OnSpawn(character, humanoid)
@@ -145,7 +166,7 @@ end
 
 local function deathEffect()
 	sounds.Death:Play()
-	signals.PauseGame:Fire()
+	module.attemptPause("DeathPause")
 
 	local viewModel = ViewmodelService.viewModels[1].Model
 	local impactCorrection = lighting.ImpactCorrection
@@ -165,7 +186,7 @@ local function deathEffect()
 	highlight.FillTransparency = 1
 	impactCorrection.Enabled = false
 
-	signals.ResumeGame:Fire()
+	module.attemptResume("DeathPause")
 end
 
 function module:OnDied()
@@ -201,14 +222,14 @@ end
 local function checkForHeal()
 	collectedBlood += 1
 
-	if collectedBlood >= 25 then
+	if collectedBlood >= 10 then
 		collectedBlood = 0
 		util.PlaySound(assets.Sounds.BloodFuel, script, 0.1)
 		net:RemoteEvent("Damage"):FireServer(Player.Character, -1)
 		signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Sauce_Is_Fuel")
 	end
 
-	signals.DoUiAction:Fire("HUD", "UpdateGiftProgress", true, "Sauce_Is_Fuel", collectedBlood / 30)
+	signals.DoUiAction:Fire("HUD", "UpdateGiftProgress", true, "Sauce_Is_Fuel", collectedBlood / 10)
 end
 
 mouseTarget.Changed:Connect(function(value)
@@ -252,18 +273,18 @@ RunService.Heartbeat:Connect(function()
 
 	local playerPivot = Player.Character:GetPivot()
 
-	local inDamageZone = false
+	local inDamageZone = nil
 	for _, damagePart in ipairs(CollectionService:GetTagged("DamageZone")) do
 		local distance = ((playerPivot.Position * Vector3.new(1, 0, 1)) - (damagePart.Position * Vector3.new(1, 0, 1))).Magnitude
 		if distance > damagePart.Size.Z / 2 then
 			continue
 		end
 
-		inDamageZone = true
+		inDamageZone = damagePart.Color
 	end
 
 	if inDamageZone then
-		signals.DoUiAction:Fire("HUD", "showDanger")
+		signals.DoUiAction:Fire("HUD", "showDanger", true, inDamageZone)
 	else
 		signals.DoUiAction:Fire("HUD", "hideDanger")
 	end
@@ -468,14 +489,24 @@ net:Connect("OpenKiosk", function()
 	UIService.doUiAction("Kiosk", "ShowScreen", true, soulsService.Souls)
 end)
 
-UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+UserInputService.InputBegan:Connect(function(input)
 	if input.KeyCode == Enum.KeyCode.Tab then
-		signals.DoUiAction:Fire("Menu", "Toggle", false)
+		signals.DoUiAction:Fire("Menu", "Toggle", true)
 	end
 end)
 
 signals.ToggleMenu:Connect(function()
-	signals.DoUiAction:Fire("Menu", "Toggle", false)
+	signals.DoUiAction:Fire("Menu", "Toggle", true)
+end)
+
+GuiService.MenuOpened:Connect(function()
+	module.attemptPause("RegPause")
+	UIService.doUiAction("Paused", "Pause", true, true)
+end)
+
+GuiService.MenuClosed:Connect(function()
+	module.attemptResume("RegPause")
+	UIService.doUiAction("Paused", "Pause", true, false)
 end)
 
 return module

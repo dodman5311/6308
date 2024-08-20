@@ -1,10 +1,5 @@
 local module = {
 	Perks = {
-		Scavenger = {
-			Icon = "rbxassetid://15990088593",
-			Catagories = { "Tactical" },
-			Desc = "Enemies now have a chance to drop ammo, when killed with a picked up weapon. (15% chance)",
-		},
 
 		Deadshot = {
 			Icon = "rbxassetid://15990088905",
@@ -117,6 +112,12 @@ local module = {
 
 	Upgrades = {
 
+		Scavenger = {
+			Icon = "rbxassetid://15990088593",
+			Catagories = { "Tactical" },
+			Desc = "Enemies now have a chance to drop ammo, when killed with a picked up weapon. (10% chance)",
+		},
+
 		War_Drums = {
 			Icon = "rbxassetid://17590259313",
 			Catagories = { "Tactical" },
@@ -158,7 +159,7 @@ local module = {
 		Life_Steal = { -- done
 			Icon = "rbxassetid://18671291054",
 			Catagories = { "Soul" },
-			Desc = "When at 0 Souls, hits now have a chance to heal you. (15% chance)",
+			Desc = "When at 0 Souls, hits now have a chance to heal you. (5% chance)",
 		},
 
 		Open_Wounds = { -- done
@@ -220,7 +221,7 @@ local module = {
 		Sauce_Is_Fuel = {
 			Icon = "rbxassetid://16234651850",
 			Catagories = { "Soul" },
-			Desc = "You can now absorb blood splotches. Every 25 splotches absorbed will heal 1 HP. (Walk over blood to obsorb)",
+			Desc = "You can now absorb blood splotches. Every 10 splotches absorbed will heal 1 HP. (Walk over blood to obsorb)",
 		},
 
 		Set_Em_Up = {
@@ -278,15 +279,19 @@ When active, you gain +50% firerate, and infinite ammo for 3 seconds. (20 hits f
 		Brick_Hook = {
 			Icon = "rbxassetid://16465803959",
 			Catagories = { "Tactical" },
-			Desc = [[Grapple onto any surface and pull yourself towards it. Grappling an enemy will deal 1 damage and give you 1 second on invincibility. 1 second cooldown.
+			Desc = [[Grapple onto any surface and pull yourself towards it. 
+
+Grappling an enemy will deal 1 damage and give you 0.5 second on invincibility. 
+0.75 second cooldown.
 (Left Shift to grapple)]],
 		},
 
 		Righteous_Motion = {
 			Icon = "rbxassetid://16873872103",
 			Catagories = { "Tactical" },
-			Desc = [[Quick dash in any direction. Dash has three charges. 
-The more charges that are used, the longer it takes to refresh the charges.
+			Desc = [[Quick dash in any direction. Dash has three charges.
+
+The more charges that are used, the longer it takes to recharge.
 (Left Shift to dash)]],
 		},
 
@@ -294,7 +299,9 @@ The more charges that are used, the longer it takes to refresh the charges.
 			Icon = "rbxassetid://16873986562",
 			Catagories = { "Tactical" },
 			Desc = [[Run next to a wall while in the air to begin wallrunning. 
-When jumping off a wall, you will be given another jump in the air.]],
+When jumping off a wall, you will be given another jump in the air.
+
+When on a wall, parrying has a 50% chance to award 1 ammo and will refresh combo.]],
 		},
 	},
 }

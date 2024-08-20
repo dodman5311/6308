@@ -52,6 +52,7 @@ local WeakspotService = require(Globals.Client.Services.WeakspotService)
 local explosionService = require(Globals.Client.Services.ExplosionService)
 local UIService = require(Globals.Client.Services.UIService)
 local soulsService = require(Globals.Client.Services.SoulsService)
+local codexService = require(Globals.Client.Services.CodexService)
 
 local projectileService = require(Globals.Client.Services.ClientProjectiles)
 
@@ -284,7 +285,11 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo)
 	end
 
 	local weapon = assets.Models.Weapons:FindFirstChild(weaponName)
+
+	print(weaponName, weapon)
+
 	if not weapon then
+		acts:removeAct("Equipping")
 		return
 	end
 
@@ -583,7 +588,7 @@ local function dropAmmo(position)
 	if
 		not module.currentWeapon
 		or not GiftsService.CheckGift("Scavenger")
-		or not ChanceService.checkChance(15, true)
+		or not ChanceService.checkChance(10, true)
 	then
 		return
 	end
@@ -658,7 +663,8 @@ local function addToConsecutive(hit)
 
 	if not overchargeDebounce and hit and GiftsService.CheckGift("Overcharge") and not acts:checkAct("Overcharged") then
 		-- make pistol exlusive
-		if not weaponData or weaponData.Type == "Pistol" then
+
+		if not module.currentWeapon or weaponData.Type == "Pistol" then
 			if Overcharge < 20 then
 				Overcharge += 1
 				overchargeDebounce = true
@@ -681,11 +687,25 @@ local function addToConsecutive(hit)
 end
 
 local function createFakeWeakpoint(subject, part, position)
+	for _, partInSubject in ipairs(subject:GetChildren()) do
+		if partInSubject.Name ~= "Weakspot" then
+			continue
+		end
+
+		if partInSubject:HasTag("OpenWound") then
+			return
+		end
+	end
+
 	signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Open_Wounds")
 	local newWeakpoint = assets.Models.Weakspot:Clone()
 
 	newWeakpoint.Parent = subject
 	newWeakpoint.Position = position
+	newWeakpoint.CFrame = CFrame.lookAt(newWeakpoint.Position, player.Character:GetPivot().Position)
+	newWeakpoint.CFrame *= CFrame.new(0, 0, -0.5)
+
+	newWeakpoint:AddTag("OpenWound")
 
 	local newWeld = Instance.new("WeldConstraint")
 	newWeld.Parent = newWeakpoint
@@ -729,15 +749,19 @@ function module.dealDamage(cframe, subject, damage, source, element)
 		siuDamage = 1
 	end
 
-	local critDamage = 0
+	local critMult = 1
 
 	if module.currentWeapon and source == module.currentWeapon.Name then
 		if ChanceService.checkChance(module.critChances[weaponData.Type], true) then
-			critDamage = 1
+			critMult = 2
+
+			util.PlaySound(assets.Sounds.Crit, script, 0.05)
 		end
 	elseif source == "Default" then
 		if ChanceService.checkChance(module.critChances.Pistol, true) then
-			critDamage = 1
+			critMult = 2
+
+			util.PlaySound(assets.Sounds.Crit, script, 0.05)
 		end
 	end
 
@@ -751,15 +775,11 @@ function module.dealDamage(cframe, subject, damage, source, element)
 		ChanceService.doWithChance(10, true, createFakeWeakpoint, model, subject, cframe.Position)
 	end
 
-	local totalDamage = damage
-		+ deadshotDamage
-		+ weakspotDamage
-		+ boringDamage
-		+ siuDamage
-		+ critDamage
-		+ soulElementDamage
+	local totalDamage = damage + deadshotDamage + weakspotDamage + boringDamage + siuDamage + soulElementDamage
 
 	lastDamageSource = source
+
+	totalDamage *= critMult
 
 	if isVendingMachine then
 		totalDamage = 1
@@ -776,14 +796,18 @@ function module.dealDamage(cframe, subject, damage, source, element)
 		end
 
 		if humanoid.Health > 0 then
-			signals.DoUiAction:Fire("HUD", "ShowHit", true, critDamage > 0)
+			signals.DoUiAction:Fire("HUD", "ShowHit", true, critMult > 1)
 		end
 
-		if element and not ChanceService.checkChance(35, true) then
+		if element and not ChanceService.checkChance(60, true) then
 			element = nil
+		else
+			codexService.AddEntry("Elements")
 		end
 
-		local sourceIsWeapon = module.currentWeapon and source == module.currentWeapon.Name or source == "Default"
+		local sourceIsWeapon = module.currentWeapon and source == module.currentWeapon.Name
+			or source == "Default"
+			or source == "Ricoshot"
 
 		if GiftsService.CheckGift("Burn_Hell") and ChanceService.checkChance(50, true) then
 			if not sourceIsWeapon and source ~= "ThrownWeapon" then
@@ -814,7 +838,7 @@ function module.dealDamage(cframe, subject, damage, source, element)
 		)
 	end
 
-	if soulsService.Souls <= 0 and GiftsService.CheckGift("Life_Steal") and ChanceService.checkChance(15, true) then
+	if soulsService.Souls <= 0 and GiftsService.CheckGift("Life_Steal") and ChanceService.checkChance(5, true) then
 		net:RemoteEvent("Damage"):FireServer(player.Character, -1)
 		signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Life_Steal")
 	end

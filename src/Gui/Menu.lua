@@ -32,6 +32,7 @@ local codexService = require(Globals.Client.Services.CodexService)
 local gameSettings = require(Globals.Shared.GameSettings)
 local SoulsService = require(Globals.Client.Services.SoulsService)
 local net = require(Globals.Packages.Net)
+local characterController = require(Globals.Client.Controllers.CharacterController)
 
 --// Values
 local currentMenu = nil
@@ -911,7 +912,7 @@ function module.Open(player, ui, frame)
 		module.openMap(player, ui, frame)
 	end
 
-	Signals.PauseGame:Fire()
+	characterController.attemptPause("MenuPause")
 
 	showAttention(frame)
 end
@@ -929,7 +930,7 @@ function module.Close(player, ui, frame)
 		viewport.Map:Destroy()
 	end
 
-	Signals.ResumeGame:Fire()
+	characterController.attemptResume("MenuPause")
 end
 
 function module.Toggle(player, ui, frame)

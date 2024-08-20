@@ -5,6 +5,7 @@ local module = {
 --// Services
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
+local TeleportService = game:GetService("TeleportService")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -46,6 +47,7 @@ local spinGifts = {
 		Catagories = { "Luck" },
 		Desc = "You gain luck. (+1)",
 		Chance = 75,
+		GoodLuck = true,
 	},
 
 	Large_Clover = {
@@ -53,6 +55,7 @@ local spinGifts = {
 		Catagories = { "Luck" },
 		Desc = "You gain a lot of luck. (+2)",
 		Chance = 50,
+		GoodLuck = true,
 	},
 
 	Kevlar = {
@@ -60,6 +63,7 @@ local spinGifts = {
 		Catagories = { "Tactical" },
 		Desc = "You gain armor. (+1)",
 		Chance = 100,
+		GoodLuck = false,
 	},
 
 	Holy_Kevlar = {
@@ -67,6 +71,7 @@ local spinGifts = {
 		Catagories = { "Tactical" },
 		Desc = "You gain a lot of armor. (+2)",
 		Chance = 75,
+		GoodLuck = true,
 	},
 
 	Small_Magazine = {
@@ -74,6 +79,7 @@ local spinGifts = {
 		Catagories = { "Tactical" },
 		Desc = "You gain a few bullets. (+25% ammo)",
 		Chance = 100,
+		GoodLuck = false,
 	},
 
 	Big_Magazine = {
@@ -81,34 +87,39 @@ local spinGifts = {
 		Catagories = { "Tactical" },
 		Desc = "You gain a lot of bullets. (+50% ammo)",
 		Chance = 75,
+		GoodLuck = true,
 	},
 
 	Riflemans_Crit = {
 		Icon = "rbxassetid://17631463771",
 		Catagories = { "Arsenal" },
-		Desc = "You gain a chance to deal +1 dmg with assault rifles. (+1% chance)",
+		Desc = "You gain a chance to deal double damage with assault rifles. (+1% chance)",
 		Chance = 75,
+		GoodLuck = true,
 	},
 
 	Breachers_Crit = {
 		Icon = "rbxassetid://17631463680",
 		Catagories = { "Arsenal" },
-		Desc = "You gain a chance to deal +1 dmg with shotguns. (+1% chance)",
+		Desc = "You gain a chance to deal double damage with shotguns. (+1% chance)",
 		Chance = 75,
+		GoodLuck = true,
 	},
 
 	Gun_Slingers_Crit = {
 		Icon = "rbxassetid://17631463584",
 		Catagories = { "Arsenal" },
-		Desc = "You gain a chance to deal +1 dmg with pistols. (+1% chance)",
+		Desc = "You gain a chance to deal double damage with pistols. (+1% chance)",
 		Chance = 75,
+		GoodLuck = true,
 	},
 
 	Knights_Crit = {
 		Icon = "rbxassetid://17631463457",
 		Catagories = { "Arsenal" },
-		Desc = "You gain a chance to deal +1 dmg with melees. (+1% chance)",
+		Desc = "You gain a chance to deal double damage with melees. (+1% chance)",
 		Chance = 75,
+		GoodLuck = true,
 	},
 
 	Perk_Ticket = {
@@ -116,6 +127,7 @@ local spinGifts = {
 		Catagories = { "Luck" },
 		Desc = "You gain a perk ticket.",
 		Chance = 30,
+		GoodLuck = true,
 	},
 
 	Nothing = {
@@ -123,6 +135,7 @@ local spinGifts = {
 		Catagories = { "Luck" },
 		Desc = "You gain jack squat.",
 		Chance = 60,
+		GoodLuck = false,
 	},
 }
 
@@ -165,7 +178,7 @@ function module.getRandomGiftFromLocalList()
 	local array = {}
 
 	for key, gift in pairs(spinGifts) do
-		if not chanceService.checkChance(gift.Chance, key == "Nothing" and false or true) then
+		if not chanceService.checkChance(gift.Chance, gift.GoodLuck) then
 			continue
 		end
 
@@ -670,7 +683,7 @@ local function showDescription(frame, gift, rapido)
 		until skipKeyPressed
 		keyPressed:Disconnect()
 	else
-		timer.wait(2.5, "Kiosk_Wait_Desc_1")
+		timer.wait(4, "Kiosk_Wait_Desc_1")
 	end
 
 	util.tween(frame.Desc, ti, { TextTransparency = 1 })

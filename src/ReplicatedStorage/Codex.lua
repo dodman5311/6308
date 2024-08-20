@@ -248,7 +248,7 @@ The project was abandoned, and the product was left in the dust. That was until 
 
 	["I-Six"] = {
 		Catagory = "Weapons",
-		Entry = [[<font color="#FF7800"><b>Hold fire to build up lock ons. The more lock ons, the less damage. (Only uses 1 ammo per shot)</b></font>
+		Entry = [[<font color="#FF7800"><b>Hold fire to build up lock ons. Every 2 locks reduces the damage by 1.</b></font>
 		
 The I-Six has a mysterious origin, discovered around 2895 during a drug raid in Muerta Crista by NADA. Aztac purchased the weapon from authorities for its revolutionary automatic aiming and adversary detection technology.
 
@@ -316,6 +316,14 @@ However, Qiosk still places a sign so his customers can always find him: <font c
 		Catagory = "Misc",
 		Entry = [[<font color="#FF7800"><b>Throw your weapon at the machine to activate it (X to throw weapon)</b></font>
 
+<font color="#FF7800">Vending machines can give you:
+- armor
+- weapons with extra ammo
+- elemental weapons
+- and weapons from other stages
+
+The chances for these rewards are determined by it's color (Rarity)</font>
+
 With the growing violence in the suburbs, vending machines offering weaponry to commoners were introduced. These machines were constructed and produced by a demon named Qiosk, who hoped to further his business venture amidst the ongoing carnage.
 
 However, they possess a severe design flaw. Certain forms of dramatic blunt force trauma can cause them to dispense weapons without payment. For instance, if someone were to throw a heavy object at one—such as a weapon—it would dispense its contents.]],
@@ -331,6 +339,17 @@ However, they possess a severe design flaw. Certain forms of dramatic blunt forc
 Keep that loop up, and you’ll be fine (for the most part).
 
 <font color="#FF7800"><b>Right click to parry:</b></font> Some weapons are able to parry when MB2 (Right Click) is pressed. Most melee weapons are capable of this.]],
+	},
+
+	["Elements"] = {
+		Catagory = "Misc",
+		Entry = [[<font color="#FF7800"><b>Fire:</b></font> When enemies are on fire, they will explode after death and have a higher soul chance.
+
+<font color="#FF7800"><b>Ice:</b></font> When enemies are frozen, they will stop moving and shooting and will have a chance to drop armor after death.
+
+<font color="#FF7800"><b>Electricity:</b></font> When enemies are electrified, they will move slower, have reduced accuracy, and have a 50% chance to cancel their shot.
+
+<font color="#FF7800"><b>Soul:</b></font> When enemies are soul afflicted, they will take +1 damage, but will not drop a soul upon death.]],
 	},
 }
 

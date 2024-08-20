@@ -132,8 +132,6 @@ local commands = {
 						elseif r == 3 then
 							signals["AddGift"]:Fire("Spiked_Sabatons")
 						end
-
-						
 					end
 
 					if level == 7 then
@@ -226,6 +224,27 @@ local commands = {
 				end
 
 				signals.DoWeaponAction:Fire("EquipWeapon", Weapon.Name, nil, element)
+			end,
+		},
+
+		Complete_Codex = {
+			Parameters = function()
+				return {
+					{ Name = "Confirm", Options = { true, false } },
+				}
+			end,
+
+			ExecuteClient = function(_, confirm)
+				if not confirm then
+					return
+				end
+
+				local codex = require(Globals.Shared.Codex)
+				local codexService = require(Globals.Client.Services.CodexService)
+
+				for i, _ in pairs(codex) do -- add all entries for testing
+					codexService.AddEntry(i, true)
+				end
 			end,
 		},
 

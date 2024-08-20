@@ -186,8 +186,9 @@ function module.hideReload(player, ui, frame)
 	UiAnimator.StopAnimation(frame)
 end
 
-function module.showDanger(player, ui, frame)
+function module.showDanger(player, ui, frame, color)
 	local dangerUi = frame.DangerEffect
+	dangerUi.GroupColor3 = color
 	if dangerUi.GroupTransparency ~= 1 then
 		return
 	end

@@ -11,7 +11,7 @@ local util = require(Globals.Vendor.Util)
 
 local ComboService = require(Globals.Client.Services.ComboService)
 
-function module.doWeakspotHit(part)
+function module.doWeakspotHit(part: BasePart)
 	if part.Name ~= "Weakspot" then
 		return 0
 	end
@@ -49,6 +49,10 @@ function module.doWeakspotHit(part)
 		part.CanQuery = false
 		part.CanTouch = false
 		part.Transparency = 1
+
+		if part:HasTag("OpenWound") then
+			part:RemoveTag("OpenWound")
+		end
 	end
 
 	part.Effect:Emit(part.Effect:GetAttribute("EmitCount"))

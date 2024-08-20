@@ -17,12 +17,86 @@ local createProjectileRemote = net:RemoteEvent("CreateProjectile")
 
 local moveChances = {
 	--{ "SinkRoom", 10 },
-	--{ "Geysers", 25 },
-	--{ "Sacrifice", 15 },
 
-	{ "Fire", 25 },
-	{ "Grenades", 40 },
+	{ "Sacrifice", 20 },
+	{ "Geysers", 25 },
+
+	{ "Grenades", 30 },
+	{ "Fire", 40 },
 	{ "Rockets", 100 },
+}
+
+local patterns = {
+	{ -- straight bars
+		Vector2.new(0, 1),
+		Vector2.new(0, -1),
+		Vector2.new(1, 0),
+		Vector2.new(-1, 0),
+
+		Vector2.new(0, 0.75),
+		Vector2.new(0, -0.75),
+		Vector2.new(0.75, 0),
+		Vector2.new(-0.75, 0),
+
+		Vector2.new(0, 0.5),
+		Vector2.new(0, -0.5),
+		Vector2.new(0.5, 0),
+		Vector2.new(-0.5, 0),
+
+		Vector2.new(0, 0.25),
+		Vector2.new(0, -0.25),
+		Vector2.new(0.25, 0),
+		Vector2.new(-0.25, 0),
+	},
+
+	{ -- diagonal bars
+		Vector2.new(0.25, 0.25),
+		Vector2.new(0.5, 0.5),
+		Vector2.new(0.75, 0.75),
+
+		Vector2.new(-0.25, -0.25),
+		Vector2.new(-0.5, -0.5),
+		Vector2.new(-0.75, -0.75),
+
+		Vector2.new(0.25, -0.25),
+		Vector2.new(0.5, -0.5),
+		Vector2.new(0.75, -0.75),
+
+		Vector2.new(-0.25, 0.25),
+		Vector2.new(-0.5, 0.5),
+		Vector2.new(-0.75, 0.75),
+	},
+
+	{ -- circle
+		Vector2.new(1, 0.75),
+		Vector2.new(1, 0.25),
+		Vector2.new(1, 0),
+		Vector2.new(1, -0.25),
+		Vector2.new(1, -0.75),
+
+		Vector2.new(-1, 0.75),
+		Vector2.new(-1, 0.25),
+		Vector2.new(-1, 0),
+		Vector2.new(-1, -0.25),
+		Vector2.new(-1, -0.75),
+
+		Vector2.new(0.75, 1),
+		Vector2.new(0.25, 1),
+		Vector2.new(0, 1),
+		Vector2.new(-0.25, 1),
+		Vector2.new(-0.75, 1),
+
+		Vector2.new(0.75, -1),
+		Vector2.new(0.25, -1),
+		Vector2.new(0, 1),
+		Vector2.new(-0.25, -1),
+		Vector2.new(-0.75, -1),
+
+		Vector2.new(0.75, 0.75),
+		Vector2.new(-0.75, 0.75),
+		Vector2.new(0.75, -0.75),
+		Vector2.new(-0.75, -0.75),
+	},
 }
 
 local function indicateAttack(npc, color)
@@ -121,6 +195,34 @@ local function checkHitboxes(npc)
 	end
 end
 
+local function checkGeyserHitboxes()
+	local playersHit = {}
+
+	for _, hitbox in ipairs(CollectionService:GetTagged("GeyserHitbox")) do
+		for _, partHit in ipairs(workspace:GetPartsInPart(hitbox)) do
+			local humanoid, model = util.checkForHumanoid(partHit)
+
+			local playerHit = Players:GetPlayerFromCharacter(model)
+
+			if not playerHit or table.find(playersHit, playerHit) then
+				continue
+			end
+
+			humanoid:TakeDamage(1)
+
+			table.insert(playersHit, playerHit)
+		end
+	end
+end
+
+local function RunGeyserCheck(npc)
+	local geyserTimer = npc:GetTimer("GeyserTimer")
+
+	geyserTimer.WaitTime = 0.25
+	geyserTimer.Function = checkGeyserHitboxes
+	geyserTimer:Run()
+end
+
 local function rotateForFire(npc)
 	local startTime = os.clock()
 	local lastStep = os.clock()
@@ -174,6 +276,40 @@ local function aimYAxisAtPlayer(npc)
 
 		root.ApatureRoot.WorldPosition = xyP + Vector3.new(0, target:GetPivot().Position.Y + (targetDistance / 3), 0)
 	end)
+end
+
+local function createGeyserAt(npc, indicateTime, Position)
+	--local target = npc:GetTarget()
+	local model = npc.Instance
+
+	local ti = TweenInfo.new(indicateTime, Enum.EasingStyle.Linear)
+
+	-- if not target then
+	-- 	return
+	-- end
+
+	local newGeyser = ReplicatedStorage.Assets.Effects.GeyserAttack:Clone()
+	newGeyser.Parent = workspace
+
+	local targetPosition = Position * Vector3.new(1, 0, 1) -- target:GetPivot().Position * Vector3.new(1, 0, 1)
+
+	newGeyser:PivotTo(CFrame.new(targetPosition + Vector3.new(0, model:GetPivot().Position.Y - 5, 0)))
+
+	util.tween(newGeyser.Area, ti, { Size = Vector3.new(305.65, 0, 0) })
+	timer.wait(ti.Time)
+
+	newGeyser.GeyserPart.Explosion:Play()
+	newGeyser.GeyserPart.Water:Play()
+
+	newGeyser.Area.Transparency = 1
+
+	newGeyser.Hitbox:AddTag("GeyserHitbox")
+	vfx:FireAllClients("ShowParticleFor", "Server", true, newGeyser.GeyserPart, 5)
+	timer.wait(5)
+
+	newGeyser.GeyserPart.Water:Stop()
+	newGeyser.Hitbox:Destroy()
+	Debris:AddItem(newGeyser, 5)
 end
 
 local moves = {
@@ -284,8 +420,8 @@ local moves = {
 					{
 						Dropping = 0.65,
 						Bouncing = true,
-						SplashRange = 50,
-						SplashDamage = 6,
+						SplashRange = 45,
+						SplashDamage = 3,
 					},
 					nil,
 					"GrenadeProjectile"
@@ -305,10 +441,73 @@ local moves = {
 		aimOnStep:Disconnect()
 		npc.Acts:removeAct("InAction")
 	end,
+
+	Geysers = function(npc)
+		npc.Acts:createAct("InAction")
+
+		net:RemoteEvent("ReplicateEffect")
+			:FireAllClients("IndicateAttack", "Server", true, npc.Instance.Torso, Color3.fromRGB(145, 255, 95))
+		timer.wait(0.5)
+
+		-- for i = 5, 1, -1 do
+		-- 	task.spawn(createGeyserAtPlayerPosition, npc, i / 10)
+		-- 	timer.wait(1)
+		-- end
+
+		local pattern = patterns[math.random(1, #patterns)]
+		local npcCframne = npc.Instance:GetPivot()
+
+		for _, offset in ipairs(pattern) do
+			local cframe = npcCframne * CFrame.new(offset.X * 150, 0, offset.Y * 150)
+
+			task.spawn(createGeyserAt, npc, 0.5, cframe.Position)
+		end
+
+		timer.wait(0.5)
+
+		npc.Acts:removeAct("InAction")
+	end,
+
+	Sacrifice = function(npc)
+		local enemies = CollectionService:GetTagged("Enemy")
+
+		if #enemies <= 1 then
+			return
+		end
+
+		npc.Acts:createAct("InAction")
+		npc.Instance.Humanoid:SetAttribute("Invincible", true)
+
+		npc.Instance.PrimaryPart.Shield_1.Enabled = true
+		npc.Instance.PrimaryPart.Shield_2.Enabled = true
+
+		for _, enemy in ipairs(enemies) do
+			if enemy.Name == "Visage Of False Hope" then
+				continue
+			end
+
+			local cframe = enemy:GetPivot()
+			enemy:Destroy()
+			spawners.placeNewObject(1000, cframe, "Enemy", "Betrayed")
+		end
+
+		repeat
+			timer.wait(0.35)
+			npc.Instance.Humanoid.Health += 1
+		until not workspace:FindFirstChild("Betrayed")
+
+		timer.wait(1)
+
+		npc.Instance.PrimaryPart.Shield_1.Enabled = false
+		npc.Instance.PrimaryPart.Shield_2.Enabled = false
+
+		npc.Instance.Humanoid:SetAttribute("Invincible", false)
+		npc.Acts:removeAct("InAction")
+	end,
 }
 
 local function spawnEnemy(OriginCFrame)
-	local spawnRange = 150
+	local spawnRange = 100
 	local enemyToSpawn = "Tollsman"
 
 	if rng:NextNumber(0, 100) <= 5 then
@@ -368,7 +567,7 @@ local function spawnEnemies(npc) -- 250 studs
 
 	spawnTimer.WaitTime = 8
 	spawnTimer.Function = function()
-		if #CollectionService:GetTagged("Enemy") > 7 then
+		if #CollectionService:GetTagged("Enemy") > 7 or workspace:FindFirstChild("Betrayed") then
 			return
 		end
 
@@ -379,13 +578,13 @@ local function spawnEnemies(npc) -- 250 studs
 
 	spawnTimer:Run()
 end
-
 -- local function setUp(npc)
 
 -- end
 
 local module = {
 	OnStep = {
+		{ Function = "Custom", Parameters = { RunGeyserCheck } },
 		{ Function = "Custom", Parameters = { spawnEnemies } },
 		{ Function = "Custom", Parameters = { runAttackTimer } },
 		{ Function = "SearchForTarget", Parameters = { "Player", math.huge } },

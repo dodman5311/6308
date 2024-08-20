@@ -39,10 +39,6 @@ function module:OnSpawn()
 	module.AddEntry("Cleanse & Repent")
 	module.AddEntry("The Iron Gate")
 	module.AddEntry("Info & Tips")
-
-	-- for i, _ in pairs(codex) do -- add all entries for testing
-	-- 	module.AddEntry(i, true)
-	-- end
 end
 
 return module

@@ -21,6 +21,7 @@ local net = require(Globals.Packages.Net)
 local ComboService = require(Globals.Client.Services.ComboService)
 local ChanceService = require(Globals.Vendor.ChanceService)
 local GiftsService = require(Globals.Client.Services.GiftsService)
+local util = require(Globals.Vendor.Util)
 
 --// Values
 
@@ -47,6 +48,11 @@ function module.CalculateDropChance(chanceMod)
 	return math.clamp(chance, 0, 75)
 end
 
+local function playDropSound()
+	util.PlaySound(assets.Sounds.SoulDropVoices, script, 0.1)
+	util.PlaySound(assets.Sounds.SoulDrop, script, 0.1)
+end
+
 function module.DropSoul(position, chanceModifier)
 	chanceModifier = chanceModifier or 1
 
@@ -54,6 +60,8 @@ function module.DropSoul(position, chanceModifier)
 	if not ChanceService.checkChance(chance) then
 		return
 	end
+
+	playDropSound()
 
 	dropService.CreateDrop(position, "Soul").Sound:Play()
 

@@ -209,37 +209,33 @@ Maps generate smaller
 
 Diasy chain has chance to apply elecricity to other guy
 
-Perk the lights things on fire if not damaged by a bullet
+Perk that lights things on fire if not damaged by a bullet
 
 Grapple deals 1 damage and grants invincibility (Cooldown)
 
 ^^-------^^
 
-Fix riccoshot icon on ground
+TEXTURE BOSS!!!!!!!
 
-Make crit sound
-
-Make soul drop sound?
-
-Make praying altar - lessens visage health - disables a perk
+Make praying altar offering - lessens visage health - disables a perk
 
 Add Cutter
-
 Add Therma
 Add Gratana
 
 Make boss gyser move
+
 Dudes make a shield on boss. Kill dudes to break shield
 
-Fix shield removing on parry
+Make grapple fire bullet raycast first
 
-Make tips and tricks pop up and stop game and start
+SMALL STUFF vv
 
-Make enemies spawn by raycasting down from high point
+Add console support to the menu map
 
-Acid will cover boss
+Fix riccoshot icon on ground
 
-Add Main boss
+Make projectiles have a 2 stage raycast
 
 --
 
@@ -260,24 +256,39 @@ When dying, you will restart the entire campaign.
 
 Make variant Vending machines
 
+upgrade: when at 0 souls, x6 soul chance instead of x4
+
 --
+fixed healing going over the health limit
+
+Buffed Sauce if fuel - 10 sploches to heal instead of 25
+
+Added visible magazines to the Cleanse and Repent
+
+Added soul drop sound
+
+Added Critical hit sound
+
+Crits deal double damage, instead of +1 damage
+
+Kevlar and Small magazine in the kiosk, changed to bad luck (The more luck, the lower chance for getting it)
+
+Fixed shield removing on successfull parry
 
 Added 800M : Explosive assault rifle *
 
 buffed heavenly fortune: 5 to 10 luck buff
 
-upgrade: when at 0 souls, x6 soul chance instead of x4
-
 hover over delivery number now changes color
 
 Added bullet holes
 
-Added paladins faith
-added aggressive forgery
-added life steal
-added open wounds
-Added Burn hell
-Added Tacticool
+Added paladins faith perk
+added aggressive forgery perk
+added life steal perk
+added open wounds perk
+Added Burn hell perk
+Added Tacticool perk
 
 Nerfed Quad shot pellet count: 14 to 10
 Nerfed Double Shot pellet count: 8 to 5
@@ -321,23 +332,29 @@ Added restart run button to settings menu (Fixes floor camera glitch)
 Combo hit penalty increased to -2
 Soul chance capped at 75%
 
-Make codex entries *
-Make spawning other level weapons a chance (Vending machine) *
-Add ambushes *
-Fix elements for mule bags *
-Completed arenas now count towards final score
+Added ambushes: Single wave, hardcore, arenas that activate if you have 3 souls or above.*
 Picked up weapons no longer count towards final score (Bold)
-Add elemental weapons ^*
+Completed arenas now count towards final score
+
+Added elements:
+Fire - increases enemy soul chance, will explode if killed.
+Ice - Freezes enemy in place. Has a chance to drop armor if killed.
+Electricity - Slows walkspeed, reduced accuracy, 50% chance to cancel a shot.
+Soul - Takes +1 damage, will not drop a soul.
+
+Added vending machines:
+Throw your weapon at it for a new weapon, some armor, and a chance to get next stage weapons or elemental weapons.
+
 Enemy melees no longer damage other enemies
-Add Harpoon *
-Add vending machines*
+Added Harpoon *
+
 Thrown weapons now ignite barrels
-display level and stage on map
 
 Fixed master scouting breaking after death
 Fixed Wax On breaking after death
+Fixed spiked sabatons breaking after death
 
-a computer on spawn that you can look stuff up on. (LOOOOOREE)
+
 
 -----------------
 
@@ -347,6 +364,7 @@ Save data
 
 Tutorials
 
+a computer on spawn that you can look stuff up on. (LOOOOOREE)
 
 Lockers (Store cool weapon) (Perk for 2 slots)
 Add 3 lives? (As a perma upgrade)

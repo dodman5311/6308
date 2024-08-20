@@ -137,7 +137,7 @@ module.Presets = {
 	Rocket = {
 		Speed = 300,
 		LifeTime = 10,
-		Info = { SplashRange = 20, SplashDamage = 1 },
+		Info = { Size = 2, SplashRange = 20, SplashDamage = 1 },
 		Damage = 1,
 		Piercing = 0,
 		Model = "RocketProjectile",
