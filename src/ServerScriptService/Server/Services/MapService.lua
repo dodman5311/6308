@@ -4,6 +4,7 @@ local module = {
 	GeneratedAt = 0,
 }
 --// services
+local RunService = game:GetService("RunService")
 local serverStorage = game:GetService("ServerStorage")
 local replicatedStorage = game:GetService("ReplicatedStorage")
 local collectionService = game:GetService("CollectionService")
@@ -60,7 +61,7 @@ local function doUnitFunction(functionName, unit, ...)
 	-- 	task.spawn(unitModule[functionName], unit, module, ...)
 	-- end
 
-	local modules = unit.Modules
+	local modules = unit:FindFirstChild("Modules")
 	if not modules then
 		return
 	end
@@ -640,5 +641,49 @@ end
 
 net:Connect("BossExit", module.bossExit)
 net:Connect("MiniBossExit", module.exitMiniBoss)
+
+local function detectHit(part: BasePart)
+	local model = part:FindFirstAncestorOfClass("Model")
+	if not model then
+		return
+	end
+
+	local humanoid = model:FindFirstChildOfClass("Humanoid")
+	if not humanoid or humanoid.Health <= 0 then
+		return
+	end
+
+	return humanoid
+end
+
+local lastTimeReset = os.clock()
+
+RunService.Heartbeat:Connect(function()
+	if os.clock() - lastTimeReset >= 0.25 or workspace:GetAttribute("GamePaused") then
+		lastTimeReset = os.clock()
+	else
+		return
+	end
+
+	for _, damagePart in ipairs(collectionService:GetTagged("DamagePart")) do
+		local detect = workspace:GetPartBoundsInBox(damagePart.CFrame, damagePart.Size + Vector3.new(1, 1, 1))
+
+		local hit = {}
+
+		for _, part in ipairs(detect) do
+			local humanoid = detectHit(part)
+
+			if table.find(hit, humanoid) then
+				continue
+			end
+
+			if not humanoid then
+				continue
+			end
+			table.insert(hit, humanoid)
+			humanoid:TakeDamage(1)
+		end
+	end
+end)
 
 return module

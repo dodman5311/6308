@@ -21,7 +21,7 @@ local spring = require(Globals.Vendor.Spring)
 
 local grappleIncicatorSpring = spring.new(Vector2.zero)
 grappleIncicatorSpring.Damper = 0.5
-grappleIncicatorSpring.Speed = 15
+grappleIncicatorSpring.Speed = 10
 
 --// Values
 local frameDelay = 0.045
@@ -108,7 +108,7 @@ function module.Init(player, ui, frame)
 		targetEnemy.Value = inCenter
 
 		local mouseDelta = UserInputService:GetMouseDelta()
-		grappleIncicatorSpring.Target = mouseDelta * 2
+		grappleIncicatorSpring.Target = mouseDelta * 3
 
 		frame.GrappleReady.Position =
 			UDim2.new(0.5, grappleIncicatorSpring.Position.X, 0.5, grappleIncicatorSpring.Position.Y)

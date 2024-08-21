@@ -42,6 +42,14 @@ net:RemoteEvent("PickupWeapon")
 
 net:RemoteFunction("CheckChance")
 
+net:Connect("PauseGame", function()
+	workspace:SetAttribute("GamePaused", true)
+end)
+
+net:Connect("ResumeGame", function()
+	workspace:SetAttribute("GamePaused", false)
+end)
+
 for _, signal in ipairs(allSignals) do
 	Signals:addSignal(signal)
 end

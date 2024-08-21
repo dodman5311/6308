@@ -304,6 +304,10 @@ local attacks = {
 	end,
 
 	function(npc) -- Bell hit
+		if rng:NextNumber(0, 100) > 30 then
+			return
+		end
+
 		local model = npc.Instance
 		local runTo = workspace:FindFirstChild("JumpPoint", true)
 

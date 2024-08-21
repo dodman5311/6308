@@ -343,7 +343,7 @@ uis.InputBegan:Connect(function(input, gameProcessedEvent)
 
 		if GiftsService.CheckGift("Stuff_Hook") and item then
 			onCooldown = true
-			uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", true, 0.85)
+			uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", true, 0.9)
 
 			module.Activate(item)
 
@@ -362,7 +362,7 @@ uis.InputBegan:Connect(function(input, gameProcessedEvent)
 		end
 
 		onCooldown = true
-		uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", true, 0.85)
+		uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", true, 0.9)
 
 		module.Activate()
 
