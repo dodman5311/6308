@@ -22,7 +22,7 @@ local moveChances = {
 	{ "Geysers", 25 },
 
 	{ "Grenades", 30 },
-	{ "Fire", 40 },
+	{ "Fire", 45 },
 	{ "Rockets", 100 },
 }
 
@@ -274,7 +274,8 @@ local function aimYAxisAtPlayer(npc)
 
 		local targetDistance = (npcPos2 - targetPos2).Magnitude
 
-		root.ApatureRoot.WorldPosition = xyP + Vector3.new(0, target:GetPivot().Position.Y + (targetDistance / 3), 0)
+		root.ApatureRoot.WorldPosition = xyP
+			+ Vector3.new(0, target:GetPivot().Position.Y + (targetDistance / 3) + 2, 0)
 	end)
 end
 
@@ -420,8 +421,8 @@ local moves = {
 					{
 						Dropping = 0.65,
 						Bouncing = true,
-						SplashRange = 45,
-						SplashDamage = 3,
+						SplashRange = 50,
+						SplashDamage = 4,
 					},
 					nil,
 					"GrenadeProjectile"
@@ -492,7 +493,7 @@ local moves = {
 		end
 
 		repeat
-			timer.wait(0.35)
+			timer.wait(0.3)
 			npc.Instance.Humanoid.Health += 1
 		until not workspace:FindFirstChild("Betrayed")
 

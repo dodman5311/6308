@@ -281,8 +281,9 @@ When active, you gain +50% firerate, and infinite ammo for 3 seconds. (20 hits f
 			Catagories = { "Tactical" },
 			Desc = [[Grapple onto any surface and pull yourself towards it. 
 
-Grappling an enemy will deal 1 damage and give you 0.5 second on invincibility. 
-0.75 second cooldown.
+Grappling an enemy will deal 1 damage and give you 0.5 seconds of invincibility. 
+1 second invincibility cooldown.
+
 (Left Shift to grapple)]],
 		},
 
@@ -301,7 +302,7 @@ The more charges that are used, the longer it takes to recharge.
 			Desc = [[Run next to a wall while in the air to begin wallrunning. 
 When jumping off a wall, you will be given another jump in the air.
 
-When on a wall, parrying has a 50% chance to award 1 ammo and will refresh combo.]],
+Wall running will sustain your previous velocity.]],
 		},
 	},
 }

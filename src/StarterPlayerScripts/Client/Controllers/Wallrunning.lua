@@ -114,6 +114,8 @@ local function wallrun(distanceToCeiling)
 	end
 
 	local primaryPart = character.PrimaryPart
+	local logVelocity = primaryPart.AssemblyLinearVelocity.Magnitude
+
 	local humanoid = character.Humanoid
 
 	if not acts:checkAct("wallrunning") then
@@ -129,7 +131,8 @@ local function wallrun(distanceToCeiling)
 
 	local pullVector = (wallPosition - primaryPart.Position)
 		+ ((primaryPart.CFrame * CFrame.new(d * -3.5, 0, 0)).Position - primaryPart.Position)
-	module.linearVelocity.VectorVelocity = (humanoid.MoveDirection * module.speed)
+
+	module.linearVelocity.VectorVelocity = (humanoid.MoveDirection * logVelocity) --(humanoid.WalkSpeed * 1.5))
 		+ module.vectorMod.Value
 		+ (pullVector * module.draw)
 end

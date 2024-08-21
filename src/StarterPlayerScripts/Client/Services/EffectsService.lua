@@ -76,7 +76,7 @@ function module.ShowParticleFor(part, showTime)
 
 		emitter.Enabled = true
 
-		timer.delay(showTime, nil, function()
+		timer.delay(showTime, function()
 			emitter.Enabled = false
 		end)
 	end

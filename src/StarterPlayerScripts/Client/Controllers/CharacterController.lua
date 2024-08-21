@@ -128,8 +128,14 @@ function module:OnSpawn(character, humanoid)
 
 		if health < logHealth then
 			if giftService.CheckGift("Haven") then
+				signals.DoUiAction:Fire("HUD", "ShowInvincible", true)
+
 				signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Haven")
 				signals.DoUiAction:Fire("HUD", "CooldownGift", true, "Haven", 1)
+
+				task.delay(1, function()
+					signals.DoUiAction:Fire("HUD", "HideInvincible", true)
+				end)
 			end
 
 			PlayHitEffect()

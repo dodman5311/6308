@@ -14,10 +14,14 @@ local sounds = assets.Sounds
 
 --// Modules
 local util = require(Globals.Vendor.Util)
-local acts = require(Globals.Vendor.Acts)
 local UiAnimator = require(Globals.Vendor.UIAnimationService)
 local SoulsService = require(Globals.Client.Services.SoulsService)
 local GiftsService = require(Globals.Client.Services.GiftsService)
+local spring = require(Globals.Vendor.Spring)
+
+local grappleIncicatorSpring = spring.new(Vector2.zero)
+grappleIncicatorSpring.Damper = 0.5
+grappleIncicatorSpring.Speed = 15
 
 --// Values
 local frameDelay = 0.045
@@ -102,6 +106,12 @@ function module.Init(player, ui, frame)
 	RunService.RenderStepped:Connect(function()
 		local inCenter = module.getObjectInCenter(frame.CenterFrame, player)
 		targetEnemy.Value = inCenter
+
+		local mouseDelta = UserInputService:GetMouseDelta()
+		grappleIncicatorSpring.Target = mouseDelta * 2
+
+		frame.GrappleReady.Position =
+			UDim2.new(0.5, grappleIncicatorSpring.Position.X, 0.5, grappleIncicatorSpring.Position.Y)
 	end)
 
 	local currentHealthChanged
@@ -419,6 +429,18 @@ function module.DamagePulse(player, ui, frame)
 	util.tween(frame.Static, ti, { ImageColor3 = Color3.new(1, 1, 1) })
 end
 
+function module.ShowInvincible(player, ui, frame)
+	local ti = TweenInfo.new(0.1, Enum.EasingStyle.Linear)
+
+	util.tween(frame.Static, ti, { ImageColor3 = Color3.new(1, 0.85, 0) })
+end
+
+function module.HideInvincible(player, ui, frame)
+	local ti = TweenInfo.new(0.2, Enum.EasingStyle.Linear)
+
+	util.tween(frame.Static, ti, { ImageColor3 = Color3.new(1, 1, 1) })
+end
+
 function module.SetCombo(player, ui, frame, amount)
 	local comboNumber = frame.ComboNumber
 	local comboFrame = frame.ComboFrame
@@ -584,6 +606,21 @@ function module.HideOvercharge(player, ui, frame)
 	frame.OverchargeBar.Visible = false
 
 	UiAnimator.StopAnimation(frame.OverchargeBar.BarFrame.Bar.BarAnimation)
+end
+
+function module.ToggleGrappleIndicator(player, ui, frame, value)
+	frame.GrappleReady.Visible = value
+end
+
+function module.SetGrappleIndicatorTransparency(player, ui, frame, value)
+	frame.GrappleReady.ImageTransparency = value
+end
+
+function module.GrappleCooldown(player, ui, frame, cooldownTime, goal)
+	local gradient: UIGradient = frame.GrappleReady.UIGradient
+	local ti = TweenInfo.new(cooldownTime, Enum.EasingStyle.Linear)
+
+	util.tween(gradient, ti, { Offset = Vector2.new(0, -goal) })
 end
 
 function module.UpdateOvercharge(player, ui, frame, number)

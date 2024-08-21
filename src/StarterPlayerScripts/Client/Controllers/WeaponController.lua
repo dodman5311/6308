@@ -53,6 +53,7 @@ local explosionService = require(Globals.Client.Services.ExplosionService)
 local UIService = require(Globals.Client.Services.UIService)
 local soulsService = require(Globals.Client.Services.SoulsService)
 local codexService = require(Globals.Client.Services.CodexService)
+local wallrunning = require(Globals.Client.Controllers.Wallrunning)
 
 local projectileService = require(Globals.Client.Services.ClientProjectiles)
 
@@ -813,6 +814,10 @@ function module.dealDamage(cframe, subject, damage, source, element)
 			if not sourceIsWeapon and source ~= "ThrownWeapon" then
 				net:RemoteEvent("Damage"):FireServer(model, 1, "Fire")
 			end
+		end
+
+		if wallrunning.onWall and ChanceService.checkChance(50, true) then
+			ComboService.RestartTimer()
 		end
 
 		local serverHumanoid, preHealth, postHealth = net:RemoteFunction("Damage")
@@ -1790,7 +1795,7 @@ signals.AddAmmo:Connect(function(bigMag)
 	local amount
 	local baseAmmo
 
-	if weaponData then
+	if module.currentWeapon then
 		baseAmmo = weaponData.Ammo
 	else
 		baseAmmo = 16

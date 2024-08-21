@@ -13,12 +13,10 @@ local Lighting = game:GetService("Lighting")
 local Globals = require(replicatedStorage.Shared.Globals)
 
 --// requirements
-local util = require(Globals.Vendor.Util)
 local spawners = require(Globals.Services.Spawners)
 local signals = require(Globals.Signals)
 local net = require(Globals.Packages.Net)
 local arenas = require(Globals.Services.HandleArenas)
-local timer = require(Globals.Vendor.Timer):newQueue()
 
 --// instances
 
@@ -39,7 +37,7 @@ local newStart
 local links = {}
 
 local leeway = 6
-local unitModules = {}
+--local unitModules = {}
 local blacklistedUnits = {}
 
 local clearBloodEvent = net:RemoteEvent("ClearBlood")
@@ -49,32 +47,47 @@ net:RemoteEvent("SpawnBoss")
 net:RemoteEvent("MiniBossExit")
 
 local function doUnitFunction(functionName, unit, ...)
-	local moduleTable = unitModules[unit.Name]
-	if not moduleTable then
+	-- local moduleTable = unitModules[unit.Name]
+	-- if not moduleTable then
+	-- 	return
+	-- end
+
+	-- for _, unitModule in ipairs(moduleTable) do
+	-- 	if not unitModule[functionName] then
+	-- 		continue
+	-- 	end
+
+	-- 	task.spawn(unitModule[functionName], unit, module, ...)
+	-- end
+
+	local modules = unit.Modules
+	if not modules then
 		return
 	end
 
-	for _, unitModule in ipairs(moduleTable) do
-		if not unitModule[functionName] then
+	for _, unitModule in ipairs(modules:GetChildren()) do
+		local required = require(unitModule)
+
+		if not required[functionName] then
 			continue
 		end
 
-		task.spawn(unitModule[functionName], unit, module, ...)
+		task.spawn(required[functionName], unit, module, ...)
 	end
 end
 
-local function loadModules()
-	for _, unit in ipairs(collectionService:GetTagged("Unit")) do
-		local modules = unit.Modules
-		local moduleTable = {}
+-- local function loadModules()
+-- 	-- for _, unit in ipairs(collectionService:GetTagged("Unit")) do
+-- 	-- 	local modules = unit.Modules
+-- 	-- 	local moduleTable = {}
 
-		for _, module in ipairs(modules:GetChildren()) do
-			table.insert(moduleTable, require(module))
-		end
+-- 	-- 	for _, module in ipairs(modules:GetChildren()) do
+-- 	-- 		table.insert(moduleTable, require(module))
+-- 	-- 	end
 
-		unitModules[unit.Name] = moduleTable
-	end
-end
+-- 	-- 	unitModules[unit.Name] = moduleTable
+-- 	-- end
+-- end
 
 local function calculatePlacePosition(baseLink, newUnit, newLink)
 	local newPos = newUnit:GetPivot()
@@ -383,7 +396,7 @@ function module.generateUnit(linkList)
 end
 
 local function getFurthestCap()
-	local furthestDistance, furthestCap = 0
+	local furthestDistance, furthestCap = 0, nil
 
 	for _, cap in ipairs(collectionService:GetTagged("Cap")) do
 		local distance = (newStart:GetPivot().Position - cap:GetPivot().Position).Magnitude
@@ -400,7 +413,7 @@ local function getFurthestCap()
 end
 
 function module.placeExit()
-	loadModules()
+	--loadModules()
 
 	local cap = getFurthestCap()
 	local newExit = exit:Clone()
@@ -422,7 +435,7 @@ end
 
 function module.setupMap(ignoreStart)
 	clearMap()
-	loadModules()
+	--loadModules()
 	getAssets()
 
 	sky:Clone().Parent = Lighting
@@ -536,7 +549,7 @@ function module.loadBossRoom()
 	end
 end
 
-local function spawnBoss(player, type)
+local function spawnBoss(_, type)
 	spawners.SpawnBoss(stageFolder:GetAttribute(type), map:FindFirstChildOfClass("Model"))
 end
 

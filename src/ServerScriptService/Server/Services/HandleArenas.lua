@@ -114,6 +114,8 @@ local function endArena(gates, result, isAmbush)
 end
 
 local function startArena(unit, level, isAmbush)
+	print(level, isAmbush)
+
 	local encounter = unit.Modules:FindFirstChild("Encounter")
 	if not encounter then
 		return

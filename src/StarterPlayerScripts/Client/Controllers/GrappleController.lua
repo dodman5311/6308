@@ -20,6 +20,7 @@ local Net = require(Globals.Packages.Net)
 local GiftsService = require(Globals.Client.Services.GiftsService)
 local signals = require(Globals.Signals)
 local timer = require(Globals.Vendor.Timer)
+local uiService = require(Globals.Client.Services.UIService)
 local weapons = require(Globals.Client.Controllers.WeaponController)
 
 --// Instances
@@ -33,6 +34,7 @@ local ViewModel
 
 local grapplePart
 local onCooldown = false
+local onInvCooldown = false
 
 --// Connections
 local InputEnded
@@ -137,7 +139,6 @@ local function startGrapple(c, position, item)
 end
 
 local function dealDamage(characterHit)
-	print(characterHit)
 	if not characterHit then
 		return
 	end
@@ -154,15 +155,28 @@ local function dealDamage(characterHit)
 	-- end
 	-- signals["registerHit"]:Fire(enemyHumanoid, dmgDelt)
 
-	Net:RemoteEvent("SetInvincible", true)
-	--signals.DoWeaponAction:Fire("dealDamage", part.CFrame, characterHit, 1, "Brick_Hook")
+	if onInvCooldown then
+		return
+	end
 
-	signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Brick_Hook")
-	signals.DoUiAction:Fire("HUD", "CooldownGift", true, "Brick_Hook", 1)
+	onInvCooldown = true
+
+	Net:RemoteEvent("SetInvincible", true)
+	uiService.doUiAction("HUD", "ShowInvincible", true)
+
+	uiService.doUiAction("HUD", "ActivateGift", true, "Brick_Hook")
+	uiService.doUiAction("HUD", "CooldownGift", true, "Brick_Hook", 0.5)
+
+	uiService.doUiAction("HUD", "GrappleCooldown", true, 0.5, 0)
+
+	timer.wait(0.5)
+	Net:RemoteEvent("SetInvincible", false)
+	uiService.doUiAction("HUD", "HideInvincible", true)
+
+	uiService.doUiAction("HUD", "GrappleCooldown", true, 1, 1)
 
 	timer.wait(1)
-
-	Net:RemoteEvent("SetInvincible", false)
+	onInvCooldown = false
 end
 
 local function endGrapple()
@@ -294,7 +308,7 @@ function module.Activate(item)
 		animationService:playAnimation(vm, "Grapple", Enum.AnimationPriority.Action4.Value, false, 0, 2, 1)
 		animation.Stopped:Wait()
 
-		task.wait(0.125)
+		timer.wait(0.125)
 
 		task.spawn(function()
 			endGrapple()
@@ -302,7 +316,7 @@ function module.Activate(item)
 
 		animationService:playAnimation(vm, "DeactivateGrapple", Enum.AnimationPriority.Action4.Value, false, 0, 2, 1)
 
-		task.delay(animationService:getAnimation(vm, "DeactivateGrapple").Length - 0.01, function()
+		timer.delay(animationService:getAnimation(vm, "DeactivateGrapple").Length - 0.01, function()
 			animationService:stopAnimation(vm, "DeactivateGrapple", 0)
 		end)
 
@@ -313,7 +327,7 @@ function module.Activate(item)
 	end)
 end
 
-local cooldown = 0.75
+local cooldown = 0.5
 
 uis.InputBegan:Connect(function(input, gameProcessedEvent)
 	if gameProcessedEvent or onCooldown then
@@ -329,11 +343,16 @@ uis.InputBegan:Connect(function(input, gameProcessedEvent)
 
 		if GiftsService.CheckGift("Stuff_Hook") and item then
 			onCooldown = true
+			uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", true, 0.85)
 
 			module.Activate(item)
 
-			task.wait(cooldown)
+			timer.wait(cooldown)
 			onCooldown = false
+
+			if GiftsService.CheckGift("Stuff_Hook") then
+				uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", true, 0)
+			end
 		end
 	end
 
@@ -343,11 +362,16 @@ uis.InputBegan:Connect(function(input, gameProcessedEvent)
 		end
 
 		onCooldown = true
+		uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", true, 0.85)
 
 		module.Activate()
 
-		task.wait(cooldown)
+		timer.wait(cooldown)
+
 		onCooldown = false
+		if GiftsService.CheckGift("Brick_Hook") then
+			uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", true, 0)
+		end
 	end
 end)
 
@@ -361,8 +385,21 @@ signals.Movement:Connect(function()
 
 	module.Activate()
 
-	task.wait(cooldown)
+	timer.wait(cooldown)
 	onCooldown = false
+end)
+
+GiftsService.OnGiftAdded:Connect(function(gift)
+	if gift == "Brick_Hook" then
+		uiService.doUiAction("HUD", "GrappleCooldown", true, 0.1, 1)
+		uiService.doUiAction("HUD", "ToggleGrappleIndicator", true, true)
+	end
+end)
+
+GiftsService.OnGiftRemoved:Connect(function(gift)
+	if gift == "Brick_Hook" then
+		uiService.doUiAction("HUD", "ToggleGrappleIndicator", true, false)
+	end
 end)
 
 return module

@@ -27,10 +27,10 @@ module.wait = function(sec, index)
 	waitTimer:Destroy()
 end
 
-module.delay = function(sec, index, callback, ...)
+module.delay = function(sec, callback, ...)
 	local params = ...
 
-	local waitTimer = module:new(index or "delayAt_" .. os.clock())
+	local waitTimer = module:new("delayAt_" .. os.clock())
 	waitTimer.WaitTime = sec or 0.01
 	waitTimer.Function = function()
 		callback(params)
