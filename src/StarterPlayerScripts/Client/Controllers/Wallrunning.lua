@@ -97,8 +97,10 @@ local function jumpOffWall(_, state)
 	startDebounce()
 	--script.End:Play()
 
+	local logVelocity = primaryPart.AssemblyLinearVelocity.Magnitude
+
 	removePhysics()
-	primaryPart.Velocity = (primaryPart.CFrame.RightVector * (-25 * d) + Vector3.new(0, 40, 0))
+	primaryPart.Velocity = (primaryPart.CFrame.RightVector * (-logVelocity.Magnitude * d) + Vector3.new(0, 40, 0))
 		+ (humanoid.MoveDirection * module.speed)
 	airMomentum.switchFalling(true)
 end
@@ -132,7 +134,11 @@ local function wallrun(distanceToCeiling)
 	local pullVector = (wallPosition - primaryPart.Position)
 		+ ((primaryPart.CFrame * CFrame.new(d * -3.5, 0, 0)).Position - primaryPart.Position)
 
-	module.linearVelocity.VectorVelocity = (humanoid.MoveDirection * logVelocity) --(humanoid.WalkSpeed * 1.5))
+	module.linearVelocity.VectorVelocity = math.clamp(
+		humanoid.MoveDirection * logVelocity,
+		humanoid.WalkSpeed,
+		math.huge
+	) --(humanoid.WalkSpeed * 1.5))
 		+ module.vectorMod.Value
 		+ (pullVector * module.draw)
 end

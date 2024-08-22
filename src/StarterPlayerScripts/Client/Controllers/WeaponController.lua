@@ -13,7 +13,6 @@ local module = {
 local CollectionService = game:GetService("CollectionService")
 local Debris = game:GetService("Debris")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local SoundService = game:GetService("SoundService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
@@ -35,7 +34,6 @@ local defaultFireRate = 0.2
 
 --// Modules
 local signals = require(Globals.Signals)
-local signal = require(Globals.Packages.Signal)
 local viewmodelService = require(Globals.Vendor.ViewmodelService)
 local animationService = require(Globals.Vendor.AnimationService)
 local UiAnimationService = require(Globals.Vendor.UIAnimationService)
@@ -130,7 +128,7 @@ local recoilSpring = spring.new(Vector3.zero)
 recoilSpring.Speed = 30
 recoilSpring.Damper = 0.45
 
-local function getObjectInCenter(player, blacklist)
+local function getObjectInCenter(_, blacklist)
 	local inCenter
 	local objectsOnScreen = {}
 	local leastDistance = math.huge
@@ -249,6 +247,17 @@ function module.UpdateAmmo(amount)
 	amount = math.round(amount)
 	currentAmmo = amount
 	signals.DoUiAction:Fire("HUD", "UpdateAmmo", true, currentAmmo)
+
+	if
+		GiftsService.CheckGift("Tacticool")
+		and module.currentWeapon
+		and currentAmmo == 1
+		and not weaponData.HasReloaded
+	then
+		UIService.doUiAction("HUD", "ToggleReloadPrompt", true, true)
+	else
+		UIService.doUiAction("HUD", "ToggleReloadPrompt", true, false)
+	end
 
 	module.UpdateSlot()
 end
@@ -538,6 +547,8 @@ local function reload(infiniteReloads)
 	end
 
 	acts:createAct("Reloading")
+
+	UIService.doUiAction("HUD", "ToggleReloadPrompt", true, false)
 
 	local defWeapon = assets.Models.Weapons:FindFirstChild(module.currentWeapon.Name)
 	local defWeaponData = require(defWeapon.Data)
@@ -861,7 +872,8 @@ local function HitPart(rayResult)
 
 	newHitEffect.Hole.Transparency = 0
 	newHitEffect.Parent = workspace
-	newHitEffect.CFrame = CFrame.new(rayResult.Position, rayResult.Position + rayResult.Normal)
+
+	newHitEffect.CFrame = CFrame.new(rayResult.Position, rayResult.Position + (rayResult["Normal"] or Vector3.zero))
 	newHitEffect.CFrame *= CFrame.Angles(math.rad(-90), 0, 0)
 
 	for _, p in ipairs(newHitEffect:GetChildren()) do
@@ -1432,7 +1444,20 @@ local function ThrowWeapon()
 		if not weaponClone.Parent then
 			return
 		end
+
+		if
+			RicoshotService.checkRicoshot({
+				Instance = weaponClone.HitBox,
+				Position = weaponClone:GetPivot().Position,
+			})
+		then
+			ricoHitbox.Ui.Enabled = true
+		else
+			ricoHitbox.Ui.Enabled = false
+		end
 	until grip.Velocity.Magnitude <= 5
+
+	ricoHitbox.Ui.Enabled = false
 
 	for _, part in ipairs(weaponClone:GetDescendants()) do
 		if not part:IsA("BasePart") then
@@ -1727,7 +1752,7 @@ UserInputService.InputEnded:Connect(function(input, gpe)
 	end
 end)
 
-UserInputService.TouchEnded:Connect(function(touch, gpe)
+UserInputService.TouchEnded:Connect(function(_, gpe)
 	releaseTrigger(gpe)
 end)
 
@@ -1855,6 +1880,12 @@ GiftsService.OnGiftAdded:Connect(function(gift)
 	end
 
 	UIService.doUiAction("HUD", "ShowOvercharge")
+end)
+
+GiftsService.OnGiftRemoved:Connect(function(gift)
+	if gift == "Tacticool" then
+		UIService.doUiAction("HUD", "ToggleReloadPrompt", true, false)
+	end
 end)
 
 return module

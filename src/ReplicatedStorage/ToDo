@@ -214,12 +214,7 @@ Perk that lights things on fire if not damaged by a bullet
 Grapple deals 1 damage and grants invincibility (Cooldown)
 
 ^^-------^^
-
-TEXTURE BOSS!!!!!!!
-
 Make praying altar offering - lessens visage health - disables a perk
-
-Fix ambushes
 
 make rising acid
 
@@ -227,13 +222,9 @@ Add Cutter
 Add Gratana
 Add Therma
 
-make death sequence
-
-SMALL STUFF vv
-
 Add console support to the menu map
 
-Fix riccoshot icon on ground
+make death sequence
 
 --
 
@@ -257,6 +248,8 @@ Make variant Vending machines
 upgrade: when at 0 souls, x6 soul chance instead of x4
 
 --
+
+fixed acid not working
 fixed healing going over the health limit
 
 Buffed Sauce if fuel - 10 sploches to heal instead of 25

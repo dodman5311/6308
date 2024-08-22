@@ -608,6 +608,37 @@ function module.HideOvercharge(player, ui, frame)
 	UiAnimator.StopAnimation(frame.OverchargeBar.BarFrame.Bar.BarAnimation)
 end
 
+function module.ToggleReloadPrompt(player, ui, frame, value)
+	local reloadPrompt = frame.ReloadPrompt
+
+	reloadPrompt.Visible = value
+
+	if not value then
+		return
+	end
+
+	task.spawn(function()
+		local switch = true
+
+		repeat
+			task.wait(0.075)
+
+			if switch then
+				reloadPrompt.BackgroundColor3 = Color3.new(1, 1, 1)
+				reloadPrompt.Prompt.TextColor3 = Color3.new(1)
+				reloadPrompt.UIStroke.Color = Color3.new(1)
+			else
+				reloadPrompt.BackgroundColor3 = Color3.new(1)
+				reloadPrompt.Prompt.TextColor3 = Color3.new(1, 1, 1)
+				reloadPrompt.UIStroke.Color = Color3.new(1, 1, 1)
+			end
+
+			switch = not switch
+
+		until not reloadPrompt.Visible
+	end)
+end
+
 function module.ToggleGrappleIndicator(player, ui, frame, value)
 	frame.GrappleReady.Visible = value
 end

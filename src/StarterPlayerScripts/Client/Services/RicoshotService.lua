@@ -11,11 +11,7 @@ local Globals = require(ReplicatedStorage.Shared.Globals)
 local Assets = ReplicatedStorage.Assets
 
 --// Modules
-local Signals = require(Globals.Shared.Signals)
-local net = require(Globals.Packages.Net)
 local UiAnimationService = require(Globals.Vendor.UIAnimationService)
-local GiftsService = require(Globals.Client.Services.GiftsService)
-
 --// Values
 
 --// Functions
@@ -80,7 +76,12 @@ local function getNearestEnemy(position, position2)
 	end
 
 	for _, model in ipairs(CollectionService:GetTagged("ThrownWeapon")) do
-		table.insert(list, model)
+		if module.checkRicoshot({
+			Instance = model.HitBox,
+			Position = model:GetPivot().Position,
+		}) then
+			table.insert(list, model)
+		end
 	end
 
 	for _, enemy in ipairs(list) do
