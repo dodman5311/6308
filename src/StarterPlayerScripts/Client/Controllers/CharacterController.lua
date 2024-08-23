@@ -228,14 +228,14 @@ end
 local function checkForHeal()
 	collectedBlood += 1
 
-	if collectedBlood >= 10 then
+	if collectedBlood >= 25 then
 		collectedBlood = 0
 		util.PlaySound(assets.Sounds.BloodFuel, script, 0.1)
 		net:RemoteEvent("Damage"):FireServer(Player.Character, -1)
 		signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Sauce_Is_Fuel")
 	end
 
-	signals.DoUiAction:Fire("HUD", "UpdateGiftProgress", true, "Sauce_Is_Fuel", collectedBlood / 10)
+	signals.DoUiAction:Fire("HUD", "UpdateGiftProgress", true, "Sauce_Is_Fuel", collectedBlood / 25)
 end
 
 mouseTarget.Changed:Connect(function(value)

@@ -404,6 +404,7 @@ local function onDied(npc)
 	net:RemoteEvent("StopMusic"):FireAllClients("Phillip The Everlasting")
 	timer.wait(1)
 	net:RemoteEvent("DoUiAction"):FireAllClients("BossIntro", "ShowCompleted", true, npc.Instance.Name)
+	net:RemoteEvent("DoUiAction"):FireAllClients("HUD", "HideBossBar", true)
 end
 
 local function lead(npc)
@@ -418,7 +419,7 @@ local function lead(npc)
 	local distance = (targetPosition - npc.Instance:GetPivot().Position).Magnitude
 
 	if npc.Acts:checkAct(false, "leading_shot") then
-		local positionToLookAt = targetPosition + targetVelocity / 2.5
+		local positionToLookAt = targetPosition + targetVelocity / 2.25
 		moveTowardsPosition(npc.Instance, positionToLookAt)
 	elseif npc.Acts:checkAct(false, "leading_shot_wdistance") then
 		local positionToLookAt = targetPosition

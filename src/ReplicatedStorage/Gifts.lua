@@ -94,7 +94,7 @@ local module = {
 		Heavenly_Fortune = {
 			Icon = "rbxassetid://17590259189",
 			Catagories = { "Luck" },
-			Desc = "You now have more Luck while in the air (+10 Luck)",
+			Desc = "You now have more Luck while in the air (+5 Luck)",
 		},
 
 		Unearthly_Metal = {
@@ -106,7 +106,7 @@ local module = {
 		Burn_Hell = {
 			Icon = "rbxassetid://18731039717",
 			Catagories = { "Arsenal", "Soul" },
-			Desc = "Any damage, not dealt by a weapon, now has a chance to deal 1 point of fire damage - lighting the said on fire. (50% chance)",
+			Desc = "Any damage, not dealt by a weapon, now has a chance to deal 1 point of fire damage - lighting the enemy said on fire. (50% chance)",
 		},
 	},
 
@@ -221,13 +221,13 @@ local module = {
 		Sauce_Is_Fuel = {
 			Icon = "rbxassetid://16234651850",
 			Catagories = { "Soul" },
-			Desc = "You can now absorb blood splotches. Every 10 splotches absorbed will heal 1 HP. (Walk over blood to obsorb)",
+			Desc = "You can now absorb blood splotches. Every 25 splotches absorbed will heal 1 HP. (Walk over blood to obsorb)",
 		},
 
 		Set_Em_Up = {
 			Icon = "rbxassetid://16235430594",
 			Catagories = { "Luck" },
-			Desc = "Your combo score is now linked to your Luck. (+1 Luck per combo score)",
+			Desc = "Your combo score is now linked to your Luck. (+1 Luck per combo score, Max 20)",
 		},
 
 		Haven = {
@@ -300,9 +300,10 @@ The more charges that are used, the longer it takes to recharge.
 			Icon = "rbxassetid://16873986562",
 			Catagories = { "Tactical" },
 			Desc = [[Run next to a wall while in the air to begin wallrunning. 
-When jumping off a wall, you will be given another jump in the air.
+When jumping off a wall, you will jump in the direction you are looking, 
+and will be given extra jump in the air.
 
-Wall running will sustain your previous velocity.]],
++50% movement speed while wallrunning.]],
 		},
 	},
 }

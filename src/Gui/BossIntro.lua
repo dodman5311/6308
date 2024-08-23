@@ -315,6 +315,8 @@ function module.ShowIntro(player, ui, frame, bossName)
 end
 
 function module.ShowCompleted(player, ui, frame, bossName)
+	local isMiniboss = ReplicatedStorage.Enemies:FindFirstChild(bossName, true):HasTag("MiniBoss")
+
 	for _, v in ipairs(frame.Gui:GetChildren()) do
 		v.Visible = false
 	end
@@ -332,7 +334,15 @@ function module.ShowCompleted(player, ui, frame, bossName)
 
 	util.tween(frame.Background, ti, { BackgroundTransparency = 0 })
 
-	task.wait(2.5)
+	task.wait(1.25)
+
+	if isMiniboss then
+		sounds.BossKillNoVoices:Play()
+	else
+		sounds.BossKill:Play()
+	end
+
+	task.wait(1.25)
 
 	condemnFrame.Visible = true
 

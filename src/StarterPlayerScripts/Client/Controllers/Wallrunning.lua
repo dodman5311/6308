@@ -13,6 +13,7 @@ local players = game:GetService("Players")
 local rs = game:GetService("RunService")
 local ts = game:GetService("TweenService")
 local cas = game:GetService("ContextActionService")
+local UserInputService = game:GetService("UserInputService")
 
 local Globals = require(replicatedStorage.Shared.Globals)
 
@@ -32,6 +33,8 @@ local logOnWall
 local d = 0
 local wallPosition
 local debounce = false
+
+local spaceDown = false
 
 --// Functions
 local function createPhysics(yDistance)
@@ -97,11 +100,12 @@ local function jumpOffWall(_, state)
 	startDebounce()
 	--script.End:Play()
 
-	local logVelocity = primaryPart.AssemblyLinearVelocity.Magnitude
+	local logVelocity = primaryPart.AssemblyLinearVelocity
 
 	removePhysics()
-	primaryPart.Velocity = (primaryPart.CFrame.RightVector * (-logVelocity.Magnitude * d) + Vector3.new(0, 40, 0))
-		+ (humanoid.MoveDirection * module.speed)
+	primaryPart.Velocity = (primaryPart.CFrame.RightVector * (-20 * d) + Vector3.new(0, 25, 0))
+		+ (camera.CFrame.LookVector * humanoid.WalkSpeed * 1.5)
+	--+ (humanoid.MoveDirection * humanoid.WalkSpeed * 1.5)
 	airMomentum.switchFalling(true)
 end
 
@@ -116,7 +120,7 @@ local function wallrun(distanceToCeiling)
 	end
 
 	local primaryPart = character.PrimaryPart
-	local logVelocity = primaryPart.AssemblyLinearVelocity.Magnitude
+	local logVelocity = primaryPart.AssemblyLinearVelocity
 
 	local humanoid = character.Humanoid
 
@@ -134,13 +138,18 @@ local function wallrun(distanceToCeiling)
 	local pullVector = (wallPosition - primaryPart.Position)
 		+ ((primaryPart.CFrame * CFrame.new(d * -3.5, 0, 0)).Position - primaryPart.Position)
 
-	module.linearVelocity.VectorVelocity = math.clamp(
-		humanoid.MoveDirection * logVelocity,
-		humanoid.WalkSpeed,
-		math.huge
-	) --(humanoid.WalkSpeed * 1.5))
-		+ module.vectorMod.Value
-		+ (pullVector * module.draw)
+	-- local walkspeed = humanoid.WalkSpeed * 1.5
+	-- local targetVelocity = humanoid.MoveDirection * logVelocity.Magnitude
+	-- local clampedVelocity = Vector3.new(
+	-- 	math.clamp(targetVelocity.X, humanoid.MoveDirection.X * walkspeed, math.huge),
+	-- 	targetVelocity.Y,
+	-- 	math.clamp(targetVelocity.Z, humanoid.MoveDirection.Z * walkspeed, math.huge)
+	-- )
+
+	local walkspeed = humanoid.WalkSpeed * 1.5
+	local targetVelocity = humanoid.MoveDirection * walkspeed
+
+	module.linearVelocity.VectorVelocity = targetVelocity + module.vectorMod.Value + (pullVector * module.draw)
 end
 
 local function onRender()

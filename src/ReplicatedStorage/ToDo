@@ -228,6 +228,8 @@ make death sequence
 
 --
 
+Reflect damage on chance perk B
+
 Add difficulty settings:
 Easy:
 3 lives.
@@ -249,8 +251,17 @@ upgrade: when at 0 souls, x6 soul chance instead of x4
 
 --
 
-fixed acid not working
-fixed healing going over the health limit
+Beating Phillip now gives you Master Scouting by default.
+
+Added Specimen enemy
+Added Resident enemy
+Added Pestilent enemy
+Added Ghoul enemy
+
+Added Specimen #09 miniboss
+Added Visage of False Hope boss
+
+Added stage 2 OST
 
 Buffed Sauce if fuel - 10 sploches to heal instead of 25
 
@@ -260,17 +271,21 @@ Added soul drop sound
 
 Added Critical hit sound
 
+Added sounds for boss defeat sequence
+
 Crits deal double damage, instead of +1 damage
 
 Kevlar and Small magazine in the kiosk, changed to bad luck (The more luck, the lower chance for getting it)
 
 Fixed shield removing on successfull parry
 
-Added 800M : Explosive assault rifle *
+Added 800M : Explosive assault rifle
 
-buffed heavenly fortune: 5 to 10 luck buff
+Nerfed Set Em Up: Now capped at 20
 
 hover over delivery number now changes color
+
+Keeper's Parry sound now plays without position
 
 Added bullet holes
 
@@ -286,15 +301,11 @@ Nerfed Double Shot pellet count: 8 to 5
 
 Changed how spread is processed (More shotgun feeling shotguns)
 
-Keeper's Parry sound now plays without position
-
 Changed fire sound for Quad Shot
 
-Fixed boss health staying after kill and after death
+Changed texture for quad shot
 
 Lowered ammo for RIPP
-
-Changed texture for quad shot
 
 Buffed I-Six:
 I-Six deals 3 damage. Every 2 locks reduces the damage by 1.
@@ -309,8 +320,6 @@ Heavily increased firerate
 Heavily reduced recoil
 Increased ammo from 10 to 12
 
-Fixed I-Six locking onto ghosts
-
 Added main menu:
 Map
 Arsenal
@@ -320,7 +329,7 @@ Settings
 Removed roblox's reset button
 Added restart run button to settings menu (Fixes floor camera glitch)
 
-Combo hit penalty increased to -2
+Combo hit penalty increased from -1 to -2
 Soul chance capped at 75%
 
 Added ambushes: Single wave, hardcore, arenas that activate if you have 3 souls or above.*
@@ -337,15 +346,24 @@ Added vending machines:
 Throw your weapon at it for a new weapon, some armor, and a chance to get next stage weapons or elemental weapons.
 
 Enemy melees no longer damage other enemies
-Added Harpoon *
+Added Harpoons
 
 Thrown weapons now ignite barrels
+
+Fixed I-Six locking onto ghosts
+
+Fixed Death by floor glitch
 
 Fixed master scouting breaking after death
 Fixed Wax On breaking after death
 Fixed spiked sabatons breaking after death
 
+Fixed boss health staying after kill and after death
+fixed ricoshot icon not hiding when on the ground
+fixed ricoshot targeting weapons on the ground.
 
+fixed acid not working sometimes
+fixed healing going over the health limit
 
 -----------------
 

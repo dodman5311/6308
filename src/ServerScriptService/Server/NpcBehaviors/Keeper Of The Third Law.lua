@@ -732,6 +732,7 @@ local function onDied(npc)
 		net:RemoteEvent("StopMusic"):FireAllClients("Keeper Of The Third Law")
 		timer.wait(2)
 		net:RemoteEvent("DoUiAction"):FireAllClients("BossIntro", "ShowCompleted", true, npc.Instance.Name)
+		net:RemoteEvent("DoUiAction"):FireAllClients("HUD", "HideBossBar", true)
 
 		return
 	end
@@ -748,6 +749,7 @@ local function onDied(npc)
 
 	task.delay(19, function()
 		net:RemoteEvent("DoUiAction"):FireAllClients("BossIntro", "ShowCompleted", true, npc.Instance.Name)
+		net:RemoteEvent("DoUiAction"):FireAllClients("HUD", "HideBossBar", true)
 	end)
 
 	repeat

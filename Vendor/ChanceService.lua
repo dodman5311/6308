@@ -24,11 +24,11 @@ function module.getLuck()
 	end
 
 	if module.airluck then
-		result += 10
+		result += 5
 	end
 
 	if giftService.CheckGift("Set_Em_Up") then
-		result += comboService.CurrentCombo
+		result += math.clamp(comboService.CurrentCombo, 0, 20)
 	end
 
 	if giftService.CheckGift("Tough_Luck") then

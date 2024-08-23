@@ -666,6 +666,10 @@ RunService.Heartbeat:Connect(function()
 	end
 
 	for _, damagePart in ipairs(collectionService:GetTagged("DamagePart")) do
+		if not damagePart:FindFirstAncestor("Workspace") then
+			continue
+		end
+
 		local detect = workspace:GetPartBoundsInBox(damagePart.CFrame, damagePart.Size + Vector3.new(1, 1, 1))
 
 		local hit = {}

@@ -1449,7 +1449,7 @@ local function ThrowWeapon()
 			RicoshotService.checkRicoshot({
 				Instance = weaponClone.HitBox,
 				Position = weaponClone:GetPivot().Position,
-			})
+			}) and GiftsService.CheckGift("Ricoshot")
 		then
 			ricoHitbox.Ui.Enabled = true
 		else

@@ -592,6 +592,7 @@ local function onDied(npc)
 	net:RemoteEvent("StopMusic"):FireAllClients("Specimen #09")
 	timer.wait(1)
 	net:RemoteEvent("DoUiAction"):FireAllClients("BossIntro", "ShowCompleted", true, npc.Instance.Name)
+	net:RemoteEvent("DoUiAction"):FireAllClients("HUD", "HideBossBar", true)
 end
 
 local function lead(npc)

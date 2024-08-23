@@ -97,6 +97,60 @@ local patterns = {
 		Vector2.new(0.75, -0.75),
 		Vector2.new(-0.75, -0.75),
 	},
+
+	{ -- close circle... kinda
+		Vector2.new(1, 0.5),
+		Vector2.new(1, 0.15),
+		Vector2.new(1, 0),
+		Vector2.new(1, -0.15),
+		Vector2.new(1, -0.5),
+
+		Vector2.new(-1, 0.5),
+		Vector2.new(-1, 0.15),
+		Vector2.new(-1, 0),
+		Vector2.new(-1, -0.15),
+		Vector2.new(-1, -0.5),
+
+		Vector2.new(0.5, 1),
+		Vector2.new(0.15, 1),
+		Vector2.new(0, 1),
+		Vector2.new(-0.15, 1),
+		Vector2.new(-0.5, 1),
+
+		Vector2.new(0.15, -1),
+		Vector2.new(0.25, -1),
+		Vector2.new(0, 1),
+		Vector2.new(-0.15, -1),
+		Vector2.new(-0.5, -1),
+
+		Vector2.new(0.5, 0.5),
+		Vector2.new(-0.5, 0.5),
+		Vector2.new(0.5, -0.5),
+		Vector2.new(-0.5, -0.5),
+	},
+}
+
+local closePattern = {
+	Vector2.new(0.175, 0),
+	Vector2.new(0.175, 0.1),
+	Vector2.new(0.175, -0.1),
+
+	Vector2.new(-0.175, 0),
+	Vector2.new(-0.175, 0.1),
+	Vector2.new(-0.175, -0.1),
+
+	Vector2.new(0, 0.175),
+	Vector2.new(0.1, 0.175),
+	Vector2.new(-0.1, 0.175),
+
+	Vector2.new(0, -0.175),
+	Vector2.new(0.1, -0.175),
+	Vector2.new(-0.1, -0.175),
+
+	Vector2.new(0.15, 0.15),
+	Vector2.new(-0.15, -0.15),
+	Vector2.new(0.15, -0.15),
+	Vector2.new(-0.15, 0.15),
 }
 
 local function indicateAttack(npc, color)
@@ -230,7 +284,7 @@ local function rotateForFire(npc)
 	local hitBoxAlpha = 0
 
 	local raiseTime = 10
-	local rotateTime = 3
+	local rotateTime = 2
 
 	npc.fireHitboxes = {}
 
@@ -274,8 +328,7 @@ local function aimYAxisAtPlayer(npc)
 
 		local targetDistance = (npcPos2 - targetPos2).Magnitude
 
-		root.ApatureRoot.WorldPosition = xyP
-			+ Vector3.new(0, target:GetPivot().Position.Y + (targetDistance / 3) + 2, 0)
+		root.ApatureRoot.WorldPosition = xyP + Vector3.new(0, target:GetPivot().Position.Y + (targetDistance / 3), 0)
 	end)
 end
 
@@ -292,7 +345,7 @@ local function createGeyserAt(npc, indicateTime, Position)
 	local newGeyser = ReplicatedStorage.Assets.Effects.GeyserAttack:Clone()
 	newGeyser.Parent = workspace
 
-	local targetPosition = Position * Vector3.new(1, 0, 1) -- target:GetPivot().Position * Vector3.new(1, 0, 1)
+	local targetPosition = Position * Vector3.new(1, 0, 1)
 
 	newGeyser:PivotTo(CFrame.new(targetPosition + Vector3.new(0, model:GetPivot().Position.Y - 5, 0)))
 
@@ -363,7 +416,7 @@ local moves = {
 					Seeking = rng:NextNumber(0.5, 1),
 					SeekProgression = -0.025,
 					SplashRange = 12,
-					SplashDamage = 3,
+					SplashDamage = 5,
 					SeekDistance = 9000,
 					Size = 0,
 				}, nil, "RocketProjectile")
@@ -422,7 +475,7 @@ local moves = {
 						Dropping = 0.65,
 						Bouncing = true,
 						SplashRange = 50,
-						SplashDamage = 4,
+						SplashDamage = 6,
 					},
 					nil,
 					"GrenadeProjectile"
@@ -456,10 +509,10 @@ local moves = {
 		-- end
 
 		local pattern = patterns[math.random(1, #patterns)]
-		local npcCframne = npc.Instance:GetPivot()
+		local npcCframe = npc.Instance:GetPivot()
 
 		for _, offset in ipairs(pattern) do
-			local cframe = npcCframne * CFrame.new(offset.X * 150, 0, offset.Y * 150)
+			local cframe = npcCframe * CFrame.new(offset.X * 150, 0, offset.Y * 150)
 
 			task.spawn(createGeyserAt, npc, 0.5, cframe.Position)
 		end
@@ -493,7 +546,7 @@ local moves = {
 		end
 
 		repeat
-			timer.wait(0.3)
+			timer.wait(0.25)
 			npc.Instance.Humanoid.Health += 1
 		until not workspace:FindFirstChild("Betrayed")
 
@@ -511,7 +564,7 @@ local function spawnEnemy(OriginCFrame)
 	local spawnRange = 100
 	local enemyToSpawn = "Tollsman"
 
-	if rng:NextNumber(0, 100) <= 5 then
+	if rng:NextNumber(0, 100) <= 10 then
 		enemyToSpawn = "Specimen"
 	elseif rng:NextNumber(0, 100) <= 50 then
 		enemyToSpawn = "Sentinel"
@@ -566,9 +619,9 @@ local function spawnEnemies(npc) -- 250 studs
 
 	local spawnTimer = npc:GetTimer("SpawnEnemies")
 
-	spawnTimer.WaitTime = 8
+	spawnTimer.WaitTime = 7
 	spawnTimer.Function = function()
-		if #CollectionService:GetTagged("Enemy") > 7 or workspace:FindFirstChild("Betrayed") then
+		if #CollectionService:GetTagged("Enemy") > 8 or workspace:FindFirstChild("Betrayed") then
 			return
 		end
 
@@ -581,10 +634,43 @@ local function spawnEnemies(npc) -- 250 studs
 end
 -- local function setUp(npc)
 
+local function closeAttack(npc)
+	local target = npc:GetTarget()
+	local model = npc.Instance
+
+	if not target or npc.Acts:checkAct("CloseAttack") then
+		return
+	end
+
+	local playerPosition = target:GetPivot().Position * Vector3.new(1, 0, 1)
+	local npcPosition = model:GetPivot().Position * Vector3.new(1, 0, 1)
+
+	local distance = (playerPosition - npcPosition).Magnitude
+
+	if distance > 35 then
+		return
+	end
+
+	npc.Acts:createAct("CloseAttack")
+
+	local npcCframe = model:GetPivot()
+
+	for _, offset in ipairs(closePattern) do
+		local cframe = npcCframe * CFrame.new(offset.X * 150, 0, offset.Y * 150)
+
+		task.spawn(createGeyserAt, npc, 0.25, cframe.Position)
+	end
+
+	timer.wait(5)
+
+	npc.Acts:removeAct("CloseAttack")
+end
+
 -- end
 
 local module = {
 	OnStep = {
+		{ Function = "Custom", Parameters = { closeAttack } },
 		{ Function = "Custom", Parameters = { RunGeyserCheck } },
 		{ Function = "Custom", Parameters = { spawnEnemies } },
 		{ Function = "Custom", Parameters = { runAttackTimer } },
