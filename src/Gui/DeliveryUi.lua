@@ -1,5 +1,6 @@
 local module = {}
 --// Services
+local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 local UserInputService = game:GetService("UserInputService")
@@ -80,6 +81,11 @@ function module.Init(player, ui, frame)
 	frame.Cursor.Visible = false
 
 	RunService.RenderStepped:Connect(function()
+		if UserInputService.GamepadEnabled then
+			frame.Cursor.Visible = false
+			return
+		end
+
 		local mousePos = UserInputService:GetMouseLocation()
 		frame.Cursor.Position = UDim2.new(0, mousePos.X, 0, mousePos.Y)
 	end)
@@ -144,6 +150,7 @@ function module.fakeScreen(player, ui, frame)
 	--musicService.playMusic()
 	task.delay(0.1, function()
 		module.onHidden:Fire()
+		acts:removeAct("InActiveMenu")
 	end)
 	return module.onHidden
 end
@@ -179,6 +186,8 @@ function module.ShowScreen(player, ui, frame)
 	if GiftsService.CheckGift("Drav_Is_Dead") then
 		return module.fakeScreen(player, ui, frame)
 	end
+
+	acts:createAct("InActiveMenu")
 
 	musicService.playTrack("Delivery", 1)
 
@@ -254,6 +263,7 @@ function module.ShowScreen(player, ui, frame)
 			util.tween(frame.Fade, ti, { BackgroundTransparency = 1 })
 
 			module.onHidden:Fire()
+			acts:removeAct("InActiveMenu")
 			return
 		end
 
@@ -263,6 +273,10 @@ function module.ShowScreen(player, ui, frame)
 		local chosenGift = module.chooseRandomGift(player, ui, frame, giftType)
 		module.TakeDelivery(player, ui, frame, chosenGift)
 	end)
+
+	if UserInputService.GamepadEnabled then
+		GuiService:Select(frame.Frame)
+	end
 
 	return module.onHidden
 end
@@ -354,6 +368,7 @@ function module.showDescription(frame, gift)
 			input.UserInputType == Enum.UserInputType.MouseButton1
 			or input.UserInputType == Enum.UserInputType.Touch
 			or input.KeyCode == Enum.KeyCode.ButtonX
+			or input.KeyCode == Enum.KeyCode.ButtonA
 		then
 			skipKeyPressed = true
 		end
@@ -430,6 +445,7 @@ function module.TakeDelivery(player, ui, frame, gift)
 
 		--musicService.playMusic()
 		module.onHidden:Fire()
+		acts:removeAct("InActiveMenu")
 	end)
 
 	animation:OnFrameRached(6):Connect(function()

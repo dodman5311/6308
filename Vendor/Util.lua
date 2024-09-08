@@ -96,7 +96,7 @@ function util.circleCurve(t)
 	return math.sqrt(1 - (2 * t - 1) ^ 2)
 end
 
-function util.tween(instance, tweenInfo, propertyTable, yield, endingFunction, endingState: Enum.PlaybackState)
+function util.tween(instance, tweenInfo, propertyTable, yield, endingFunction, endingState: Enum.PlaybackState?)
 	local createdTween
 
 	if typeof(instance) == "table" then

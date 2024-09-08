@@ -4,6 +4,7 @@ local player = Players.LocalPlayer
 local playerGui = player.PlayerGui
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local cameraController = require(Globals.Client.Controllers.CameraController)
@@ -15,7 +16,7 @@ local settings = {
 		Name = "Music Volume",
 		Type = "Slider",
 		MaxValue = 100,
-		Value = 0, -- 100,
+		Value = 100,
 		OnChanged = function(self)
 			game:GetService("SoundService").Music.Volume = self.Value / 100
 		end,
@@ -41,7 +42,27 @@ local settings = {
 		end,
 	},
 
-	"Interface",
+	"Graphics",
+
+	{
+		Name = "Gamma",
+		Type = "Slider",
+		MaxValue = 100,
+		Value = 25,
+		OnChanged = function(self, frame)
+			game:GetService("Lighting").ExposureCompensation = self.Value / 100
+
+			if not frame then
+				return
+			end
+
+			local ti_0 = TweenInfo.new(0.2, Enum.EasingStyle.Linear)
+			local ti_1 = TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 3)
+
+			TweenService:Create(frame.Background, ti_0, { BackgroundTransparency = 1 }):Play()
+			--TweenService:Create(frame.Background, ti_1, { BackgroundTransparency = 0 }):Play()
+		end,
+	},
 
 	{
 		Name = "Distortion",
@@ -54,6 +75,9 @@ local settings = {
 			distortions.Visible = self.Value
 		end,
 	},
+
+	"Interface",
+
 	{
 		Name = "HUD",
 		Type = "Boolean",

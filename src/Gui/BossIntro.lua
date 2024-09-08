@@ -106,6 +106,61 @@ local intros = {
 			Wait = 2,
 		},
 	},
+
+	["Keeper Of Divine Iron"] = {
+		{
+			Text = "This was to be my grave.",
+			Sound = "rbxassetid://102678617100781",
+			Wait = 1.5,
+		},
+		{
+			Text = "I was to join them, to be alongside them beyond the black veil.",
+			Sound = "rbxassetid://130317988572477",
+			Wait = 1.5,
+		},
+		{
+			Text = "Yet my soul remains, in torment and shame.",
+			Sound = "rbxassetid://73464772246708",
+			Wait = 1,
+		},
+		{
+			Text = "Because of you.",
+			Sound = "rbxassetid://93182235228699",
+			Wait = 1,
+		},
+		{
+			Text = "You who believe they have the authority to deny my angel's will. You who dares insult the heavens with your archaic flesh.",
+			Sound = "rbxassetid://140557601090093",
+			Wait = 0.5,
+		},
+		{
+			Text = "You are a pestilence, a being of pure anarchy.",
+			Sound = "rbxassetid://128317954681973",
+			Wait = 0.75,
+		},
+
+		{
+			Text = "Behold the next revelation!",
+			Sound = "rbxassetid://82632184311628",
+			Wait = 0.5,
+		},
+
+		{
+			Text = "Your time has come!",
+			Sound = "rbxassetid://121714933233590",
+			Wait = 0.5,
+		},
+		{
+			Text = "You shall be cast down, torn from existence, and burnt to ash beneath her ever glowing light!",
+			Sound = "rbxassetid://133400969505608",
+			Wait = 0.5,
+		},
+		{
+			Text = "Let me show you the true meaning of Iron, MONSTER!",
+			Sound = "rbxassetid://95048725262914",
+			Wait = 0.5,
+		},
+	},
 }
 --rbxassetid://18265555247
 local rewards = {
@@ -116,9 +171,9 @@ local rewards = {
 	},
 
 	["Visage Of False Hope"] = {
-		"Brick_Hook",
-		"Righteous_Motion",
-		"Spiked_Sabatons",
+		"Coming_Soon!",
+		"Coming_Soon!",
+		"Coming_Soon!",
 	},
 
 	["Phillip The Everlasting"] = "Master_Scouting",
@@ -170,6 +225,11 @@ function module.Init(player, ui, frame)
 	frame.Cursor.Visible = false
 
 	RunService.RenderStepped:Connect(function()
+		if UserInputService.GamepadEnabled then
+			frame.Cursor.Visible = false
+			return
+		end
+
 		local mousePos = UserInputService:GetMouseLocation()
 		frame.Cursor.Position = UDim2.new(0, mousePos.X, 0, mousePos.Y)
 	end)
@@ -200,6 +260,8 @@ function module.ShowIntro(player, ui, frame, bossName)
 	for _, v in ipairs(frame.Gui:GetChildren()) do
 		v.Visible = false
 	end
+
+	acts:createAct("InActiveMenu")
 
 	frame.Gui.Enabled = true
 
@@ -299,6 +361,7 @@ function module.ShowIntro(player, ui, frame, bossName)
 
 	task.delay(0.05, function()
 		module.onHidden:Fire()
+		acts:removeAct("InActiveMenu")
 	end)
 
 	util.tween(frame.Background, ti_0, { BackgroundTransparency = 1 }, false, function()
@@ -320,6 +383,8 @@ function module.ShowCompleted(player, ui, frame, bossName)
 	for _, v in ipairs(frame.Gui:GetChildren()) do
 		v.Visible = false
 	end
+
+	acts:createAct("InActiveMenu")
 
 	local condemnFrame = frame.Condemn
 
@@ -377,6 +442,7 @@ function module.showDescription(frame, gift)
 			input.UserInputType == Enum.UserInputType.MouseButton1
 			or input.UserInputType == Enum.UserInputType.Touch
 			or input.KeyCode == Enum.KeyCode.ButtonX
+			or input.KeyCode == Enum.KeyCode.ButtonA
 		then
 			skipKeyPressed = true
 		end
@@ -505,6 +571,8 @@ function module.showChoices(player, ui, frame, bossName)
 		util.tween(award, ti_0, { Size = UDim2.fromScale(1, 1), GroupTransparency = 0 })
 		module.showDescription(frame, module.chooseGift(player, ui, frame, bossName))
 
+		acts:removeAct("InActiveMenu")
+
 		return
 	end
 
@@ -525,6 +593,8 @@ function module.showChoices(player, ui, frame, bossName)
 	choices.Visible = true
 
 	util.tween(choices, ti_0, { Size = UDim2.fromScale(1, 1), GroupTransparency = 0 }, true)
+
+	acts:removeAct("InActiveMenu")
 end
 
 return module

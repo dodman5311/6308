@@ -1,6 +1,6 @@
 local module = {
 	defaultMagSize = 16,
-
+	HasHitMachine = false,
 	critChances = {
 		AR = 0,
 		Pistol = 0,
@@ -97,6 +97,7 @@ local slots = {
 		CurrentWeapon = nil,
 		WeaponData = nil,
 		Element = nil,
+		HasReloaded = false,
 	},
 
 	{
@@ -104,6 +105,7 @@ local slots = {
 		CurrentWeapon = nil,
 		WeaponData = nil,
 		Element = nil,
+		HasReloaded = false,
 	},
 
 	{
@@ -111,6 +113,7 @@ local slots = {
 		CurrentWeapon = nil,
 		WeaponData = nil,
 		Element = nil,
+		HasReloaded = false,
 	},
 }
 
@@ -121,6 +124,7 @@ local lockTimer = weaponTimer:new("LockOn")
 local lockGuis = {}
 
 local fireTimer = Timer:new("FireDelay", 0)
+local isPaused = false
 
 --// Function
 
@@ -229,6 +233,7 @@ function module.UpdateSlot()
 	slot.CurrentWeapon = module.currentWeapon
 	slot.WeaponData = weaponData
 	slot.Element = weaponData and weaponData.Element
+	slot.HasReloaded = weaponData and weaponData.HasReloaded or false
 
 	slot.Ammo = currentAmmo -- module.currentWeapon and currentAmmo or 0
 
@@ -272,7 +277,7 @@ local function playVoiceLine()
 	end)
 end
 
-function module.EquipWeapon(weaponName, pickupType, element, extraAmmo)
+function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloaded)
 	signals.DoUiAction:Fire("HUD", "hideReload", true)
 
 	lockTimer:Cancel()
@@ -295,8 +300,6 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo)
 	end
 
 	local weapon = assets.Models.Weapons:FindFirstChild(weaponName)
-
-	print(weaponName, weapon)
 
 	if not weapon then
 		acts:removeAct("Equipping")
@@ -366,6 +369,7 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo)
 	animationService:stopAnimation(viewmodel.Model, "ReloadOut", 0)
 
 	weaponData.Element = element
+	weaponData.HasReloaded = hasReloaded
 
 	if element then
 		if weaponData.Type == "Melee" then
@@ -751,8 +755,12 @@ function module.dealDamage(cframe, subject, damage, source, element)
 	end
 
 	local isVendingMachine = string.match(model.Name, "Vending Machine")
-	if isVendingMachine and source ~= "ThrownWeapon" then
-		return
+	if isVendingMachine then
+		module.HasHitMachine = true
+
+		if source ~= "ThrownWeapon" then
+			return
+		end
 	end
 
 	local siuDamage = 0
@@ -811,10 +819,12 @@ function module.dealDamage(cframe, subject, damage, source, element)
 			signals.DoUiAction:Fire("HUD", "ShowHit", true, critMult > 1)
 		end
 
-		if element and not ChanceService.checkChance(60, true) then
-			element = nil
-		else
-			codexService.AddEntry("Elements")
+		if element then
+			if ChanceService.checkChance(50, true) then
+				codexService.AddEntry("Elements")
+			else
+				element = nil
+			end
 		end
 
 		local sourceIsWeapon = module.currentWeapon and source == module.currentWeapon.Name
@@ -854,7 +864,7 @@ function module.dealDamage(cframe, subject, damage, source, element)
 		)
 	end
 
-	if soulsService.Souls <= 0 and GiftsService.CheckGift("Life_Steal") and ChanceService.checkChance(5, true) then
+	if GiftsService.CheckGift("Life_Steal") and soulsService.Souls <= 0 and critMult > 1 then
 		net:RemoteEvent("Damage"):FireServer(player.Character, -1)
 		signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Life_Steal")
 	end
@@ -1213,6 +1223,7 @@ function module.Fire()
 	if weaponData.LockedOn then
 		bulletCount = math.clamp(#weaponData.LockedOn, 1, 100)
 		bulletDamage -= math.ceil(bulletCount / 2) - 1
+		bulletDamage = math.clamp(bulletDamage, 1, math.huge)
 	end
 
 	local equipAnimation = animationService:getAnimation(viewmodel.Model, "Equip")
@@ -1495,7 +1506,7 @@ function module.SwitchToSlot(slotNumber)
 	end
 
 	if slot.CurrentWeapon then
-		module.EquipWeapon(slot.CurrentWeapon.Name, "SlotSwitch", slot.Element)
+		module.EquipWeapon(slot.CurrentWeapon.Name, "SlotSwitch", slot.Element, nil, slot.HasReloaded)
 	else
 		EquipDefault(true)
 	end
@@ -1517,7 +1528,15 @@ function module.Throw(outOfAmmo)
 	animationService:stopAnimation(viewmodel.Model, "Fire", 0)
 	animationService:stopAnimation(viewmodel.Model, "FireOut", 0)
 
-	local animation = animationService:playAnimation(viewmodel.Model, "Throw", Enum.AnimationPriority.Action4.Value)
+	local animation = animationService:playAnimation(
+		viewmodel.Model,
+		"Throw",
+		Enum.AnimationPriority.Action4.Value,
+		false,
+		0,
+		2,
+		1.25
+	)
 
 	animation.Ended:Wait()
 	EquipDefault()
@@ -1697,7 +1716,7 @@ local function switchWeapon()
 end
 
 UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
-	if gameProcessedEvent then
+	if gameProcessedEvent or isPaused then
 		return
 	end
 
@@ -1710,7 +1729,7 @@ UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
 	end
 
 	if input.KeyCode == Enum.KeyCode.R or input.KeyCode == Enum.KeyCode.ButtonX then
-		local conditions = acts.Condition.blacklist("Firing", "Throwing")
+		local conditions = acts.Condition.blacklist("Firing", "Throwing", "InActiveMenu")
 
 		if module.currentWeapon then
 			if GiftsService.CheckGift("TactiAwesome") then
@@ -1777,7 +1796,7 @@ RunService.RenderStepped:Connect(function()
 
 	logRecoil = recoilCFrame
 
-	if not mouseButton1Down then
+	if not mouseButton1Down or isPaused then
 		return
 	end
 
@@ -1840,6 +1859,7 @@ net:Connect("StartExitSequence", function()
 end)
 
 signals.PauseGame:Connect(function()
+	isPaused = true
 	mouseButton1Down = false
 
 	for _, anim in pairs(animationService:getLoadedAnimations(viewmodel.Model)) do
@@ -1848,6 +1868,8 @@ signals.PauseGame:Connect(function()
 end)
 
 signals.ResumeGame:Connect(function()
+	isPaused = false
+
 	for _, anim in pairs(animationService:getLoadedAnimations(viewmodel.Model)) do
 		anim:AdjustSpeed(1)
 	end

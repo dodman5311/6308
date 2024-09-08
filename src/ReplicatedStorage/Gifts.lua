@@ -106,7 +106,7 @@ local module = {
 		Burn_Hell = {
 			Icon = "rbxassetid://18731039717",
 			Catagories = { "Arsenal", "Soul" },
-			Desc = "Any damage, not dealt by a weapon, now has a chance to deal 1 point of fire damage - lighting the enemy said on fire. (50% chance)",
+			Desc = "Any hits, not from a weapon, now has a chance to deal 1 point of fire damage - lighting the said enemy on fire. (50% chance)",
 		},
 	},
 
@@ -144,12 +144,6 @@ local module = {
 
 		---
 
-		["Paladin's_Faith"] = { -- done
-			Icon = "rbxassetid://18671027019",
-			Catagories = { "Soul" },
-			Desc = "At the beginning of each level, you now start with a shield around you. (30 shield health)",
-		},
-
 		Aggressive_Forgery = { -- done
 			Icon = "rbxassetid://18671287606",
 			Catagories = { "Soul" },
@@ -159,7 +153,7 @@ local module = {
 		Life_Steal = { -- done
 			Icon = "rbxassetid://18671291054",
 			Catagories = { "Soul" },
-			Desc = "When at 0 Souls, hits now have a chance to heal you. (5% chance)",
+			Desc = "When at 0 Souls, crits will now heal you.",
 		},
 
 		Open_Wounds = { -- done
@@ -233,7 +227,7 @@ local module = {
 		Haven = {
 			Icon = "rbxassetid://16235850238",
 			Catagories = { "Soul" },
-			Desc = "When hit, you now gain 1 second of invincibility.",
+			Desc = "When hit, you now gain 0.5 second of invincibility.",
 		},
 
 		Ultra_Slayer = {
@@ -281,7 +275,7 @@ When active, you gain +50% firerate, and infinite ammo for 3 seconds. (20 hits f
 			Catagories = { "Tactical" },
 			Desc = [[Grapple onto any surface and pull yourself towards it. 
 
-Grappling an enemy will deal 1 damage and give you 0.5 seconds of invincibility. 
+Hitting an enemy with a grapple will give you 0.5 seconds of invincibility. 
 1 second invincibility cooldown.
 
 (Left Shift to grapple)]],
@@ -304,6 +298,18 @@ When jumping off a wall, you will jump in the direction you are looking,
 and will be given extra jump in the air.
 
 +50% movement speed while wallrunning.]],
+		},
+
+		["Paladin's_Faith"] = { -- done
+			Icon = "rbxassetid://18671027019",
+			Catagories = { "Soul" },
+			Desc = "At the beginning of each level, you now start with a shield around you. (30 shield health)",
+		},
+
+		["Coming_Soon!"] = { -- done
+			Icon = "rbxassetid://16422611114",
+			Catagories = { "Soul", "Tactical", "Arsenal", "Luck" },
+			Desc = "Perk coming soon! (Still planning it out)",
 		},
 	},
 }

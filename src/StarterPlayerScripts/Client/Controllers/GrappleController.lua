@@ -288,7 +288,7 @@ function module.Activate(item)
 	ViewModel = viewModelService.viewModels[1].Model
 
 	acts:createTempAct("ability_invasive", function()
-		local _, characterHit = weapons.FireBullet(1, 0, 300, nil, "Brick_Hook")
+		local _, characterHit = weapons.FireBullet(0, 0, 300, nil, "Brick_Hook")
 
 		task.spawn(dealDamage, characterHit)
 

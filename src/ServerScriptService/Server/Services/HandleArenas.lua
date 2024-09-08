@@ -45,7 +45,13 @@ local function runArena(encounter, unit, level, isAmbush)
 	for _, wave in ipairs(encounter) do
 		timer.wait(1)
 
-		spawners.spawnInUnit(level, unit, "Weapon", Vector3.new(0, 3, 0), unit:FindFirstChild("WeaponSpawn"), true)
+		for _, spawner in ipairs(unit:GetChildren()) do
+			if spawner.Name ~= "WeaponSpawn" then
+				continue
+			end
+
+			spawners.spawnInUnit(level, unit, "Weapon", Vector3.new(0, 3, 0), spawner, true)
+		end
 
 		for _, spawnData in ipairs(wave) do
 			if spawnData.SpawnDelay > 0 then

@@ -572,7 +572,10 @@ local commands = {
 
 			Parameters = function()
 				return {
-					{ Name = "Boss", Options = { "Keeper Of The Third Law", "Visage Of False Hope" } },
+					{
+						Name = "Boss",
+						Options = { "Keeper Of The Third Law", "Visage Of False Hope", "Keeper Of Divine Iron" },
+					},
 				}
 			end,
 

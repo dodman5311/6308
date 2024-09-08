@@ -47,6 +47,8 @@ function module.Dash(subject)
 			module.canDash = false
 		end
 
+		util.PlaySound(ReplicatedStorage.Assets.Sounds.Dash, script, 0.1)
+
 		local ti = TweenInfo.new(1)
 
 		Lighting.DashBlur.Size = 10

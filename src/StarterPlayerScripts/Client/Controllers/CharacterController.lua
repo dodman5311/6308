@@ -7,6 +7,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local lighting = game:GetService("Lighting")
+local UserInputService = game:GetService("UserInputService")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
@@ -29,6 +30,7 @@ local ChanceService = require(Globals.Vendor.ChanceService)
 local MusicService = require(Globals.Client.Services.MusicService)
 local codexService = require(Globals.Client.Services.CodexService)
 local Acts = require(Globals.Vendor.Acts)
+local weaponService = require(Globals.Client.Controllers.WeaponController)
 
 --// Values
 local logHealth = 0
@@ -38,8 +40,11 @@ local isPaused = false
 local lastOnGroundPosition = Vector3.zero
 local render
 local mouse = Player:GetMouse()
+local hasLookedAtMachine = false
 
 local mouseTarget = Instance.new("ObjectValue")
+
+Player:WaitForChild("PlayerGui").SelectionImageObject = ReplicatedStorage:WaitForChild("HideSelection")
 
 --// Fucntions
 
@@ -131,7 +136,7 @@ function module:OnSpawn(character, humanoid)
 				signals.DoUiAction:Fire("HUD", "ShowInvincible", true)
 
 				signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Haven")
-				signals.DoUiAction:Fire("HUD", "CooldownGift", true, "Haven", 1)
+				signals.DoUiAction:Fire("HUD", "CooldownGift", true, "Haven", 0.5)
 
 				task.delay(1, function()
 					signals.DoUiAction:Fire("HUD", "HideInvincible", true)
@@ -249,8 +254,25 @@ mouseTarget.Changed:Connect(function(value)
 		return
 	end
 
+	local throwWeaponGui = Player.PlayerGui.ThrowWeaponGui
+
+	if weaponService.HasHitMachine or not weaponService.currentWeapon then
+		throwWeaponGui.Enabled = false
+	end
+
 	if model:HasTag("VendingMachine") then
 		signals.AddEntry:Fire("Vending Machines")
+
+		if not weaponService.HasHitMachine and weaponService.currentWeapon then
+			throwWeaponGui.Enabled = true
+			throwWeaponGui.Adornee = model.PrimaryPart
+
+			if UserInputService.GamepadEnabled then
+				throwWeaponGui.TextLabel.Text = "B to throw weapon"
+			else
+				throwWeaponGui.TextLabel.Text = "X to throw weapon"
+			end
+		end
 	end
 
 	if model.Name == "Kiosk" then
@@ -495,8 +517,9 @@ net:Connect("OpenKiosk", function()
 	UIService.doUiAction("Kiosk", "ShowScreen", true, soulsService.Souls)
 end)
 
-UserInputService.InputBegan:Connect(function(input)
-	if input.KeyCode == Enum.KeyCode.Tab then
+UserInputService.InputBegan:Connect(function(input, gpe)
+	if input.KeyCode == Enum.KeyCode.Tab or input.KeyCode == Enum.KeyCode.ButtonSelect then
+		GuiService.SelectedObject = nil
 		signals.DoUiAction:Fire("Menu", "Toggle", true)
 	end
 end)

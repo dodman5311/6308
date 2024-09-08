@@ -2,6 +2,7 @@ local CollectionService = game:GetService("CollectionService")
 local rng = Random.new()
 
 local Debris = game:GetService("Debris")
+local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -16,7 +17,7 @@ local vfx = net:RemoteEvent("ReplicateEffect")
 local createProjectileRemote = net:RemoteEvent("CreateProjectile")
 
 local moveChances = {
-	--{ "SinkRoom", 10 },
+	{ "Acid", 10 },
 
 	{ "Sacrifice", 20 },
 	{ "Geysers", 25 },
@@ -153,6 +154,14 @@ local closePattern = {
 	Vector2.new(-0.15, 0.15),
 }
 
+local function dealDamage(humanoid, amount)
+	if npc:GetState() == "Dead" then
+		return
+	end
+
+	humanoid:TakeDamage(amount)
+end
+
 local function indicateAttack(npc, color)
 	net:RemoteEvent("ReplicateEffect"):FireAllClients("IndicateVisageAttack", "Server", true, npc.Instance, color)
 	timer.wait(0.5)
@@ -242,7 +251,7 @@ local function checkHitboxes(npc)
 				continue
 			end
 
-			humanoid:TakeDamage(1)
+			dealDamage(humanoid, 1)
 
 			table.insert(playersHit, playerHit)
 		end
@@ -262,7 +271,7 @@ local function checkGeyserHitboxes()
 				continue
 			end
 
-			humanoid:TakeDamage(1)
+			dealDamage(humanoid, 1)
 
 			table.insert(playersHit, playerHit)
 		end
@@ -284,11 +293,16 @@ local function rotateForFire(npc)
 	local hitBoxAlpha = 0
 
 	local raiseTime = 10
-	local rotateTime = 2
+	local rotateTime = 2.75
 
 	npc.fireHitboxes = {}
 
 	return RunService.Heartbeat:Connect(function()
+		if npc:GetState() == "Dead" then
+			timer:getTimer("VisageFireWaiting"):Destroy()
+			return
+		end
+
 		local currentTime = os.clock() - startTime
 		local step = os.clock() - lastStep
 
@@ -328,7 +342,8 @@ local function aimYAxisAtPlayer(npc)
 
 		local targetDistance = (npcPos2 - targetPos2).Magnitude
 
-		root.ApatureRoot.WorldPosition = xyP + Vector3.new(0, target:GetPivot().Position.Y + (targetDistance / 3), 0)
+		root.ApatureRoot.WorldPosition = xyP
+			+ Vector3.new(0, (target:GetPivot().Position.Y - 5) + (targetDistance / 3), 0)
 	end)
 end
 
@@ -366,6 +381,29 @@ local function createGeyserAt(npc, indicateTime, Position)
 	Debris:AddItem(newGeyser, 5)
 end
 
+local function togglePlatforms(direction)
+	local room = workspace.Map:FindFirstChild("BossRoom_2")
+
+	if not room then
+		return
+	end
+
+	for _, platform in ipairs(room.RoomModel:GetChildren()) do
+		if platform.Name ~= "Platform" then
+			continue
+		end
+
+		local logPos = platform:GetPivot()
+
+		task.spawn(function()
+			for i = 0, 1, 0.05 do
+				task.wait(0.025)
+				platform:PivotTo(logPos:Lerp(logPos * CFrame.new(0, 11 * direction, 0), i))
+			end
+		end)
+	end
+end
+
 local moves = {
 	Fire = function(npc)
 		local model = npc.Instance
@@ -383,7 +421,7 @@ local moves = {
 
 		npc.Janitor:Add(rotateOnStep, "Disconnect")
 
-		timer.wait(15)
+		timer.wait(15, "VisageFireWaiting")
 
 		vfx:FireAllClients("VisageFire", "Server", true, npc.Instance, false)
 		rotateOnStep:Disconnect()
@@ -406,6 +444,10 @@ local moves = {
 		timer.wait(2)
 
 		for i = 1, 5 do
+			if npc:GetState() == "Dead" then
+				break
+			end
+
 			util.PlaySound(model.PrimaryPart.Launch, model.PrimaryPart, 0.1)
 
 			doForBarrels(npc, function(barrel)
@@ -453,6 +495,10 @@ local moves = {
 
 		local offset = false
 		for _ = 1, 10 do
+			if npc:GetState() == "Dead" then
+				break
+			end
+
 			local npcPos2 = model:GetPivot().Position * Vector3.new(1, 0, 1)
 			local targetPos2 = target:GetPivot().Position * Vector3.new(1, 0, 1)
 
@@ -474,7 +520,7 @@ local moves = {
 					{
 						Dropping = 0.65,
 						Bouncing = true,
-						SplashRange = 50,
+						SplashRange = 45,
 						SplashDamage = 6,
 					},
 					nil,
@@ -500,8 +546,12 @@ local moves = {
 		npc.Acts:createAct("InAction")
 
 		net:RemoteEvent("ReplicateEffect")
-			:FireAllClients("IndicateAttack", "Server", true, npc.Instance.Torso, Color3.fromRGB(145, 255, 95))
+			:FireAllClients("IndicateAttack", "Server", true, npc.Instance.Torso, Color3.fromRGB(183, 95, 255))
 		timer.wait(0.5)
+
+		if npc:GetState() == "Dead" then
+			return
+		end
 
 		-- for i = 5, 1, -1 do
 		-- 	task.spawn(createGeyserAtPlayerPosition, npc, i / 10)
@@ -525,7 +575,7 @@ local moves = {
 	Sacrifice = function(npc)
 		local enemies = CollectionService:GetTagged("Enemy")
 
-		if #enemies <= 1 then
+		if #enemies <= 1 or workspace:GetAttribute("GamePaused") then
 			return
 		end
 
@@ -546,7 +596,7 @@ local moves = {
 		end
 
 		repeat
-			timer.wait(0.25)
+			timer.wait(0.5)
 			npc.Instance.Humanoid.Health += 1
 		until not workspace:FindFirstChild("Betrayed")
 
@@ -558,10 +608,82 @@ local moves = {
 		npc.Instance.Humanoid:SetAttribute("Invincible", false)
 		npc.Acts:removeAct("InAction")
 	end,
+
+	Acid = function(npc)
+		local model = npc.Instance
+
+		if npc.Acts:checkAct("AcidAttack") then
+			return
+		end
+
+		togglePlatforms(1)
+
+		npc.Acts:createAct("AcidAttack")
+
+		--local riseTween = TweenInfo.new(2, Enum.EasingStyle.Linear)
+		local layers = model.AcidLayers
+
+		local logPos = layers:GetPivot()
+
+		net:RemoteEvent("ReplicateEffect")
+			:FireAllClients("IndicateAttack", "Server", true, npc.Instance.Torso, Color3.fromRGB(110, 255, 105))
+		timer.wait(0.5)
+
+		ReplicatedStorage.Assets.Sounds.Alarm:Play()
+
+		Lighting.Ambient = Color3.new(1)
+
+		for _, v in ipairs(CollectionService:GetTagged("VisageRoomLight")) do
+			v.Color = Color3.new(1)
+		end
+
+		timer.wait(2)
+
+		local startPos = layers:GetPivot()
+		local endGoal = model:FindFirstChild("AcidStage3"):GetPivot()
+
+		layers.PartA.Bubbles:Play()
+
+		for i = 0, 1, 0.001 do
+			timer.wait(0.012)
+
+			layers:PivotTo(startPos:Lerp(endGoal, i))
+
+			if npc:GetState() == "Dead" then
+				break
+			end
+		end
+
+		if npc:GetState() ~= "Dead" then
+			timer.wait(6)
+		end
+
+		local startPos = layers:GetPivot()
+
+		for i = 0, 1, 0.001 do
+			timer.wait(0.001)
+
+			layers:PivotTo(startPos:Lerp(logPos, i))
+		end
+
+		layers.PartA.Bubbles:Stop()
+		togglePlatforms(-1)
+
+		Lighting.Ambient = Color3.fromRGB(125, 125, 125)
+		for _, v in ipairs(CollectionService:GetTagged("VisageRoomLight")) do
+			v.Color = Color3.fromRGB(255, 228, 121)
+		end
+
+		task.wait(1)
+
+		npc.Acts:removeAct("AcidAttack")
+	end,
 }
 
 local function spawnEnemy(OriginCFrame)
-	local spawnRange = 100
+	local spawnRangeX = rng:NextInteger(100, 60)
+	local spawnRangeZ = rng:NextInteger(100, 60)
+
 	local enemyToSpawn = "Tollsman"
 
 	if rng:NextNumber(0, 100) <= 10 then
@@ -571,7 +693,7 @@ local function spawnEnemy(OriginCFrame)
 	end
 
 	local spawnCFrame = OriginCFrame
-		* CFrame.new(rng:NextNumber(-spawnRange, spawnRange), 2, rng:NextNumber(-spawnRange, spawnRange))
+		* CFrame.new(rng:NextInteger(-spawnRangeX, spawnRangeX), 2, rng:NextInteger(-spawnRangeZ, spawnRangeZ))
 
 	local enemyModel = spawners.placeNewObject(10, spawnCFrame, "Enemy", enemyToSpawn)
 
@@ -666,6 +788,35 @@ local function closeAttack(npc)
 	npc.Acts:removeAct("CloseAttack")
 end
 
+local function onDied(npc)
+	for _, enemy in ipairs(CollectionService:GetTagged("Enemy")) do
+		if enemy.Name == npc.Instance.Name then
+			continue
+		end
+		enemy:Destroy()
+	end
+
+	local primaryPart = npc.Instance.PrimaryPart
+
+	net:RemoteEvent("StopMusic"):FireAllClients(npc.Instance.Name)
+
+	if primaryPart and primaryPart:FindFirstChild("Death") then
+		npc.Instance.PrimaryPart.Death:Play()
+	end
+
+	task.delay(23.85, function()
+		vfx:FireAllClients("emitObject", "Server", true, npc.Instance.PrimaryPart.Explode)
+
+		npc.Instance.PrimaryPart.Crack:Play()
+		npc.Instance.PrimaryPart.Transparency = 1
+
+		task.wait(3)
+
+		net:RemoteEvent("DoUiAction"):FireAllClients("BossIntro", "ShowCompleted", true, npc.Instance.Name)
+		net:RemoteEvent("DoUiAction"):FireAllClients("HUD", "HideBossBar", true)
+	end)
+end
+
 -- end
 
 local module = {
@@ -686,7 +837,7 @@ local module = {
 	OnDied = {
 		{ Function = "SetCollision", Parameters = { "DeadBody" } },
 		{ Function = "SwitchToState", Parameters = { "Dead" } },
-		{ Function = "RemoveWithDelay", Parameters = { 1 } },
+		{ Function = "Custom", Parameters = { onDied } },
 	},
 }
 

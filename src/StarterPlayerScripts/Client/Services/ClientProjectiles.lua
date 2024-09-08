@@ -51,15 +51,29 @@ module.Presets = {
 		Speed = 100,
 		LifeTime = 5,
 		Info = {
-			SeekProgression = -0.1,
-			Seeking = 1,
-			Dropping = 0.75,
+			SeekProgression = 0.01,
+			Seeking = 0.1,
+			Dropping = 0.5,
 			Bouncing = true,
-			Size = 0.5,
+			Size = 2,
 		},
 		Damage = 1,
 		Piercing = 3,
 		Model = "BladeProjectile",
+	},
+
+	ThermaCan = {
+		Speed = 150,
+		LifeTime = 5,
+		Info = {
+			Dropping = 0.5,
+			Size = 2,
+			SplashRange = 15,
+			SplashDamage = 1,
+			SplashElement = "Fire",
+		},
+		Damage = 1,
+		Model = "ThermaProjectile",
 	},
 
 	SmartPellet = {
@@ -280,9 +294,8 @@ Net:Connect("CreateBeam", fireBeam)
 
 local lastRenderStep = os.clock()
 
-local function processStep(timePassed, projectile: Projectile)
-	local distanceMoved = timePassed * projectile.Speed
-	projectile.Instance.CFrame *= CFrame.new(0, 0, -(distanceMoved + 0.1))
+local function processStep(distanceToMove, projectile: Projectile)
+	projectile.Instance.CFrame *= CFrame.new(0, 0, -(distanceToMove + 0.1))
 
 	--- extra ---
 
@@ -309,13 +322,13 @@ local function processStep(timePassed, projectile: Projectile)
 			end
 		end
 
-		local nearestEnemy, enemyDistance, position
+		local nearestEnemy, distanceToMove, position
 
 		if projectile.Info["Locked"] then
 			nearestEnemy = projectile.Info["Locked"]
 			position = nearestEnemy:GetPivot().Position
 		else
-			nearestEnemy, enemyDistance, position =
+			nearestEnemy, distanceToMove, position =
 				util.getNearestEnemy(projectile.Instance.Position, projectile.Info["SeekDistance"] or 40, list, true)
 		end
 
@@ -328,7 +341,7 @@ local function processStep(timePassed, projectile: Projectile)
 			local projectilePosition = projectile.Instance.Position
 
 			if workspace:Raycast(projectilePosition, position - projectilePosition, rp) then
-				return distanceMoved
+				return distanceToMove
 			end
 
 			projectile.Instance.CFrame = projectile.Instance.CFrame:Lerp(
@@ -344,7 +357,7 @@ local function processStep(timePassed, projectile: Projectile)
 		end
 	end
 
-	return distanceMoved
+	return distanceToMove
 end
 
 local function removeProjectileInstance(projectile)
@@ -402,9 +415,10 @@ RunService.Heartbeat:Connect(function()
 		local timePassed = os.clock() - lastRenderStep
 		projectile.Age += timePassed
 
-		local distanceMoved = processStep(timePassed, projectile)
+		local distanceToMove = timePassed * projectile.Speed
+		local raycast = checkRaycast(projectile, distanceToMove + 0.1)
 
-		local raycast = checkRaycast(projectile, distanceMoved)
+		processStep(distanceToMove, projectile)
 
 		if not raycast then
 			continue
@@ -421,6 +435,7 @@ RunService.Heartbeat:Connect(function()
 
 		if projectile.Sender and projectile.Sender:IsA("Player") then
 			hitModel = raycast.Instance:FindFirstAncestorOfClass("Model")
+
 			if hitModel and (hitModel:HasTag("Commrad") or Players:GetPlayerFromCharacter(hitModel)) then
 				continue
 			end
@@ -437,7 +452,8 @@ RunService.Heartbeat:Connect(function()
 				projectile.Info["SplashDamage"] or 1,
 				projectile.Sender,
 				projectile.Info.ExplosiveColor,
-				projectile.Source
+				projectile.Source,
+				projectile.Info["SplashElement"]
 			)
 		end
 

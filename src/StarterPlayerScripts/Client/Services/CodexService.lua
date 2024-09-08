@@ -16,6 +16,8 @@ local codex = require(Globals.Shared.Codex)
 module.CodexEntries = {}
 signals.AddEntry = signal.new()
 
+module.latestEntry = nil
+
 function module.AddEntry(entryIndex, quiet)
 	if module.CodexEntries[entryIndex] or not codex[entryIndex] then
 		return
@@ -28,6 +30,10 @@ function module.AddEntry(entryIndex, quiet)
 
 	if quiet then
 		return
+	end
+
+	if isImportant then
+		module.latestEntry = entryIndex
 	end
 
 	signals.DoUiAction:Fire("Notify", "AddEntry", true, entryIndex, isImportant)

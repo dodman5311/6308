@@ -25,6 +25,12 @@ function module.enableSkip(callback, ...)
 
 	skipEnabled = true
 
+	if UserInputService.GamepadEnabled then
+		skipGui.SkipPrompt.Text = "X: SKIP"
+	else
+		skipGui.SkipPrompt.Text = "F: SKIP"
+	end
+
 	util.tween(skipGui.SkipPrompt, ti, { TextTransparency = 0 })
 
 	table.insert(
@@ -51,7 +57,7 @@ function module.hideSkip()
 end
 
 UserInputService.InputBegan:Connect(function(input)
-	if not skipEnabled or input.KeyCode ~= Enum.KeyCode.F then
+	if not skipEnabled or (input.KeyCode ~= Enum.KeyCode.F and input.KeyCode ~= Enum.KeyCode.ButtonX) then
 		return
 	end
 

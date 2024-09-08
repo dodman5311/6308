@@ -436,7 +436,12 @@ end)
 
 net:Connect("ResumeGame", function()
 	for _, Npc in ipairs(Npcs) do
-		if Npc.Instance.Parent and Npc.Instance.PrimaryPart and not Npc.StatusEffects["Ice"] then
+		if
+			Npc.Instance.Parent
+			and Npc.Instance.PrimaryPart
+			and not Npc.StatusEffects["Ice"]
+			and Npc.Instance.Name ~= "Visage Of False Hope"
+		then
 			Npc.Instance.PrimaryPart.Anchored = false
 		end
 

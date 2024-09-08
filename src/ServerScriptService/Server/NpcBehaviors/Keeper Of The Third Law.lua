@@ -211,8 +211,8 @@ local function parryAttack(npc, health)
 
 	humanoid.Health = logHealth
 
-	util.PlaySound(assets.Sounds.Blocked, script, 0.1)
-	util.PlaySound(assets.Sounds.BlockedMetal, script, 0.1)
+	util.PlaySound(assets.Sounds.Blocked, ReplicatedStorage, 0.1)
+	util.PlaySound(assets.Sounds.BlockedMetal, ReplicatedStorage, 0.1)
 
 	animationService:playAnimation(
 		npc.Instance,
@@ -756,7 +756,7 @@ local function onDied(npc)
 		timer.wait()
 	until animation.Length > 0
 
-	task.delay(animation.Length - 7, function()
+	task.delay(animation.Length - 5, function()
 		DeathEffect(npc)
 	end)
 end

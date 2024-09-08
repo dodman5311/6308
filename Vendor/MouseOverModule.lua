@@ -1,3 +1,4 @@
+local GuiService = game:GetService("GuiService")
 local Player = game.Players.LocalPlayer or game.Players:GetPropertyChangedSignal("LocalPlayer")
 
 local Mouse = Player:GetMouse()
@@ -10,10 +11,12 @@ local function IsInFrame(v)
 	local Y = Mouse.Y
 
 	if
-		X > v.AbsolutePosition.X
-		and Y > v.AbsolutePosition.Y
-		and X < v.AbsolutePosition.X + v.AbsoluteSize.X
-		and Y < v.AbsolutePosition.Y + v.AbsoluteSize.Y
+		(
+			X > v.AbsolutePosition.X
+			and Y > v.AbsolutePosition.Y
+			and X < v.AbsolutePosition.X + v.AbsoluteSize.X
+			and Y < v.AbsolutePosition.Y + v.AbsoluteSize.Y
+		) or GuiService.SelectedObject == v
 	then
 		return true
 	else

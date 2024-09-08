@@ -1,3 +1,4 @@
+local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
 local module = {}
 
@@ -5,6 +6,7 @@ local module = {}
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local collectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
@@ -18,15 +20,21 @@ local util = require(Globals.Vendor.Util)
 local signals = require(Globals.Shared.Signals)
 local signal = require(Globals.Packages.Signal)
 local CameraController = require(Globals.Client.Controllers.CameraController)
+local chanceService = require(Globals.Vendor.ChanceService)
 
 --// Values
 
 module.explosiveHit = signal.new()
 
-local function hitEnemy(subject, damage, magnitude, sender, source)
+local function hitEnemy(subject, damage, magnitude, sender, source, element)
 	task.wait(0.05)
 
-	local serverHumanoid, preHealth, postHealth = Net:RemoteFunction("Damage"):InvokeServer(subject, damage or 1)
+	if element and not chanceService.checkChance(50, true) then
+		element = nil
+	end
+
+	local serverHumanoid, preHealth, postHealth = Net:RemoteFunction("Damage")
+		:InvokeServer(subject, damage or 1, element)
 
 	local hitPlayer = Players:GetPlayerFromCharacter(subject)
 	if hitPlayer then
@@ -40,10 +48,87 @@ local function hitEnemy(subject, damage, magnitude, sender, source)
 	module.explosiveHit:Fire(subject, preHealth, postHealth, math.clamp(damage, 0, math.huge), source)
 end
 
-function module.createExplosion(position, size, damage, sender, color, source)
-	local lightTi = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+local elementalExplosions = {
+	Electricity = function(position, size, color)
+		local lightTi = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+		local newEffect = Effects.ElectricExplode:Clone()
 
+		Debris:AddItem(newEffect, 5)
+
+		newEffect.Center.Electricity.Color = ColorSequence.new(color or Color3.fromRGB(188, 239, 255))
+
+		newEffect.Parent = workspace.Ignore
+		newEffect.Position = position
+
+		newEffect.Center.Electricity:Emit(150)
+		util.tween(newEffect.Light, lightTi, { Brightness = 0 })
+
+		return newEffect
+	end,
+
+	Fire = function(position, size, color)
+		local lightTi = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+		local newEffect = Effects.FireExplode:Clone()
+
+		Debris:AddItem(newEffect, 5)
+
+		newEffect.Center.Fire.Color = ColorSequence.new(color or Color3.fromRGB(255, 255, 255))
+
+		newEffect.Parent = workspace.Ignore
+		newEffect.Position = position
+
+		newEffect.Center.Fire:Emit(150)
+		util.tween(newEffect.Light, lightTi, { Brightness = 0 })
+
+		local rp = RaycastParams.new()
+		rp.FilterDescendantsInstances = { workspace.Map }
+		rp.FilterType = Enum.RaycastFilterType.Include
+
+		local cast = workspace:Raycast(position, CFrame.new(position + Vector3.new(0, 1, 0)).UpVector * -size, rp)
+
+		if not cast then
+			return newEffect
+		end
+
+		local linger = Effects.FireLinger:Clone()
+		Debris:AddItem(linger, 5)
+		linger.Parent = workspace
+		linger.Position = cast.Position
+		linger.Fire.Enabled = true
+
+		local beat
+		local i = 0
+
+		beat = RunService.Heartbeat:Connect(function(deltaTime)
+			if not linger or not linger.Parent then
+				beat:Disconnect()
+			end
+
+			i += deltaTime
+
+			if i >= 0.5 then
+				i = 0
+			else
+				return
+			end
+
+			local partsHit = workspace:GetPartsInPart(linger)
+
+			for _, part in ipairs(partsHit) do
+				Net:RemoteEvent("Damage"):FireServer(part, 0, "Fire")
+			end
+		end)
+
+		return newEffect
+	end,
+}
+
+local function explodeNormal(position, size, color)
+	local lightTi = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 	local newEffect = ExplodeEffect:Clone()
+
+	Debris:AddItem(newEffect, 5)
+
 	newEffect.Explosion.Color = ColorSequence.new(color or Color3.new(1, 1, 1))
 
 	newEffect.Parent = workspace.Ignore
@@ -56,6 +141,22 @@ function module.createExplosion(position, size, damage, sender, color, source)
 	newEffect.Shockwave:Emit(1)
 	util.tween(newEffect.Light, lightTi, { Brightness = 0 })
 
+	return newEffect
+end
+
+function module.createExplosion(position, size, damage, sender, color, source, element, chance)
+	if chance and not chanceService.checkChance(chance, true) then
+		return
+	end
+
+	local effect
+
+	if element then
+		effect = elementalExplosions[element](position, size, color)
+	else
+		effect = explodeNormal(position, size, color)
+	end
+
 	local sound
 
 	if size < 15 then
@@ -66,7 +167,7 @@ function module.createExplosion(position, size, damage, sender, color, source)
 		sound = Assets.Sounds.Large_Explosion
 	end
 
-	util.PlaySound(sound, newEffect, 0.1)
+	util.PlaySound(sound, effect, 0.1)
 
 	local list = {}
 
@@ -76,6 +177,10 @@ function module.createExplosion(position, size, damage, sender, color, source)
 		for _, v in ipairs(Players:GetPlayers()) do
 			table.insert(list, v.Character)
 		end
+	end
+
+	if sender and Players.LocalPlayer ~= sender then
+		return
 	end
 
 	local rp = RaycastParams.new()
@@ -101,7 +206,15 @@ function module.createExplosion(position, size, damage, sender, color, source)
 		end
 
 		local distancePercentage = math.abs((distance / size) - 1)
-		task.spawn(hitEnemy, target, math.ceil(damage * distancePercentage), distancePercentage, sender, source)
+		task.spawn(
+			hitEnemy,
+			target,
+			math.ceil(damage * distancePercentage),
+			distancePercentage,
+			sender,
+			source,
+			element
+		)
 	end
 end
 

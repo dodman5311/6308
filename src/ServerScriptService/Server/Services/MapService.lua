@@ -417,6 +417,11 @@ function module.placeExit()
 	--loadModules()
 
 	local cap = getFurthestCap()
+
+	if not cap then
+		warn("Exit not placed (no caps found)")
+		return
+	end
 	local newExit = exit:Clone()
 	newExit.Parent = cap.Parent
 	newExit:PivotTo(cap:GetPivot())
@@ -653,13 +658,17 @@ local function detectHit(part: BasePart)
 		return
 	end
 
-	return humanoid
+	return humanoid, model
 end
 
 local lastTimeReset = os.clock()
 
 RunService.Heartbeat:Connect(function()
-	if os.clock() - lastTimeReset >= 0.25 or workspace:GetAttribute("GamePaused") then
+	if workspace:GetAttribute("GamePaused") then
+		return
+	end
+
+	if os.clock() - lastTimeReset >= 0.5 then
 		lastTimeReset = os.clock()
 	else
 		return
@@ -675,7 +684,11 @@ RunService.Heartbeat:Connect(function()
 		local hit = {}
 
 		for _, part in ipairs(detect) do
-			local humanoid = detectHit(part)
+			local humanoid, model = detectHit(part)
+
+			if model and model.Name == "Visage Of False Hope" then
+				continue
+			end
 
 			if table.find(hit, humanoid) then
 				continue

@@ -22,8 +22,13 @@ function module.Init(player, ui, frame)
 end
 
 function module.Pause(player, ui, frame, value)
-	Lighting.PauseBlur.Enabled = value
 	frame.Gui.Enabled = value
+
+	if value == false and ui.Menu.Gui.Enabled then
+		return
+	end
+
+	Lighting.PauseBlur.Enabled = value
 end
 
 return module

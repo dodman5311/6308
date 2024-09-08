@@ -70,7 +70,22 @@ function module.dealDamage(_, subject, amount, element)
 			local explosionPosition = subject:GetPivot().Position
 
 			net:RemoteEvent("CreateExplosion")
-				:FireAllClients(explosionPosition, 25, 3, Players:FindFirstChildOfClass("Player"))
+				:FireAllClients(explosionPosition, 25, 3, Players:FindFirstChildOfClass("Player"), nil, "Elemental")
+		end
+
+		if subject:GetAttribute("Electricity") then
+			local explosionPosition = subject:GetPivot().Position
+
+			net:RemoteEvent("CreateExplosion"):FireAllClients(
+				explosionPosition,
+				30,
+				1,
+				Players:FindFirstChildOfClass("Player"),
+				nil,
+				"Elemental",
+				"Electricity",
+				15
+			)
 		end
 
 		if subject:GetAttribute("Ice") then

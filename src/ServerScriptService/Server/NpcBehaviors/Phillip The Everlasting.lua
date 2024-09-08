@@ -133,7 +133,7 @@ local function stunEnemy(npc)
 end
 
 function moves.addArmor(npc)
-	npc.Acts:createAct("inAction")
+	npc.Acts:createAct("inAction", "inHeal")
 	local subject = npc.Instance
 
 	local humanoid = subject.Humanoid
@@ -181,7 +181,7 @@ function moves.addArmor(npc)
 
 	humanoid.WalkSpeed = 15
 
-	npc.Acts:removeAct("inAction")
+	npc.Acts:removeAct("inAction", "inHeal")
 end
 
 local function checkRaycast(subject: Model, origin, destination)
@@ -189,7 +189,7 @@ local function checkRaycast(subject: Model, origin, destination)
 	rp.FilterType = Enum.RaycastFilterType.Exclude
 	rp.FilterDescendantsInstances = { subject }
 
-	local newRay = workspace:Raycast(origin, destination)
+	local newRay = workspace:Spherecast(origin, 0.5, destination)
 
 	if not newRay then
 		return
@@ -312,7 +312,7 @@ function moves.throwAttack(npc)
 end
 
 local function grabPlayer(npc)
-	if npc.Acts:checkAct("inGrab", "inStun") then
+	if npc.Acts:checkAct("inGrab", "inStun", "inHeal") then
 		return
 	end
 

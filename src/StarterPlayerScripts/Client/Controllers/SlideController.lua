@@ -66,7 +66,7 @@ function module.Slide()
 		--script.Slide:Play()
 
 		local slidePhysics = PhysicalProperties.new(0.01, 0.01, 0.5, 100, 1)
-		logPhysics = character.PrimaryPart.CustomPhysicalProperties
+		logPhysics = game:GetService("StarterPlayer").StarterCharacter.PrimaryPart.CustomPhysicalProperties
 
 		for _, v in ipairs(character:GetDescendants()) do
 			if not v:IsA("BasePart") then

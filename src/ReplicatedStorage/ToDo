@@ -51,6 +51,8 @@ When ending a level, for every hundred points after 300, another soul is added. 
 
 Add momentum *
 
+nerfed Haven to 0.5 seconds of invinciblity
+
 iron will is now not affected by luck *
 
 If the play has ricoshot, smart weapons will now target thrown guns. *
@@ -214,18 +216,18 @@ Perk that lights things on fire if not damaged by a bullet
 Grapple deals 1 damage and grants invincibility (Cooldown)
 
 ^^-------^^
-Make praying altar offering - lessens visage health - disables a perk
 
-make rising acid
+pause game > intro text > press tab to continue > menu tutorial text > end ?
 
-Add Cutter
-Add Gratana
-Add Therma
+make arenas and ambushes a chance ?
 
-Add console support to the menu map
+Make praying altar offering - lessens visage health - disables a perk ?
 
-make death sequence
+Make teleport pause
 
+Fix electric sound stopping early
+
+Fix getting stuck while loading
 --
 
 Reflect damage on chance perk B
@@ -251,6 +253,14 @@ upgrade: when at 0 souls, x6 soul chance instead of x4
 
 --
 
+Added Cutter Melee
+
+Added Bull Shot Pistol
+
+Revamped Stage 1 map
+
+Throw speed increased by 25% (Pull out pistols faster after throwing)
+
 Beating Phillip now gives you Master Scouting by default.
 
 Added Specimen enemy
@@ -263,7 +273,8 @@ Added Visage of False Hope boss
 
 Added stage 2 OST
 
-Buffed Sauce if fuel - 10 sploches to heal instead of 25
+Revamped Spiked Sabatons
+Revamped Brick Hook
 
 Added visible magazines to the Cleanse and Repent
 

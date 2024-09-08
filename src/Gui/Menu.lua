@@ -2,6 +2,8 @@ local module = {}
 --// Services
 local CollectionService = game:GetService("CollectionService")
 local ContextActionService = game:GetService("ContextActionService")
+local GuiService = game:GetService("GuiService")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Lighting = game:GetService("Lighting")
 local RunService = game:GetService("RunService")
@@ -15,10 +17,6 @@ local sounds = assets.Sounds
 
 local mapCamera = Instance.new("Camera")
 local weaponCamera = Instance.new("Camera")
-local zoomAmount = 0
-local mouse2Down = false
-local mouse1Down = false
-local lastMouseUp = os.clock()
 
 --// Modules
 local util = require(Globals.Vendor.Util)
@@ -35,8 +33,19 @@ local net = require(Globals.Packages.Net)
 local characterController = require(Globals.Client.Controllers.CharacterController)
 
 --// Values
-local currentMenu = nil
+local mapInFocus = false
+local currentMenu = "Map"
 local currentCatagory = "Weapons"
+
+local zoomDirection = 0
+local zoomAmount = 0
+local mouse2Down = false
+local mouse1Down = false
+
+local padDeltaLeft = Vector2.zero
+local padDeltaRight = Vector2.zero
+
+local lastMouseUp = os.clock()
 
 --// Functions
 
@@ -46,6 +55,12 @@ local weaponIcons = {
 	Melee = "rbxassetid://18298955289",
 	AR = "rbxassetid://18298954616",
 }
+
+local function setDownSelection(frame, downSelectionButton)
+	for _, v in ipairs(frame.Main.Buttons:GetChildren()) do
+		v.NextSelectionDown = downSelectionButton
+	end
+end
 
 local function showAttention(frame)
 	frame.Codex_Lbl.Attention.Visible = false
@@ -75,7 +90,20 @@ local function showAttention(frame)
 	end
 end
 
-local function loadCodexCatagory(frame, catagory)
+local function openCodexEntry(entry, entryIndex, frame)
+	if not entry then
+		return
+	end
+
+	frame.EntryText.Text = entry.Entry
+	frame.EntryName.Text = entryIndex
+
+	codexService.CodexEntries[entryIndex].Viewed = true
+
+	showAttention(frame)
+end
+
+local function loadCodexCatagory(frame, catagory, setColor)
 	for _, v in ipairs(frame.CodexList:GetChildren()) do
 		if not v:IsA("ImageButton") then
 			continue
@@ -85,6 +113,17 @@ local function loadCodexCatagory(frame, catagory)
 	end
 
 	frame.EntryText.Text = ""
+	frame.EntryName.Text = ""
+
+	if setColor then
+		for _, button in ipairs(frame.Codex_Menu.Buttons:GetChildren()) do
+			if button.Name == catagory then
+				frame[button.Name .. "_Lbl"].ImageColor3 = Color3.fromRGB(255, 75, 75)
+			else
+				frame[button.Name .. "_Lbl"].ImageColor3 = Color3.fromRGB(255, 255, 255)
+			end
+		end
+	end
 
 	for entryName, entry in pairs(codexService.CodexEntries) do
 		if entry.Catagory ~= catagory then
@@ -98,11 +137,7 @@ local function loadCodexCatagory(frame, catagory)
 		newButton.Name = entryName
 
 		newButton.MouseButton1Click:Connect(function()
-			frame.EntryText.Text = entry.Entry
-
-			codexService.CodexEntries[entryName].Viewed = true
-
-			showAttention(frame)
+			openCodexEntry(entry, entryName, frame)
 		end)
 
 		local enter, leave = MouseOver.MouseEnterLeaveEvent(newButton)
@@ -323,15 +358,51 @@ function module.Init(player, ui, frame)
 	frame.CancelRestart.MouseButton1Click:Connect(function()
 		frame.ConfirmRestartFrame.Visible = false
 	end)
+
+	local focusButton: TextButton = frame.FocusMap
+
+	focusButton.MouseButton1Click:Connect(function()
+		GuiService.SelectedObject = nil
+		mapInFocus = true
+	end)
 end
 
 UserInputService.InputChanged:Connect(function(input, gameProcessedEvent)
 	if input.UserInputType == Enum.UserInputType.MouseWheel then
 		zoomAmount -= input.Position.Z
 	end
+
+	if mapInFocus and input.KeyCode == Enum.KeyCode.Thumbstick1 then
+		if input.Position.Magnitude > 0.25 then
+			padDeltaLeft = (input.Position * Vector3.new(1, -1)) * 2
+		else
+			padDeltaLeft = Vector2.zero
+		end
+	end
+
+	if mapInFocus and input.KeyCode == Enum.KeyCode.Thumbstick2 then
+		if input.Position.Magnitude > 0.25 then
+			padDeltaRight = input.Position
+		else
+			padDeltaRight = Vector2.zero
+		end
+	end
 end)
 
 UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+	if input.KeyCode == Enum.KeyCode.ButtonA and mapInFocus then
+		mapInFocus = false
+		GuiService:Select(Players.LocalPlayer.PlayerGui)
+	end
+
+	if input.KeyCode == Enum.KeyCode.ButtonL2 then
+		zoomDirection = 1
+	end
+
+	if input.KeyCode == Enum.KeyCode.ButtonR2 then
+		zoomDirection = -1
+	end
+
 	if input.UserInputType == Enum.UserInputType.MouseButton2 then
 		mouse2Down = true
 	end
@@ -364,6 +435,14 @@ UserInputService.TouchPinch:Connect(function(pos, scale, velocity, state)
 end)
 
 UserInputService.InputEnded:Connect(function(input, gameProcessedEvent)
+	if input.KeyCode == Enum.KeyCode.ButtonL2 then
+		zoomDirection = 0
+	end
+
+	if input.KeyCode == Enum.KeyCode.ButtonR2 then
+		zoomDirection = 0
+	end
+
 	if input.UserInputType == Enum.UserInputType.MouseButton2 then
 		mouse2Down = false
 		UserInputService.MouseBehavior = Enum.MouseBehavior.Default
@@ -406,14 +485,9 @@ local function processCamera(frame)
 	local lerpedOffset = CFrame.new()
 	local lerpedAngle = Vector2.new()
 
-	RunService:BindToRenderStep("ProcessMapCamera", Enum.RenderPriority.Camera.Value, function()
-		if UserInputService:IsKeyDown(Enum.KeyCode.ButtonA) then
-			print(zoomAmount)
-			zoomAmount -= 0.25
-		end
-
-		if UserInputService:IsKeyDown(Enum.KeyCode.ButtonB) then
-			zoomAmount += 0.25
+	RunService:BindToRenderStep("ProcessMapCamera", Enum.RenderPriority.Camera.Value, function(delta)
+		if mapInFocus then
+			zoomAmount += (zoomDirection * delta) * zoomSensitivity
 		end
 
 		if mouse2Down or mouse1Down then
@@ -430,6 +504,12 @@ local function processCamera(frame)
 			end
 		end
 
+		if UserInputService.GamepadEnabled then
+			cameraOffset *= CFrame.new(padDeltaLeft.X * moveSensitivity, -padDeltaLeft.Y * moveSensitivity, 0)
+			camAngleX += padDeltaRight.X * turnSensitivity
+			camAngleY += padDeltaRight.Y * turnSensitivity
+		end
+
 		lerpedOffset = lerpedOffset:Lerp(cameraOffset, 0.1)
 		lerpedAngle = lerpedAngle:Lerp(Vector2.new(camAngleX, camAngleY), 0.25)
 
@@ -444,6 +524,7 @@ local function processCamera(frame)
 end
 
 local function hideAllMenus(frame)
+	mapInFocus = false
 	RunService:UnbindFromRenderStep("ProcessMapCamera")
 	RunService:UnbindFromRenderStep("RotateWeapon")
 	RunService:UnbindFromRenderStep("ResizeScrollBar")
@@ -603,6 +684,8 @@ local function loadPerksList(frame)
 			frame.PerkInfo.Text = giftData.Desc
 			frame.PerkInfo.Visible = true
 			frame.WeaponViewport.Visible = false
+
+			frame.PerkInfo.PerkName.Text = gift
 		end)
 
 		leave:Connect(function()
@@ -668,12 +751,12 @@ local function loadArsenal(frame)
 	local damageNum = frame.Damage_Num
 	damageNum.Text = gunStats.Damage
 
-	if gunStats.BulletCount > 1 then
-		damageNum.Text ..= " x " .. gunStats.BulletCount
-	end
-
 	if gunStats["SplashDamage"] then
 		damageNum.Text ..= " + " .. gunStats.SplashDamage
+	end
+
+	if gunStats.BulletCount > 1 then
+		damageNum.Text ..= " x " .. gunStats.BulletCount
 	end
 
 	if gunStats["LockAmount"] then
@@ -719,9 +802,15 @@ local function setBoolToValue(buttonFrame, value)
 end
 
 local function setSliderToValue(barFrame, input, maxValue)
-	local mousePosition = Vector2.new(input.Position.X, input.Position.Y)
-	local xPosition = (mousePosition.X - barFrame.AbsolutePosition.X) / barFrame.AbsoluteSize.X
-	local alphaValue = math.round(xPosition * 100) / 100
+	local alphaValue = 0
+
+	if typeof(input) == "number" then
+		alphaValue = math.round(input * 100) / 100
+	else
+		local mousePosition = Vector2.new(input.Position.X, input.Position.Y)
+		local xPosition = (mousePosition.X - barFrame.AbsolutePosition.X) / barFrame.AbsoluteSize.X
+		alphaValue = math.round(xPosition * 100) / 100
+	end
 
 	if alphaValue >= 0.98 then
 		alphaValue = 1
@@ -776,7 +865,7 @@ local function loadSettings(frame)
 				settingTable.Value = not settingTable.Value
 
 				setBoolToValue(newSettingsButton, settingTable.Value)
-				settingTable:OnChanged()
+				settingTable:OnChanged(frame)
 			end)
 
 			newSettingsButton.SettingName.Text = settingTable.Name
@@ -792,6 +881,8 @@ local function loadSettings(frame)
 			local mouseDown = false
 
 			barFrame.InputBegan:Connect(function(input)
+				print(input)
+
 				if input.UserInputType ~= Enum.UserInputType.MouseButton1 then
 					return
 				end
@@ -799,7 +890,7 @@ local function loadSettings(frame)
 				mouseDown = true
 
 				settingTable.Value = setSliderToValue(barFrame, input, settingTable.MaxValue)
-				settingTable:OnChanged()
+				settingTable:OnChanged(frame)
 			end)
 
 			barFrame.InputEnded:Connect(function(input)
@@ -818,7 +909,41 @@ local function loadSettings(frame)
 				end
 
 				settingTable.Value = setSliderToValue(barFrame, input, settingTable.MaxValue)
-				settingTable:OnChanged()
+				settingTable:OnChanged(frame)
+			end)
+
+			local inputChanged
+			local heartbeat
+
+			newSettingsButton.SelectionGained:Connect(function()
+				local position = Vector2.zero
+				inputChanged = UserInputService.InputChanged:Connect(function(input, gpe)
+					if input.KeyCode ~= Enum.KeyCode.Thumbstick2 then
+						return
+					end
+
+					position = input.Position
+
+					if input.Position.Magnitude > 0.25 then
+						position = input.Position
+					else
+						position = Vector2.zero
+					end
+				end)
+
+				heartbeat = RunService.Heartbeat:Connect(function(delta)
+					settingTable.Value = setSliderToValue(
+						barFrame,
+						barFrame.Bar.Size.X.Scale + ((position.X * 1.5) * delta),
+						settingTable.MaxValue
+					)
+					settingTable:OnChanged(frame)
+				end)
+			end)
+
+			newSettingsButton.SelectionLost:Connect(function()
+				inputChanged:Disconnect()
+				heartbeat:Disconnect()
 			end)
 		end
 	end
@@ -831,6 +956,8 @@ function module.openMap(player, ui, frame)
 
 	currentMenu = "Map"
 
+	mapInFocus = false
+
 	hideAllMenus(frame)
 	loadMap(player, frame)
 	processCamera(frame)
@@ -842,8 +969,12 @@ function module.openMap(player, ui, frame)
 		.. workspace:GetAttribute("Level")
 
 	frame.Map_Menu.Visible = true
+
+	setDownSelection(frame, frame.FocusMap)
+
 	local ti = TweenInfo.new(0.1, Enum.EasingStyle.Linear)
 	util.tween(frame.Map_Menu, ti, { GroupTransparency = 0 })
+	util.tween(frame.BackgroundFrame, ti, { BackgroundTransparency = 0 })
 end
 
 function module.openArsenal(player, ui, frame)
@@ -859,10 +990,14 @@ function module.openArsenal(player, ui, frame)
 
 	local ti = TweenInfo.new(0.1, Enum.EasingStyle.Linear)
 	frame.Arsenal_Menu.Visible = true
+
+	setDownSelection(frame, frame.PerksList)
+
 	util.tween(frame.Arsenal_Menu, ti, { GroupTransparency = 0 })
+	util.tween(frame.BackgroundFrame, ti, { BackgroundTransparency = 0.25 })
 end
 
-function module.openCodex(player, ui, frame)
+function module.openCodex(player, ui, frame, openToLatest)
 	if currentMenu == "Codex" then
 		return
 	end
@@ -870,13 +1005,25 @@ function module.openCodex(player, ui, frame)
 	currentMenu = "Codex"
 	hideAllMenus(frame)
 	loadCodex(frame)
-	loadCodexCatagory(frame, currentCatagory)
 
+	local latestEntry
+
+	if openToLatest and codexService.latestEntry then
+		latestEntry = codexService.CodexEntries[codexService.latestEntry]
+		currentCatagory = latestEntry.Catagory
+	end
+
+	loadCodexCatagory(frame, currentCatagory, true)
 	showAttention(frame)
+	openCodexEntry(latestEntry, codexService.latestEntry, frame)
 
 	frame.Codex_Menu.Visible = true
+
+	setDownSelection(frame, frame.CodexList)
+
 	local ti = TweenInfo.new(0.1, Enum.EasingStyle.Linear)
 	util.tween(frame.Codex_Menu, ti, { GroupTransparency = 0 })
+	util.tween(frame.BackgroundFrame, ti, { BackgroundTransparency = 0.25 })
 end
 
 function module.openSettings(player, ui, frame)
@@ -892,45 +1039,74 @@ function module.openSettings(player, ui, frame)
 	--loadCodexCatagory(frame, currentCatagory)
 
 	frame.Settings_Menu.Visible = true
+
+	setDownSelection(frame, frame.Settings)
+
 	local ti = TweenInfo.new(0.1, Enum.EasingStyle.Linear)
 	util.tween(frame.Settings_Menu, ti, { GroupTransparency = 0 })
+	util.tween(frame.BackgroundFrame, ti, { BackgroundTransparency = 0.25 })
 end
 
 function module.Open(player, ui, frame)
 	ui.HUD.OpenMenuPrompt_T.Visible = false
+	mapInFocus = false
+	frame.Cursor.Visible = true
+
+	setDownSelection(frame)
 
 	RunService:BindToRenderStep("ProcessCursor", Enum.RenderPriority.Camera.Value, function()
+		if UserInputService.GamepadEnabled then
+			frame.Cursor.Visible = false
+			return
+		end
+
 		local mousePos = UserInputService:GetMouseLocation()
 		frame.Cursor.Position = UDim2.new(0, mousePos.X, 0, mousePos.Y)
 	end)
 
 	frame.Gui.Enabled = true
+	Lighting.PauseBlur.Enabled = true
+
+	local logCurrentMenu = currentMenu
+	currentMenu = nil
 
 	if acts:checkAct("EntryAdded") then
-		module.openCodex(player, ui, frame)
+		module.openCodex(player, ui, frame, true)
 	else
-		module.openMap(player, ui, frame)
+		module["open" .. logCurrentMenu](player, ui, frame)
+		--module.openMap(player, ui, frame)
 	end
 
 	characterController.attemptPause("MenuPause")
 
 	showAttention(frame)
+
+	--GuiService.GuiNavigationEnabled = true
+
+	if UserInputService.GamepadEnabled then
+		GuiService:Select(frame.Main.Buttons)
+	end
 end
 
 function module.Close(player, ui, frame)
 	hideAllMenus(frame)
 	RunService:UnbindFromRenderStep("ProcessCursor")
 
+	Lighting.PauseBlur.Enabled = false
 	frame.Gui.Enabled = false
+	mapInFocus = false
 
 	local viewport = frame.MapViewport
-	currentMenu = nil
 
 	if viewport:FindFirstChild("Map") then
 		viewport.Map:Destroy()
 	end
 
 	characterController.attemptResume("MenuPause")
+
+	if UserInputService.GamepadEnabled then
+		GuiService:Select(player.PlayerGui)
+	end
 end
 
 function module.Toggle(player, ui, frame)

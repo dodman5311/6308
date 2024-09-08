@@ -154,7 +154,7 @@ function module.placeNewObject(currentLevel, cframe, type, objectName, noChance)
 		local object = getType.Folder:FindFirstChild(objectName)
 
 		local level = object:GetAttribute("Level")
-		if level and (currentLevel < level.Min or currentLevel > level.Max) then
+		if level and (currentLevel < level.Min or (currentLevel > level.Max and type ~= "Enemy")) then
 			selectedObject = getRandomObjectOfType(currentLevel, type, noChance)
 		else
 			selectedObject = object

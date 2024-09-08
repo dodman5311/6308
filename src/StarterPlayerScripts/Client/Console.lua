@@ -1,5 +1,6 @@
 --// Services
 local ContentProvider = game:GetService("ContentProvider")
+local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
@@ -353,7 +354,11 @@ local function openGui()
 	fullGui.Gui.Enabled = true
 	fullGui.Frame.Position = UDim2.fromScale(0.5, -1)
 
-	util.tween(fullGui.Frame, ti, { Position = UDim2.fromScale(0.5, 0.025) })
+	util.tween(fullGui.Frame, ti, { Position = UDim2.fromScale(0.5, 0.025) }, false, function()
+		if UserInputService.GamepadEnabled then
+			GuiService:Select(fullGui.Frame.CommandsFrame)
+		end
+	end, Enum.PlaybackState.Completed)
 end
 
 local function closeGui()
@@ -389,15 +394,15 @@ local function toggleConsole()
 end
 
 UserInputService.InputBegan:Connect(function(input, gpe)
+	if input.KeyCode == Enum.KeyCode.DPadDown and (not gpe or inGui) then
+		toggleConsole()
+	end
+
 	if gpe then
 		return
 	end
 
-	if
-		input.KeyCode == Enum.KeyCode.Backquote
-		or input.KeyCode == Enum.KeyCode.DPadDown
-		or input.KeyCode == Enum.KeyCode.Tilde
-	then
+	if input.KeyCode == Enum.KeyCode.Backquote or input.KeyCode == Enum.KeyCode.Tilde then
 		toggleConsole()
 	end
 end)

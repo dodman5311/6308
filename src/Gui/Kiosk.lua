@@ -3,6 +3,7 @@ local module = {
 	soulCost = 1,
 }
 --// Services
+local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 local TeleportService = game:GetService("TeleportService")
@@ -34,6 +35,7 @@ local weapons = require(Globals.Client.Controllers.WeaponController)
 local skip = require(Globals.Shared.Skip)
 local timer = require(Globals.Vendor.Timer)
 local promise = require(Globals.Packages.Promise)
+local acts = require(Globals.Vendor.Acts)
 
 local chanceService = require(Globals.Vendor.ChanceService)
 
@@ -265,6 +267,8 @@ local function exit(frame)
 	module.onHidden:Fire()
 
 	MusicService.playMusic()
+
+	acts:removeAct("InActiveMenu")
 end
 
 local function showText(frame, text)
@@ -313,6 +317,11 @@ function module.Init(player, ui, frame)
 	frame.Cursor.Visible = false
 
 	RunService.RenderStepped:Connect(function()
+		if UserInputService.GamepadEnabled then
+			frame.Cursor.Visible = false
+			return
+		end
+
 		local mousePos = UserInputService:GetMouseLocation()
 		frame.Cursor.Position = UDim2.new(0, mousePos.X, 0, mousePos.Y)
 	end)
@@ -428,6 +437,8 @@ function module.ShowScreen(player, ui, frame, playerSouls)
 		return
 	end
 
+	acts:createAct("InActiveMenu")
+
 	frame.Gui.Enabled = true
 
 	MusicService.playTrack("TheKiosk")
@@ -479,6 +490,10 @@ function module.ShowScreen(player, ui, frame, playerSouls)
 
 	frame.Sign.Visible = true
 	UiAnimator.PlayAnimation(frame.Sign, 0.1, false, true)
+
+	if UserInputService.GamepadEnabled then
+		GuiService:Select(frame.SelectButtons)
+	end
 
 	return module.onHidden
 end
@@ -673,6 +688,7 @@ local function showDescription(frame, gift, rapido)
 				input.UserInputType == Enum.UserInputType.MouseButton1
 				or input.UserInputType == Enum.UserInputType.Touch
 				or input.KeyCode == Enum.KeyCode.ButtonX
+				or input.KeyCode == Enum.KeyCode.ButtonA
 			then
 				skipKeyPressed = true
 			end
@@ -710,6 +726,10 @@ function module.TakeDelivery(player, ui, frame, gift, rapido)
 
 	frame.SoulCost.Visible = true
 	frame.TicketCost.Visible = true
+
+	if UserInputService.GamepadEnabled then
+		GuiService:Select(frame.SelectButtons)
+	end
 end
 
 function module.resetCost()

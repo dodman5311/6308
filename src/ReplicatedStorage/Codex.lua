@@ -38,6 +38,22 @@ Phillip has been fighting and thriving for over 400 years. He is seen as the eve
 You could call this place the Bermuda Triangle of the sewers.]],
 	},
 
+	["Visage Of False Hope"] = {
+		Catagory = "Bosses",
+		Entry = [[Upon the creation of the first law, Bruce watched helplessly as his body, alongside his son, committed unspeakable acts of carnage. Desperate to avoid punishment, Bruce pleaded with the demon within him to stop the madness and spare him and his child, but his cries went unheard.
+
+In time, Bruce, his son, and the demon were banished to the sewers for defying the Iron Gate’s Order. Bruce endured unimaginable suffering, witnessing his child's torment and eventual ruin.
+The demon, seeing his brother’s vessel, Bruce's son, broken and lame, decided it was time for him to find a new host. 
+Bruce pleaded once again, and once again his pleas fell on deaf ears as the demon stripped his son of life and consumed his soul. 
+
+Broken and without hope, Bruce struck a deal with the demon: he would surrender entirely, but only if the demon became a symbol of hope and order in the sewers.
+
+The demon agreed, but Bruce was unaware of its true power. Manifesting its full form, the demon twisted Bruce's body into a grotesque tower of ego, pride, and sickness. This abomination compelled all in the sewers to follow it, growing ever more powerful by consuming its followers. Bruce, now a mere remnant, was left hanging from the creature's face, forced to witness his grave mistake.
+
+The followers of this new entity called it the Stone God, while others knew it as the Visage of False Hope. 
+The Stone God spread a prophecy: when all beings surrendered to it, the Iron Gate would fall, and the underworld would rise to claim the surface.]],
+	},
+
 	-- phillip the everlasting
 
 	------------- Areas -------------
@@ -290,6 +306,41 @@ The gauntlet is forged from a mixture of steel and the broken iron of the 1st Ke
 Although there was not enough of this alloy to produce entire suits, there was enough to create gauntlets for minor protection. Once these gauntlets were produced, they were naturally paired with the Mare’s Leg, creating the deadly combination known as the Drill Bite.]],
 	},
 
+	["800M"] = {
+		Catagory = "Weapons",
+		Entry = [[The 800M was an experimental weapon developed by the Iron Unit as a heavy ordnance tool for personnel. Its primary purpose was to hold back overwhelming threats until reinforcements could arrive.
+
+Despite its powerful rocket-propelled projectiles, the 800M was quickly abandoned by the Iron Unit due to its overcomplexity, unreliability, inaccuracy, and punishing recoil. Though the Unit had prematurely ordered over 90,000 of these rifles, they ultimately discarded them.
+
+The sewer residents, however, were unfazed by these flaws. Drawn to the explosive firepower, they eagerly adopted the 800M, embracing its destructive potential despite its drawbacks.
+
+Explosive boollet + awesome = sewer people take.]],
+	},
+
+	["Cutter"] = {
+		Catagory = "Weapons",
+		Entry = [[Much like the Harpoons, the Cutter is a basic handheld saw with all safety systems removed. It was introduced early in the days of sewer habitation when residents scrambled to arm themselves with whatever they could find. 
+
+The Cutter quickly became a weapon of choice due to its accessibility and lethal simplicity.]],
+	},
+
+	["Bull Shot"] = {
+		Catagory = "Weapons",
+		Entry = [[The Bull Shot is a break-action, single-shot explosive shotgun pistol, cobbled together from spare parts of broken 800M rifles. It was devised as a way to salvage materials from an already formidable weapon, though the result was a slightly less effective firearm.
+
+Desperate sewer residents primarily use the Bull Shot for long-range defense when confronting powerful foes, making it a makeshift but essential tool in their struggle for survival.]],
+	},
+
+	["Gratana"] = {
+		Catagory = "Weapons",
+		Entry = [[The Gratana is a saw blade launcher equipped with trajectory-adjusting technology, capable of firing blades with deadly precision. 
+This weapon is a mosaic of parts, combining components from the 800M, the I-Six, and blades from the Cutter.
+
+Much like the Sentinels, the creator of the Gratana remains unknown. The weapon appeared shortly after the Sentinels, quickly becoming a favorite among sewer residents for its ability to slice through multiple adversaries with a single shot.
+
+A truly devastating weapon, in the hands of a truly devastating being.]],
+	},
+
 	------------- Misc -------------
 	["The Iron Gate"] = {
 		Catagory = "Misc",
@@ -336,18 +387,20 @@ However, they possess a severe design flaw. Certain forms of dramatic blunt forc
 <font color="#FF7800"><b>Combo:</b></font> Killing enemies increases your combo. For every point of combo, soul drop chance is increased.
 
 <font color="#FF7800"><b>Kill faster than you can die:</b></font> Keep a good combo. Don't worry about dying and wasting a few souls. 
-Keep that loop up, and you’ll be fine (for the most part).
-
-<font color="#FF7800"><b>Right click to parry:</b></font> Some weapons are able to parry when MB2 (Right Click) is pressed. Most melee weapons are capable of this.]],
+Keep that loop up, and you’ll be fine (for the most part).]],
 	},
 
 	["Elements"] = {
 		Catagory = "Misc",
-		Entry = [[<font color="#FF7800"><b>Fire:</b></font> When enemies are on fire, they will explode after death and have a higher soul chance.
+		Entry = [[<font color="#FF7800"><b>Fire:</b></font> When enemies are on fire, they have a higher soul chance and will explode upon death.
 
-<font color="#FF7800"><b>Ice:</b></font> When enemies are frozen, they will stop moving and shooting and will have a chance to drop armor after death.
+<font color="#FF7800"><b>Ice:</b></font> When enemies are frozen, they will stop moving and shooting and will have a chance to drop armor upon death.
 
-<font color="#FF7800"><b>Electricity:</b></font> When enemies are electrified, they will move slower, have reduced accuracy, and have a 50% chance to cancel their shot.
+<font color="#FF7800"><b>Electricity:</b></font> When enemies are electrified they will: 
+move slower, 
+shoot less, 
+have reduced accuracy, 
+and have a small chance to explode upon death spreading electricity.
 
 <font color="#FF7800"><b>Soul:</b></font> When enemies are soul afflicted, they will take +1 damage, but will not drop a soul upon death.]],
 	},
