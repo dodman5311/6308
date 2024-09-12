@@ -440,7 +440,7 @@ net:Connect("ResumeGame", function()
 			Npc.Instance.Parent
 			and Npc.Instance.PrimaryPart
 			and not Npc.StatusEffects["Ice"]
-			and Npc.Instance.Name ~= "Visage Of False Hope"
+			and not Npc.Instance:HasTag("IsAnchored")
 		then
 			Npc.Instance.PrimaryPart.Anchored = false
 		end

@@ -195,6 +195,21 @@ local commands = {
 			end,
 		},
 
+		Set_Luck = {
+			Parameters = function()
+				return {
+					{ Name = "Amount", Options = { "_Input" } },
+				}
+			end,
+
+			ExecuteClient = function(_, amount)
+				if not amount then
+					return
+				end
+				require(Globals.Vendor.ChanceService).luck = amount
+			end,
+		},
+
 		Give_Perk_Ticket = {
 
 			Parameters = function()

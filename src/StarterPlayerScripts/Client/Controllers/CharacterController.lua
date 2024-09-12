@@ -267,8 +267,10 @@ mouseTarget.Changed:Connect(function(value)
 			throwWeaponGui.Enabled = true
 			throwWeaponGui.Adornee = model.PrimaryPart
 
-			if UserInputService.GamepadEnabled then
+			if workspace:GetAttribute("GlobalInputType") == "Xbox" then
 				throwWeaponGui.TextLabel.Text = "B to throw weapon"
+			elseif workspace:GetAttribute("GlobalInputType") == "Ps4" then
+				throwWeaponGui.TextLabel.Text = "Circle to throw weapon"
 			else
 				throwWeaponGui.TextLabel.Text = "X to throw weapon"
 			end

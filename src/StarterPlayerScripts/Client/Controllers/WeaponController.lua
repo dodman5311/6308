@@ -13,6 +13,7 @@ local module = {
 local CollectionService = game:GetService("CollectionService")
 local Debris = game:GetService("Debris")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SoundService = game:GetService("SoundService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
@@ -29,6 +30,7 @@ local player = Players.LocalPlayer
 local voiceSound = Instance.new("Sound")
 voiceSound.Parent = script
 voiceSound.Volume = 1.5
+voiceSound.SoundGroup = SoundService.Voice
 
 local defaultFireRate = 0.2
 
@@ -580,6 +582,8 @@ local function reload(infiniteReloads)
 	weaponReloadTimer.Parameters = { magSize }
 
 	weaponReloadTimer:Run()
+
+	return true
 end
 
 local function checkDeadshot()
@@ -1823,7 +1827,15 @@ signals.Parry:Connect(module.Block)
 signals.SwitchWeapon:Connect(switchWeapon)
 signals.ThrowWeapon:Connect(function()
 	if module.currentWeapon then
-		module.Throw()
+		if GiftsService.CheckGift("TactiAwesome") then
+			reload(true)
+		elseif GiftsService.CheckGift("Tacticool") then
+			if not reload() then
+				module.Throw()
+			end
+		else
+			module.Throw()
+		end
 	else
 		local conditions = acts.Condition.blacklist("Firing", "Throwing")
 

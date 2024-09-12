@@ -19,7 +19,7 @@ local createProjectileRemote = net:RemoteEvent("CreateProjectile")
 local moveChances = {
 	{ "Acid", 10 },
 
-	{ "Sacrifice", 20 },
+	{ "Sacrifice", 20 }, -- 20
 	{ "Geysers", 25 },
 
 	{ "Grenades", 30 },
@@ -154,7 +154,7 @@ local closePattern = {
 	Vector2.new(-0.15, 0.15),
 }
 
-local function dealDamage(humanoid, amount)
+local function dealDamage(npc, humanoid, amount)
 	if npc:GetState() == "Dead" then
 		return
 	end
@@ -251,14 +251,14 @@ local function checkHitboxes(npc)
 				continue
 			end
 
-			dealDamage(humanoid, 1)
+			dealDamage(npc, humanoid, 1)
 
 			table.insert(playersHit, playerHit)
 		end
 	end
 end
 
-local function checkGeyserHitboxes()
+local function checkGeyserHitboxes(npc)
 	local playersHit = {}
 
 	for _, hitbox in ipairs(CollectionService:GetTagged("GeyserHitbox")) do
@@ -271,7 +271,7 @@ local function checkGeyserHitboxes()
 				continue
 			end
 
-			dealDamage(humanoid, 1)
+			dealDamage(npc, humanoid, 1)
 
 			table.insert(playersHit, playerHit)
 		end
@@ -283,6 +283,7 @@ local function RunGeyserCheck(npc)
 
 	geyserTimer.WaitTime = 0.25
 	geyserTimer.Function = checkGeyserHitboxes
+	geyserTimer.Parameters = { npc }
 	geyserTimer:Run()
 end
 
@@ -592,6 +593,17 @@ local moves = {
 
 			local cframe = enemy:GetPivot()
 			enemy:Destroy()
+
+			local rp = RaycastParams.new()
+			rp.FilterDescendantsInstances = workspace.Map
+			rp.FilterType = Enum.RaycastFilterType.Include
+			local upcast = workspace:Raycast(cframe.Position, CFrame.new(0, 0, 0).UpVector * 100, rp)
+
+			if upcast then
+				warn("upcast caught")
+				continue
+			end
+
 			spawners.placeNewObject(1000, cframe, "Enemy", "Betrayed")
 		end
 
@@ -812,9 +824,14 @@ local function onDied(npc)
 
 		task.wait(3)
 
-		net:RemoteEvent("DoUiAction"):FireAllClients("BossIntro", "ShowCompleted", true, npc.Instance.Name)
+		net:RemoteEvent("DoUiAction")
+			:FireAllClients("BossIntro", "ShowCompleted", true, "That's all we got, so back to the start with you!")
 		net:RemoteEvent("DoUiAction"):FireAllClients("HUD", "HideBossBar", true)
 	end)
+end
+
+local function setUp(npc)
+	npc.Instance.Apature:PivotTo(CFrame.new(npc.Instance:GetPivot().Position))
 end
 
 -- end
@@ -829,7 +846,7 @@ local module = {
 	},
 
 	OnSpawned = {
-		--{ Function = "Custom", Parameters = { setUp } },
+		{ Function = "Custom", Parameters = { setUp } },
 		{ Function = "PlayAnimation", Parameters = { "Idle", Enum.AnimationPriority.Core } },
 		{ Function = "AddTag", Parameters = { "Enemy" } },
 	},

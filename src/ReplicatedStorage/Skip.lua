@@ -57,7 +57,14 @@ function module.hideSkip()
 end
 
 UserInputService.InputBegan:Connect(function(input)
-	if not skipEnabled or (input.KeyCode ~= Enum.KeyCode.F and input.KeyCode ~= Enum.KeyCode.ButtonX) then
+	if
+		not skipEnabled
+		or (
+			input.KeyCode ~= Enum.KeyCode.F
+			and input.KeyCode ~= Enum.KeyCode.ButtonX
+			and input.UserInputType ~= Enum.UserInputType.Touch
+		)
+	then
 		return
 	end
 

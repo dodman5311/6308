@@ -881,9 +881,10 @@ local function loadSettings(frame)
 			local mouseDown = false
 
 			barFrame.InputBegan:Connect(function(input)
-				print(input)
-
-				if input.UserInputType ~= Enum.UserInputType.MouseButton1 then
+				if
+					input.UserInputType ~= Enum.UserInputType.MouseButton1
+					and input.UserInputType ~= Enum.UserInputType.Touch
+				then
 					return
 				end
 
@@ -894,13 +895,19 @@ local function loadSettings(frame)
 			end)
 
 			barFrame.InputEnded:Connect(function(input)
-				if input.UserInputType == Enum.UserInputType.MouseButton1 then
+				if
+					input.UserInputType == Enum.UserInputType.MouseButton1
+					or input.UserInputType == Enum.UserInputType.Touch
+				then
 					mouseDown = false
 				end
 			end)
 
 			barFrame.InputChanged:Connect(function(input)
-				if input.UserInputType ~= Enum.UserInputType.MouseMovement then
+				if
+					input.UserInputType ~= Enum.UserInputType.MouseMovement
+					and input.UserInputType ~= Enum.UserInputType.Touch
+				then
 					return
 				end
 
@@ -971,6 +978,20 @@ function module.openMap(player, ui, frame)
 	frame.Map_Menu.Visible = true
 
 	setDownSelection(frame, frame.FocusMap)
+
+	if workspace:GetAttribute("GlobalInputType") == "Keyboard" then
+		frame.MapControls.Text = [[Scroll : Zoom
+Left Click : Move
+Right Click : Rotate]]
+	elseif workspace:GetAttribute("GlobalInputType") == "Mobile" then
+		frame.MapControls.Text = [[Pinch : Zoom
+Tap : Move
+Double Tap : Rotate]]
+	else
+		frame.MapControls.Text = [[Triggers : Zoom
+Left Thumbstick : Move
+Right Thumbstick : Rotate]]
+	end
 
 	local ti = TweenInfo.new(0.1, Enum.EasingStyle.Linear)
 	util.tween(frame.Map_Menu, ti, { GroupTransparency = 0 })
@@ -1051,6 +1072,7 @@ function module.Open(player, ui, frame)
 	ui.HUD.OpenMenuPrompt_T.Visible = false
 	mapInFocus = false
 	frame.Cursor.Visible = true
+	Signals["SetMobileControlsVisible"]:Fire(false)
 
 	setDownSelection(frame)
 
@@ -1090,6 +1112,8 @@ end
 
 function module.Close(player, ui, frame)
 	hideAllMenus(frame)
+	Signals["SetMobileControlsVisible"]:Fire(true)
+
 	RunService:UnbindFromRenderStep("ProcessCursor")
 
 	Lighting.PauseBlur.Enabled = false
