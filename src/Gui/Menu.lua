@@ -685,7 +685,7 @@ local function loadPerksList(frame)
 			frame.PerkInfo.Visible = true
 			frame.WeaponViewport.Visible = false
 
-			frame.PerkInfo.PerkName.Text = gift
+			frame.PerkInfo.PerkName.Text = string.gsub(gift, "_", " ")
 		end)
 
 		leave:Connect(function()

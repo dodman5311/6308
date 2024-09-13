@@ -17,7 +17,7 @@ local vfx = net:RemoteEvent("ReplicateEffect")
 local createProjectileRemote = net:RemoteEvent("CreateProjectile")
 
 local moveChances = {
-	{ "Acid", 10 },
+	{ "Acid", 10 }, -- 10
 
 	{ "Sacrifice", 20 }, -- 20
 	{ "Geysers", 25 },
@@ -595,7 +595,7 @@ local moves = {
 			enemy:Destroy()
 
 			local rp = RaycastParams.new()
-			rp.FilterDescendantsInstances = workspace.Map
+			rp.FilterDescendantsInstances = { workspace.Map }
 			rp.FilterType = Enum.RaycastFilterType.Include
 			local upcast = workspace:Raycast(cframe.Position, CFrame.new(0, 0, 0).UpVector * 100, rp)
 
@@ -661,13 +661,16 @@ local moves = {
 
 			layers:PivotTo(startPos:Lerp(endGoal, i))
 
-			if npc:GetState() == "Dead" then
+			if npc:GetState() == "Dead" or not npc.Instance.Parent then
+				Lighting.Ambient = Color3.fromRGB(125, 125, 125)
 				break
 			end
 		end
 
-		if npc:GetState() ~= "Dead" then
+		if npc:GetState() ~= "Dead" or not npc.Instance.Parent then
 			timer.wait(6)
+		else
+			Lighting.Ambient = Color3.fromRGB(125, 125, 125)
 		end
 
 		local startPos = layers:GetPivot()
@@ -676,6 +679,11 @@ local moves = {
 			timer.wait(0.001)
 
 			layers:PivotTo(startPos:Lerp(logPos, i))
+
+			if npc:GetState() == "Dead" or not npc.Instance.Parent then
+				Lighting.Ambient = Color3.fromRGB(125, 125, 125)
+				break
+			end
 		end
 
 		layers.PartA.Bubbles:Stop()
@@ -824,8 +832,7 @@ local function onDied(npc)
 
 		task.wait(3)
 
-		net:RemoteEvent("DoUiAction")
-			:FireAllClients("BossIntro", "ShowCompleted", true, "That's all we got, so back to the start with you!")
+		net:RemoteEvent("DoUiAction"):FireAllClients("BossIntro", "ShowCompleted", true, "Visage Of False Hope")
 		net:RemoteEvent("DoUiAction"):FireAllClients("HUD", "HideBossBar", true)
 	end)
 end

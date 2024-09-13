@@ -474,7 +474,11 @@ local moves = {
 	end,
 
 	GroundElectrify = function(npc)
-		npc.Acts:createAct("InAttack", "inAction")
+		if npc.Acts:checkAct("InElectrify") then
+			return
+		end
+
+		npc.Acts:createAct("InAttack", "inAction", "InElectrify")
 
 		animationService:playAnimation(npc.Instance, "SlamAttack", Enum.AnimationPriority.Action3)
 
@@ -500,8 +504,7 @@ local moves = {
 
 		local lastDamage = os.clock()
 
-		assets.Sounds.Electricity.Volume = 0.5
-		assets.Sounds.Electricity:Play()
+		local electricSound = util.PlaySound(assets.Sounds.Electricity, ReplicatedStorage)
 
 		local connection = RunService.Heartbeat:Connect(function()
 			local getPartsHit = workspace:GetPartBoundsInBox(newGround.CFrame, newGround.Size)
@@ -526,12 +529,19 @@ local moves = {
 
 		timer.wait(5)
 
-		util.tween(assets.Sounds.Electricity, TweenInfo.new(1), { Volume = 0 })
-		assets.Sounds.Electricity:Stop()
+		npc.Acts:removeAct("InElectrify")
 
 		if connection and connection.Connected then
 			connection:Disconnect()
 		end
+
+		util.tween(electricSound, TweenInfo.new(1), { Volume = 0 }, false, function()
+			electricSound:Stop()
+
+			task.defer(function()
+				print(electricSound.Parent)
+			end)
+		end)
 
 		Debris:AddItem(newGround, 5)
 	end,

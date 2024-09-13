@@ -333,7 +333,8 @@ Desperate sewer residents primarily use the Bull Shot for long-range defense whe
 
 	["Gratana"] = {
 		Catagory = "Weapons",
-		Entry = [[The Gratana is a saw blade launcher equipped with trajectory-adjusting technology, capable of firing blades with deadly precision. 
+		Entry = [[<font color="#FF7800">Saw blades will stick into enemies until they die.</font>
+The Gratana is a saw blade launcher equipped with trajectory-adjusting technology, capable of firing blades with deadly precision. 
 This weapon is a mosaic of parts, combining components from the BORUS, the I-Six, and modified blades from the Cutter.
 
 Much like the Sentinels, the creator of the Gratana remains unknown. The weapon appeared shortly after the Sentinels, quickly becoming a favorite among sewer residents for its ability to slice through multiple adversaries with a single shot.
