@@ -21,6 +21,8 @@ local map = workspace.Map
 --// Modules
 local util = require(Globals.Vendor.Util)
 local net = require(Globals.Packages.Net)
+local giftService = require(Globals.Client.Services.GiftsService)
+
 local rng = Random.new()
 
 local splatters = {}
@@ -54,6 +56,10 @@ function module.createSplatter(cframe, ignoreInstantLimit)
 	end
 
 	local splatterTime = 10
+
+	if giftService.CheckGift("Sauce_Is_Fuel") then
+		splatterTime += 5
+	end
 
 	local rp = RaycastParams.new()
 	rp.FilterType = Enum.RaycastFilterType.Include

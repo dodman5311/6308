@@ -189,7 +189,7 @@ local function checkRaycast(subject: Model, origin, destination)
 	rp.FilterType = Enum.RaycastFilterType.Exclude
 	rp.FilterDescendantsInstances = { subject }
 
-	local newRay = workspace:Spherecast(origin, 0.5, destination)
+	local newRay = workspace:Raycast(origin, destination, rp)
 
 	if not newRay then
 		return
@@ -419,7 +419,7 @@ local function lead(npc)
 	local distance = (targetPosition - npc.Instance:GetPivot().Position).Magnitude
 
 	if npc.Acts:checkAct(false, "leading_shot") then
-		local positionToLookAt = targetPosition + targetVelocity / 2.25
+		local positionToLookAt = targetPosition + targetVelocity / 3 --2.25
 		moveTowardsPosition(npc.Instance, positionToLookAt)
 	elseif npc.Acts:checkAct(false, "leading_shot_wdistance") then
 		local positionToLookAt = targetPosition
