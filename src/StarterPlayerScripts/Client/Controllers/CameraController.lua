@@ -33,7 +33,6 @@ local damp = 1
 local i = 0
 local p = Vector3.new()
 local r = Vector3.new()
-local lastBobStep = os.clock()
 
 local isWalking = false
 local isPaused = false
@@ -51,13 +50,10 @@ module.camShake:Start()
 local currentVelocityTilt = Vector3.new()
 
 local function calculateViewmodelWalkSway()
-	local dt = os.clock() - lastBobStep
-	lastBobStep = os.clock()
-
 	if isWalking and not Acts:checkAct("slide") then
-		i += dt * 35
-		p += Vector3.new(math.sin(i / 4) * 0.8, math.sin(i / 2 - 0.4)) / 8 / damp / 10
-		r += Vector3.new(math.sin(i / 2) / 5, math.cos(i / 4 - 0.3) / 4, math.sin(i / 4 - 0.4) / 3) / 20 / (damp * 5)
+		i = time() * 35
+		p = Vector3.new(math.sin(i / 4) * 1, math.sin(i / 2 - 0.4)) / -19
+		r = Vector3.new(math.sin(i / 2) / 5, math.cos(i / 4 - 0.3) / 4, math.sin(i / 4 - 0.4) / 3) / 20 / (damp * 5)
 	else
 		i = 0
 		p = Vector3.new()
