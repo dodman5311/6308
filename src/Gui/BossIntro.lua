@@ -107,7 +107,7 @@ local intros = {
 		},
 	},
 
-	["Keeper Of Divine Iron"] = {
+	["Deilos, Right Hand Of Iron"] = {
 		{
 			Text = "This was to be my grave.",
 			Sound = "rbxassetid://102678617100781",
@@ -504,7 +504,7 @@ end
 
 function module.chooseGift(player, ui, frame, bossName)
 	local name = rewards[bossName]
-	local randomGift = gifts.Upgrades[name]
+	local randomGift = gifts.Specials[name]
 
 	loadToGiftsSlot(frame)
 

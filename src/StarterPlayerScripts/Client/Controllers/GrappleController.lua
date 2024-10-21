@@ -165,11 +165,11 @@ local function dealDamage(characterHit)
 	uiService.doUiAction("HUD", "ShowInvincible", true)
 
 	uiService.doUiAction("HUD", "ActivateGift", true, "Brick_Hook")
-	uiService.doUiAction("HUD", "CooldownGift", true, "Brick_Hook", 0.5)
+	uiService.doUiAction("HUD", "CooldownGift", true, "Brick_Hook", 1)
 
-	uiService.doUiAction("HUD", "GrappleCooldown", true, 0.5, 0)
+	uiService.doUiAction("HUD", "GrappleCooldown", true, 1, 0)
 
-	timer.wait(0.5)
+	timer.wait(1)
 	Net:RemoteEvent("SetInvincible", false)
 	uiService.doUiAction("HUD", "HideInvincible", true)
 
@@ -329,49 +329,57 @@ end
 
 local cooldown = 0.5
 
+local function grappleMovement()
+	if acts:checkAct("grappling", "ability_invasive") or workspace:GetAttribute("GamePaused") then
+		return
+	end
+
+	onCooldown = true
+	uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", true, 0.9)
+
+	module.Activate()
+
+	timer.wait(cooldown)
+
+	onCooldown = false
+	if GiftsService.CheckGift("Brick_Hook") then
+		uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", true, 0)
+	end
+end
+
+local function grapplePickup()
+	if acts:checkAct("grappling", "ability_invasive") or workspace:GetAttribute("GamePaused") then
+		return
+	end
+
+	local item = getObjectInCenter()
+
+	if GiftsService.CheckGift("Stuff_Hook") and item then
+		onCooldown = true
+		uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", true, 0.9)
+
+		module.Activate(item)
+
+		timer.wait(cooldown)
+		onCooldown = false
+
+		if GiftsService.CheckGift("Stuff_Hook") then
+			uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", true, 0)
+		end
+	end
+end
+
 uis.InputBegan:Connect(function(input, gameProcessedEvent)
 	if gameProcessedEvent or onCooldown then
 		return
 	end
 
 	if input.KeyCode == Enum.KeyCode.E or input.KeyCode == Enum.KeyCode.ButtonL1 then
-		if acts:checkAct("grappling", "ability_invasive") then
-			return
-		end
-
-		local item = getObjectInCenter()
-
-		if GiftsService.CheckGift("Stuff_Hook") and item then
-			onCooldown = true
-			uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", true, 0.9)
-
-			module.Activate(item)
-
-			timer.wait(cooldown)
-			onCooldown = false
-
-			if GiftsService.CheckGift("Stuff_Hook") then
-				uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", true, 0)
-			end
-		end
+		grapplePickup()
 	end
 
 	if input.KeyCode == Enum.KeyCode.LeftShift or input.KeyCode == Enum.KeyCode.ButtonR1 then
-		if acts:checkAct("grappling", "ability_invasive") then
-			return
-		end
-
-		onCooldown = true
-		uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", true, 0.9)
-
-		module.Activate()
-
-		timer.wait(cooldown)
-
-		onCooldown = false
-		if GiftsService.CheckGift("Brick_Hook") then
-			uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", true, 0)
-		end
+		grappleMovement()
 	end
 end)
 
@@ -381,12 +389,16 @@ signals.Movement:Connect(function()
 		return
 	end
 
-	onCooldown = true
+	grappleMovement()
+end)
 
-	module.Activate()
+signals.AttemptGrab:Connect(function()
+	local character = player.Character
+	if not character then
+		return
+	end
 
-	timer.wait(cooldown)
-	onCooldown = false
+	grapplePickup()
 end)
 
 GiftsService.OnGiftAdded:Connect(function(gift)
@@ -401,5 +413,9 @@ GiftsService.OnGiftRemoved:Connect(function(gift)
 		uiService.doUiAction("HUD", "ToggleGrappleIndicator", true, false)
 	end
 end)
+
+function module:OnSpawn()
+	onCooldown = false
+end
 
 return module

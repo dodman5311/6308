@@ -100,6 +100,7 @@ end
 --// Main //--
 
 starterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
+starterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)
 signals.DoUiAction:Connect(module.doUiAction)
 net:Connect("DoUiAction", module.doUiAction)
 

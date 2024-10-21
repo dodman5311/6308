@@ -521,7 +521,7 @@ local moves = {
 					{
 						Dropping = 0.65,
 						Bouncing = true,
-						SplashRange = 45,
+						SplashRange = 50,
 						SplashDamage = 6,
 					},
 					nil,
@@ -533,7 +533,7 @@ local moves = {
 
 			offset = not offset
 
-			timer.wait(1)
+			timer.wait(1.25)
 		end
 
 		timer.wait(1)
@@ -824,7 +824,26 @@ local function onDied(npc)
 		npc.Instance.PrimaryPart.Death:Play()
 	end
 
-	task.delay(23.85, function()
+	task.delay(24.5, function()
+		npc.Instance.PrimaryPart.Thanks:Play()
+
+		local thanks = npc.Instance.Head.ThankYou
+
+		local ti = TweenInfo.new(2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+		local ti_0 = TweenInfo.new(0.25, Enum.EasingStyle.Linear)
+		local ti_1 = TweenInfo.new(0.75, Enum.EasingStyle.Linear)
+
+		thanks.Enabled = true
+
+		util.tween(thanks, ti, { SizeOffset = Vector2.new(0, 2) })
+		util.tween(thanks.TextLabel.UIStroke, ti_0, { Transparency = 0 })
+		util.tween(thanks.TextLabel, ti_0, { TextTransparency = 0 }, false, function()
+			task.wait(0.25)
+			util.tween(thanks.TextLabel.UIStroke, ti_1, { Transparency = 1 })
+			util.tween(thanks.TextLabel, ti_1, { TextTransparency = 1 })
+		end)
+
+		task.wait(2.5)
 		vfx:FireAllClients("emitObject", "Server", true, npc.Instance.PrimaryPart.Explode)
 
 		npc.Instance.PrimaryPart.Crack:Play()

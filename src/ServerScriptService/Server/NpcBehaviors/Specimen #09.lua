@@ -447,7 +447,7 @@ local moves = {
 			removeBlackHole(npc, newBlackHole)
 		end)
 
-		timer.wait(5.75)
+		timer.wait(5.5)
 
 		removeBlackHole(npc, newBlackHole)
 	end,

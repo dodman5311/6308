@@ -292,7 +292,13 @@ net:Connect("PickupWeapon", function(player, object)
 		return
 	end
 
-	equipWeaponRemote:FireClient(player, object.Name, "FromWorld")
+	equipWeaponRemote:FireClient(
+		player,
+		object.Name,
+		"FromWorld",
+		object:GetAttribute("Element"),
+		object:GetAttribute("ExtraAmmo")
+	)
 
 	object:Destroy()
 end)

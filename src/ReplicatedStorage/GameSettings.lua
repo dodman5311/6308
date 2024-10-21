@@ -8,6 +8,7 @@ local TweenService = game:GetService("TweenService")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local cameraController = require(Globals.Client.Controllers.CameraController)
+local net = require(Globals.Packages.Net)
 
 local settings = {
 	"Audio",
@@ -120,6 +121,25 @@ local function applySettings()
 		setting:OnChanged()
 	end
 end
+
+local function loadSaveData(upgradeIndex, gameState, settingsToLoad)
+	if not settingsToLoad then
+		return
+	end
+
+	for _, value in ipairs(settings) do
+		local foundSetting = settingsToLoad[value.Name]
+		if foundSetting == nil then
+			continue
+		end
+
+		value.Value = foundSetting
+	end
+
+	applySettings()
+end
+
+net:Connect("LoadData", loadSaveData)
 
 task.delay(0.5, applySettings)
 

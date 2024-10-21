@@ -194,6 +194,43 @@ local function catagoryButtonEntered(button, player, ui, frame)
 	util.tween(frame[button.Name .. "_Lbl"], ti, { ImageColor3 = Color3.fromRGB(255, 75, 75) })
 end
 
+local function setBoolToValue(buttonFrame, value)
+	local ti = TweenInfo.new(0.15, Enum.EasingStyle.Quart)
+
+	local endPos = value and UDim2.fromScale(0.11, 0) or UDim2.fromScale(0, 0)
+	local endColor = value and Color3.fromRGB(160, 255, 175) or Color3.fromRGB(170, 70, 70)
+
+	util.tween(buttonFrame.Switch, ti, { Position = endPos })
+	util.tween(buttonFrame.ValueColor, ti, { ImageColor3 = endColor })
+
+	buttonFrame.Value.Text = tostring(value)
+end
+
+local function setSliderToValue(barFrame, input, maxValue)
+	local alphaValue = 0
+
+	if typeof(input) == "number" then
+		alphaValue = math.round(input * 100) / 100
+	else
+		local mousePosition = Vector2.new(input.Position.X, input.Position.Y)
+		local xPosition = (mousePosition.X - barFrame.AbsolutePosition.X) / barFrame.AbsoluteSize.X
+		alphaValue = math.round(xPosition * 100) / 100
+	end
+
+	if alphaValue >= 0.98 then
+		alphaValue = 1
+	elseif alphaValue <= 0.02 then
+		alphaValue = 0
+	end
+
+	local value = alphaValue * maxValue
+
+	barFrame.Parent.Value.Text = math.round(value)
+	barFrame.Bar.Size = UDim2.fromScale(alphaValue, 1)
+
+	return value
+end
+
 local buttonFunctions = {
 	Map = {
 		Action = function(button, player, ui, frame)
@@ -789,43 +826,6 @@ local function loadCodex(frame)
 	end)
 end
 
-local function setBoolToValue(buttonFrame, value)
-	local ti = TweenInfo.new(0.15, Enum.EasingStyle.Quart)
-
-	local endPos = value and UDim2.fromScale(0.11, 0) or UDim2.fromScale(0, 0)
-	local endColor = value and Color3.fromRGB(160, 255, 175) or Color3.fromRGB(170, 70, 70)
-
-	util.tween(buttonFrame.Switch, ti, { Position = endPos })
-	util.tween(buttonFrame.ValueColor, ti, { ImageColor3 = endColor })
-
-	buttonFrame.Value.Text = tostring(value)
-end
-
-local function setSliderToValue(barFrame, input, maxValue)
-	local alphaValue = 0
-
-	if typeof(input) == "number" then
-		alphaValue = math.round(input * 100) / 100
-	else
-		local mousePosition = Vector2.new(input.Position.X, input.Position.Y)
-		local xPosition = (mousePosition.X - barFrame.AbsolutePosition.X) / barFrame.AbsoluteSize.X
-		alphaValue = math.round(xPosition * 100) / 100
-	end
-
-	if alphaValue >= 0.98 then
-		alphaValue = 1
-	elseif alphaValue <= 0.02 then
-		alphaValue = 0
-	end
-
-	local value = alphaValue * maxValue
-
-	barFrame.Parent.Value.Text = math.round(value)
-	barFrame.Bar.Size = UDim2.fromScale(alphaValue, 1)
-
-	return value
-end
-
 local function loadSettings(frame)
 	local settingsMenu = frame.Settings_Menu
 
@@ -1068,6 +1068,19 @@ function module.openSettings(player, ui, frame)
 	util.tween(frame.BackgroundFrame, ti, { BackgroundTransparency = 0.25 })
 end
 
+local function saveSettings(player)
+	local settingsToSave = {}
+	for _, value in ipairs(gameSettings) do
+		if typeof(value) == "string" then
+			continue
+		end
+
+		settingsToSave[value.Name] = value.Value
+	end
+
+	net:RemoteEvent("SaveData"):FireServer("PlayerSettings", settingsToSave)
+end
+
 function module.Open(player, ui, frame)
 	ui.HUD.OpenMenuPrompt_T.Visible = false
 	mapInFocus = false
@@ -1131,6 +1144,8 @@ function module.Close(player, ui, frame)
 	if UserInputService.GamepadEnabled then
 		GuiService:Select(player.PlayerGui)
 	end
+
+	saveSettings(player)
 end
 
 function module.Toggle(player, ui, frame)

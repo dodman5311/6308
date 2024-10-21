@@ -64,7 +64,7 @@ local module = {
 		Switch_It_Up = {
 			Icon = "rbxassetid://16442958701",
 			Catagories = { "Arsenal" },
-			Desc = "After dealing damage, damage from a different source will now have more damage. (+1 damage)",
+			Desc = "After dealing damage, your first damage with a different source have +1 damage.",
 		},
 
 		Tough_Shell = {
@@ -82,7 +82,7 @@ local module = {
 		Boring_Bullets = {
 			Icon = "rbxassetid://16442971842",
 			Catagories = { "Arsenal" },
-			Desc = "You will now deal more damage after 10 hits, without missing. (+1 damage)",
+			Desc = "You will now deal +1 damage after 10 hits, without missing.",
 		},
 
 		Tough_Luck = {
@@ -153,7 +153,7 @@ local module = {
 		Life_Steal = { -- done
 			Icon = "rbxassetid://18671291054",
 			Catagories = { "Soul" },
-			Desc = "When at 0 Souls, crits will now heal you.",
+			Desc = "When at 1 Soul or less, crits will now heal you.",
 		},
 
 		Open_Wounds = { -- done
@@ -166,14 +166,6 @@ local module = {
 			Icon = "rbxassetid://18715333039",
 			Catagories = { "Tactical" },
 			Desc = "Weapons can now be reloaded once. (reload time = 5% of the mag size)",
-		},
-
-		--
-
-		Master_Scouting = {
-			Icon = "rbxassetid://16274497711",
-			Catagories = { "Tactical" },
-			Desc = "Double jump is now unlocked. (Press space mid air to double jump)",
 		},
 
 		Iron_Will = {
@@ -227,21 +219,13 @@ local module = {
 		Haven = {
 			Icon = "rbxassetid://16235850238",
 			Catagories = { "Soul" },
-			Desc = "When hit, you now gain 0.5 second of invincibility.",
+			Desc = "When hit, you now gain 1 second of invincibility.",
 		},
 
 		Ultra_Slayer = {
 			Icon = "rbxassetid://16275507396",
 			Catagories = { "Arsenal" },
 			Desc = "You can now perform a parrying punch attack. (Right click to melee)",
-		},
-
-		Overcharge = {
-			Icon = "rbxassetid://18415380600",
-			Catagories = { "Arsenal" },
-			Desc = [[pistols damage now adds to <b>overcharge</b>.
-Other weapon damage activates <b>overcharge</b>.
-When active, you gain +50% firerate, and infinite ammo for 3 seconds. (20 hits for an <b>overcharge</b>)]],
 		},
 
 		Sierra_6308 = {
@@ -275,8 +259,7 @@ When active, you gain +50% firerate, and infinite ammo for 3 seconds. (20 hits f
 			Catagories = { "Tactical" },
 			Desc = [[Grapple onto any surface and pull yourself towards it. 
 
-Hitting an enemy with a grapple will give you 0.5 seconds of invincibility. 
-1 second invincibility cooldown.
+Hitting an enemy with a grapple will give you 1 seconds of invincibility. 
 
 (Left Shift to grapple)]],
 		},
@@ -310,6 +293,20 @@ and will be given extra jump in the air.
 			Icon = "rbxassetid://16422611114",
 			Catagories = { "Soul", "Tactical", "Arsenal", "Luck" },
 			Desc = "Perk coming soon! (Still planning it out)",
+		},
+
+		Master_Scouting = {
+			Icon = "rbxassetid://16274497711",
+			Catagories = { "Tactical" },
+			Desc = "Double jump is now unlocked. (Press space mid air to double jump)",
+		},
+
+		Overcharge = {
+			Icon = "rbxassetid://18415380600",
+			Catagories = { "Arsenal" },
+			Desc = [[pistols damage now adds to <b>overcharge</b>.
+Other weapon damage activates <b>overcharge</b>.
+When active, you gain +50% firerate, and infinite ammo for 3 seconds. (20 hits for an <b>overcharge</b>)]],
 		},
 	},
 }

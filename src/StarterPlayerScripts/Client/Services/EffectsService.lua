@@ -20,6 +20,7 @@ local util = require(Globals.Vendor.Util)
 local net = require(Globals.Packages.Net)
 local cameraShaker = require(Globals.Packages.CameraShaker)
 local timer = require(Globals.Vendor.Timer)
+local uiAnimationService = require(Globals.Vendor.UIAnimationService)
 
 local replicateRemote = net:RemoteEvent("ReplicateEffect")
 
@@ -118,18 +119,34 @@ end
 function module.IndicateAttack(model: Instance, color)
 	local ti = TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
 
-	util.PlaySound(sounds.AttackIndicator, script)
+	local indicateSound = model:FindFirstChild("IndicateSound", true)
+	local indicator = model:FindFirstChild("AttackIndicator", true)
 
-	local flare = model:FindFirstChild("AttackIndicator", true)
+	if not indicateSound then
+		indicateSound = sounds.AttackIndicator
+	end
 
-	flare.Image.Size = UDim2.fromScale(0.25, 0.25)
-	flare.Image.Rotation = 180
-	flare.Image.ImageColor3 = color
-	flare.Enabled = true
+	util.PlaySound(indicateSound, script)
 
-	util.tween(flare.Image, ti, { Size = UDim2.fromScale(1, 1), Rotation = 0 }, false, function()
-		flare.Enabled = false
-	end, Enum.PlaybackState.Completed)
+	local isFlare = indicator:FindFirstChild("Image") and true or false
+
+	indicator.Enabled = true
+
+	if isFlare then
+		indicator.Image.Size = UDim2.fromScale(0.25, 0.25)
+		indicator.Image.Rotation = 180
+		indicator.Image.ImageColor3 = color
+
+		util.tween(indicator.Image, ti, { Size = UDim2.fromScale(1, 1), Rotation = 0 }, false, function()
+			indicator.Enabled = false
+		end, Enum.PlaybackState.Completed)
+	else
+		uiAnimationService
+			.PlayAnimation(indicator.Frame, 0.5 / indicator.Frame.Image.Size.X.Scale, false, false).OnEnded
+			:Once(function()
+				indicator.Enabled = false
+			end)
+	end
 end
 
 function module.GhoulTeleport(position)

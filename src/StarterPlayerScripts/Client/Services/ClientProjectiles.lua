@@ -249,7 +249,14 @@ local function checkRaycast(projectile, raycastDistance)
 	local cframe = projectile.Instance.CFrame
 
 	local rp = RaycastParams.new()
-	rp.FilterDescendantsInstances = projectile.RecentHits
+
+	local blacklist = { workspace.CurrentCamera }
+
+	for _, value in ipairs(projectile.RecentHits) do
+		table.insert(blacklist, value)
+	end
+
+	rp.FilterDescendantsInstances = blacklist
 	rp.FilterType = Enum.RaycastFilterType.Exclude
 	rp.CollisionGroup = "Bullet"
 
@@ -420,7 +427,7 @@ RunService.Heartbeat:Connect(function()
 
 		processStep(distanceToMove, projectile)
 
-		if not raycast then
+		if not raycast or not raycast.Instance then
 			continue
 		end
 

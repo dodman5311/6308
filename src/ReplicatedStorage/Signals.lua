@@ -13,6 +13,7 @@ local signals = {
 	Super = signal.new(),
 	Movement = signal.new(),
 	WeaponEquipped = signal.new(),
+	AttemptGrab = signal.new(),
 	Jump = signal.new(),
 	Slide = signal.new(),
 	AddArmor = signal.new(),

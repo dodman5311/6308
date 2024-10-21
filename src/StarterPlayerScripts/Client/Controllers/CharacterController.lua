@@ -31,6 +31,7 @@ local MusicService = require(Globals.Client.Services.MusicService)
 local codexService = require(Globals.Client.Services.CodexService)
 local Acts = require(Globals.Vendor.Acts)
 local weaponService = require(Globals.Client.Controllers.WeaponController)
+local kiosk = require(ReplicatedStorage.Gui.Kiosk)
 
 --// Values
 local logHealth = 0
@@ -65,7 +66,7 @@ local function PlayHitEffect()
 end
 
 function module.attemptPause(index)
-	if not Acts:checkAct("DeathPause", "MenuPause", "RegPause") then
+	if not Acts:checkAct("DeathPause", "MenuPause", "RegPause", "EndPause") then
 		signals.PauseGame:Fire()
 	end
 
@@ -75,7 +76,7 @@ end
 function module.attemptResume(index)
 	Acts:removeAct(index)
 
-	if Acts:checkAct("DeathPause", "MenuPause", "RegPause") then
+	if Acts:checkAct("DeathPause", "MenuPause", "RegPause", "EndPause") then
 		return
 	end
 
@@ -136,7 +137,7 @@ function module:OnSpawn(character, humanoid)
 				signals.DoUiAction:Fire("HUD", "ShowInvincible", true)
 
 				signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Haven")
-				signals.DoUiAction:Fire("HUD", "CooldownGift", true, "Haven", 0.5)
+				signals.DoUiAction:Fire("HUD", "CooldownGift", true, "Haven", 1)
 
 				task.delay(1, function()
 					signals.DoUiAction:Fire("HUD", "HideInvincible", true)
@@ -366,7 +367,8 @@ RunService.Heartbeat:Connect(function()
 end)
 
 local function exitS2(extraSouls, totalLevel, level, stageBoss, miniBoss, stage)
-	Player.Character.PrimaryPart.Anchored = false
+	module.attemptResume("EndPause")
+
 	soulsService.AddSoul(extraSouls)
 
 	if giftService.CheckGift("Paladin's_Faith") then
@@ -403,6 +405,21 @@ local function exitS2(extraSouls, totalLevel, level, stageBoss, miniBoss, stage)
 		task.delay(0.5, function()
 			MusicService.playMusic(math.floor(totalLevel + 1))
 		end)
+
+		local gameState = {
+			Stage = workspace:GetAttribute("Stage"),
+			Level = workspace:GetAttribute("Level"),
+			Souls = soulsService.Souls,
+
+			critChances = weaponService.critChances,
+
+			Luck = ChanceService.luck,
+			PerkTickets = kiosk.tickets,
+
+			PerkList = giftService.AquiredGifts,
+		}
+
+		net:RemoteEvent("SaveGameState"):FireServer(gameState)
 	end
 
 	camera.FieldOfView = 120
@@ -415,7 +432,7 @@ local function ExitSequence(levelData, level, stageBoss, miniBoss, stage)
 	local plusStage = (stage - 1) * 5
 	local totalLevel = plusStage + level
 
-	Player.Character.PrimaryPart.Anchored = true
+	module.attemptPause("EndPause")
 
 	local extraSouls = UIService.doUiAction("LevelEnd", "ShowLevelEnd", true, levelData)
 	local onHidden
@@ -434,6 +451,24 @@ local function ExitSequence(levelData, level, stageBoss, miniBoss, stage)
 
 	net:RemoteEvent("ProceedToNextLevel"):FireServer()
 end
+
+net:Connect("LoadData", function(upgradeIndex, gameState)
+	if not Player.Character then
+		Player.CharacterAdded:Wait()
+	end
+
+	soulsService.AddSoul(gameState["Souls"] or 0)
+
+	if gameState["critChances"] then
+		weaponService.critChances = gameState.critChances
+	end
+	ChanceService.luck = gameState["Luck"] or 0
+	kiosk.tickets = gameState["PerkTickets"] or 0
+
+	for _, perkName in ipairs(gameState["PerkList"] or {}) do
+		signals.AddGift:Fire(perkName)
+	end
+end)
 
 signals.PauseGame:Connect(function()
 	local character = Player.Character
@@ -520,7 +555,11 @@ net:Connect("OpenKiosk", function()
 end)
 
 UserInputService.InputBegan:Connect(function(input, gpe)
-	if input.KeyCode == Enum.KeyCode.Tab or input.KeyCode == Enum.KeyCode.ButtonSelect then
+	if
+		input.KeyCode == Enum.KeyCode.Tab
+		or input.KeyCode == Enum.KeyCode.M
+		or input.KeyCode == Enum.KeyCode.ButtonSelect
+	then
 		GuiService.SelectedObject = nil
 		signals.DoUiAction:Fire("Menu", "Toggle", true)
 	end

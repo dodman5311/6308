@@ -3,6 +3,7 @@ local module = {}
 --// Services
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local collectionService = game:GetService("CollectionService")
+local DataStoreService = game:GetService("DataStoreService")
 local Players = game:GetService("Players")
 
 --// Instances
@@ -12,6 +13,7 @@ local Globals = require(ReplicatedStorage.Shared.Globals)
 local signals = require(Globals.Signals)
 local mapService = require(Globals.Services.MapService)
 local net = require(Globals.Packages.Net)
+local dataStore = require(Globals.Server.Services.DataStore)
 
 local getBlockedNerd = net:RemoteEvent("GetBlockedNerd")
 net:RemoteEvent("CreateShield")
@@ -46,11 +48,6 @@ Players.PlayerAdded:Connect(function(player)
 	player.CharacterAdded:Connect(function(character)
 		local humanoid = character:WaitForChild("Humanoid")
 		humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
-
-		mapService.CurrentStage = 1
-		mapService.CurrentLevel = 0
-
-		signals["ProceedToNextLevel"]:Fire()
 
 		for _, part in ipairs(character:GetDescendants()) do
 			if not part:IsA("BasePart") then
@@ -98,7 +95,12 @@ Players.PlayerAdded:Connect(function(player)
 	end)
 end)
 
-local function onDied(player)
+local function onDied(player: Player)
+	mapService.CurrentStage = 1
+	mapService.CurrentLevel = 1
+
+	dataStore.saveGameState(player, {})
+
 	for _, enemy in ipairs(collectionService:GetTagged("Enemy")) do
 		enemy:Destroy()
 	end
@@ -109,6 +111,10 @@ local function onDied(player)
 	if spawnLocation then
 		character:PivotTo(spawnLocation.CFrame * CFrame.new(0, 3, 0))
 	end
+
+	player.CharacterAdded:Once(function(character)
+		signals["ProceedToNextLevel"]:Fire(nil, true)
+	end)
 end
 
 local function setArmor(player, amount)

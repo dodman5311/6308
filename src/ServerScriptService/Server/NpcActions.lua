@@ -253,6 +253,10 @@ function module.PlayAnimation(npc, animationName, priority, noReplay, ...)
 	AnimationService:playAnimation(npc.Instance, animationName, priority, noReplay, ...)
 end
 
+function module.IndicateAttack(npc, color)
+	Net:RemoteEvent("ReplicateEffect"):FireAllClients("IndicateAttack", "Server", true, npc.Instance, color)
+end
+
 local function createProjectile(speed, cframe, spread, info, modelName, sender)
 	createProjectileRemote:FireAllClients(speed, cframe, spread, nil, nil, nil, info, sender, modelName)
 end
@@ -261,9 +265,14 @@ local function createHitCast(npc, damage, cframe, distance, spread)
 	Net:RemoteEvent("CreateBeam"):FireAllClients(npc.Instance, damage, cframe, distance, spread)
 end
 
-function module.Shoot(npc, cooldown, amount, speed, bulletCount, info, visualModel, sender)
+function module.Shoot(npc, cooldown, amount, speed, bulletCount, info, visualModel, sender, indicateAttack)
 	if npc:GetState() == "Dead" or checkFear(npc) then
 		return
+	end
+
+	if indicateAttack then
+		module.IndicateAttack(npc)
+		task.wait(0.5)
 	end
 
 	if typeof(amount) == "table" then
@@ -400,18 +409,29 @@ local function swing(npc, distance, stopMovement)
 	hitHumanoid:TakeDamage(1)
 end
 
-function module.ShootProjectile(npc, shotDelay, cooldown, amount, speed, bulletCount, info, visualModel, timerIndex)
+function module.ShootProjectile(
+	npc,
+	shotDelay,
+	cooldown,
+	amount,
+	speed,
+	bulletCount,
+	info,
+	visualModel,
+	timerIndex,
+	indicateAttack
+)
 	if npc.Instance:GetAttribute("State") ~= "Attacking" then
 		return
 	end
 
-	local AttackTimer = getTimer(npc, timerIndex or "ShootAttack")
+	local attackTimer = getTimer(npc, timerIndex or "ShootAttack")
 
-	AttackTimer.WaitTime = shotDelay
-	AttackTimer.Function = module.Shoot
-	AttackTimer.Parameters = { npc, cooldown, amount, speed, bulletCount, info, visualModel }
+	attackTimer.WaitTime = shotDelay
+	attackTimer.Function = module.Shoot
+	attackTimer.Parameters = { npc, cooldown, amount, speed, bulletCount, info, visualModel, false, indicateAttack }
 
-	AttackTimer:Run()
+	attackTimer:Run()
 end
 
 function module.ShootPlayerProjectile(

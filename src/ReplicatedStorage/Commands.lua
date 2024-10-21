@@ -589,7 +589,7 @@ local commands = {
 				return {
 					{
 						Name = "Boss",
-						Options = { "Keeper Of The Third Law", "Visage Of False Hope", "Keeper Of Divine Iron" },
+						Options = { "Keeper Of The Third Law", "Visage Of False Hope", "Deilos, Right Hand Of Iron" },
 					},
 				}
 			end,

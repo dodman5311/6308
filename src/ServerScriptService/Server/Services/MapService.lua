@@ -1,6 +1,6 @@
 local module = {
-	CurrentStage = 1,
-	CurrentLevel = 1,
+	CurrentStage = 2,
+	CurrentLevel = 3,
 	GeneratedAt = 0,
 }
 --// services
@@ -16,9 +16,11 @@ local Globals = require(replicatedStorage.Shared.Globals)
 --// requirements
 local spawners = require(Globals.Services.Spawners)
 local signals = require(Globals.Signals)
+local signal = require(Globals.Packages.Signal)
 local net = require(Globals.Packages.Net)
 local arenas = require(Globals.Services.HandleArenas)
 
+module.onLevelPassed = signal.new()
 --// instances
 
 local map = workspace.Map
@@ -578,7 +580,7 @@ signals["GenerateMap"]:Connect(function(Style, Size)
 	end
 end)
 
-function module.proceedToNext(sender)
+function module.proceedToNext(sender, onlyLoadMap)
 	for _, player in ipairs(Players:GetPlayers()) do -- Teleport players to spawn
 		local character = player.Character
 		if not character then
@@ -595,15 +597,17 @@ function module.proceedToNext(sender)
 		character.Humanoid.Health = character.Humanoid.MaxHealth
 	end
 
-	if module.CurrentLevel == 5 or module.CurrentLevel == 2 then
-		module.CurrentLevel += 0.5
-	else
-		module.CurrentLevel = math.floor(module.CurrentLevel + 1)
-	end
+	if not onlyLoadMap then
+		if module.CurrentLevel == 5 or module.CurrentLevel == 2 then
+			module.CurrentLevel += 0.5
+		else
+			module.CurrentLevel = math.floor(module.CurrentLevel + 1)
+		end
 
-	if module.CurrentLevel > 5.5 then
-		module.CurrentLevel = 1
-		module.CurrentStage += 1
+		if module.CurrentLevel > 5.5 then
+			module.CurrentLevel = 1
+			module.CurrentStage += 1
+		end
 	end
 
 	workspace:SetAttribute("Level", module.CurrentLevel)
@@ -614,7 +618,6 @@ function module.proceedToNext(sender)
 		return
 	end
 	module.loadLinearMap(math.clamp(module.CurrentLevel * 4, 5, 25))
-	--module.loadLinearMap(0)
 
 	if not sender then
 		return

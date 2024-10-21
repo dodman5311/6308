@@ -58,7 +58,7 @@ function module.Slide()
 		return
 	end
 
-	local ti = TweenInfo.new(0.25, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
+	local ti = TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.InOut)
 	local ti2 = TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
 
 	if module.inSlide then

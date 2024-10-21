@@ -760,11 +760,11 @@ function module.dealDamage(cframe, subject, damage, source, element)
 
 	local isVendingMachine = string.match(model.Name, "Vending Machine")
 	if isVendingMachine then
-		module.HasHitMachine = true
-
 		if source ~= "ThrownWeapon" then
 			return
 		end
+
+		module.HasHitMachine = true
 	end
 
 	local siuDamage = 0
@@ -868,7 +868,7 @@ function module.dealDamage(cframe, subject, damage, source, element)
 		)
 	end
 
-	if GiftsService.CheckGift("Life_Steal") and soulsService.Souls <= 0 and critMult > 1 then
+	if GiftsService.CheckGift("Life_Steal") and soulsService.Souls <= 1 and critMult > 1 then
 		net:RemoteEvent("Damage"):FireServer(player.Character, -1)
 		signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Life_Steal")
 	end
