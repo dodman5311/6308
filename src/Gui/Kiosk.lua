@@ -3,7 +3,9 @@ local module = {
 	soulCost = 1,
 }
 --// Services
+local BadgeService = game:GetService("BadgeService")
 local GuiService = game:GetService("GuiService")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 local TeleportService = game:GetService("TeleportService")
@@ -60,7 +62,7 @@ local spinGifts = {
 		GoodLuck = true,
 	},
 
-	Kevlar = {
+	Kevlar = { -- remove
 		Icon = "rbxassetid://16422610651",
 		Catagories = { "Tactical" },
 		Desc = "You gain armor. (+1)",
@@ -76,7 +78,7 @@ local spinGifts = {
 		GoodLuck = true,
 	},
 
-	Small_Magazine = {
+	Small_Magazine = { -- remove
 		Icon = "rbxassetid://17631463318",
 		Catagories = { "Tactical" },
 		Desc = "You gain a few bullets. (+25% ammo)",
@@ -132,7 +134,7 @@ local spinGifts = {
 		GoodLuck = true,
 	},
 
-	Nothing = {
+	Nothing = { -- remove
 		Icon = "rbxassetid://16422611114",
 		Catagories = { "Luck" },
 		Desc = "You gain jack squat.",
@@ -140,6 +142,8 @@ local spinGifts = {
 		GoodLuck = false,
 	},
 }
+
+local costIsDoubled = false
 
 --// Functions
 
@@ -341,20 +345,28 @@ function module.Init(player, ui, frame)
 	end)
 
 	frame.UseSoul.MouseButton1Click:Connect(function()
-		if SoulsService.Souls < module.soulCost then
+		if (costIsDoubled and SoulsService.Souls < module.soulCost * 2) or SoulsService.Souls < module.soulCost then
 			return
 		end
 
 		sfx.KioskBuy:Play()
 
-		SoulsService.RemoveSoul(module.soulCost)
+		SoulsService.RemoveSoul(costIsDoubled and module.soulCost * 2 or module.soulCost)
 
 		frame.SelectButtons.Visible = false
 		frame.ExitButton.Visible = false
 
 		module.UpdateSouls(player, ui, frame, math.round(SoulsService.Souls))
 		module.soulCost = math.clamp(module.soulCost + 1, 1, 25)
-		frame.SoulCost.Text = -module.soulCost
+
+		if GiftsService.CheckUpgrade("Quality Sauce") then
+			costIsDoubled = chanceService.checkChance(5, false)
+			print(costIsDoubled)
+		else
+			costIsDoubled = false
+		end
+
+		frame.SoulCost.Text = costIsDoubled and -module.soulCost * 2 or -module.soulCost
 
 		local chosenGift = module.chooseRandomGift(player, ui, frame)
 		module.TakeDelivery(player, ui, frame, chosenGift, true)
@@ -437,6 +449,12 @@ function module.ShowScreen(player, ui, frame, playerSouls)
 		return
 	end
 
+	if GiftsService.CheckUpgrade("Quality Sauce") then
+		spinGifts.Nothing = nil
+		spinGifts.Small_Magazine = nil
+		spinGifts.Kevlar = nil
+	end
+
 	acts:createAct("InActiveMenu")
 
 	frame.Gui.Enabled = true
@@ -444,7 +462,7 @@ function module.ShowScreen(player, ui, frame, playerSouls)
 	MusicService.playTrack("TheKiosk")
 
 	SoulsService.Souls = playerSouls
-	frame.SoulCost.Text = -module.soulCost
+	frame.SoulCost.Text = costIsDoubled and -module.soulCost * 2 or -module.soulCost
 
 	frame.Tickets.Count.Text = module.tickets
 	module.UpdateStats(player, ui, frame)

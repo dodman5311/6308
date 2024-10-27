@@ -1,3 +1,4 @@
+local BadgeService = game:GetService("BadgeService")
 local CollectionService = game:GetService("CollectionService")
 local rng = Random.new()
 
@@ -15,6 +16,8 @@ local timer = require(Globals.Vendor.Timer)
 
 local vfx = net:RemoteEvent("ReplicateEffect")
 local createProjectileRemote = net:RemoteEvent("CreateProjectile")
+
+local assets = ReplicatedStorage.Assets
 
 local moveChances = {
 	{ "Acid", 10 }, -- 10
@@ -159,7 +162,7 @@ local function dealDamage(npc, humanoid, amount)
 		return
 	end
 
-	humanoid:TakeDamage(amount)
+	humanoid:TakeDamage(amount + npc["DamageBuff"] or 0)
 end
 
 local function indicateAttack(npc, color)
@@ -809,6 +812,14 @@ local function closeAttack(npc)
 end
 
 local function onDied(npc)
+	for _, player in ipairs(Players:GetPlayers()) do
+		task.spawn(function()
+			if BadgeService:AwardBadge(player.UserId, 1970850586708568) then
+				net:RemoteEvent("DoUiAction"):FireAllClients("Notify", "AchievementUnlocked", true, 1970850586708568)
+			end
+		end)
+	end
+
 	for _, enemy in ipairs(CollectionService:GetTagged("Enemy")) do
 		if enemy.Name == npc.Instance.Name then
 			continue

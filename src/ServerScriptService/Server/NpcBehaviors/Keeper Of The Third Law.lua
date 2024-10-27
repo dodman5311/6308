@@ -1,3 +1,5 @@
+local BadgeService = game:GetService("BadgeService")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Debris = game:GetService("Debris")
@@ -83,7 +85,7 @@ local function createHitbox(npc, size, offset, damage, blacklist)
 			continue
 		end
 
-		humanoid:TakeDamage(damage)
+		humanoid:TakeDamage(damage + npc["DamageBuff"] or 0)
 
 		table.insert(hasHit, model)
 	end
@@ -238,7 +240,7 @@ local function parryAttack(npc, health)
 		return
 	end
 
-	enemyHumanoid:TakeDamage(healthChange)
+	enemyHumanoid:TakeDamage(healthChange + npc["DamageBuff"] or 0)
 end
 
 local function addArmor(npc)
@@ -635,7 +637,7 @@ local function setUpEnemy(npc)
 				-- hit player
 				hasHit = true
 				target.Humanoid.WalkSpeed -= 20
-				target.Humanoid:TakeDamage(1)
+				target.Humanoid:TakeDamage(1 + npc["DamageBuff"] or 0)
 				target:SetAttribute("LockSlide", true)
 
 				task.delay(6, function()
@@ -677,7 +679,7 @@ local function setUpEnemy(npc)
 					return
 				end
 
-				humanoid:TakeDamage(3)
+				humanoid:TakeDamage(3 + npc["DamageBuff"] or 0)
 
 				table.insert(enemiesHitWithChain, model)
 			end)
@@ -720,6 +722,14 @@ local function DeathEffect(npc)
 end
 
 local function onDied(npc)
+	for _, player in ipairs(Players:GetPlayers()) do
+		task.spawn(function()
+			if BadgeService:AwardBadge(player.UserId, 2275688768196496) then
+				net:RemoteEvent("DoUiAction"):FireAllClients("Notify", "AchievementUnlocked", true, 2275688768196496)
+			end
+		end)
+	end
+
 	if npc.Instance:GetAttribute("KnockedOut") then
 		for _, v in ipairs(npc.Instance:GetDescendants()) do
 			if not v:IsA("BasePart") then

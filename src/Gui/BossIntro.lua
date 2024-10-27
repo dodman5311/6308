@@ -107,7 +107,7 @@ local intros = {
 		},
 	},
 
-	["Deilos, Right Hand Of Iron"] = {
+	["Right Hand Of Iron"] = {
 		{
 			Text = "This was to be my grave.",
 			Sound = "rbxassetid://102678617100781",
@@ -159,6 +159,67 @@ local intros = {
 			Text = "Let me show you the true meaning of Iron, MONSTER!",
 			Sound = "rbxassetid://95048725262914",
 			Wait = 0.5,
+		},
+	},
+
+	["Tarnished Son Of Iron"] = {
+		{
+			Text = "I've been waiting, you know...",
+			Sound = "rbxassetid://120509950430525",
+			Wait = 1,
+		},
+		{
+			Text = "Waiting for you to see me. For you to remember.",
+			Sound = "rbxassetid://108385611410748",
+			Wait = 1,
+		},
+		{
+			Text = "Waiting for you to feel the pain and regret for what you took from me.",
+			Sound = "rbxassetid://89839729216701",
+			Wait = 1,
+		},
+		{
+			Text = "But now that you're here... face to face.",
+			Sound = "rbxassetid://125071809885740",
+			Wait = 1,
+		},
+		{
+			Text = "all I see is rage...",
+			Sound = "rbxassetid://91288250435020",
+			Wait = 2,
+		},
+		{
+			Text = "She was right. She has always been right.",
+			Sound = "rbxassetid://129688259224358",
+			Wait = 1,
+		},
+
+		{
+			Text = "You are a monster. An evil that feeds upon blood and suffering.",
+			Sound = "rbxassetid://75831919154694",
+			Wait = 1,
+		},
+
+		{
+			Text = "I wont let you do this.",
+			Sound = "rbxassetid://104439571747884",
+			Wait = 0.75,
+		},
+		{
+			Text = "I wont let you break her metal, I won't let you extinguish her light.",
+			Sound = "rbxassetid://138658054923918",
+			Wait = 0.5,
+		},
+		{
+			Text = "I will end you here and now.",
+			Sound = "rbxassetid://102172826290490",
+			Wait = 1.75,
+		},
+
+		{
+			Text = "I have to...",
+			Sound = "rbxassetid://139480693644447", -- rbxassetid://133161645841198
+			Wait = 2,
 		},
 	},
 }
@@ -302,7 +363,11 @@ function module.ShowIntro(player, ui, frame, bossName)
 
 	for _, dialogue in ipairs(intro) do
 		voice.SoundId = dialogue.Sound
-		voice.Loaded:Wait()
+
+		local startTime = os.clock()
+		while not voice.IsLoaded and os.clock() - startTime < 5 do
+			task.wait()
+		end
 
 		voice:Play()
 

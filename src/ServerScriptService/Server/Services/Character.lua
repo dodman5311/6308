@@ -44,7 +44,7 @@ local function setInvincible(player, value)
 	humanoid:SetAttribute("Invincible", value)
 end
 
-Players.PlayerAdded:Connect(function(player)
+Players.PlayerAdded:Connect(function(player: Player)
 	player.CharacterAdded:Connect(function(character)
 		local humanoid = character:WaitForChild("Humanoid")
 		humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
@@ -93,6 +93,9 @@ Players.PlayerAdded:Connect(function(player)
 			end
 		end)
 	end)
+
+	print("Save data loaded in", dataStore.LoadGameData(player))
+	player:LoadCharacter()
 end)
 
 local function onDied(player: Player)

@@ -45,8 +45,6 @@ local hasLookedAtMachine = false
 
 local mouseTarget = Instance.new("ObjectValue")
 
-Player:WaitForChild("PlayerGui").SelectionImageObject = ReplicatedStorage:WaitForChild("HideSelection")
-
 --// Fucntions
 
 local function ShakeCamera(shakeCf)
@@ -468,6 +466,8 @@ net:Connect("LoadData", function(upgradeIndex, gameState)
 	for _, perkName in ipairs(gameState["PerkList"] or {}) do
 		signals.AddGift:Fire(perkName)
 	end
+
+	giftService.UpgradeIndex = upgradeIndex
 end)
 
 signals.PauseGame:Connect(function()
@@ -577,6 +577,13 @@ end)
 GuiService.MenuClosed:Connect(function()
 	module.attemptResume("RegPause")
 	UIService.doUiAction("Paused", "Pause", true, false)
+end)
+
+net:Connect("LoadData", function()
+	if giftService.CheckUpgrade("Order Wheel") then
+		signals.AddGift:Fire("Speed_Demon")
+		signals.AddGift:Fire("SpeedRunner")
+	end
 end)
 
 return module

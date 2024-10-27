@@ -26,6 +26,7 @@ local Acts = require(Globals.Vendor.Acts)
 local Timer = require(Globals.Vendor.Timer)
 local AnimationService = require(Globals.Vendor.AnimationService)
 local janitor = require(Globals.Packages.Janitor)
+local Signals = require(Globals.Shared.Signals)
 
 local net = require(Globals.Packages.Net)
 local lessHealth = false
@@ -485,6 +486,23 @@ net:Connect("GiftRemoved", function(player, gift)
 		return
 	end
 	lessHealth = false
+end)
+
+Signals.ActivateUpgrade:Connect(function(player, upgradeName)
+	if upgradeName == "Order Wheel" then
+		for _, v in ipairs(Enemies:GetChildren()) do
+			if not v:GetAttribute("Level") then
+				continue
+			end
+			v:SetAttribute("Level", NumberRange.new(v:GetAttribute("Level").Min - 1, v:GetAttribute("Level").Max))
+		end
+	end
+
+	if upgradeName == "Smart Fridge" then
+		Enemies.Npcs.VendingMachine["Garbage Vending Machine"].Humanoid.Health = 2
+		Enemies.Npcs.VendingMachine["Basic Vending Machine"].Humanoid.Health = 2
+		Enemies.Npcs.VendingMachine["Epic Vending Machine"].Humanoid.Health = 2
+	end
 end)
 
 return module

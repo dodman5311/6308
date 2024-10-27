@@ -361,6 +361,10 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 		ammoToAdd += weaponData.Ammo * 0.75
 	end
 
+	if GiftsService.CheckUpgrade(player, "Bigger Boxes") then
+		ammoToAdd += weaponData.Ammo * 0.15
+	end
+
 	if extraAmmo then
 		ammoToAdd += weaponData.Ammo * (extraAmmo / 100)
 	end

@@ -95,6 +95,10 @@ function module.GameInit()
 
 		task.spawn(module.doUiAction, uiModule.Name, "Init")
 	end
+
+	-- for _, object in ipairs(starterGui:GetChildren()) do
+	-- 	object:Clone().Parent = player:WaitForChild("PlayerGui")
+	-- end
 end
 
 --// Main //--

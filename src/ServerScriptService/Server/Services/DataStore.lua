@@ -12,6 +12,7 @@ local Globals = require(ReplicatedStorage.Shared.Globals)
 local net = require(Globals.Packages.Net)
 local mapService = require(Globals.Server.Services.MapService)
 local signals = require(Globals.Shared.Signals)
+local permaUpgrades = require(ReplicatedStorage.Upgrades)
 
 --// Values
 local gameState = {
@@ -60,18 +61,31 @@ local function SaveData(player: Player, dataStore: DataStore, value)
 	end
 end
 
-Players.PlayerAdded:Connect(function(player)
+function module.LoadGameData(player)
+	local startTime = os.clock()
 	local upgradeIndex = LoadData(player, DataStoreService:GetDataStore("PlayerUpgradeIndex")) or 0
 	local gameSettings = LoadData(player, DataStoreService:GetDataStore("PlayerSettings")) or {}
 	local gameState = LoadData(player, DataStoreService:GetDataStore("PlayerGameState")) or {}
+	local furthestLevel = LoadData(player, DataStoreService:GetDataStore("PlayerFurthestLevel")) or 0
 
-	net:RemoteEvent("LoadData"):FireClient(player, upgradeIndex, gameState, gameSettings)
+	player:SetAttribute("furthestLevel", furthestLevel)
+	player:SetAttribute("UpgradeIndex", upgradeIndex)
+
+	local permaUpgradeName = permaUpgrades.Upgrades[upgradeIndex] and permaUpgrades.Upgrades[upgradeIndex].Name or ""
+	player:SetAttribute("UpgradeName", permaUpgradeName)
 
 	mapService.CurrentStage = gameState["Stage"] and math.clamp(gameState["Stage"], 1, math.huge) or 1
 	mapService.CurrentLevel = gameState["Level"] and math.clamp(gameState["Level"], 1, math.huge) or 1
 
-	signals["ProceedToNextLevel"]:Fire(nil, true)
-end)
+	print(mapService.CurrentStage, mapService.CurrentLevel)
+
+	mapService.proceedToNext(nil, true)
+	--signals["ProceedToNextLevel"]:Fire(nil, true)
+
+	signals.ActivateUpgrade:Fire(player, permaUpgradeName)
+	net:RemoteEvent("LoadData"):FireClient(player, upgradeIndex, gameState, gameSettings)
+	return os.clock() - startTime
+end
 
 -- mapService.onLevelPassed:Connect(function(player, gameState)
 -- 	SaveData(player, "PlayerGameState", gameState)
@@ -82,6 +96,15 @@ function module.saveGameState(player, gameState)
 	gameState.Stage = mapService.CurrentStage
 	gameState.Level = mapService.CurrentLevel
 	SaveData(player, dataStore, gameState)
+
+	local plusStage = (gameState.Stage - 1) * 5
+	local totalLevel = plusStage + gameState.Level
+
+	if totalLevel > player:GetAttribute("furthestLevel") then
+		player:SetAttribute("furthestLevel", totalLevel)
+		print(player:GetAttribute("furthestLevel"))
+		SaveData(player, DataStoreService:GetDataStore("PlayerFurthestLevel"), totalLevel)
+	end
 end
 
 net:Connect("SaveGameState", module.saveGameState)

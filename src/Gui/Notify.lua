@@ -1,5 +1,6 @@
 local module = {}
 --// Services
+local BadgeService = game:GetService("BadgeService")
 local Debris = game:GetService("Debris")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
@@ -32,6 +33,10 @@ function module.Init(player, ui, frame)
 		end
 		v.Visible = false
 	end
+
+	task.delay(1, function()
+		StarterGui:SetCore("BadgesNotificationsActive", false)
+	end)
 end
 
 function module.Cleanup(player, ui, frame) end
@@ -194,6 +199,32 @@ function module.AddEntry(player, ui, frame, entryName, important)
 	if important then
 		acts:removeAct("EntryAdded")
 	end
+end
+
+function module.AchievementUnlocked(player, ui, frame, id)
+	local ti = TweenInfo.new(0.5, Enum.EasingStyle.Linear)
+
+	local badgeInfo = BadgeService:GetBadgeInfoAsync(id)
+	sounds.Achievement:Play()
+
+	if not badgeInfo then
+		return
+	end
+
+	local achievementUi = frame.Achievement:Clone()
+	achievementUi.Name = "ActiveAchievement"
+	achievementUi.Parent = frame.Gui
+	achievementUi.Title.Text = badgeInfo.Name
+	achievementUi.Description.Text = badgeInfo.Description
+	achievementUi.Icon.Image = "rbxassetid://" .. badgeInfo.IconImageId
+	achievementUi.Position = UDim2.fromScale(1, 1.2)
+
+	achievementUi.Visible = true
+
+	util.tween(achievementUi, ti, { Position = UDim2.fromScale(1, 1) }, true)
+	task.wait(5)
+	util.tween(achievementUi, ti, { Position = UDim2.fromScale(1, 1.2) }, true)
+	achievementUi:Destroy()
 end
 
 return module

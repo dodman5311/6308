@@ -584,7 +584,7 @@ function module.proceedToNext(sender, onlyLoadMap)
 	for _, player in ipairs(Players:GetPlayers()) do -- Teleport players to spawn
 		local character = player.Character
 		if not character then
-			return
+			continue
 		end
 
 		local spawnLocation = workspace:FindFirstChild("SpawnLocation")

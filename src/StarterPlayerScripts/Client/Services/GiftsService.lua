@@ -1,4 +1,6 @@
-local module = {}
+local module = {
+	UpgradeIndex = 0,
+}
 
 --// Services
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -6,6 +8,7 @@ local Players = game:GetService("Players")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
+local permaUpgradeList = require(ReplicatedStorage.Upgrades)
 
 --// Modules
 local signal = require(Globals.Packages.Signal)
@@ -55,6 +58,17 @@ local function ClearGifts()
 
 	module.AquiredGifts = {}
 	signals.DoUiAction:Fire("HUD", "ClearGifts", true)
+end
+
+function module.CheckUpgrade(upgradeName)
+	local upgradeIndex = Players.LocalPlayer:GetAttribute("UpgradeIndex")
+	local upgrades = permaUpgradeList.Upgrades
+
+	if not upgradeIndex or upgradeIndex == 0 then
+		return
+	end
+
+	return upgrades[upgradeIndex].Name == upgradeName
 end
 
 function module:OnDied()

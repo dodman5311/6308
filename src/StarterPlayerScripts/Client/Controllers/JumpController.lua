@@ -60,7 +60,10 @@ local function DoubleJump()
 end
 
 function module:OnSpawn()
-	doubleJump = false
+	if not giftService.CheckGift("Master_Scouting") then
+		doubleJump = false
+	end
+
 	input = uis.InputBegan:Connect(function(Input)
 		if Input.KeyCode == Enum.KeyCode.Space or Input.KeyCode == Enum.KeyCode.ButtonA then
 			DoubleJump()

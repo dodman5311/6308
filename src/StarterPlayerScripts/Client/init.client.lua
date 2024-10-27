@@ -6,6 +6,7 @@ local Players = game:GetService("Players")
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local Promise = require(Globals.Packages.Promise)
 local signals = require(Globals.Signals)
+local net = require(Globals.Packages.Net)
 
 local player = Players.LocalPlayer
 
@@ -45,7 +46,7 @@ local function connectOnSpawn(mod, character)
 	end)
 end
 
-local function InitModules()
+local function InitModules(upgradeIndex, gameState, gameSettings)
 	local inits = {}
 
 	for _, module in script:GetDescendants() do
@@ -64,7 +65,7 @@ local function InitModules()
 					end
 
 					if mod.GameInit then
-						mod:GameInit()
+						mod:GameInit(upgradeIndex, gameState, gameSettings)
 					end
 
 					if player.Character then
@@ -86,6 +87,8 @@ local function InitModules()
 		end
 	end)
 
+	signals.LoadSavedDataFromClient:Fire(upgradeIndex, gameState, gameSettings)
+
 	return Promise.allSettled(inits)
 end
 
@@ -106,7 +109,9 @@ local function StartModules()
 	return Promise.allSettled(starts)
 end
 
-Promise.try(InitModules):andThenCall(StartModules):catch(warn)
+net:Connect("LoadData", function(upgradeIndex, gameState, gameSettings)
+	Promise.try(InitModules, upgradeIndex, gameState, gameSettings):andThenCall(StartModules):catch(warn)
+end)
 
 local coreCall
 do

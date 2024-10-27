@@ -17,6 +17,8 @@ local signals = {
 	Jump = signal.new(),
 	Slide = signal.new(),
 	AddArmor = signal.new(),
+	ActivateUpgrade = signal.new(),
+	LoadSavedDataFromClient = signal.new(),
 }
 
 function signals:addSignal(index)

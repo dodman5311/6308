@@ -12,6 +12,7 @@ local stats = {
 	NpcType = "Enemy",
 }
 
+local BadgeService = game:GetService("BadgeService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -131,7 +132,7 @@ local function grabPlayer(npc)
 	animationService:playAnimation(subject, "Attack", Enum.AnimationPriority.Action4.Value, false, 0, 1, 1.5)
 
 	timer.wait(0.1)
-	humanoid:TakeDamage(2)
+	humanoid:TakeDamage(2 + npc["DamageBuff"] or 0)
 
 	if not target or not target.Parent or not target.PrimaryPart then
 		return
@@ -148,7 +149,7 @@ local function hitPlayer(character)
 	character.PrimaryPart.AssemblyLinearVelocity = Vector3.new(0, -200, 0)
 	local humanoid = character:FindFirstChild("Humanoid")
 
-	humanoid:TakeDamage(3)
+	humanoid:TakeDamage(3 + npc["DamageBuff"] or 0)
 end
 
 local function createAttackAt(npc, position, hasSound)
@@ -319,7 +320,7 @@ local function shootRock(npc, i)
 	if not humanoid or humanoid.Health <= 0 then
 		return
 	end
-	humanoid:TakeDamage(4)
+	humanoid:TakeDamage(4 + npc["DamageBuff"] or 0)
 end
 
 local function ShowCatwalks(npc, bossRoom)
@@ -412,7 +413,7 @@ local moves = {
 					local humanoid = character:FindFirstChild("Humanoid")
 
 					if humanoid and npc:GetState() ~= "Dead" then
-						humanoid:TakeDamage(1)
+						humanoid:TakeDamage(1 + npc["DamageBuff"] or 0)
 						lastDamage = os.clock()
 					end
 				end
@@ -518,7 +519,7 @@ local moves = {
 				if os.clock() - lastDamage < 0.25 or npc:GetState() == "Dead" then
 					continue
 				end
-				model.Humanoid:TakeDamage(1)
+				model.Humanoid:TakeDamage(1 + npc["DamageBuff"] or 0)
 
 				lastDamage = os.clock()
 			end
@@ -598,6 +599,14 @@ local function moveTowardsPosition(subject: Model, position: Vector3)
 end
 
 local function onDied(npc)
+	for _, player in ipairs(Players:GetPlayers()) do
+		task.spawn(function()
+			if BadgeService:AwardBadge(player.UserId, 2888864866950727) then
+				net:RemoteEvent("DoUiAction"):FireAllClients("Notify", "AchievementUnlocked", true, 2888864866950727)
+			end
+		end)
+	end
+
 	removeBlackHole(npc)
 	net:RemoteEvent("StopMusic"):FireAllClients("Specimen #09")
 	timer.wait(1)

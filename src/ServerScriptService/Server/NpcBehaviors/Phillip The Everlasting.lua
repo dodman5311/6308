@@ -12,6 +12,8 @@ local stats = {
 	NpcType = "Enemy",
 }
 
+local BadgeService = game:GetService("BadgeService")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Debris = game:GetService("Debris")
@@ -238,7 +240,7 @@ function moves.shootAttack(npc)
 	local hitHumanoid =
 		checkRaycast(subject, subject.PrimaryPart.CFrame.Position, subject.PrimaryPart.CFrame.LookVector * 500)
 	if hitHumanoid and npc:GetState() ~= "Dead" then
-		hitHumanoid:TakeDamage(2)
+		hitHumanoid:TakeDamage(2 + npc["DamageBuff"] or 0)
 	end
 	npc.Acts:removeAct("leading_shot", "inAction")
 	timer.wait(0.125)
@@ -295,7 +297,7 @@ function moves.throwAttack(npc)
 			if table.find(hitHumanoids, humanoid) or npc:GetState() == "Dead" then
 				continue
 			end
-			humanoid:TakeDamage(2)
+			humanoid:TakeDamage(2 + npc["DamageBuff"] or 0)
 			table.insert(hitHumanoids, humanoid)
 		end
 
@@ -345,14 +347,14 @@ local function grabPlayer(npc)
 	showHitBlood(subject, rootPart.AxeHit)
 
 	if npc:GetState() ~= "Dead" then
-		humanoid:TakeDamage(2)
+		humanoid:TakeDamage(2 + npc["DamageBuff"] or 0)
 	end
 
 	timer.wait(0.515)
 	showGunFire(subject, rootPart.GunFire)
 
 	if npc:GetState() ~= "Dead" then
-		humanoid:TakeDamage(2)
+		humanoid:TakeDamage(2 + npc["DamageBuff"] or 0)
 	end
 
 	beat:Disconnect()
@@ -401,6 +403,14 @@ local function moveTowardsPosition(subject: Model, position: Vector3)
 end
 
 local function onDied(npc)
+	for _, player in ipairs(Players:GetPlayers()) do
+		task.spawn(function()
+			if BadgeService:AwardBadge(player.UserId, 982889213750283) then
+				net:RemoteEvent("DoUiAction"):FireAllClients("Notify", "AchievementUnlocked", true, 982889213750283)
+			end
+		end)
+	end
+
 	net:RemoteEvent("StopMusic"):FireAllClients("Phillip The Everlasting")
 	timer.wait(1)
 	net:RemoteEvent("DoUiAction"):FireAllClients("BossIntro", "ShowCompleted", true, npc.Instance.Name)

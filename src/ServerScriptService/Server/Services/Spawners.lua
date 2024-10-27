@@ -12,6 +12,7 @@ local Globals = require(ReplicatedStorage.Shared.Globals)
 local UiAnimationService = require(Globals.Vendor.UIAnimationService)
 local net = require(Globals.Packages.Net)
 local HandleNpcs = require(Globals.Server.HandleNpcs)
+local signals = require(Globals.Shared.Signals)
 
 local equipWeaponRemote = net:RemoteEvent("EquipWeapon")
 
@@ -51,6 +52,7 @@ local function onWeaponSpawned(object)
 	newHitbox.Parent = object
 	newHitbox.Name = "Hitbox"
 	newHitbox.CanCollide = false
+	newHitbox.CanQuery = false
 	newHitbox.Anchored = true
 	newHitbox.CFrame = object:GetPivot()
 
@@ -268,6 +270,23 @@ function module.SpawnBoss(bossToSpawn, unit)
 
 	newObject.Instance:AddTag("Enemy")
 	newObject.Parent = workspace
+
+	local plusStage = (workspace:GetAttribute("Stage") - 1) * 5
+	local totalLevel = plusStage + workspace:GetAttribute("Level")
+
+	for _, player in ipairs(Players:GetPlayers()) do -- @TODO FIX DIS
+		if
+			player:GetAttribute("UpgradeName") == "Aged Cheese"
+			and totalLevel < player:GetAttribute("furthestLevel")
+		then
+			local humanoid = newObject.Instance:FindFirstChildOfClass("Humanoid")
+			humanoid.Health /= 2
+			newObject.DamageBuff = 1
+			return
+		else
+			newObject.DamageBuff = 0
+		end
+	end
 end
 
 function module.spawnHazards(currentLevel)
@@ -301,6 +320,12 @@ net:Connect("PickupWeapon", function(player, object)
 	)
 
 	object:Destroy()
+end)
+
+signals.ActivateUpgrade:Connect(function(player, upgradeName)
+	if upgradeName == "Bigger Boxes" then
+		objectTypes.Weapon.SpawnChance -= 5
+	end
 end)
 
 return module
