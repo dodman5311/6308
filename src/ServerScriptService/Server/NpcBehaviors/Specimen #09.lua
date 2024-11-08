@@ -145,7 +145,7 @@ local function grabPlayer(npc)
 	npc.Acts:removeAct("inAction", "inGrab")
 end
 
-local function hitPlayer(character)
+local function hitPlayer(character, npc)
 	character.PrimaryPart.AssemblyLinearVelocity = Vector3.new(0, -200, 0)
 	local humanoid = character:FindFirstChild("Humanoid")
 
@@ -195,7 +195,7 @@ local function createAttackAt(npc, position, hasSound)
 			return
 		end
 
-		hitPlayer(character)
+		hitPlayer(character, npc)
 	end
 
 	if hasSound then

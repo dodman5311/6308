@@ -79,6 +79,28 @@ local commands = {
 				print(Player.Name .. "'s health set to " .. Value)
 			end,
 		},
+
+		Reset_Progress = {
+
+			Parameters = function()
+				return {
+					{ Name = "Player", Options = Players:GetPlayers() },
+					{ Name = "Confrim", Options = { true, false } },
+				}
+			end,
+
+			ExecuteServer = function(self, _, Player, Value)
+				if not Value then
+					return
+				end
+				local dataStore = require(Globals.Server.Services.DataStore)
+
+				dataStore.SaveData(Player, "PlayerGameState", {})
+				dataStore.SaveData(Player, "PlayerFurthestLevel", 0)
+				dataStore.SaveData(Player, "PlayerCodex", {})
+				dataStore.SaveData(Player, "PlayerUpgradeIndex", 0)
+			end,
+		},
 	},
 
 	Recources = {
@@ -625,6 +647,20 @@ local commands = {
 				end
 
 				signals["DoUiAction"]:Fire("BossIntro", "ShowCompleted", true, boss)
+			end,
+		},
+
+		Show_Death = {
+
+			Parameters = function()
+				return {
+					{ Name = "Unlock", Options = { true, false } },
+				}
+			end,
+
+			ExecuteClient = function(_, unlock)
+				require(ReplicatedStorage.Gui.DeathScreen).unlocked = unlock
+				require(Globals.Client.Services.UIService).doUiAction("DeathScreen", "ShowDeathScreen", true)
 			end,
 		},
 

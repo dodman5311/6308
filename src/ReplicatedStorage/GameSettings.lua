@@ -16,7 +16,7 @@ local settings = {
 	{
 		Name = "Music Volume",
 		Type = "Slider",
-		MaxValue = 100,
+		MaxValue = NumberRange.new(0, 100),
 		Value = 100,
 		OnChanged = function(self)
 			game:GetService("SoundService").Music.Volume = self.Value / 100
@@ -26,7 +26,7 @@ local settings = {
 	{
 		Name = "Effects Volume",
 		Type = "Slider",
-		MaxValue = 100,
+		MaxValue = NumberRange.new(0, 100),
 		Value = 100,
 		OnChanged = function(self)
 			game:GetService("SoundService").Effects.Volume = self.Value / 100
@@ -36,7 +36,7 @@ local settings = {
 	{
 		Name = "Voice Volume",
 		Type = "Slider",
-		MaxValue = 100,
+		MaxValue = NumberRange.new(0, 100),
 		Value = 100,
 		OnChanged = function(self)
 			game:GetService("SoundService").Voice.Volume = self.Value / 100
@@ -48,7 +48,7 @@ local settings = {
 	{
 		Name = "Gamma",
 		Type = "Slider",
-		MaxValue = 100,
+		MaxValue = NumberRange.new(0, 100),
 		Value = 25,
 		OnChanged = function(self, frame)
 			game:GetService("Lighting").ExposureCompensation = self.Value / 100
@@ -103,6 +103,17 @@ local settings = {
 	"Gameplay",
 
 	{
+		Name = "Field of View",
+		Type = "Slider",
+		MaxValue = NumberRange.new(50, 90),
+		Value = 70,
+		OnChanged = function(self)
+			local ti = TweenInfo.new(0.5, Enum.EasingStyle.Quint)
+			require(Globals.Vendor.Util).tween(workspace.CurrentCamera, ti, { FieldOfView = self.Value })
+		end,
+	},
+
+	{
 		Name = "View Bobbing",
 		Type = "Boolean",
 		Value = true,
@@ -135,8 +146,6 @@ local function loadSaveData(upgradeIndex, gameState, settingsToLoad)
 
 		value.Value = foundSetting
 	end
-
-	print(settingsToLoad, settings)
 
 	applySettings()
 end

@@ -106,14 +106,7 @@ local function GiveObjects(npc)
 	local clientModel = ReplicatedStorage.Assets.Models.Weapons:FindFirstChild(SpawnedWeapon.Name)
 	local weaponData = require(clientModel.Data)
 
-	if
-		not weaponData.Element
-		and checkChance:InvokeClient(
-			player,
-			stats.ElementalChance + (player:GetAttribute("UpgradeName") == "Smart Fridge" and 20 or 0),
-			true
-		)
-	then
+	if not weaponData.Element and checkChance:InvokeClient(player, stats.ElementalChance, true) then
 		local element = elements[math.random(1, #elements)]
 
 		SpawnedWeapon:SetAttribute("Element", element)

@@ -54,9 +54,9 @@ function module.Dash(subject)
 		Lighting.DashBlur.Size = 10
 		util.tween(Lighting.DashBlur, ti, { Size = 0 })
 
-		util.tween(camera, TweenInfo.new(0.1), { FieldOfView = 74 })
+		util.tween(camera, TweenInfo.new(0.1), { FieldOfView = util.getSetting("Field of View").Value + 5 })
 		task.delay(0.1, function()
-			util.tween(camera, TweenInfo.new(1), { FieldOfView = 70 })
+			util.tween(camera, TweenInfo.new(1), { FieldOfView = util.getSetting("Field of View").Value })
 		end)
 
 		uiService.doUiAction("HUD", "UpdateGiftProgress", true, "Righteous_Motion", module.dashes / 3)

@@ -64,7 +64,7 @@ function module.dealDamage(_, subject, amount, element)
 		and humanoid.Health <= 0
 		and not subject:GetAttribute("Soul")
 	then -- kill awarded
-		local fireChance = subject:GetAttribute("Fire") and 20 or 0
+		local fireChance = subject:GetAttribute("Fire") and 35 or 0
 
 		if fireChance > 0 then
 			local explosionPosition = subject:GetPivot().Position
@@ -92,8 +92,7 @@ function module.dealDamage(_, subject, amount, element)
 			net:RemoteEvent("DropArmor"):FireAllClients(subject:GetPivot().Position, 25)
 		end
 
-		net:RemoteEvent("DropSoul")
-			:FireAllClients(subject:GetPivot().Position, math.clamp(humanoid.MaxHealth, 1, 7) + fireChance)
+		net:RemoteEvent("DropSoul"):FireAllClients(subject:GetPivot().Position, humanoid.MaxHealth / 2.5 + fireChance)
 	end
 
 	return humanoid, preHealth, humanoid.Health

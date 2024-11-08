@@ -10,6 +10,7 @@ local uis = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
+local util = require(Globals.Vendor.Util)
 
 local player = game:GetService("Players").LocalPlayer
 local camera = workspace.CurrentCamera
@@ -84,7 +85,7 @@ function module.Slide()
 
 		util.tween(cameraOffset, ti, { Value = Vector3.new(0, -1, 0) })
 		util.tween(cameraTilt, ti, { Value = -10 })
-		util.tween(camera, ti, { FieldOfView = 80 })
+		util.tween(camera, ti, { FieldOfView = util.getSetting("Field of View").Value + 10 })
 		--effects.CreateEffect("QuickBlur")
 
 		--ui.toggleCrosshair(false)
@@ -101,7 +102,7 @@ function module.Slide()
 
 		util.tween(cameraOffset, ti2, { Value = Vector3.new(0, 0, 0) })
 		util.tween(cameraTilt, ti2, { Value = 0 })
-		util.tween(camera, ti2, { FieldOfView = 70 })
+		util.tween(camera, ti2, { FieldOfView = util.getSetting("Field of View").Value })
 
 		for _, v in ipairs(character:GetDescendants()) do
 			if not v:IsA("BasePart") then

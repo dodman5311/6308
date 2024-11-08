@@ -99,7 +99,9 @@ local function PositionViewModel(viewModel)
 		viewModel.Goal = goal
 	end
 
-	viewModel.Model:PivotTo(viewModel.Goal * currentCameraOffset:Inverse())
+	viewModel.Model:PivotTo(
+		viewModel.Goal * currentCameraOffset:Inverse() * CFrame.new(0, 0, ((camera.FieldOfView / 70) - 1) * 2)
+	)
 end
 
 function module.new()

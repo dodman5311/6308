@@ -2,6 +2,7 @@ local modules = {}
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
+local StarterGui = game:GetService("StarterGui")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local Promise = require(Globals.Packages.Promise)
@@ -46,7 +47,7 @@ local function connectOnSpawn(mod, character)
 	end)
 end
 
-local function InitModules(upgradeIndex, gameState, gameSettings)
+local function InitModules(...)
 	local inits = {}
 
 	for _, module in script:GetDescendants() do
@@ -59,17 +60,13 @@ local function InitModules(upgradeIndex, gameState, gameSettings)
 			Promise.try(function()
 				return require(module)
 			end)
-				:andThen(function(mod)
+				:andThen(function(mod, ...)
 					if typeof(mod) ~= "table" then
 						return
 					end
 
 					if mod.GameInit then
-						mod:GameInit(upgradeIndex, gameState, gameSettings)
-					end
-
-					if player.Character then
-						connectOnSpawn(mod, player.Character)
+						mod:GameInit(...)
 					end
 
 					table.insert(modules, mod)
@@ -81,13 +78,19 @@ local function InitModules(upgradeIndex, gameState, gameSettings)
 		)
 	end
 
+	if player.Character then
+		for _, v in ipairs(modules) do
+			connectOnSpawn(v, player.Character)
+		end
+	end
+
 	player.CharacterAdded:Connect(function(character)
 		for _, v in ipairs(modules) do
 			connectOnSpawn(v, character)
 		end
 	end)
 
-	signals.LoadSavedDataFromClient:Fire(upgradeIndex, gameState, gameSettings)
+	signals.LoadSavedDataFromClient:Fire(...)
 
 	return Promise.allSettled(inits)
 end
@@ -109,8 +112,13 @@ local function StartModules()
 	return Promise.allSettled(starts)
 end
 
-net:Connect("LoadData", function(upgradeIndex, gameState, gameSettings)
-	Promise.try(InitModules, upgradeIndex, gameState, gameSettings):andThenCall(StartModules):catch(warn)
+net:Connect("LoadData", function(...)
+	while not player:GetAttribute("AssetsLoaded") do
+		task.wait()
+	end
+
+	player:SetAttribute("DataLoaded", true)
+	Promise.try(InitModules, ...):andThenCall(StartModules):catch(warn)
 end)
 
 local coreCall

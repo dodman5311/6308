@@ -1,7 +1,6 @@
 local module = {
 	Souls = 0,
-	MaxDistance = 15,
-	DropChance = 3,
+	DropChance = 2,
 }
 
 --// Services
@@ -30,22 +29,25 @@ local ironWillActive = false
 --// Functions
 
 function module.CalculateDropChance(chanceMod)
-	chanceMod = chanceMod or 1
-
 	local combo = math.clamp(ComboService.CurrentCombo, 1, 100)
-	local healthMod = math.clamp(chanceMod / 2, 1, 100)
-	local chance = (module.DropChance * combo) * healthMod
+	local chance = (module.DropChance * combo) + chanceMod
 	--chance += ChanceService.getLuck()
 
 	if module.Souls <= 0 then
-		chance *= 4
+		chance *= 5
+	end
+
+	chance /= (1 + (module.Souls / 5))
+
+	if GiftsService.CheckUpgrade("Quality Sauce") then
+		chance /= 1.10
 	end
 
 	if GiftsService.CheckGift("Drav_Is_Dead") then
 		return 0
 	end
 
-	return math.clamp(chance, 0, 75)
+	return chance
 end
 
 local function playDropSound()
@@ -54,8 +56,6 @@ local function playDropSound()
 end
 
 function module.DropSoul(position, chanceModifier)
-	chanceModifier = chanceModifier or 1
-
 	local chance = module.CalculateDropChance(chanceModifier)
 	if not ChanceService.checkChance(chance) then
 		return

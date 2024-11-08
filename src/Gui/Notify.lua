@@ -227,4 +227,16 @@ function module.AchievementUnlocked(player, ui, frame, id)
 	achievementUi:Destroy()
 end
 
+function module.GameSaved(player, ui, frame)
+	frame.GameSaved.Visible = true
+	local icon = frame.GameSaved.Icon
+
+	local ti = TweenInfo.new(1, Enum.EasingStyle.Linear)
+
+	util.tween(icon, ti, { ImageTransparency = 0 }, false, function()
+		task.wait(2.5)
+		util.tween(icon, ti, { ImageTransparency = 1 })
+	end)
+end
+
 return module

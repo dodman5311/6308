@@ -417,11 +417,16 @@ Change perk award UI
 * Redesign arenas
 * Fix mule bags reload glitch
 
+----------------------------------------------------------------------------------------
 Fix grapple pausing issue
 
 Luck codex entry
 
 Select perk list
+
+Fix vending machines losing health with chicken perk
+
+Fix wrong music playing with warp upgrade
 
 Switching perks
 Weapon alt fires
@@ -429,6 +434,7 @@ Shotgun rail rifle
 Art gallery
 More perk
 Challenge mode
+----------------------------------------------------------------------------------------
 
 Entries = {
     All enemies

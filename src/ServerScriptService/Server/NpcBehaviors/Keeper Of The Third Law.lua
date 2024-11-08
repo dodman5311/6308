@@ -508,7 +508,7 @@ local function damaged(npc, health)
 		soulsLeft -= 1
 
 		if not npc.StatusEffects["Soul"] then
-			net:RemoteEvent("DropSoul"):FireAllClients(subject:GetPivot().Position, 400)
+			net:RemoteEvent("DropSoul"):FireAllClients(subject:GetPivot().Position, 1000)
 		end
 	end
 

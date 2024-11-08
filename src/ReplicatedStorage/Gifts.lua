@@ -302,7 +302,7 @@ and will be given extra jump in the air.
 		},
 
 		Overcharge = {
-			Icon = "rbxassetid://18415380600",
+			Icon = "rbxassetid://120254924259541",
 			Catagories = { "Arsenal" },
 			Desc = [[pistols damage now adds to <b>overcharge</b>.
 Other weapon damage activates <b>overcharge</b>.

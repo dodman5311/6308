@@ -18,6 +18,8 @@ local signals = require(Globals.Shared.Signals)
 local signal = require(Globals.Packages.Signal)
 
 local explosionService = require(Globals.Client.Services.ExplosionService)
+local giftService = require(Globals.Client.Services.GiftsService)
+local chanceService = require(Globals.Vendor.ChanceService)
 
 local damageRemote = Net:RemoteEvent("Damage")
 
@@ -149,7 +151,7 @@ module.Presets = {
 	},
 
 	Rocket = {
-		Speed = 300,
+		Speed = 400,
 		LifeTime = 10,
 		Info = { Size = 2, SplashRange = 20, SplashDamage = 1 },
 		Damage = 1,
@@ -449,6 +451,10 @@ RunService.Heartbeat:Connect(function()
 
 			module.projectileHit:Fire(raycast, projectile)
 		elseif hitModel then
+			if giftService.CheckUpgrade("Insurance") and chanceService.checkChance(50, false) then
+				projectile.Damage += 1
+			end
+
 			damageRemote:FireServer(hitModel, projectile.Damage)
 		end
 

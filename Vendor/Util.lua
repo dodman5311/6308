@@ -2,6 +2,7 @@ local util = {
 	bound = {},
 }
 local deb = game:GetService("Debris")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ts = game:GetService("TweenService")
 
 local rng = Random.new()
@@ -23,6 +24,16 @@ end
 
 function util.map(v, min1, max1, min2, max2)
 	return (v - min1) / (max1 - min1) * (max2 - min2) + min2
+end
+
+function util.getSetting(settingName)
+	local settings = require(ReplicatedStorage.Shared.GameSettings)
+
+	for i, v in ipairs(settings) do
+		if v.Name == settingName then
+			return v
+		end
+	end
 end
 
 local function typeOutTxt(label, text, letterPerSecond)

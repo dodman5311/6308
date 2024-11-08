@@ -98,7 +98,7 @@ local spinGifts = {
 		Icon = "rbxassetid://17631463771",
 		Catagories = { "Arsenal" },
 		Desc = "You gain a chance to deal double damage with assault rifles. (+1% chance)",
-		Chance = 75,
+		Chance = 65,
 		GoodLuck = true,
 	},
 
@@ -106,7 +106,7 @@ local spinGifts = {
 		Icon = "rbxassetid://17631463680",
 		Catagories = { "Arsenal" },
 		Desc = "You gain a chance to deal double damage with shotguns. (+1% chance)",
-		Chance = 75,
+		Chance = 65,
 		GoodLuck = true,
 	},
 
@@ -114,7 +114,7 @@ local spinGifts = {
 		Icon = "rbxassetid://17631463584",
 		Catagories = { "Arsenal" },
 		Desc = "You gain a chance to deal double damage with pistols. (+1% chance)",
-		Chance = 75,
+		Chance = 65,
 		GoodLuck = true,
 	},
 
@@ -122,7 +122,7 @@ local spinGifts = {
 		Icon = "rbxassetid://17631463457",
 		Catagories = { "Arsenal" },
 		Desc = "You gain a chance to deal double damage with melees. (+1% chance)",
-		Chance = 75,
+		Chance = 65,
 		GoodLuck = true,
 	},
 
@@ -130,7 +130,7 @@ local spinGifts = {
 		Icon = "rbxassetid://16422611287",
 		Catagories = { "Luck" },
 		Desc = "You gain a perk ticket.",
-		Chance = 30,
+		Chance = 15,
 		GoodLuck = true,
 	},
 
@@ -138,7 +138,7 @@ local spinGifts = {
 		Icon = "rbxassetid://16422611114",
 		Catagories = { "Luck" },
 		Desc = "You gain jack squat.",
-		Chance = 60,
+		Chance = 50,
 		GoodLuck = false,
 	},
 }
@@ -261,7 +261,7 @@ local function exit(frame)
 
 	frame.Frame.Visible = false
 	frame.Background.Visible = false
-	frame.Cursor.Visible = false
+	Signals.DoUiAction:Fire("Cursor", "Toggle", true, false)
 
 	util.tween(frame.Fade, ti, { BackgroundTransparency = 1 }, false, function()
 		frame.Gui.Enabled = false
@@ -318,17 +318,6 @@ function module.Init(player, ui, frame)
 	frame.Gui.Enabled = false
 	frame.Frame.Visible = false
 	frame.Background.Visible = false
-	frame.Cursor.Visible = false
-
-	RunService.RenderStepped:Connect(function()
-		if UserInputService.GamepadEnabled then
-			frame.Cursor.Visible = false
-			return
-		end
-
-		local mousePos = UserInputService:GetMouseLocation()
-		frame.Cursor.Position = UDim2.new(0, mousePos.X, 0, mousePos.Y)
-	end)
 
 	connectButtonHover(frame.UseSoul)
 	connectButtonHover(frame.UseTicket)
@@ -357,10 +346,10 @@ function module.Init(player, ui, frame)
 		frame.ExitButton.Visible = false
 
 		module.UpdateSouls(player, ui, frame, math.round(SoulsService.Souls))
-		module.soulCost = math.clamp(module.soulCost + 1, 1, 25)
+		--module.soulCost = math.clamp(module.soulCost + 1, 1, 25)
 
-		if GiftsService.CheckUpgrade("Quality Sauce") then
-			costIsDoubled = chanceService.checkChance(5, false)
+		if GiftsService.CheckUpgrade("A+ Dough") then
+			costIsDoubled = chanceService.checkChance(15, false)
 			print(costIsDoubled)
 		else
 			costIsDoubled = false
@@ -449,7 +438,7 @@ function module.ShowScreen(player, ui, frame, playerSouls)
 		return
 	end
 
-	if GiftsService.CheckUpgrade("Quality Sauce") then
+	if GiftsService.CheckUpgrade("A+ Dough") then
 		spinGifts.Nothing = nil
 		spinGifts.Small_Magazine = nil
 		spinGifts.Kevlar = nil
@@ -472,7 +461,7 @@ function module.ShowScreen(player, ui, frame, playerSouls)
 	module.UpdateSouls(player, ui, frame, SoulsService.Souls)
 
 	local ti = TweenInfo.new(0.25, Enum.EasingStyle.Linear)
-	frame.Cursor.Visible = true
+	Signals.DoUiAction:Fire("Cursor", "Toggle", true, true)
 
 	frame.SelectButtons.Visible = true
 	frame.CatagoryButtons.Visible = false
@@ -728,7 +717,7 @@ local function showDescription(frame, gift, rapido)
 end
 
 function module.TakeDelivery(player, ui, frame, gift, rapido)
-	frame.Cursor.Visible = false
+	Signals.DoUiAction:Fire("Cursor", "Toggle", true, false)
 
 	showDescription(frame, gift, rapido)
 
@@ -739,7 +728,7 @@ function module.TakeDelivery(player, ui, frame, gift, rapido)
 	frame.SwitchFrame.Image.Position = UDim2.fromScale(0, 0)
 	frame.SelectButtons.Visible = true
 	frame.CatagoryButtons.Visible = false
-	frame.Cursor.Visible = true
+	Signals.DoUiAction:Fire("Cursor", "Toggle", true, true)
 	frame.ExitButton.Visible = true
 
 	frame.SoulCost.Visible = true

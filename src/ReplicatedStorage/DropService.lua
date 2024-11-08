@@ -70,7 +70,7 @@ local function checkForDrops()
 			return
 		end
 
-		drop.CFrame = drop.CFrame:Lerp(characterCFrame, 0.15)
+		drop.CFrame = drop.CFrame:Lerp(characterCFrame, 0.25)
 	end
 end
 

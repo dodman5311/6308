@@ -82,7 +82,8 @@ function module.checkChance(chance, goodLuck, PureLuck)
 	end
 
 	if
-		not PureLuck
+		goodLuck ~= false
+		and not PureLuck
 		and giftService.CheckGift("Take_Two")
 		and player.Character
 		and player.Character:WaitForChild("Humanoid").Health <= 1
@@ -95,18 +96,6 @@ function module.checkChance(chance, goodLuck, PureLuck)
 	end
 
 	return false
-end
-
-function module.doWithChance(chance, useLuck, callback, ...)
-	if useLuck then
-		chance += module.getLuck()
-	end
-
-	if rng:NextNumber(0, 100) > chance then
-		return
-	end
-
-	return callback(...)
 end
 
 Net:RemoteFunction("CheckChance").OnClientInvoke = function(chance, goodLuck)

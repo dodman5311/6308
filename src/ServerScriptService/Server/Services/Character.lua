@@ -46,7 +46,7 @@ end
 
 Players.PlayerAdded:Connect(function(player: Player)
 	player.CharacterAdded:Connect(function(character)
-		local humanoid = character:WaitForChild("Humanoid")
+		local humanoid: Humanoid = character:WaitForChild("Humanoid")
 		humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
 
 		for _, part in ipairs(character:GetDescendants()) do
@@ -101,6 +101,16 @@ end)
 local function onDied(player: Player)
 	mapService.CurrentStage = 1
 	mapService.CurrentLevel = 1
+
+	if player:GetAttribute("UpgradeName") == "Sister Location" then
+		mapService.CurrentStage = 2
+		mapService.CurrentLevel = 1
+	end
+
+	if player:GetAttribute("UpgradeName") == "Pizza Chain" then
+		mapService.CurrentStage = 3
+		mapService.CurrentLevel = 1
+	end
 
 	dataStore.saveGameState(player, {})
 

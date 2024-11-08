@@ -10,6 +10,7 @@ local Globals = require(ReplicatedStorage.Shared.Globals)
 local signal = require(Globals.Packages.Signal)
 local signals = require(Globals.Signals)
 local codex = require(Globals.Shared.Codex)
+local net = require(Globals.Packages.Net)
 
 --// Values
 
@@ -18,7 +19,17 @@ signals.AddEntry = signal.new()
 
 module.latestEntry = nil
 
-function module.AddEntry(entryIndex, quiet)
+function module.saveCurrentCodex()
+	local codexToSave = {}
+
+	for index, entry in pairs(module.CodexEntries) do
+		codexToSave[index] = entry.Viewed
+	end
+
+	net:RemoteEvent("SaveData"):FireServer("PlayerCodex", codexToSave)
+end
+
+function module.AddEntry(entryIndex: string, quiet: boolean?, doNotSave: boolean?)
 	if module.CodexEntries[entryIndex] or not codex[entryIndex] then
 		return
 	end
@@ -36,15 +47,24 @@ function module.AddEntry(entryIndex, quiet)
 		module.latestEntry = entryIndex
 	end
 
+	if not doNotSave then
+		module.saveCurrentCodex()
+	end
+
 	signals.DoUiAction:Fire("Notify", "AddEntry", true, entryIndex, isImportant)
 end
 
 signals.AddEntry:Connect(module.AddEntry)
 
-function module:OnSpawn()
-	module.AddEntry("Cleanse & Repent")
-	module.AddEntry("The Iron Gate")
-	module.AddEntry("Info & Tips")
-end
+signals.LoadSavedDataFromClient:Connect(function(upgradeIndex, gameState, gameSettings, savedCodex) -- load codex
+	for entryIndex, viewed in pairs(savedCodex) do
+		module.CodexEntries[entryIndex] = codex[entryIndex]
+		module.CodexEntries[entryIndex].Viewed = viewed
+	end
+
+	module.AddEntry("Cleanse & Repent", false, true)
+	module.AddEntry("The Iron Gate", false, true)
+	module.AddEntry("Info & Tips", false, true)
+end)
 
 return module

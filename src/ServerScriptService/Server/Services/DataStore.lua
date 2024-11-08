@@ -48,7 +48,7 @@ local function LoadData(player: Player, dataStore: DataStore) -- load data
 	end
 end
 
-local function SaveData(player: Player, dataStore: DataStore, value)
+local function SaveToStore(player: Player, dataStore: DataStore, value)
 	local success, errorMessage = pcall(function()
 		dataStore:SetAsync("Pizza_Guy_" .. player.UserId, value)
 	end)
@@ -61,12 +61,22 @@ local function SaveData(player: Player, dataStore: DataStore, value)
 	end
 end
 
+function module.SaveData(player, dataStoreName, value)
+	local startTime = os.clock()
+
+	local dataStore = DataStoreService:GetDataStore(dataStoreName)
+	SaveToStore(player, dataStore, value)
+
+	print(dataStoreName, "saved in", os.clock() - startTime)
+end
+
 function module.LoadGameData(player)
 	local startTime = os.clock()
 	local upgradeIndex = LoadData(player, DataStoreService:GetDataStore("PlayerUpgradeIndex")) or 0
 	local gameSettings = LoadData(player, DataStoreService:GetDataStore("PlayerSettings")) or {}
 	local gameState = LoadData(player, DataStoreService:GetDataStore("PlayerGameState")) or {}
 	local furthestLevel = LoadData(player, DataStoreService:GetDataStore("PlayerFurthestLevel")) or 0
+	local codex = LoadData(player, DataStoreService:GetDataStore("PlayerCodex")) or {}
 
 	player:SetAttribute("furthestLevel", furthestLevel)
 	player:SetAttribute("UpgradeIndex", upgradeIndex)
@@ -77,13 +87,26 @@ function module.LoadGameData(player)
 	mapService.CurrentStage = gameState["Stage"] and math.clamp(gameState["Stage"], 1, math.huge) or 1
 	mapService.CurrentLevel = gameState["Level"] and math.clamp(gameState["Level"], 1, math.huge) or 1
 
-	print(mapService.CurrentStage, mapService.CurrentLevel)
+	signals.ActivateUpgrade:Fire(player, permaUpgradeName)
+
+	if permaUpgradeName == "Sister Location" and mapService.CurrentStage < 2 then
+		mapService.CurrentStage = 2
+		mapService.CurrentLevel = 1
+	end
+
+	if permaUpgradeName == "Pizza Chain" and mapService.CurrentStage < 3 then
+		mapService.CurrentStage = 3
+		mapService.CurrentLevel = 1
+	end
+
+	if permaUpgradeName == "Gourmet Kitchen Knife" then
+		ReplicatedStorage.Assets.Models.WeaponPickups.Katana:Destroy()
+	end
 
 	mapService.proceedToNext(nil, true)
 	--signals["ProceedToNextLevel"]:Fire(nil, true)
 
-	signals.ActivateUpgrade:Fire(player, permaUpgradeName)
-	net:RemoteEvent("LoadData"):FireClient(player, upgradeIndex, gameState, gameSettings)
+	net:RemoteEvent("LoadData"):FireClient(player, upgradeIndex, gameState, gameSettings, codex)
 	return os.clock() - startTime
 end
 
@@ -91,27 +114,32 @@ end
 -- 	SaveData(player, "PlayerGameState", gameState)
 -- end)
 
-function module.saveGameState(player, gameState)
-	local dataStore = DataStoreService:GetDataStore("PlayerGameState")
-	gameState.Stage = mapService.CurrentStage
-	gameState.Level = mapService.CurrentLevel
-	SaveData(player, dataStore, gameState)
+function module.saveFurthestLevel(player)
+	local level = workspace:GetAttribute("Level")
+	local stage = workspace:GetAttribute("Stage")
 
-	local plusStage = (gameState.Stage - 1) * 5
-	local totalLevel = plusStage + gameState.Level
+	local plusStage = (stage - 1) * 5
+	local totalLevel = plusStage + level
 
 	if totalLevel > player:GetAttribute("furthestLevel") then
 		player:SetAttribute("furthestLevel", totalLevel)
-		print(player:GetAttribute("furthestLevel"))
-		SaveData(player, DataStoreService:GetDataStore("PlayerFurthestLevel"), totalLevel)
+		SaveToStore(player, DataStoreService:GetDataStore("PlayerFurthestLevel"), totalLevel)
 	end
 end
 
-net:Connect("SaveGameState", module.saveGameState)
+function module.saveGameState(player, gameState)
+	local startTime = os.clock()
 
-net:Connect("SaveData", function(player, dataStoreName, value)
-	local dataStore = DataStoreService:GetDataStore(dataStoreName)
-	SaveData(player, dataStore, value)
-end)
+	local dataStore = DataStoreService:GetDataStore("PlayerGameState")
+	gameState.Stage = mapService.CurrentStage
+	gameState.Level = mapService.CurrentLevel
+	SaveToStore(player, dataStore, gameState)
+
+	print("Game saved in", os.clock() - startTime)
+end
+
+net:Connect("SaveGameState", module.saveGameState)
+net:Connect("SaveFurthestLevel", module.saveFurthestLevel)
+net:Connect("SaveData", module.SaveData)
 
 return module

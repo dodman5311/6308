@@ -7,6 +7,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local lighting = game:GetService("Lighting")
+local StarterGui = game:GetService("StarterGui")
 local UserInputService = game:GetService("UserInputService")
 
 --// Instances
@@ -81,11 +82,54 @@ function module.attemptResume(index)
 	signals.ResumeGame:Fire()
 end
 
+local function progressTo(level)
+	if level >= 1 then
+		signals["AddGift"]:Fire("Master_Scouting")
+	end
+
+	if level >= 2 then
+		local r = math.random(1, 3)
+
+		if r == 1 then
+			signals["AddGift"]:Fire("Brick_Hook")
+		elseif r == 2 then
+			signals["AddGift"]:Fire("Righteous_Motion")
+		elseif r == 3 then
+			signals["AddGift"]:Fire("Spiked_Sabatons")
+		end
+	end
+
+	if level >= 3 then
+		signals["AddGift"]:Fire("Overcharge")
+	end
+end
+
 function module:OnSpawn(character, humanoid)
 	ChanceService.luck = 0
 	ChanceService.repetitionLuck = 0
 
 	signals.DoUiAction:Fire("HUD", "Cleanup", true, humanoid.Health, humanoid.MaxHealth)
+
+	if giftService.CheckUpgrade("Order Wheel") then
+		signals.AddGift:Fire("Speed_Demon")
+		signals.AddGift:Fire("SpeedRunner")
+	end
+
+	if giftService.CheckUpgrade("Insurance") then
+		signals.AddGift:Fire("Haven")
+	end
+
+	if giftService.CheckUpgrade("Quality Sauce") then
+		signals.AddGift:Fire("Sauce_Is_Fuel")
+	end
+
+	if giftService.CheckUpgrade("Sister Location") then
+		progressTo(2)
+	end
+
+	if giftService.CheckUpgrade("Pizza Chain") then
+		progressTo(4)
+	end
 
 	signals.DoUiAction:Fire("Kiosk", "resetCost", true)
 	signals.DoUiAction:Fire("HUD", "UpdatePlayerHealth", true, humanoid.Health, humanoid.MaxHealth)
@@ -418,12 +462,17 @@ local function exitS2(extraSouls, totalLevel, level, stageBoss, miniBoss, stage)
 		}
 
 		net:RemoteEvent("SaveGameState"):FireServer(gameState)
+		signals.DoUiAction:Fire("Notify", "GameSaved", false)
 	end
 
-	camera.FieldOfView = 120
+	net:RemoteEvent("SaveFurthestLevel"):FireServer()
+
+	camera.FieldOfView = 1000
 	local ti = TweenInfo.new(1, Enum.EasingStyle.Exponential)
 
-	util.tween(camera, ti, { FieldOfView = 70 })
+	print(util.getSetting("Field of View").Value, true)
+
+	util.tween(camera, ti, { FieldOfView = util.getSetting("Field of View").Value })
 end
 
 local function ExitSequence(levelData, level, stageBoss, miniBoss, stage)
@@ -450,7 +499,7 @@ local function ExitSequence(levelData, level, stageBoss, miniBoss, stage)
 	net:RemoteEvent("ProceedToNextLevel"):FireServer()
 end
 
-net:Connect("LoadData", function(upgradeIndex, gameState)
+signals.LoadSavedDataFromClient:Connect(function(upgradeIndex, gameState)
 	if not Player.Character then
 		Player.CharacterAdded:Wait()
 	end
@@ -570,6 +619,8 @@ signals.ToggleMenu:Connect(function()
 end)
 
 GuiService.MenuOpened:Connect(function()
+	StarterGui:SetCore("ResetButtonCallback", false)
+
 	module.attemptPause("RegPause")
 	UIService.doUiAction("Paused", "Pause", true, true)
 end)
@@ -577,13 +628,6 @@ end)
 GuiService.MenuClosed:Connect(function()
 	module.attemptResume("RegPause")
 	UIService.doUiAction("Paused", "Pause", true, false)
-end)
-
-net:Connect("LoadData", function()
-	if giftService.CheckUpgrade("Order Wheel") then
-		signals.AddGift:Fire("Speed_Demon")
-		signals.AddGift:Fire("SpeedRunner")
-	end
 end)
 
 return module

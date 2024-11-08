@@ -117,7 +117,9 @@ This transformation usually occurs in militants, as their lifestyle glorifies th
 
 	["Everlasting"] = {
 		Catagory = "Enemies",
-		Entry = [[<font color="#FF7800"><b>Shoot their heart for extra damage.</b></font>
+		Entry = [[<font color="#FF7800"><b>Shoot their heart for extra damage.
+
+Resistant to shotguns.</b></font>
 		
 An Everlasting is created when a weak demon is overpowered by its host's undying will to survive.
 
@@ -162,7 +164,9 @@ They now roam the sewers, adorned with the tools of a hopeful ceremony, tolling 
 
 	["Dreadful"] = {
 		Catagory = "Enemies",
-		Entry = [[The Dreadful are the result of a horrid, abhorrent demon taking over the flesh of its host. While not necessarily strong, these demons harbor a hateful will unseen by many in the land of the living.
+		Entry = [[<font color="#FF7800"><b>Resistant to melee weapons.</b></font>
+		
+The Dreadful are the result of a horrid, abhorrent demon taking over the flesh of its host. While not necessarily strong, these demons harbor a hateful will unseen by many in the land of the living.
 
 They infect, corrupt, and destroy the mind and body of their host, warping and combining their flesh with metal to protect their unholy form. They spew explosive bile infused with burning chemicals and a hateful intent.
 
@@ -209,7 +213,7 @@ This is a creature of madness and brutality. There is no mercy in the likes of a
 		Catagory = "Weapons",
 		Entry = [[A pair of M45A1 Pistols, the most common pistols found in the Suburbs.
 
-After obtaining the left from a downed lunatic and the right from a church of refuge, you named them Cleanse & Repent. This marked the beginning of your path—to cleanse the world and make those who participated in its destruction repent.
+After obtaining the left from a downed citizen and the right from a church of refuge, you named them Cleanse & Repent. This marked the beginning of your path—to cleanse the world and make those who participated in its destruction repent.
 
 They will be by your side to the end, whether in victory or beyond the dark veil of death.]],
 	},

@@ -56,6 +56,26 @@ local weaponIcons = {
 	AR = "rbxassetid://18298954616",
 }
 
+local function Lerp(num, goal, i)
+	return num + (goal - num) * i
+end
+
+local function map(n, start, stop, newStart, newStop, withinBounds)
+	local value = ((n - start) / (stop - start)) * (newStop - newStart) + newStart
+
+	-- Returning basic value.
+	if not withinBounds then
+		return value
+	end
+
+	-- Returns Values constrained to exact Range.
+	if newStart < newStop then
+		return math.max(math.min(value, newStop), newStart)
+	else
+		return math.max(math.min(value, newStart), newStop)
+	end
+end
+
 local function setDownSelection(frame, downSelectionButton)
 	for _, v in ipairs(frame.Main.Buttons:GetChildren()) do
 		v.NextSelectionDown = downSelectionButton
@@ -223,7 +243,9 @@ local function setSliderToValue(barFrame, input, maxValue)
 		alphaValue = 0
 	end
 
-	local value = alphaValue * maxValue
+	--local value = alphaValue * maxValue
+
+	local value = Lerp(maxValue.Min, maxValue.Max, alphaValue)
 
 	barFrame.Parent.Value.Text = math.round(value)
 	barFrame.Bar.Size = UDim2.fromScale(alphaValue, 1)
@@ -345,12 +367,12 @@ local buttonFunctions = {
 	},
 }
 
-local function Lerp(num, goal, i)
-	return num + (goal - num) * i
-end
-
-function module.Init(player, ui, frame)
+function module.Init(player: Player, ui, frame)
 	frame.Gui.Enabled = false
+
+	if player:GetAttribute("furthestLevel") > 1 then
+		ui.HUD.OpenMenuPrompt_T.Visible = false
+	end
 
 	for _, button in ipairs(frame.Gui:GetDescendants()) do
 		if not button:IsA("TextButton") then
@@ -875,8 +897,10 @@ local function loadSettings(frame)
 			newSettingsButton.SettingName.Text = settingTable.Name
 
 			local barFrame: Frame = newSettingsButton.BarFrame
-
-			barFrame.Bar.Size = UDim2.fromScale(settingTable.Value / settingTable.MaxValue, 1)
+			barFrame.Bar.Size = UDim2.fromScale(
+				map(settingTable.Value, settingTable.MaxValue.Min, settingTable.MaxValue.Max, 0, 1, false),
+				1
+			)
 
 			local mouseDown = false
 
@@ -1081,23 +1105,17 @@ local function saveSettings(player)
 	net:RemoteEvent("SaveData"):FireServer("PlayerSettings", settingsToSave)
 end
 
+local function saveCodex()
+	codexService.saveCurrentCodex()
+end
+
 function module.Open(player, ui, frame)
 	ui.HUD.OpenMenuPrompt_T.Visible = false
 	mapInFocus = false
-	frame.Cursor.Visible = true
+	Signals.DoUiAction:Fire("Cursor", "Toggle", true, true)
 	Signals["SetMobileControlsVisible"]:Fire(false)
 
 	setDownSelection(frame)
-
-	RunService:BindToRenderStep("ProcessCursor", Enum.RenderPriority.Camera.Value, function()
-		if UserInputService.GamepadEnabled then
-			frame.Cursor.Visible = false
-			return
-		end
-
-		local mousePos = UserInputService:GetMouseLocation()
-		frame.Cursor.Position = UDim2.new(0, mousePos.X, 0, mousePos.Y)
-	end)
 
 	frame.Gui.Enabled = true
 	Lighting.PauseBlur.Enabled = true
@@ -1127,7 +1145,7 @@ function module.Close(player, ui, frame)
 	hideAllMenus(frame)
 	Signals["SetMobileControlsVisible"]:Fire(true)
 
-	RunService:UnbindFromRenderStep("ProcessCursor")
+	Signals.DoUiAction:Fire("Cursor", "Toggle", true, false)
 
 	Lighting.PauseBlur.Enabled = false
 	frame.Gui.Enabled = false
@@ -1146,6 +1164,7 @@ function module.Close(player, ui, frame)
 	end
 
 	saveSettings(player)
+	saveCodex()
 end
 
 function module.Toggle(player, ui, frame)

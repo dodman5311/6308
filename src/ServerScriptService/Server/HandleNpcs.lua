@@ -468,7 +468,7 @@ net:Connect("GiftAdded", function(player, gift)
 	for _, Npc in ipairs(Npcs) do
 		local humanoid = Npc.Instance:WaitForChild("Humanoid")
 		if not humanoid then
-			return
+			continue
 		end
 
 		if humanoid.MaxHealth > 1 then
@@ -490,19 +490,34 @@ end)
 
 Signals.ActivateUpgrade:Connect(function(player, upgradeName)
 	if upgradeName == "Order Wheel" then
-		for _, v in ipairs(Enemies:GetChildren()) do
-			if not v:GetAttribute("Level") then
-				continue
-			end
-			v:SetAttribute("Level", NumberRange.new(v:GetAttribute("Level").Min - 1, v:GetAttribute("Level").Max))
-		end
+		-- for _, v in ipairs(Enemies:GetChildren()) do
+		-- 	if not v:GetAttribute("Level") then
+		-- 		continue
+		-- 	end
+		-- 	v:SetAttribute("Level", NumberRange.new(v:GetAttribute("Level").Min - 1, v:GetAttribute("Level").Max))
+		-- end
+
+		Enemies.Divine:SetAttribute("Level", NumberRange.new(0, 1000))
 	end
 
-	if upgradeName == "Smart Fridge" then
-		Enemies.Npcs.VendingMachine["Garbage Vending Machine"].Humanoid.Health = 2
-		Enemies.Npcs.VendingMachine["Basic Vending Machine"].Humanoid.Health = 2
-		Enemies.Npcs.VendingMachine["Epic Vending Machine"].Humanoid.Health = 2
-	end
+	-- if upgradeName == "Smart Fridge" then
+	-- 	Enemies.Npcs.VendingMachine["Garbage Vending Machine"].Humanoid.Health = 2
+	-- 	Enemies.Npcs.VendingMachine["Basic Vending Machine"].Humanoid.Health = 2
+	-- 	Enemies.Npcs.VendingMachine["Epic Vending Machine"].Humanoid.Health = 2
+
+	-- 	for _, Npc in ipairs(Npcs) do
+	-- 		if not string.match(Npc.Instance.Name, "Vending Machine") then
+	-- 			continue
+	-- 		end
+
+	-- 		local humanoid = Npc.Instance:WaitForChild("Humanoid")
+	-- 		if not humanoid then
+	-- 			continue
+	-- 		end
+
+	-- 		humanoid.Health = 2
+	-- 	end
+	-- end
 end)
 
 return module

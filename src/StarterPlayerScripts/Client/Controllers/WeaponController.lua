@@ -270,24 +270,29 @@ function module.UpdateAmmo(amount)
 end
 
 local function playVoiceLine()
-	ChanceService.doWithChance(1, true, function()
+	if ChanceService.checkChance(1, true, true) then
 		local voiceLines = assets.Sounds.VoiceLines
 		local voiceLine = util.getRandomChild(voiceLines)
 
 		voiceSound.SoundId = voiceLine.SoundId
 		voiceSound:Play()
-	end)
+	end
 end
 
 function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloaded)
 	signals.DoUiAction:Fire("HUD", "hideReload", true)
 
 	lockTimer:Cancel()
-	acts:waitForAct("Throwing", "Equipping")
+
+	if pickupType == "FakeDefault" then
+		acts:waitForAct("Equipping")
+	else
+		acts:waitForAct("Throwing", "Equipping")
+	end
 
 	acts:createAct("Equipping")
 
-	if pickupType ~= "SlotSwitch" then
+	if pickupType ~= "SlotSwitch" and pickupType ~= "FakeDefault" then
 		signals.DoUiAction:Fire("Notify", "ShowWeapon", true, weaponName)
 	end
 
@@ -297,7 +302,7 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 		if GiftsService.CheckGift("Mule_Bags") and slotIsEmpty then
 			module.SwitchToSlot(emptySlot)
 		else
-			module.Throw()
+			module.Throw(nil, true)
 		end
 	end
 
@@ -402,12 +407,18 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 		module.UpdateSlot()
 	end
 
-	acts:removeAct("Equipping")
 	signals.WeaponEquipped:Fire(weaponName, weaponData["BlockTime"])
+	acts:removeAct("Equipping")
 end
 
 local function EquipDefault(ignoreAmmo)
 	signals.DoUiAction:Fire("HUD", "hideReload", true)
+
+	if GiftsService.CheckUpgrade("Gourmet Kitchen Knife") then
+		module.EquipWeapon("Katana", "FakeDefault", nil, math.huge, true, true)
+		return
+	end
+
 	animationService:stopAnimation(viewmodel.Model, "Equip", 0)
 	animationService:playAnimation(viewmodel.Model, "DefaultIdle", Enum.AnimationPriority.Core.Value, false, 0)
 
@@ -751,6 +762,43 @@ local function awardKill(model, position)
 	end
 end
 
+local function checkImmunity(subject, source)
+	local immunityString = subject:GetAttribute("Immunity")
+
+	if not immunityString then
+		return false
+	end
+
+	local immunities = string.split(immunityString, ",")
+	for _, immunity in ipairs(immunities) do
+		if immunity == source then
+			return true
+		end
+
+		local sourceIsWeapon = assets.Models.Weapons:FindFirstChild(source)
+
+		if not sourceIsWeapon then
+			if source == "Default" then
+				if immunity == "Pistol" then
+					return true
+				end
+			end
+
+			return false
+		end
+
+		local sourceData = require(sourceIsWeapon.Data)
+
+		if immunity == sourceData.Type then
+			return true
+		end
+
+		if immunity == sourceData.Effect then
+			return true
+		end
+	end
+end
+
 function module.dealDamage(cframe, subject, damage, source, element)
 	if not subject or Players:GetPlayerFromCharacter(subject) then
 		return
@@ -759,6 +807,13 @@ function module.dealDamage(cframe, subject, damage, source, element)
 	local humanoid, model = findHumanoid(subject)
 
 	if not humanoid then
+		return
+	end
+
+	local isImmune = checkImmunity(model, source)
+
+	if isImmune and humanoid.Health > 0 then
+		signals.DoUiAction:Fire("HUD", "ShowImmune", true)
 		return
 	end
 
@@ -799,8 +854,8 @@ function module.dealDamage(cframe, subject, damage, source, element)
 	local boringDamage = consecutiveHits >= 5 and 1 or 0
 	local subjectPosition = subject:GetPivot().Position
 
-	if GiftsService.CheckGift("Open_Wounds") then
-		ChanceService.doWithChance(10, true, createFakeWeakpoint, model, subject, cframe.Position)
+	if GiftsService.CheckGift("Open_Wounds") and ChanceService.checkChance(10, true) then
+		createFakeWeakpoint(model, subject, cframe.Position)
 	end
 
 	local totalDamage = damage + deadshotDamage + weakspotDamage + boringDamage + siuDamage + soulElementDamage
@@ -828,7 +883,7 @@ function module.dealDamage(cframe, subject, damage, source, element)
 		end
 
 		if element then
-			if ChanceService.checkChance(50, true) then
+			if ChanceService.checkChance(GiftsService.CheckUpgrade("Brick Oven") and 75 or 50, true) then
 				codexService.AddEntry("Elements")
 			else
 				element = nil
@@ -1197,7 +1252,7 @@ local function LockOn()
 end
 
 function module.Fire()
-	if acts:checkAct("IsBlocking", "Reloading") then
+	if acts:checkAct("IsBlocking", "Reloading") or currentAmmo == 0 then
 		return
 	end
 
@@ -1522,7 +1577,12 @@ function module.SwitchToSlot(slotNumber)
 	module.UpdateAmmo(slot.Ammo)
 end
 
-function module.Throw(outOfAmmo)
+function module.Throw(outOfAmmo, dontSwitchToDefault)
+	if GiftsService.CheckUpgrade("Gourmet Kitchen Knife") and module.currentWeapon.Name == "Katana" then
+		module.Unequip()
+		return
+	end
+
 	if not outOfAmmo and acts:checkAct("Throwing") then
 		return
 	end
@@ -1547,7 +1607,10 @@ function module.Throw(outOfAmmo)
 	)
 
 	animation.Ended:Wait()
-	EquipDefault()
+
+	if not dontSwitchToDefault then
+		EquipDefault()
+	end
 
 	acts:removeAct("Throwing")
 end
@@ -1618,13 +1681,11 @@ function module.OnBlock()
 	util.PlaySound(assets.Sounds.Blocked, script, 0.05)
 	util.PlaySound(util.getRandomChild(assets.Sounds.Ricochets), script, 0.1)
 
-	if GiftsService.CheckGift("Martial_Grace") then
-		ChanceService.doWithChance(30, true, function()
-			assets.Sounds.MartialHeal:Play()
+	if GiftsService.CheckGift("Martial_Grace") and ChanceService.checkChance(30, true) then
+		assets.Sounds.MartialHeal:Play()
 
-			signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Martial_Grace")
-			net:RemoteEvent("Damage"):FireServer(player.Character, -1)
-		end)
+		signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Martial_Grace")
+		net:RemoteEvent("Damage"):FireServer(player.Character, -1)
 	end
 
 	if GiftsService.CheckGift("Ultra_Slayer") then
@@ -1750,7 +1811,11 @@ UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
 		end
 	end
 
-	if (input.KeyCode == Enum.KeyCode.X or input.KeyCode == Enum.KeyCode.ButtonB) and module.currentWeapon then
+	if
+		(input.KeyCode == Enum.KeyCode.X or input.KeyCode == Enum.KeyCode.ButtonB)
+		and module.currentWeapon
+		and not (GiftsService.CheckUpgrade("Gourmet Kitchen Knife") and module.currentWeapon.Name == "Katana")
+	then
 		module.Throw()
 	end
 
@@ -1923,6 +1988,12 @@ end)
 GiftsService.OnGiftRemoved:Connect(function(gift)
 	if gift == "Tacticool" then
 		UIService.doUiAction("HUD", "ToggleReloadPrompt", true, false)
+	end
+end)
+
+signals.LoadSavedDataFromClient:Connect(function()
+	if player:GetAttribute("furthestLevel") > 1 then
+		module.HasHitMachine = true
 	end
 end)
 

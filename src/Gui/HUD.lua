@@ -27,6 +27,7 @@ grappleIncicatorSpring.Speed = 10
 local frameDelay = 0.045
 local targetEnemy = Instance.new("ObjectValue")
 local boss
+local rng = Random.new()
 
 --// Functions
 function module.getObjectInCenter(center, player)
@@ -158,7 +159,7 @@ function module.Init(player, ui, frame)
 
 		module.SetUpEnemyHealth(player, ui, frame, humanoid.MaxHealth, value.Name)
 		module.UpdateEnemyHealth(player, ui, frame, humanoid.Health, humanoid.MaxHealth, value.Name, true)
-		module.showSoulChance(player, ui, frame, humanoid.MaxHealth)
+		--module.showSoulChance(player, ui, frame, humanoid.MaxHealth)
 		module.ShowEnemyHealthBar(player, ui, frame)
 
 		currentHealthChanged = humanoid.HealthChanged:Connect(function(Health)
@@ -315,12 +316,29 @@ function module.ShowHit(_, _, frame, crit)
 	end)
 end
 
+function module.ShowImmune(_, _, frame)
+	util.PlaySound(util.getRandomChild(sounds.Immune), script, 0.1)
+
+	local x = frame.CrosshairFrame.X
+	x.Visible = true
+
+	for _ = 0, 4 do
+		x.Position = UDim2.fromScale(rng:NextNumber(0.45, 0.55), rng:NextNumber(0.45, 0.55))
+		task.wait()
+	end
+	x.Position = UDim2.fromScale(0.5, 0.5)
+	x.Visible = false
+end
+
 function module.UpdateAmmo(_, _, frame, amount)
 	local ammoFrame = frame.Ammo
 	local label = ammoFrame.Count
 
 	UiAnimator.PlayAnimation(ammoFrame, frameDelay)
 	label.Text = amount
+
+	label.Visible = amount ~= math.huge
+	ammoFrame.Inf.Visible = amount == math.huge
 end
 
 function module.UpdateSouls(_, _, frame, amount)

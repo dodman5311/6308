@@ -1,5 +1,6 @@
 local module = {}
 
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
@@ -8,6 +9,8 @@ local npcHandler = require(Globals.Server.HandleNpcs)
 local animationService = require(Globals.Vendor.AnimationService)
 local net = require(Globals.Packages.Net)
 local vfx = net:RemoteEvent("ReplicateEffect")
+local doUiAction = net:RemoteEvent("DoUiAction")
+local signals = require(Globals.Signals)
 
 net:RemoteEvent("ApplyElement")
 
@@ -67,7 +70,28 @@ local elements = {
 	},
 }
 
-function module.applyElement(_, npcModel, elementName)
+local function runElementDamage(player, timer, npcModel, elementName)
+	if
+		player:GetAttribute("UpgradeName") ~= "Brick Oven"
+		or elementName == "Soul"
+		or npcModel:GetAttribute(elementName)
+	then
+		return
+	end
+
+	local lastStepTime = 0
+	timer.OnTimerStepped:Connect(function(currentTimeInTimer)
+		if math.floor(currentTimeInTimer) ~= lastStepTime then
+			local humanoid = npcModel:FindFirstChild("Humanoid")
+			humanoid:TakeDamage(1)
+			doUiAction:FireAllClients("HUD", "ShowHit", true)
+		end
+
+		lastStepTime = math.floor(currentTimeInTimer)
+	end)
+end
+
+function module.applyElement(player, npcModel, elementName)
 	if not elementName then
 		return
 	end
@@ -82,6 +106,8 @@ function module.applyElement(_, npcModel, elementName)
 
 	local elementTimer = npc:GetTimer(elementName)
 	elementTimer.WaitTime = element.time
+
+	runElementDamage(player, elementTimer, npcModel, elementName)
 
 	npc.Instance:SetAttribute(elementName, true)
 	npc.StatusEffects[elementName] = true
@@ -103,5 +129,14 @@ function module.applyElement(_, npcModel, elementName)
 end
 
 net:Connect("ApplyElement", module.applyElement)
+signals.ActivateUpgrade:Connect(function(upgradeName)
+	if upgradeName ~= "Brick Oven" then
+		return
+	end
+
+	for key, element in pairs(elements) do
+		element.time -= 1
+	end
+end)
 
 return module
