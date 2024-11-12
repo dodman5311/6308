@@ -39,9 +39,9 @@ function module.CalculateDropChance(chanceMod)
 
 	chance /= (1 + (module.Souls / 5))
 
-	if GiftsService.CheckUpgrade("Quality Sauce") then
-		chance /= 1.10
-	end
+	-- if GiftsService.CheckUpgrade("Quality Sauce") then
+	-- 	chance /= 1.10
+	-- end
 
 	if GiftsService.CheckGift("Drav_Is_Dead") then
 		return 0

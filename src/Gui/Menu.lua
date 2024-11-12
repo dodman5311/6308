@@ -7,6 +7,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Lighting = game:GetService("Lighting")
 local RunService = game:GetService("RunService")
+local TeleportService = game:GetService("TeleportService")
 local UserInputService = game:GetService("UserInputService")
 
 --// Instances
@@ -399,11 +400,19 @@ function module.Init(player: Player, ui, frame)
 	end
 
 	frame.Restart.MouseButton1Click:Connect(function()
-		if frame.ConfirmRestartFrame.Visible then
+		if frame.ConfirmRestartFrame.Visible or frame.ConfirmReturnFrame.Visible then
 			return
 		end
 
 		frame.ConfirmRestartFrame.Visible = true
+	end)
+
+	frame.Return.MouseButton1Click:Connect(function()
+		if frame.ConfirmReturnFrame.Visible or frame.ConfirmRestartFrame.Visible then
+			return
+		end
+
+		frame.ConfirmReturnFrame.Visible = true
 	end)
 
 	frame.ConfirmRestart.MouseButton1Click:Connect(function()
@@ -416,6 +425,23 @@ function module.Init(player: Player, ui, frame)
 
 	frame.CancelRestart.MouseButton1Click:Connect(function()
 		frame.ConfirmRestartFrame.Visible = false
+	end)
+
+	frame.ConfirmReturn.MouseButton1Click:Connect(function()
+		local loadingScreen = ReplicatedStorage.LoadingScreen:Clone()
+		loadingScreen.Parent = player.PlayerGui
+
+		loadingScreen.Background.BackgroundTransparency = 1
+		util.tween(loadingScreen.Background, TweenInfo.new(0.5), { BackgroundTransparency = 0 })
+
+		loadingScreen.Enabled = true
+
+		TeleportService:SetTeleportGui(ReplicatedStorage.LoadingScreen)
+		TeleportService:Teleport(17820071397, player)
+	end)
+
+	frame.CancelReturn.MouseButton1Click:Connect(function()
+		frame.ConfirmReturnFrame.Visible = false
 	end)
 
 	local focusButton: TextButton = frame.FocusMap

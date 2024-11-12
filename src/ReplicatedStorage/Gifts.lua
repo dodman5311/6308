@@ -20,7 +20,7 @@ local module = {
 		},
 
 		Speed_Demon = {
-			Icon = "rbxassetid://15990088470",
+			Icon = "rbxassetid://107482721361244",
 			Catagories = { "Tactical" },
 			Desc = "Walking speed is now increased. (+20%)",
 		},
@@ -207,7 +207,7 @@ local module = {
 		Sauce_Is_Fuel = {
 			Icon = "rbxassetid://16234651850",
 			Catagories = { "Soul" },
-			Desc = "You can now absorb blood splotches. Every 25 splotches absorbed will heal 1 HP. (Walk over blood to obsorb)",
+			Desc = "You can now absorb blood splotches. Every 20 splotches absorbed will heal 1 HP. (Walk over blood to obsorb)",
 		},
 
 		Set_Em_Up = {

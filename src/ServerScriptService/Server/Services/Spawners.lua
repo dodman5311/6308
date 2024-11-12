@@ -271,8 +271,7 @@ function module.SpawnBoss(bossToSpawn, unit)
 	newObject.Instance:AddTag("Enemy")
 	newObject.Parent = workspace
 
-	local plusStage = (workspace:GetAttribute("Stage") - 1) * 5
-	local totalLevel = plusStage + workspace:GetAttribute("Level")
+	local totalLevel = workspace:GetAttribute("TotalLevel")
 
 	for _, player in ipairs(Players:GetPlayers()) do -- @TODO FIX DIS
 		if

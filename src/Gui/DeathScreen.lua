@@ -59,8 +59,13 @@ function module.Init(player, ui, frame)
 	end)
 
 	frame.ReturnButton.MouseButton1Click:Connect(function()
-		frame.Loading.Visible = true
-		frame.LoadingBackground.Visible = true
+		local loadingScreen = ReplicatedStorage.LoadingScreen:Clone()
+		loadingScreen.Parent = player.PlayerGui
+
+		loadingScreen.Background.BackgroundTransparency = 1
+		util.tween(loadingScreen.Background, TweenInfo.new(0.5), { BackgroundTransparency = 0 })
+
+		loadingScreen.Enabled = true
 
 		TeleportService:SetTeleportGui(ReplicatedStorage.LoadingScreen)
 		TeleportService:Teleport(17820071397, player)

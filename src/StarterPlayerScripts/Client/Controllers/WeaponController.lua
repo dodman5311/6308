@@ -1848,12 +1848,6 @@ UserInputService.TouchEnded:Connect(function(_, gpe)
 	releaseTrigger(gpe)
 end)
 
-task.spawn(function()
-	repeat
-		task.wait()
-	until UIService.isLoaded
-end)
-
 local logRecoil = CFrame.new()
 
 RunService.RenderStepped:Connect(function()

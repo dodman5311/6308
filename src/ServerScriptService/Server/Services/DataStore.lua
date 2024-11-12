@@ -115,11 +115,7 @@ end
 -- end)
 
 function module.saveFurthestLevel(player)
-	local level = workspace:GetAttribute("Level")
-	local stage = workspace:GetAttribute("Stage")
-
-	local plusStage = (stage - 1) * 5
-	local totalLevel = plusStage + level
+	local totalLevel = workspace:GetAttribute("TotalLevel")
 
 	if totalLevel > player:GetAttribute("furthestLevel") then
 		player:SetAttribute("furthestLevel", totalLevel)
@@ -136,6 +132,7 @@ function module.saveGameState(player, gameState)
 	SaveToStore(player, dataStore, gameState)
 
 	print("Game saved in", os.clock() - startTime)
+	net:RemoteEvent("DoUiAction"):FireAllClients("Notify", "GameSaved", true)
 end
 
 net:Connect("SaveGameState", module.saveGameState)

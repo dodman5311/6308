@@ -612,6 +612,7 @@ function module.proceedToNext(sender, onlyLoadMap)
 
 	workspace:SetAttribute("Level", module.CurrentLevel)
 	workspace:SetAttribute("Stage", module.CurrentStage)
+	workspace:SetAttribute("TotalLevel", ((module.CurrentStage - 1) * 5) + module.CurrentLevel)
 
 	if math.floor(module.CurrentLevel) ~= module.CurrentLevel then
 		module.loadBossRoom()

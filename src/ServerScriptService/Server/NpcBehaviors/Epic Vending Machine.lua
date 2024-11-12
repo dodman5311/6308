@@ -56,8 +56,7 @@ local function GiveObjects(npc)
 	local goal: CFrame = origin * CFrame.new(0, -2, -5)
 
 	local SpawnedWeapon: Model
-	local plusStage = (workspace:GetAttribute("Stage") - 1) * 5
-	local totalLevel = plusStage + workspace:GetAttribute("Level")
+	local totalLevel = workspace:GetAttribute("TotalLevel")
 
 	if checkChance:InvokeClient(player, stats.OtherStageWeaponChance, true) then
 		SpawnedWeapon = Spawners.placeNewObject(100, origin, "Weapon", nil, true)

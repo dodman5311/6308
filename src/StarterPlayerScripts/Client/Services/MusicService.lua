@@ -16,8 +16,6 @@ local currentPlaying
 
 local fallBackTrack = Instance.new("Sound")
 
-local lastLevel = 0
-
 local musicTimer = timer:new("PlayCalm", 5, function()
 	local ti = TweenInfo.new(1, Enum.EasingStyle.Linear)
 
@@ -73,10 +71,8 @@ end
 function module.playMusic(level)
 	local ti = TweenInfo.new(0.05, Enum.EasingStyle.Linear)
 
-	if level then
-		lastLevel = level
-	else
-		level = lastLevel
+	if not level then
+		level = workspace:GetAttribute("TotalLevel") --lastLevel
 	end
 
 	module.stopMusic()
@@ -112,7 +108,7 @@ function module.playTrack(trackName, volume)
 end
 
 function module:OnSpawn()
-	module.playMusic(1)
+	module.playMusic()
 end
 
 function module:OnDied()
