@@ -103,6 +103,10 @@ function module.LoadGameData(player)
 		ReplicatedStorage.Assets.Models.WeaponPickups.Katana:Destroy()
 	end
 
+	if permaUpgradeName == "Quality Sauce" then
+		ReplicatedStorage.Assets.Models.WeaponPickups["Double Shot"]:Destroy()
+	end
+
 	mapService.proceedToNext(nil, true)
 	--signals["ProceedToNextLevel"]:Fire(nil, true)
 

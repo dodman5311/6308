@@ -419,6 +419,11 @@ local function EquipDefault(ignoreAmmo)
 		return
 	end
 
+	if GiftsService.CheckUpgrade("Quality Sauce") then
+		module.EquipWeapon("Double Shot", "FakeDefault", nil, math.huge, true, true)
+		return
+	end
+
 	animationService:stopAnimation(viewmodel.Model, "Equip", 0)
 	animationService:playAnimation(viewmodel.Model, "DefaultIdle", Enum.AnimationPriority.Core.Value, false, 0)
 
@@ -988,7 +993,7 @@ local function checkForGibs()
 			continue
 		end
 
-		if humanoid.MaxHealth - data.Damage > -3 then
+		if humanoid.MaxHealth - data.Damage > -3 then --(GiftsService.CheckUpgrade("Quality Sauce") and -1 or -3) then
 			continue
 		end
 
@@ -1583,6 +1588,11 @@ function module.Throw(outOfAmmo, dontSwitchToDefault)
 		return
 	end
 
+	if GiftsService.CheckUpgrade("Quality Sauce") and module.currentWeapon.Name == "Double Shot" then
+		module.Unequip()
+		return
+	end
+
 	if not outOfAmmo and acts:checkAct("Throwing") then
 		return
 	end
@@ -1815,6 +1825,7 @@ UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
 		(input.KeyCode == Enum.KeyCode.X or input.KeyCode == Enum.KeyCode.ButtonB)
 		and module.currentWeapon
 		and not (GiftsService.CheckUpgrade("Gourmet Kitchen Knife") and module.currentWeapon.Name == "Katana")
+		and not (GiftsService.CheckUpgrade("Quality Sauce") and module.currentWeapon.Name == "Double Shot")
 	then
 		module.Throw()
 	end

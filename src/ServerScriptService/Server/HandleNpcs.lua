@@ -509,21 +509,21 @@ Signals.ActivateUpgrade:Connect(function(player, upgradeName)
 		Enemies.Divine:SetAttribute("Level", NumberRange.new(0, 1000))
 	end
 
-	if upgradeName == "Quality Sauce" then
-		moreHealth = true
+	-- if upgradeName == "Quality Sauce" then
+	-- 	moreHealth = true
 
-		for _, Npc in ipairs(Npcs) do
-			local humanoid = Npc.Instance:WaitForChild("Humanoid")
-			if not humanoid or string.match(Npc.Name, "Vending Machine") then
-				continue
-			end
+	-- 	for _, Npc in ipairs(Npcs) do
+	-- 		local humanoid = Npc.Instance:WaitForChild("Humanoid")
+	-- 		if not humanoid or string.match(Npc.Name, "Vending Machine") then
+	-- 			continue
+	-- 		end
 
-			if humanoid.MaxHealth < 50 then
-				humanoid.MaxHealth += 1
-				humanoid.Health = humanoid.MaxHealth
-			end
-		end
-	end
+	-- 		if humanoid.MaxHealth < 50 then
+	-- 			humanoid.MaxHealth += 1
+	-- 			humanoid.Health = humanoid.MaxHealth
+	-- 		end
+	-- 	end
+	-- end
 
 	-- if upgradeName == "Smart Fridge" then
 	-- 	Enemies.Npcs.VendingMachine["Garbage Vending Machine"].Humanoid.Health = 2
