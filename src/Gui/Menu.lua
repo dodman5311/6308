@@ -420,7 +420,7 @@ function module.Init(player: Player, ui, frame)
 		module.Close(player, ui, frame)
 
 		SoulsService.RemoveSoul(SoulsService.Souls)
-		net:RemoteEvent("UpdatePlayerHealth"):FireServer(5, 0, false)
+		net:RemoteEvent("UpdatePlayerHealth"):FireServer(player:GetAttribute("MaxHealth"), 0, false)
 	end)
 
 	frame.CancelRestart.MouseButton1Click:Connect(function()

@@ -1157,8 +1157,14 @@ local function FireDefault(extraBullet)
 		return
 	end
 
+	local damageAmount = 1
+	if GiftsService.CheckUpgrade("Spicy Pepperoni") then
+		damageAmount = 2
+	end
+
 	for _ = 1, bulletCount do
-		local hitHumanoid, subject, damage, spreadResult = module.FireBullet(1, bulletCount - 1, 500, nil, "Default")
+		local hitHumanoid, subject, damage, spreadResult =
+			module.FireBullet(damageAmount, bulletCount - 1, 500, nil, "Default")
 
 		addToGib(hitHumanoid, subject, damage)
 		addToConsecutive(hitHumanoid)
@@ -1739,6 +1745,11 @@ function module:GameInit()
 	for _, animation in pairs(animationService.animations[viewmodel.Model]) do
 		animation:GetMarkerReachedSignal("Event"):Connect(actOnAnimation)
 	end
+
+	if GiftsService.CheckUpgrade("Spicy Pepperoni") then
+		module.defaultMagSize = 12
+		currentAmmo = module.defaultMagSize
+	end
 end
 
 function module:OnSpawn()
@@ -1929,6 +1940,10 @@ signals.AddAmmo:Connect(function(bigMag)
 		baseAmmo = weaponData.Ammo
 	else
 		baseAmmo = 16
+
+		if GiftsService.CheckUpgrade("Spicy Pepperoni") then
+			baseAmmo = 12
+		end
 	end
 
 	if bigMag then
@@ -1999,6 +2014,13 @@ end)
 signals.LoadSavedDataFromClient:Connect(function()
 	if player:GetAttribute("furthestLevel") > 1 then
 		module.HasHitMachine = true
+	end
+end)
+
+net:Connect("LoadData", function()
+	if GiftsService.CheckUpgrade("Spicy Pepperoni") then
+		module.defaultMagSize = 12
+		currentAmmo = module.defaultMagSize
 	end
 end)
 

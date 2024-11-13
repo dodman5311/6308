@@ -559,6 +559,7 @@ end
 
 local function spawnBoss(_, type)
 	spawners.SpawnBoss(stageFolder:GetAttribute(type), map:FindFirstChildOfClass("Model"))
+	workspace:SetAttribute("LastBoss", stageFolder:GetAttribute(type))
 end
 
 -------------------------------------------------------------------

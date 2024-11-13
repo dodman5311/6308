@@ -1,4 +1,6 @@
-local module = {}
+local module = {
+	Anchovies = 0,
+}
 
 --// Services
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -48,6 +50,9 @@ Players.PlayerAdded:Connect(function(player: Player)
 	player.CharacterAdded:Connect(function(character)
 		local humanoid: Humanoid = character:WaitForChild("Humanoid")
 		humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
+
+		humanoid.MaxHealth = player:GetAttribute("MaxHealth")
+		humanoid.Health = player:GetAttribute("MaxHealth")
 
 		for _, part in ipairs(character:GetDescendants()) do
 			if not part:IsA("BasePart") then
@@ -99,35 +104,41 @@ Players.PlayerAdded:Connect(function(player: Player)
 end)
 
 local function onDied(player: Player)
-	mapService.CurrentStage = 1
-	mapService.CurrentLevel = 1
+	module.Anchovies -= 1
 
-	if player:GetAttribute("UpgradeName") == "Sister Location" then
-		mapService.CurrentStage = 2
+	print(module.Anchovies)
+
+	if mapService.CurrentLevel == math.round(mapService.CurrentLevel) or module.Anchovies <= 0 then
+		mapService.CurrentStage = 1
 		mapService.CurrentLevel = 1
-	end
 
-	if player:GetAttribute("UpgradeName") == "Pizza Chain" then
-		mapService.CurrentStage = 3
-		mapService.CurrentLevel = 1
-	end
+		if player:GetAttribute("UpgradeName") == "Sister Location" then
+			mapService.CurrentStage = 2
+			mapService.CurrentLevel = 1
+		end
 
-	dataStore.saveGameState(player, {})
+		if player:GetAttribute("UpgradeName") == "Pizza Chain" then
+			mapService.CurrentStage = 3
+			mapService.CurrentLevel = 1
+		end
+
+		dataStore.saveGameState(player, {})
+
+		local character = player.Character
+		local spawnLocation = workspace:FindFirstChild("SpawnLocation")
+
+		if spawnLocation then
+			character:PivotTo(spawnLocation.CFrame * CFrame.new(0, 3, 0))
+		end
+
+		player.CharacterAdded:Once(function(character)
+			signals["ProceedToNextLevel"]:Fire(nil, true)
+		end)
+	end
 
 	for _, enemy in ipairs(collectionService:GetTagged("Enemy")) do
 		enemy:Destroy()
 	end
-
-	local character = player.Character
-	local spawnLocation = workspace:FindFirstChild("SpawnLocation")
-
-	if spawnLocation then
-		character:PivotTo(spawnLocation.CFrame * CFrame.new(0, 3, 0))
-	end
-
-	player.CharacterAdded:Once(function(character)
-		signals["ProceedToNextLevel"]:Fire(nil, true)
-	end)
 end
 
 local function setArmor(player, amount)
@@ -223,6 +234,24 @@ net:Connect("CreateShield", function(player)
 	newShield.Parent = character
 
 	require(newShield.RemoveShield).OnSpawned()
+end)
+
+net:Connect("ProceedToNextLevel", function(player)
+	if player:GetAttribute("UpgradeName") == "Anchovies" then
+		module.Anchovies = 3
+	end
+end)
+
+signals.ActivateUpgrade:Connect(function(player, upgradeName)
+	local character = player.Character
+	if not character then
+		return
+	end
+
+	local humanoid = character:WaitForChild("Humanoid")
+
+	humanoid.MaxHealth = player:GetAttribute("MaxHealth")
+	humanoid.Health = player:GetAttribute("MaxHealth")
 end)
 
 return module

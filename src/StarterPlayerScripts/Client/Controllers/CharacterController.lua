@@ -219,6 +219,11 @@ function module:OnSpawn(character, humanoid)
 end
 
 local function deathEffect()
+	local anchovies = Player:GetAttribute("Anchovies")
+	if anchovies and anchovies > 0 then
+		Player:SetAttribute("Anchovies", anchovies - 1)
+	end
+
 	sounds.Death:Play()
 	module.attemptPause("DeathPause")
 
@@ -411,6 +416,10 @@ end)
 local function exitS2(extraSouls, totalLevel, level, stageBoss, miniBoss, stage)
 	module.attemptResume("EndPause")
 
+	if giftService.CheckUpgrade("Anchovies") then
+		Player:SetAttribute("Anchovies", 3)
+	end
+
 	soulsService.AddSoul(extraSouls)
 
 	if giftService.CheckGift("Paladin's_Faith") then
@@ -427,9 +436,9 @@ local function exitS2(extraSouls, totalLevel, level, stageBoss, miniBoss, stage)
 	if level == 5 then
 		MusicService.stopMusic()
 		local onBiHidden = UIService.doUiAction("BossIntro", "ShowIntro", true, stageBoss)
-
 		onBiHidden:Once(function()
 			net:RemoteEvent("SpawnBoss"):FireServer("MainBoss")
+
 			if soulsService.Souls < 3 then
 				soulsService.AddSoul(3 - soulsService.Souls)
 				UIService.doUiAction("HUD", "UpdateSouls", true, 3)
@@ -469,8 +478,6 @@ local function exitS2(extraSouls, totalLevel, level, stageBoss, miniBoss, stage)
 
 	camera.FieldOfView = 1000
 	local ti = TweenInfo.new(1, Enum.EasingStyle.Exponential)
-
-	print(util.getSetting("Field of View").Value, true)
 
 	util.tween(camera, ti, { FieldOfView = util.getSetting("Field of View").Value })
 end

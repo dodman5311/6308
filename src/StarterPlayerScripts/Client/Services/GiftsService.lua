@@ -9,6 +9,7 @@ local Players = game:GetService("Players")
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local permaUpgradeList = require(ReplicatedStorage.Upgrades)
+local player = Players.LocalPlayer
 
 --// Modules
 local signal = require(Globals.Packages.Signal)
@@ -72,6 +73,15 @@ function module.CheckUpgrade(upgradeName)
 end
 
 function module:OnDied()
+	if
+		module.CheckUpgrade("Anchovies")
+		and workspace:GetAttribute("Level") ~= math.round(workspace:GetAttribute("Level"))
+		and player:GetAttribute("Anchovies")
+		and player:GetAttribute("Anchovies") > 0
+	then
+		return
+	end
+
 	ClearGifts()
 end
 

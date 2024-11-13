@@ -148,7 +148,7 @@ local function causeHunger(player, ui, frame)
 	local maxHealth = player.Character.Humanoid.MaxHealth
 
 	if deliveryAmount > 0 and SoulsService.Souls > 0 then
-		if maxHealth >= 5 then
+		if maxHealth >= player:GetAttribute("MaxHealth") then
 			return
 		end
 
@@ -257,6 +257,7 @@ function module.ShowScreen(player, ui, frame)
 		end
 
 		SoulsService.RemoveSoul(SoulsService.Souls * deliveryAmount)
+
 		module.UpdateSouls(player, ui, frame, SoulsService.Souls)
 
 		local chosenGift = module.chooseRandomGift(player, ui, frame, giftType)
@@ -417,10 +418,10 @@ function module.TakeDelivery(player, ui, frame, gift)
 		module.showDescription(frame, gift)
 
 		local maxHealth = player.Character.Humanoid.MaxHealth
-		if maxHealth < 5 then
+		if maxHealth < player:GetAttribute("MaxHealth") then
 			if deliveryAmount == 1 then
-				net:RemoteEvent("UpdatePlayerHealth"):FireServer(5)
-				module.showDescription(frame, { Desc = "Drav's hunger is satiated. (5 Max HP)" })
+				net:RemoteEvent("UpdatePlayerHealth"):FireServer(player:GetAttribute("MaxHealth"))
+				module.showDescription(frame, { Desc = "Drav's hunger is satiated. (Full Max HP)" })
 			else
 				net:RemoteEvent("UpdatePlayerHealth"):FireServer(maxHealth + 1)
 				module.showDescription(frame, { Desc = "Drav's hunger is partially restored. (+1 Max HP)" })

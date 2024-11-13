@@ -87,6 +87,11 @@ function module.LoadGameData(player)
 	mapService.CurrentStage = gameState["Stage"] and math.clamp(gameState["Stage"], 1, math.huge) or 1
 	mapService.CurrentLevel = gameState["Level"] and math.clamp(gameState["Level"], 1, math.huge) or 1
 
+	player:SetAttribute("MaxHealth", 5)
+	if permaUpgradeName == "Cheaper Ingredients" then
+		player:SetAttribute("MaxHealth", 3)
+	end
+
 	signals.ActivateUpgrade:Fire(player, permaUpgradeName)
 
 	if permaUpgradeName == "Sister Location" and mapService.CurrentStage < 2 then

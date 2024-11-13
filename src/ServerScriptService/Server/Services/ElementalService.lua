@@ -51,7 +51,9 @@ local elements = {
 		end,
 
 		exit = function(npc)
-			npc.Instance.PrimaryPart.Anchored = false
+			if npc.Name ~= "Visage Of False Hope" then
+				npc.Instance.PrimaryPart.Anchored = false
+			end
 
 			local animations = animationService:getLoadedAnimations(npc.Instance)
 			if not animations then

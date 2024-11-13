@@ -43,6 +43,10 @@ function module.CalculateDropChance(chanceMod)
 		chance /= 1.15
 	end
 
+	if GiftsService.CheckUpgrade("Cheaper Ingredients") then
+		chance *= 1.2
+	end
+
 	if GiftsService.CheckGift("Drav_Is_Dead") then
 		return 0
 	end
@@ -56,6 +60,13 @@ local function playDropSound()
 end
 
 function module.DropSoul(position, chanceModifier)
+	if
+		GiftsService.CheckUpgrade("Anchovies")
+		and workspace:GetAttribute("Level") == math.round(workspace:GetAttribute("Level"))
+	then
+		return
+	end
+
 	local chance = module.CalculateDropChance(chanceModifier)
 	if not ChanceService.checkChance(chance) then
 		return

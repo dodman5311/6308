@@ -337,7 +337,13 @@ local function grabPlayer(npc)
 
 	animationService:playAnimation(subject, "Grab", Enum.AnimationPriority.Action4.Value, false, 0, 1, 1.5)
 
-	local beat = RunService.Heartbeat:Connect(function()
+	local beat
+	beat = RunService.Heartbeat:Connect(function()
+		if not npc:GetState() == "Dead" or not npc.Instance.Parent or not target then
+			beat:Disconnect()
+			return
+		end
+
 		target.PrimaryPart.Anchored = true
 		local grabPosition = subject:GetPivot() * CFrame.new(0, 0, -6) * CFrame.Angles(0, math.rad(-180), 0)
 		target:PivotTo(grabPosition)
