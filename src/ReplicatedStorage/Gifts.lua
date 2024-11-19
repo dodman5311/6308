@@ -1,12 +1,5 @@
 local module = {
 	Perks = {
-
-		Deadshot = {
-			Icon = "rbxassetid://15990088905",
-			Catagories = { "Arsenal" },
-			Desc = "Shots will now have a small chance of dealing +1 extra damage. (10% chance)",
-		},
-
 		Hoarder = {
 			Icon = "rbxassetid://15990088745",
 			Catagories = { "Tactical" },
@@ -34,13 +27,13 @@ local module = {
 		Kill_Chain = {
 			Icon = "rbxassetid://16206090283",
 			Catagories = { "Tactical", "Soul" },
-			Desc = "Combo time is now increased (+1 seconds)",
+			Desc = "Combo time is now increased (+0.5 seconds)",
 		},
 
 		Fast_Mags = {
 			Icon = "rbxassetid://16235738334",
 			Catagories = { "Arsenal" },
-			Desc = "Reload speed is now increased. (+50%)",
+			Desc = "Reload speed is now increased. (+25%)",
 		},
 
 		Martial_Grace = {
@@ -108,9 +101,45 @@ local module = {
 			Catagories = { "Arsenal", "Soul" },
 			Desc = "Any hits, not from a weapon, now has a chance to deal 1 point of fire damage - lighting the said enemy on fire. (50% chance)",
 		},
+
+		-- Freeze_Heaven = { -- unfinished
+		-- 	Icon = "rbxassetid://18731039717",
+		-- 	Catagories = { "Soul", "Tactical" },
+		-- 	Desc = "When inflicting an element, you now have a chance to freeze the enemy (25% chance)",
+		-- },
+
+		-- Before_The_Storm = { -- unfinished
+		-- 	Icon = "rbxassetid://18731039717",
+		-- 	Catagories = { "Tactical" },
+		-- 	Desc = "When entering an ambush or arena, combo and ammo will now be refreshed.",
+		-- },
+
+		-- Bye_2_Get_1 = { -- unfinished
+		-- 	Icon = "rbxassetid://18731039717",
+		-- 	Catagories = { "Tactical" },
+		-- 	Desc = "Every 2 rolls at the kiosk, the next roll now has a 50% chance to be free.",
+		-- },
+
+		-- ["20_Sided_Die"] = { -- unfinished
+		-- 	Icon = "rbxassetid://18731039717",
+		-- 	Catagories = { "Luck" },
+		-- 	Desc = "Thrown weapons now have +20 luck when hitting an enemy.",
+		-- },
+
+		-- Returned_Change = { -- unfinished
+		-- 	Icon = "rbxassetid://18731039717",
+		-- 	Catagories = { "Soul" },
+		-- 	Desc = "Vending machines now have a chance to drop a soul upon being destroyed. (10% chance)",
+		-- },
 	},
 
 	Upgrades = {
+
+		Deadshot = {
+			Icon = "rbxassetid://15990088905",
+			Catagories = { "Arsenal" },
+			Desc = "Shots will now have a small chance of dealing +1 extra damage. (10% chance)",
+		},
 
 		Scavenger = {
 			Icon = "rbxassetid://15990088593",
@@ -127,7 +156,7 @@ local module = {
 		Take_Two = {
 			Icon = "rbxassetid://17655099111",
 			Catagories = { "Luck" },
-			Desc = "While at 1 HP, Luck Rolls are now rolled 1 additional time for a better outcome. (Kiosk rewards are excluded)",
+			Desc = "You now have a health bound chance for Luck Rolls to be rolled 1 additional time. (+15% chance per health point)",
 		},
 
 		["Gambler's_Fallacy"] = {
@@ -142,27 +171,25 @@ local module = {
 			Desc = "There is now a chance for an enemy to drop two souls upon death. The second soul disappears in 5 seconds. (20% chance)",
 		},
 
-		---
-
-		Aggressive_Forgery = { -- done
+		Aggressive_Forgery = {
 			Icon = "rbxassetid://18671287606",
 			Catagories = { "Soul" },
 			Desc = "When your combo is 5 or above, every kill now has a chance to drop armor (10% chance)",
 		},
 
-		Life_Steal = { -- done
+		Life_Steal = {
 			Icon = "rbxassetid://18671291054",
 			Catagories = { "Soul" },
 			Desc = "When at 1 Soul or less, crits will now heal you.",
 		},
 
-		Open_Wounds = { -- done
+		Open_Wounds = {
 			Icon = "rbxassetid://18671290957",
 			Catagories = { "Arsenal" },
 			Desc = "Shooting an enemy now has a 10% chance to create a Weak point where you shot. (+2 damage on weak point hit)",
 		},
 
-		Tacticool = { -- done
+		Tacticool = {
 			Icon = "rbxassetid://18715333039",
 			Catagories = { "Tactical" },
 			Desc = "Weapons can now be reloaded once. (reload time = 5% of the mag size)",

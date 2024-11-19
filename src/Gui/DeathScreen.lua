@@ -27,6 +27,7 @@ local Signals = require(Globals.Shared.Signals)
 local MusicService = require(Globals.Client.Services.MusicService)
 local net = require(Globals.Packages.Net)
 local soulsService = require(Globals.Client.Services.SoulsService)
+local giftService = require(Globals.Client.Services.GiftsService)
 local deliveryAmount = 0
 
 local levelsPassed = Instance.new("IntValue")
@@ -169,6 +170,10 @@ local function showUnlock(player, ui, frame)
 end
 
 local function processAnchovies(player, frame)
+	if not giftService.CheckUpgrade("Anchovies") then
+		return false
+	end
+
 	local anchovies = player:GetAttribute("Anchovies")
 	if not anchovies or anchovies <= 0 then
 		return false
@@ -182,7 +187,7 @@ local function processAnchovies(player, frame)
 
 	local ti = TweenInfo.new(2)
 
-	local amount = anchovies + 1
+	local amount = anchovies
 
 	for anchovyIndex = 1, 3 do
 		local anchovy = frame.Anchovies[anchovyIndex]
@@ -295,7 +300,7 @@ function module.ShowDeathScreen(player, ui, frame)
 
 			frame.Gui.Enabled = false
 
-			MusicService.playMusic()
+			--MusicService.playMusic()
 			SoundService.Music.Volume = logVolume
 			module.unlocked = false
 

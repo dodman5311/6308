@@ -485,7 +485,7 @@ local function showMuzzleFlash(flashPart, offset)
 	partClone.Beam.Enabled = true
 
 	task.spawn(function()
-		for i = 0.5, 1, 0.05 do
+		for i = 0.9, 1, 0.01 do
 			task.wait(0.05)
 			partClone.Beam.Transparency = NumberSequence.new(i)
 		end
@@ -494,7 +494,7 @@ local function showMuzzleFlash(flashPart, offset)
 end
 
 local function ReloadDefault()
-	local reloadTime = GiftsService.CheckGift("Fast_Mags") and 1.5 or 1
+	local reloadTime = GiftsService.CheckGift("Fast_Mags") and 1.25 or 1
 
 	if currentAmmo <= 0 then
 		animationService:playAnimation(
@@ -580,7 +580,7 @@ local function reload(infiniteReloads)
 	local defWeaponData = require(defWeapon.Data)
 	local magSize = defWeaponData.Ammo
 
-	local reloadMult = GiftsService.CheckGift("Fast_Mags") and 1.5 or 1
+	local reloadMult = GiftsService.CheckGift("Fast_Mags") and 1.25 or 1
 	local reloadTime = (magSize * 0.1) / reloadMult
 
 	local reloadSound: Sound = assets.Sounds.Reload
@@ -1179,9 +1179,18 @@ local function FireDefault(extraBullet)
 
 	module.UpdateAmmo(currentAmmo - 1)
 
-	util.PlaySound(assets.Sounds.Fire, script, 0.15)
+	if GiftsService.CheckUpgrade("Spicy Pepperoni") then
+		util.PlaySound(assets.Sounds.FireHeavy, script, 0.15).Alt:Play()
+	else
+		util.PlaySound(assets.Sounds.Fire, script, 0.15)
+	end
 
 	local recoilVector = Vector3.new(0, 0.3, 0)
+	local recoilMagnitude = 1
+
+	if GiftsService.CheckUpgrade("Spicy Pepperoni") then
+		recoilMagnitude = 1.35
+	end
 
 	if defaultIndex == 0 then
 		signals.DoUiAction:Fire("HUD", "PumpCrosshair", true)
@@ -1196,7 +1205,7 @@ local function FireDefault(extraBullet)
 			1
 		)
 
-		Recoil(recoilVector + Vector3.new(-1.75), Vector3.new(0.2, 0.1, 4), 1, 0.75)
+		Recoil(recoilVector + Vector3.new(-1.75), Vector3.new(0.2, 0.1, 4), recoilMagnitude, 0.75)
 
 		defaultIndex = 1
 	else
@@ -1212,7 +1221,7 @@ local function FireDefault(extraBullet)
 			1
 		)
 
-		Recoil(recoilVector + Vector3.new(1.75), Vector3.new(0.2, 0.1, 4), 1, 0.75)
+		Recoil(recoilVector + Vector3.new(1.75), Vector3.new(0.2, 0.1, 4), recoilMagnitude, 0.75)
 
 		defaultIndex = 0
 	end
@@ -1691,7 +1700,15 @@ function module.OnBlock()
 	-- 	module.UpdateAmmo(currentAmmo + 1)
 	-- end
 
-	module.FireBullet(1, 0, 300, nil, "Parry")
+	local parryDamage = 1
+
+	if GiftsService.CheckUpgrade("Pizza Cutter") then
+		parryDamage = 2
+		module.UpdateAmmo(currentAmmo + 1)
+		ComboService.RestartTimer()
+	end
+
+	module.FireBullet(parryDamage, 0, 300, nil, "Parry")
 
 	util.PlaySound(assets.Sounds.BlockedMetal, script, 0.1)
 	util.PlaySound(assets.Sounds.Blocked, script, 0.05)
@@ -1746,10 +1763,10 @@ function module:GameInit()
 		animation:GetMarkerReachedSignal("Event"):Connect(actOnAnimation)
 	end
 
-	if GiftsService.CheckUpgrade("Spicy Pepperoni") then
-		module.defaultMagSize = 12
-		currentAmmo = module.defaultMagSize
-	end
+	-- if GiftsService.CheckUpgrade("Spicy Pepperoni") then
+	-- 	module.defaultMagSize = 12
+	-- 	currentAmmo = module.defaultMagSize
+	-- end
 end
 
 function module:OnSpawn()
@@ -1941,9 +1958,9 @@ signals.AddAmmo:Connect(function(bigMag)
 	else
 		baseAmmo = 16
 
-		if GiftsService.CheckUpgrade("Spicy Pepperoni") then
-			baseAmmo = 12
-		end
+		-- if GiftsService.CheckUpgrade("Spicy Pepperoni") then
+		-- 	baseAmmo = 12
+		-- end
 	end
 
 	if bigMag then
@@ -2018,10 +2035,10 @@ signals.LoadSavedDataFromClient:Connect(function()
 end)
 
 net:Connect("LoadData", function()
-	if GiftsService.CheckUpgrade("Spicy Pepperoni") then
-		module.defaultMagSize = 12
-		currentAmmo = module.defaultMagSize
-	end
+	-- if GiftsService.CheckUpgrade("Spicy Pepperoni") then
+	-- 	module.defaultMagSize = 12
+	-- 	currentAmmo = module.defaultMagSize
+	-- end
 end)
 
 return module

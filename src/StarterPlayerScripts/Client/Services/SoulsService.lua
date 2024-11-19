@@ -62,7 +62,7 @@ end
 function module.DropSoul(position, chanceModifier)
 	if
 		GiftsService.CheckUpgrade("Anchovies")
-		and workspace:GetAttribute("Level") == math.round(workspace:GetAttribute("Level"))
+		and workspace:GetAttribute("Level") ~= math.round(workspace:GetAttribute("Level"))
 	then
 		return
 	end

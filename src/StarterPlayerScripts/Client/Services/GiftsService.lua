@@ -9,6 +9,7 @@ local Players = game:GetService("Players")
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local permaUpgradeList = require(ReplicatedStorage.Upgrades)
+local codexService = require(Globals.Client.Services.CodexService)
 local player = Players.LocalPlayer
 
 --// Modules
@@ -20,6 +21,7 @@ local net = require(Globals.Packages.Net)
 --// Values
 
 module.AquiredGifts = {}
+module.ActiveGift = ""
 
 module.OnGiftAdded = signal.new()
 module.OnGiftRemoved = signal.new()
@@ -44,6 +46,10 @@ local function AddGift(gift)
 	end
 	if not giftData then
 		return
+	end
+
+	if table.find(giftData.Catagories, "Luck") then
+		codexService.AddEntry("Luck")
 	end
 
 	signals.DoUiAction:Fire("HUD", "AddGift", true, giftData.Icon, gift)

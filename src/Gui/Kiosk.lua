@@ -38,6 +38,7 @@ local skip = require(Globals.Shared.Skip)
 local timer = require(Globals.Vendor.Timer)
 local promise = require(Globals.Packages.Promise)
 local acts = require(Globals.Vendor.Acts)
+local codexService = require(Globals.Client.Services.CodexService)
 
 local chanceService = require(Globals.Vendor.ChanceService)
 
@@ -625,8 +626,10 @@ function module.chooseRandomGift(player, ui, frame, catagory)
 		if name == "Perk_Ticket" then
 			module.tickets += 1
 		elseif name == "Clover" then
+			codexService.AddEntry("Luck")
 			chanceService.luck += 1
 		elseif name == "Large_Clover" then
+			codexService.AddEntry("Luck")
 			chanceService.luck += 2
 		elseif name == "Kevlar" then
 			addArmor(player, 1)

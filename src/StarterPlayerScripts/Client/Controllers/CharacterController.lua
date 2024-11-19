@@ -7,6 +7,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local lighting = game:GetService("Lighting")
+local SoundService = game:GetService("SoundService")
 local StarterGui = game:GetService("StarterGui")
 local UserInputService = game:GetService("UserInputService")
 
@@ -67,6 +68,8 @@ end
 function module.attemptPause(index)
 	if not Acts:checkAct("DeathPause", "MenuPause", "RegPause", "EndPause") then
 		signals.PauseGame:Fire()
+
+		SoundService.Music.MuffleEffect.Enabled = true
 	end
 
 	Acts:createAct(index)
@@ -79,6 +82,7 @@ function module.attemptResume(index)
 		return
 	end
 
+	SoundService.Music.MuffleEffect.Enabled = false
 	signals.ResumeGame:Fire()
 end
 
@@ -105,8 +109,15 @@ local function progressTo(level)
 end
 
 function module:OnSpawn(character, humanoid)
-	ChanceService.luck = 0
-	ChanceService.repetitionLuck = 0
+	if
+		not giftService.CheckUpgrade("Anchovies")
+		or workspace:GetAttribute("Level") == math.round(workspace:GetAttribute("Level"))
+	then
+		Player:SetAttribute("Anchovies", 4)
+
+		ChanceService.luck = 0
+		ChanceService.repetitionLuck = 0
+	end
 
 	signals.DoUiAction:Fire("HUD", "Cleanup", true, humanoid.Health, humanoid.MaxHealth)
 
@@ -168,11 +179,13 @@ function module:OnSpawn(character, humanoid)
 	humanoid.HealthChanged:Connect(function(health)
 		signals.DoUiAction:Fire("HUD", "UpdatePlayerHealth", true, health, humanoid.MaxHealth)
 
-		if health == 1 then
-			signals.DoUiAction:Fire("HUD", "UpdateGiftProgress", true, "Take_Two", 1)
-		else
-			signals.DoUiAction:Fire("HUD", "CooldownGift", true, "Take_Two", 0)
-		end
+		signals.DoUiAction:Fire(
+			"HUD",
+			"UpdateGiftProgress",
+			true,
+			"Take_Two",
+			health / Player:GetAttribute("MaxHealth")
+		)
 
 		if health < logHealth then
 			if giftService.CheckGift("Haven") then
@@ -220,7 +233,12 @@ end
 
 local function deathEffect()
 	local anchovies = Player:GetAttribute("Anchovies")
-	if anchovies and anchovies > 0 then
+	if
+		giftService.CheckUpgrade("Anchovies")
+		and workspace:GetAttribute("Level") ~= math.round(workspace:GetAttribute("Level"))
+		and anchovies
+		and anchovies > 0
+	then
 		Player:SetAttribute("Anchovies", anchovies - 1)
 	end
 
@@ -415,10 +433,6 @@ end)
 
 local function exitS2(extraSouls, totalLevel, level, stageBoss, miniBoss, stage)
 	module.attemptResume("EndPause")
-
-	if giftService.CheckUpgrade("Anchovies") then
-		Player:SetAttribute("Anchovies", 3)
-	end
 
 	soulsService.AddSoul(extraSouls)
 

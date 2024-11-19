@@ -417,36 +417,26 @@ Change perk award UI
 * Redesign arenas
 * Fix mule bags reload glitch
 
+
 ----------------------------------------------------------------------------------------
 Fix grapple pausing issue
 
-Luck codex entry
+* Luck codex entry
+
+* Nerfed fast mags
+
+* Nerfed Kill chain
 
 Select perk list
+
+* Fix barrels and machines health increasing with upgrade
+
+Change brick oven
 
 Switching perks
 Weapon alt fires
 Shotgun rail rifle
 Art gallery
-More perk
+-- More perk
 Challenge mode
 ----------------------------------------------------------------------------------------
-
-Entries = {
-    All enemies
-    church
-    6308
-    what year is it?
-    all guns
-    rift
-    demons
-    souls
-    pizza
-    all map areas
-    perk ticket
-    gifts
-    
-    why mask (Militant, lunatic, citizen)
-    
-    kiosk
-}

@@ -77,7 +77,7 @@ Players.PlayerAdded:Connect(function(player: Player)
 					humanoid.Health = LogHealth
 				elseif character:GetAttribute("HasHaven") then
 					setInvincible(player, true)
-					task.delay(0.5, function()
+					task.delay(1, function()
 						setInvincible(player, false)
 					end)
 				end
@@ -97,6 +97,10 @@ Players.PlayerAdded:Connect(function(player: Player)
 				humanoid:ChangeState(Enum.HumanoidStateType.Dead)
 			end
 		end)
+
+		if mapService.CurrentLevel == math.round(mapService.CurrentLevel) then
+			module.Anchovies = 4
+		end
 	end)
 
 	print("Save data loaded in", dataStore.LoadGameData(player))
@@ -104,11 +108,18 @@ Players.PlayerAdded:Connect(function(player: Player)
 end)
 
 local function onDied(player: Player)
-	module.Anchovies -= 1
+	if
+		player:GetAttribute("UpgradeName") == "Anchovies"
+		and mapService.CurrentLevel ~= math.round(mapService.CurrentLevel)
+	then
+		module.Anchovies -= 1
+	end
 
-	print(module.Anchovies)
-
-	if mapService.CurrentLevel == math.round(mapService.CurrentLevel) or module.Anchovies <= 0 then
+	if
+		player:GetAttribute("UpgradeName") ~= "Anchovies"
+		or mapService.CurrentLevel == math.round(mapService.CurrentLevel)
+		or module.Anchovies <= 0
+	then
 		mapService.CurrentStage = 1
 		mapService.CurrentLevel = 1
 
@@ -236,11 +247,7 @@ net:Connect("CreateShield", function(player)
 	require(newShield.RemoveShield).OnSpawned()
 end)
 
-net:Connect("ProceedToNextLevel", function(player)
-	if player:GetAttribute("UpgradeName") == "Anchovies" then
-		module.Anchovies = 3
-	end
-end)
+net:Connect("ProceedToNextLevel", function(player) end)
 
 signals.ActivateUpgrade:Connect(function(player, upgradeName)
 	local character = player.Character

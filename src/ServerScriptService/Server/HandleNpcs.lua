@@ -339,12 +339,12 @@ function module.new(NPCType)
 			table.insert(self.Connections, result)
 		end
 
-		if lessHealth and humanoid.MaxHealth > 1 then
+		if lessHealth and humanoid.MaxHealth > 1 and self.Instance:HasTag("Enemy") then
 			humanoid.MaxHealth = math.clamp(math.floor(humanoid.MaxHealth - 1), 1, math.huge)
 			humanoid.Health = humanoid.MaxHealth
 		end
 
-		if moreHealth and humanoid.MaxHealth < 50 then
+		if moreHealth and humanoid.MaxHealth ~= 50 and self.Instance:HasTag("Enemy") then
 			humanoid.MaxHealth += 1
 			humanoid.Health = humanoid.MaxHealth
 		end
@@ -474,9 +474,9 @@ net:Connect("GiftAdded", function(player, gift)
 
 	lessHealth = true
 
-	for _, Npc in ipairs(Npcs) do
-		local humanoid = Npc.Instance:WaitForChild("Humanoid")
-		if not humanoid or string.match(Npc.Name, "Vending Machine") then
+	for _, Npc in ipairs(CollectionService:GetTagged("Enemy")) do
+		local humanoid = Npc:WaitForChild("Humanoid")
+		if not humanoid then
 			continue
 		end
 
@@ -509,16 +509,16 @@ Signals.ActivateUpgrade:Connect(function(player, upgradeName)
 		Enemies.Divine:SetAttribute("Level", NumberRange.new(0, 1000))
 	end
 
-	if upgradeName == "Cheaper Ingredients" then
+	if upgradeName == "Spicy Pepperoni" then
 		moreHealth = true
 
-		for _, Npc in ipairs(Npcs) do
-			local humanoid = Npc.Instance:WaitForChild("Humanoid")
-			if not humanoid or string.match(Npc.Name, "Vending Machine") then
+		for _, Npc in ipairs(CollectionService:GetTagged("Enemy")) do
+			local humanoid = Npc:WaitForChild("Humanoid")
+			if not humanoid then
 				continue
 			end
 
-			if humanoid.MaxHealth < 50 then
+			if humanoid.MaxHealth ~= 50 then
 				humanoid.MaxHealth += 1
 				humanoid.Health = humanoid.MaxHealth
 			end

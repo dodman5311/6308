@@ -119,7 +119,7 @@ This transformation usually occurs in militants, as their lifestyle glorifies th
 		Catagory = "Enemies",
 		Entry = [[<font color="#FF7800"><b>Shoot their heart for extra damage.
 
-Resistant to shotguns.</b></font>
+Immune to shotguns.</b></font>
 		
 An Everlasting is created when a weak demon is overpowered by its host's undying will to survive.
 
@@ -130,7 +130,9 @@ Their very existence stems from their unwavering belief in not dying.]],
 
 	["Paladin"] = {
 		Catagory = "Enemies",
-		Entry = [[<font color="#FF7800"><b>After a few shots, paladins will reload. try to attack while they are reloading.</b></font>
+		Entry = [[<font color="#FF7800"><b>After a few shots, paladins will reload. try to attack while they are reloading.
+		
+Immune to Melees.</b></font>
 		
 A paladin is a host who not only has a strong relationship with their demon but was also chosen by the Iron Gate to carry out her will. They are clad in metal from the Gate and equipped with weapons of the Iron Unit.
 
@@ -164,7 +166,7 @@ They now roam the sewers, adorned with the tools of a hopeful ceremony, tolling 
 
 	["Dreadful"] = {
 		Catagory = "Enemies",
-		Entry = [[<font color="#FF7800"><b>Resistant to melee weapons.</b></font>
+		Entry = [[<font color="#FF7800"><b>Immune to melee weapons.</b></font>
 		
 The Dreadful are the result of a horrid, abhorrent demon taking over the flesh of its host. While not necessarily strong, these demons harbor a hateful will unseen by many in the land of the living.
 
@@ -197,7 +199,9 @@ Despite its differences, the Specimen still serves as a protector, but of the Vi
 
 	["Ghoul"] = {
 		Catagory = "Enemies",
-		Entry = [[<font color="#FF7800"><b>Walk backwards to avoid the goul's attacks. Shoot it's heart for an insta kill </b></font>
+		Entry = [[<font color="#FF7800"><b>Walk backwards to avoid the goul's attacks. Shoot it's heart for an insta kill.
+		
+Immune to all weapons except Pistols.</b></font>
 		
 A thing of nightmares, the Ghoul is cursed to walk the fragile thread between the physical and the theoretical. 
 It holds its essence within its chest, allowing it to break through the wall of reality. At no point does the Ghoul recognize its plane of existence or its origin. It only knows that it must kill and feed on both soul and flesh to survive.
@@ -394,6 +398,26 @@ However, they possess a severe design flaw. Certain forms of dramatic blunt forc
 
 <font color="#FF7800"><b>Kill faster than you can die:</b></font> Keep a good combo. Don't worry about dying and wasting a few souls. 
 Keep that loop up, and you’ll be fine (for the most part).]],
+	},
+
+	["Luck"] = {
+		Catagory = "Misc",
+		Entry = [[<font color="#FF7800"><b>What is luck?:</b></font>
+Luck increases the chance of any positive thing in the game except for soul drops.
+
+This includes: 
+- perk activation chances,
+- Kiosk rewards,
+- Getting a perk tickets from arenas,
+etc.
+
+In rare cases, it can also decrease the chance of bad things happening.
+
+<font color="#FF7800"><b>What do the numbers mean?:</b></font>
+The power of luck is the amount of luck divided by 2.
+
+Example: 100 luck = 50% increase to good things.
+]],
 	},
 
 	["Elements"] = {

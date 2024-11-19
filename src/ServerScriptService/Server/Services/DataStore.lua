@@ -104,16 +104,7 @@ function module.LoadGameData(player)
 		mapService.CurrentLevel = 1
 	end
 
-	if permaUpgradeName == "Gourmet Kitchen Knife" then
-		ReplicatedStorage.Assets.Models.WeaponPickups.Katana:Destroy()
-	end
-
-	if permaUpgradeName == "Quality Sauce" then
-		ReplicatedStorage.Assets.Models.WeaponPickups["Double Shot"]:Destroy()
-	end
-
 	mapService.proceedToNext(nil, true)
-	--signals["ProceedToNextLevel"]:Fire(nil, true)
 
 	net:RemoteEvent("LoadData"):FireClient(player, upgradeIndex, gameState, gameSettings, codex)
 	return os.clock() - startTime

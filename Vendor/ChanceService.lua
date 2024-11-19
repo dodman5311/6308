@@ -15,6 +15,8 @@ local giftService = require(Globals.Client.Services.GiftsService)
 local comboService = require(Globals.Client.Services.ComboService)
 local Net = require(Globals.Packages.Net)
 
+local assets = ReplicatedStorage.Assets
+
 local signals = require(Globals.Signals)
 
 function module.getLuck()
@@ -86,12 +88,13 @@ function module.checkChance(chance, goodLuck, PureLuck)
 		and not PureLuck
 		and giftService.CheckGift("Take_Two")
 		and player.Character
-		and player.Character:WaitForChild("Humanoid").Health <= 1
+		and rng:NextNumber(0, 100) <= player.Character:WaitForChild("Humanoid").Health * 15
 		and rng:NextNumber(0, 100) <= chance
 	then
 		resetRepLuck(goodLuck)
 
 		signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Take_Two")
+		assets.Sounds.TakeTwo:Play()
 		return true
 	end
 

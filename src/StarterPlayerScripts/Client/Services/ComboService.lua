@@ -28,7 +28,7 @@ function module.AddToCombo(amount)
 	comboTimer.WaitTime = module.ComboTime
 
 	if giftService.CheckGift("Kill_Chain") then
-		comboTimer.WaitTime += 1
+		comboTimer.WaitTime += 0.5
 	end
 
 	module.CurrentCombo += amount
@@ -61,7 +61,7 @@ function module.RestartTimer()
 end
 
 comboTimer.OnTimerStepped:Connect(function(currentTime)
-	local comboTime = giftService.CheckGift("Kill_Chain") and module.ComboTime + 1 or module.ComboTime
+	local comboTime = giftService.CheckGift("Kill_Chain") and module.ComboTime + 0.5 or module.ComboTime
 	UIService.fullUi.HUD.ComboBar.Size = UDim2.fromScale((comboTime - currentTime) / comboTime, 0.1)
 end)
 
