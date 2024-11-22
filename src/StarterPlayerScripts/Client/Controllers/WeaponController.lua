@@ -1522,7 +1522,7 @@ local function ThrowWeapon()
 					continue
 				end
 
-				grip.AssemblyLinearVelocity = (hit.CFrame.LookVector * 10) + Vector3.new(0, 65, 0)
+				grip.AssemblyLinearVelocity = (hit.CFrame.LookVector * 10) + Vector3.new(0, 40, 0)
 
 				hasHitTarget = true
 				return

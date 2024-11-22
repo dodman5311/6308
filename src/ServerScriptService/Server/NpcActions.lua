@@ -8,6 +8,7 @@ local ServerStorage = game:GetService("ServerStorage")
 local CollectionService = game:GetService("CollectionService")
 local ServerScriptService = game:GetService("ServerScriptService")
 local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
 local Workspace = game:GetService("Workspace")
 
 --// Instances
@@ -26,6 +27,7 @@ local Net = require(Globals.Packages.Net)
 local enemiesInCombat = {}
 
 local createProjectileRemote = Net:RemoteEvent("CreateProjectile")
+local vfx = Net:RemoteEvent("ReplicateEffect")
 local rng = Random.new()
 local canFear = false
 
@@ -171,6 +173,28 @@ end
 
 --// NPC ACTIONS //--
 
+function module.Ragdoll(npc)
+	local character = npc.Instance
+
+	for _, descendant in ipairs(character:GetDescendants()) do
+		if descendant:IsA("Motor6D") and descendant.Name ~= "Motor6D" then
+			local socket = Instance.new("BallSocketConstraint")
+			local a1 = Instance.new("Attachment")
+			local a2 = Instance.new("Attachment")
+			a1.Parent = descendant.Part0
+			a2.Parent = descendant.Part1
+			socket.Parent = descendant.Parent
+			socket.Attachment0 = a1
+			socket.Attachment1 = a2
+			a1.CFrame = descendant.C0
+			a2.CFrame = descendant.C1
+			socket.LimitsEnabled = true
+			socket.TwistLimitsEnabled = true
+			descendant.Enabled = false
+		end
+	end
+end
+
 function module.SetCollision(npc, groupName)
 	for _, part in ipairs(npc.Instance:GetDescendants()) do
 		if not part:IsA("BasePart") then
@@ -247,6 +271,16 @@ function module.PlayWalkingAnimation(npc)
 	else
 		AnimationService:stopAnimation(subject, "Walk")
 	end
+end
+
+function module.LogParameter(npc, paramName)
+	local humanoid = npc.Instance:FindFirstChild("Humanoid")
+
+	if not humanoid then
+		return
+	end
+
+	npc[paramName] = humanoid[paramName]
 end
 
 function module.PlayAnimation(npc, animationName, priority, noReplay, ...)
@@ -376,11 +410,11 @@ local function swing(npc, distance, stopMovement)
 		return
 	end
 
+	--AnimationService:stopAnimation(npc.Instance, "Attack", 0)
 	local animation = AnimationService:playAnimation(npc.Instance, "Attack", Enum.AnimationPriority.Action3)
 	if animation and stopMovement then
-		task.spawn(function()
-			npc.Instance.PrimaryPart.Anchored = true
-			animation.Stopped:Wait()
+		npc.Instance.PrimaryPart.Anchored = true
+		animation.Stopped:Once(function()
 			npc.Instance.PrimaryPart.Anchored = false
 		end)
 	end
@@ -684,7 +718,11 @@ function module.LeadTarget(npc, includeY, shotSpeed, randomness, ignoreDistance)
 	return position
 end
 
-function module.RemoveWithDelay(npc, delay)
+function module.RemoveWithDelay(npc, delay, doFade)
+	if doFade then
+		vfx:FireAllClients("fadeEnemy", "Server", true, npc.Instance, delay - 0.05)
+	end
+
 	task.delay(delay, function()
 		npc.Instance:Destroy()
 	end)

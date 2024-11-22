@@ -179,7 +179,7 @@ local module = {
 	OnDied = {
 		{ Function = "SetCollision", Parameters = { "DeadBody" } },
 		{ Function = "SwitchToState", Parameters = { "Dead" } },
-		{ Function = "RemoveWithDelay", Parameters = { 1 } },
+		{ Function = "RemoveWithDelay", Parameters = { 1, true } },
 	},
 }
 

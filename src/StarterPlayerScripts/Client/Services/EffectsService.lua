@@ -4,6 +4,7 @@ local module = {}
 local PLAYERS = game:GetService("Players")
 local REPLICATED_STORAGE = game:GetService("ReplicatedStorage")
 local DEBRIS = game:GetService("Debris")
+local TweenService = game:GetService("TweenService")
 
 --// Instances
 local player = PLAYERS.LocalPlayer
@@ -286,6 +287,18 @@ function module.RemoveElementalEffect(elementName, npcModel)
 		end
 
 		particle.Enabled = false
+	end
+end
+
+function module.fadeEnemy(enemyModel: Model, fadeTime: number)
+	local ti = TweenInfo.new(fadeTime, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
+
+	for index, part in ipairs(enemyModel:GetDescendants()) do
+		if not part:IsA("BasePart") then
+			continue
+		end
+
+		util.tween(part, ti, { Transparency = 1 })
 	end
 end
 

@@ -90,7 +90,8 @@ local module = {
 		{ Function = "Custom", Parameters = { setAllToFalse } },
 		{ Function = "SetCollision", Parameters = { "DeadBody" } },
 		{ Function = "SwitchToState", Parameters = { "Dead" } },
-		{ Function = "RemoveWithDelay", Parameters = { 1 } },
+		{ Function = "Ragdoll" },
+		{ Function = "RemoveWithDelay", Parameters = { 1, true } },
 	},
 }
 

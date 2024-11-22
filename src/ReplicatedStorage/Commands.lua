@@ -103,7 +103,7 @@ local commands = {
 		},
 	},
 
-	Recources = {
+	Resources = {
 		Simulate_Progression = {
 			Parameters = function()
 				return {
