@@ -451,7 +451,7 @@ RunService.Heartbeat:Connect(function()
 
 			module.projectileHit:Fire(raycast, projectile)
 		elseif hitModel then
-			if giftService.CheckUpgrade("Insurance") and chanceService.checkChance(50, false) then
+			if giftService.CheckUpgrade("Insurance") and chanceService.checkChance(25, false) then
 				projectile.Damage += 1
 			end
 

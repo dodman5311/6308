@@ -136,7 +136,7 @@ function NpcEvents.OnStep(npc, actions)
 		doActions(npc, actions)
 	end
 
-	onBeat = onHeartbeat:Connect(func)
+	local onBeat = onHeartbeat:Connect(func)
 	npc.Janitor:Add(onBeat, "Disconnect")
 
 	return onBeat
@@ -184,7 +184,7 @@ function NpcEvents.InCloseRange(npc, actions, closeDistance)
 		doActions(npc, actions)
 	end
 
-	onBeat = onHeartbeat:Connect(func)
+	local onBeat = onHeartbeat:Connect(func)
 	npc.Janitor:Add(onBeat, "Disconnect")
 
 	return onBeat

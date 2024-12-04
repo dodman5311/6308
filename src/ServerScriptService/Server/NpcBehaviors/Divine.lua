@@ -23,7 +23,7 @@ local module = {
 				{},
 				false,
 				false,
-				true,
+				0.5,
 			},
 		},
 

@@ -70,7 +70,7 @@ function module.Init(player, ui, frame)
 		loadingScreen.Enabled = true
 
 		TeleportService:SetTeleportGui(ReplicatedStorage.LoadingScreen)
-		TeleportService:Teleport(17820071397, player)
+		TeleportService:Teleport(16281075967, player)
 	end)
 end
 

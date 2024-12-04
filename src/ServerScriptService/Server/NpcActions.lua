@@ -305,8 +305,9 @@ function module.Shoot(npc, cooldown, amount, speed, bulletCount, info, visualMod
 	end
 
 	if indicateAttack then
-		module.IndicateAttack(npc)
-		task.wait(0.5)
+		AnimationService:playAnimation(npc.Instance, "Indicate", Enum.AnimationPriority.Action3)
+		module.IndicateAttack(npc, indicateAttack)
+		task.wait(indicateAttack)
 	end
 
 	if typeof(amount) == "table" then

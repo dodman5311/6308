@@ -393,20 +393,20 @@ local function toggleConsole()
 	UserInputService.MouseIconEnabled = inGui
 end
 
-UserInputService.InputBegan:Connect(function(input, gpe)
-	if input.KeyCode == Enum.KeyCode.DPadDown and (not gpe or inGui) then
-		toggleConsole()
-	end
+-- UserInputService.InputBegan:Connect(function(input, gpe)
+-- 	if input.KeyCode == Enum.KeyCode.DPadDown and (not gpe or inGui) then
+-- 		toggleConsole()
+-- 	end
 
-	if gpe then
-		return
-	end
+-- 	if gpe then
+-- 		return
+-- 	end
 
-	if input.KeyCode == Enum.KeyCode.Backquote or input.KeyCode == Enum.KeyCode.Tilde then
-		toggleConsole()
-	end
-end)
+-- 	if input.KeyCode == Enum.KeyCode.Backquote or input.KeyCode == Enum.KeyCode.Tilde then
+-- 		toggleConsole()
+-- 	end
+-- end)
 
-signals.ToggleConsole:Connect(toggleConsole)
+--signals.ToggleConsole:Connect(toggleConsole)
 
 return module

@@ -44,7 +44,7 @@ function module.CalculateDropChance(chanceMod)
 	end
 
 	if GiftsService.CheckUpgrade("Cheaper Ingredients") then
-		chance *= 1.2
+		chance += 20
 	end
 
 	if GiftsService.CheckGift("Drav_Is_Dead") then
