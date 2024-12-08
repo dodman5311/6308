@@ -815,9 +815,10 @@ function module.dealDamage(cframe, subject, damage, source, element)
 		return
 	end
 
+	local weakspotDamage = WeakspotService.doWeakspotHit(subject)
 	local isImmune = checkImmunity(model, source)
 
-	if isImmune and humanoid.Health > 0 then
+	if isImmune and humanoid.Health > 0 and (weakspotDamage == 0 or model:HasTag("FullImmunity")) then
 		signals.DoUiAction:Fire("HUD", "ShowImmune", true)
 		return
 	end
@@ -854,7 +855,6 @@ function module.dealDamage(cframe, subject, damage, source, element)
 	end
 
 	local soulElementDamage = model:GetAttribute("Soul") and 1 or 0
-	local weakspotDamage = WeakspotService.doWeakspotHit(subject)
 	local deadshotDamage = checkDeadshot()
 	local boringDamage = consecutiveHits >= 5 and 1 or 0
 	local subjectPosition = subject:GetPivot().Position
