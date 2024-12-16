@@ -815,14 +815,6 @@ function module.dealDamage(cframe, subject, damage, source, element)
 		return
 	end
 
-	local weakspotDamage = WeakspotService.doWeakspotHit(subject)
-	local isImmune = checkImmunity(model, source)
-
-	if isImmune and humanoid.Health > 0 and (weakspotDamage == 0 or model:HasTag("FullImmunity")) then
-		signals.DoUiAction:Fire("HUD", "ShowImmune", true)
-		return
-	end
-
 	local isVendingMachine = string.match(model.Name, "Vending Machine")
 	if isVendingMachine then
 		if source ~= "ThrownWeapon" then
@@ -830,6 +822,18 @@ function module.dealDamage(cframe, subject, damage, source, element)
 		end
 
 		module.HasHitMachine = true
+	end
+
+	if GiftsService.CheckGift("Open_Wounds") and ChanceService.checkChance(10, true) then
+		createFakeWeakpoint(model, subject, cframe.Position)
+	end
+
+	local weakspotDamage = WeakspotService.doWeakspotHit(subject)
+	local isImmune = checkImmunity(model, source)
+
+	if isImmune and humanoid.Health > 0 and (weakspotDamage == 0 or model:HasTag("FullImmunity")) then
+		signals.DoUiAction:Fire("HUD", "ShowImmune", true)
+		return
 	end
 
 	local siuDamage = 0
@@ -858,10 +862,6 @@ function module.dealDamage(cframe, subject, damage, source, element)
 	local deadshotDamage = checkDeadshot()
 	local boringDamage = consecutiveHits >= 5 and 1 or 0
 	local subjectPosition = subject:GetPivot().Position
-
-	if GiftsService.CheckGift("Open_Wounds") and ChanceService.checkChance(10, true) then
-		createFakeWeakpoint(model, subject, cframe.Position)
-	end
 
 	local totalDamage = damage + deadshotDamage + weakspotDamage + boringDamage + siuDamage + soulElementDamage
 
