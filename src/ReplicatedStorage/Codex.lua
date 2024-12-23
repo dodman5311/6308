@@ -274,7 +274,7 @@ The project was abandoned, and the product was left in the dust. That was until 
 		Catagory = "Weapons",
 		Entry = [[<font color="#FF7800"><b>Hold fire to build up lock ons. Every 2 locks reduces the damage by 1.</b></font>
 		
-The I-Six has a mysterious origin, discovered around 2895 during a drug raid in Muerta Crista by NADA. Aztac purchased the weapon from authorities for its revolutionary automatic aiming and adversary detection technology.
+The I-Six has a mysterious origin, discovered around 2895 during a medicinal raid in Muerta Crista by NADA. Aztac purchased the weapon from authorities for its revolutionary automatic aiming and adversary detection technology.
 
 Aztac conducted extensive research and development on the weapon, transforming it into a fully commercial product named the I-Six. Marketed as a civilian home defense weapon, it quickly gained popularity.
 
