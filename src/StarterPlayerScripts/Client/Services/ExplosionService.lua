@@ -12,7 +12,6 @@ local RunService = game:GetService("RunService")
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local Assets = ReplicatedStorage.Assets
 local Effects = Assets.Effects
-local ExplodeEffect = Effects.ExplodeEffect
 
 --// Modules
 local Net = require(Globals.Packages.Net)
@@ -123,23 +122,44 @@ local elementalExplosions = {
 	end,
 }
 
+local function emitObject(part)
+	for _, emitter in ipairs(part:GetChildren()) do
+		if not emitter:IsA("ParticleEmitter") then
+			continue
+		end
+
+		local emitCount = emitter:GetAttribute("EmitCount")
+		local emitDelay = emitter:GetAttribute("EmitDelay")
+
+		if emitDelay > 0 then
+			task.delay(emitDelay, function()
+				emitter:Emit(emitCount)
+			end)
+		else
+			emitter:Emit(emitCount)
+		end
+	end
+end
+
 local function explodeNormal(position, size, color)
 	local lightTi = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-	local newEffect = ExplodeEffect:Clone()
+	local newEffect
 
+	if size < 15 then
+		newEffect = Effects.Explosions.Small_Explosion
+	elseif size <= 30 then
+		newEffect = Effects.Explosions.Medium_Explosion
+	else
+		newEffect = Effects.Explosions.Large_Explosion
+	end
+
+	newEffect = newEffect:Clone()
+	newEffect.Position = position
+	newEffect.Parent = workspace
 	Debris:AddItem(newEffect, 5)
 
-	newEffect.Explosion.Color = ColorSequence.new(color or Color3.new(1, 1, 1))
-
-	newEffect.Parent = workspace.Ignore
-	newEffect.Position = position
-
-	newEffect.Explosion.Size = NumberSequence.new(size / 1.5)
-	newEffect.Shockwave.Size = NumberSequence.new(size)
-
-	newEffect.Explosion:Emit(1)
-	newEffect.Shockwave:Emit(1)
-	util.tween(newEffect.Light, lightTi, { Brightness = 0 })
+	emitObject(newEffect)
+	util.tween(newEffect.PointLight, lightTi, { Brightness = 0 })
 
 	return newEffect
 end

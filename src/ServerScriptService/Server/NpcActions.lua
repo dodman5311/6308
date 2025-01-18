@@ -337,9 +337,9 @@ function module.Shoot(npc, cooldown, amount, speed, bulletCount, info, visualMod
 		task.wait(cooldown)
 	end
 
-	if npc.Instance.PrimaryPart and npc.Instance.PrimaryPart:FindFirstChild("AttackEnd") then
-		npc.Instance.PrimaryPart.AttackEnd:Play()
-	end
+	-- if npc.Instance.PrimaryPart and npc.Instance.PrimaryPart:FindFirstChild("AttackEnd") then
+	-- 	npc.Instance.PrimaryPart.AttackEnd:Play()
+	-- end
 end
 
 function module.ShootBeam(npc, damage, chargeTime, distance, bulletCount)
@@ -467,6 +467,16 @@ function module.ShootProjectile(
 	attackTimer.Parameters = { npc, cooldown, amount, speed, bulletCount, info, visualModel, false, indicateAttack }
 
 	attackTimer:Run()
+end
+
+function module.ShootWithoutTimer(npc, cooldown, amount, speed, bulletCount, info, visualModel, indicateAttack)
+	if npc.Instance:GetAttribute("State") ~= "Attacking" or npc.MindData["CantShoot"] then
+		return
+	end
+
+	npc.MindData.CantShoot = true -- return event required
+	module.Shoot(npc, cooldown, amount, speed, bulletCount, info, visualModel, false, indicateAttack)
+	return true
 end
 
 function module.ShootPlayerProjectile(

@@ -419,26 +419,32 @@ Change perk award UI
 
 
 ----------------------------------------------------------------------------------------
-Fix grapple pausing issue
-
 * Luck codex entry
 
 * Nerfed fast mags
 
 * Nerfed Kill chain
 
-Select perk list
-
 * Fix barrels and machines health increasing with upgrade
+
+Select perk list()
+Art gallery()
+
+Fix grapple pausing issue
 
 Change brick oven
 
 Add stat buffs to keeper perks
 
-Switching perks
-Weapon alt fires
 Shotgun rail rifle
-Art gallery
--- More perk
+
 Challenge mode
+
+--
+
+rebalance arenas (cross, pillars)
+
+Add more destructables()
+
+Fixed and slightly rebalanced paladins *
 ----------------------------------------------------------------------------------------

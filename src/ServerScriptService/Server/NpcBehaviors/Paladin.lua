@@ -1,11 +1,11 @@
 local stats = {
 	ViewDistance = 200,
-	ReactionDelay = 0.1,
-	AttackDelay = 3,
+	ReactionDelay = 0,
+	AttackDelay = 0,
 	MoveDelay = { Min = 4, Max = 10 },
-	AttackCooldown = 0.15,
+	AttackCooldown = 0.2,
 	ProjectileSpeed = 200,
-	AttackAmount = { Min = 5, Max = 6 },
+	AttackAmount = { Min = 4, Max = 5 },
 	AttackDistance = 60,
 
 	NpcType = "Enemy",
@@ -27,8 +27,18 @@ local module = {
 	InCloseRange = {
 
 		{
-			Function = "ShootProjectile",
-			Parameters = { stats.AttackDelay, stats.AttackCooldown, stats.AttackAmount, stats.ProjectileSpeed, 5 },
+			Function = "ShootWithoutTimer",
+			Parameters = { stats.AttackCooldown, stats.AttackAmount, stats.ProjectileSpeed, 5 },
+			ReturnFunction = function(npc, result)
+				if not result then
+					return
+				end
+
+				local reloadSound: Sound = npc.Instance.PrimaryPart.Reloading
+				reloadSound:Play()
+				reloadSound.Ended:Wait()
+				npc.MindData.CantShoot = false
+			end,
 		},
 
 		Parameters = { stats.AttackDistance },
@@ -38,11 +48,11 @@ local module = {
 		{ Function = "SwitchToState", Parameters = { "Attacking" } },
 		{ Function = "MoveTowardsTarget" },
 
-		{
-			Function = "ShootProjectile",
-			Parameters = { stats.ReactionDelay, stats.AttackCooldown, stats.AttackAmount, stats.ProjectileSpeed, 5 },
-			IgnoreEventParams = true,
-		},
+		-- {
+		-- 	Function = "ShootProjectile",
+		-- 	Parameters = { stats.ReactionDelay, stats.AttackCooldown, stats.AttackAmount, stats.ProjectileSpeed, 5 },
+		-- 	IgnoreEventParams = true,
+		-- },
 	},
 
 	TargetLost = {

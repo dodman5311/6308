@@ -85,49 +85,55 @@ local function unpackNpcInstance(npc)
 	return npc.Instance, npc.Instance:FindFirstChild("Humanoid")
 end
 
+local function doActionFunction(action, npc, ...)
+	local result = NpcActions[action.Function](npc, ...)
+	if action.ReturnEvent then
+		NpcEvents[action.ReturnEvent](npc, npc.Behavior[action.ReturnEvent], result)
+	end
+
+	if action.ReturnFunction then
+		action.ReturnFunction(npc, result)
+	end
+end
+
+local function doAction(action, npc, ...)
+	if action.State and not npc:IsState(action.State) then
+		return
+	end
+
+	if action.NotState and npc:IsState(action.NotState) then
+		return
+	end
+
+	if not NpcActions[action.Function] then
+		warn("There is no NPC action by the name of ", action.Function)
+		return
+	end
+
+	local parameters = {}
+
+	if action.Parameters then
+		for _, parameter in ipairs(action.Parameters) do
+			if typeof(parameter) == "table" and parameter["Min"] and parameter["Max"] then
+				parameter = rng:NextNumber(parameter["Min"], parameter["Max"])
+			end
+
+			table.insert(parameters, parameter)
+		end
+	end
+
+	if not action["IgnoreEventParams"] then
+		for _, parameter in ipairs({ ... }) do
+			table.insert(parameters, parameter)
+		end
+	end
+
+	task.spawn(doActionFunction, action, npc, table.unpack(parameters))
+end
+
 local function doActions(npc, actions, ...)
 	for _, action in ipairs(actions) do
-		if action.State and not npc:IsState(action.State) then
-			continue
-		end
-
-		if action.NotState and npc:IsState(action.NotState) then
-			continue
-		end
-
-		if not NpcActions[action.Function] then
-			warn("There is no NPC action by the name of ", action.Function)
-			continue
-		end
-
-		local function doAction(...)
-			local result = NpcActions[action.Function](npc, ...)
-			if not action.ReturnEvent then
-				return
-			end
-
-			NpcEvents[action.ReturnEvent](npc, npc.Behavior[action.ReturnEvent], result)
-		end
-
-		local parameters = {}
-
-		if action.Parameters then
-			for _, parameter in ipairs(action.Parameters) do
-				if typeof(parameter) == "table" and parameter["Min"] and parameter["Max"] then
-					parameter = rng:NextNumber(parameter["Min"], parameter["Max"])
-				end
-
-				table.insert(parameters, parameter)
-			end
-		end
-
-		if not action["IgnoreEventParams"] then
-			for _, parameter in ipairs({ ... }) do
-				table.insert(parameters, parameter)
-			end
-		end
-
-		task.spawn(doAction, table.unpack(parameters))
+		doAction(action, npc, ...)
 	end
 end
 
@@ -247,6 +253,7 @@ function module.new(NPCType)
 		Instance = newModel,
 		Name = "",
 		Behavior = nil,
+		MindData = {},
 
 		Path = SimplePath.new(newModel),
 		Acts = Acts:new(),
@@ -467,7 +474,7 @@ net:Connect("ResumeGame", function()
 	isPaused = false
 end)
 
-net:Connect("GiftAdded", function(player, gift)
+net:Connect("GiftAdded", function(_, gift)
 	if gift ~= "“Do you like hurting?”" then
 		return
 	end
@@ -490,22 +497,15 @@ net:Connect("GiftAdded", function(player, gift)
 	end
 end)
 
-net:Connect("GiftRemoved", function(player, gift)
+net:Connect("GiftRemoved", function(_, gift)
 	if gift ~= "“Do you like hurting?”" then
 		return
 	end
 	lessHealth = false
 end)
 
-Signals.ActivateUpgrade:Connect(function(player, upgradeName)
+Signals.ActivateUpgrade:Connect(function(_, upgradeName)
 	if upgradeName == "Order Wheel" then
-		-- for _, v in ipairs(Enemies:GetChildren()) do
-		-- 	if not v:GetAttribute("Level") then
-		-- 		continue
-		-- 	end
-		-- 	v:SetAttribute("Level", NumberRange.new(v:GetAttribute("Level").Min - 1, v:GetAttribute("Level").Max))
-		-- end
-
 		Enemies.Divine:SetAttribute("Level", NumberRange.new(0, 1000))
 	end
 
@@ -524,25 +524,6 @@ Signals.ActivateUpgrade:Connect(function(player, upgradeName)
 			end
 		end
 	end
-
-	-- if upgradeName == "Smart Fridge" then
-	-- 	Enemies.Npcs.VendingMachine["Garbage Vending Machine"].Humanoid.Health = 2
-	-- 	Enemies.Npcs.VendingMachine["Basic Vending Machine"].Humanoid.Health = 2
-	-- 	Enemies.Npcs.VendingMachine["Epic Vending Machine"].Humanoid.Health = 2
-
-	-- 	for _, Npc in ipairs(Npcs) do
-	-- 		if not string.match(Npc.Instance.Name, "Vending Machine") then
-	-- 			continue
-	-- 		end
-
-	-- 		local humanoid = Npc.Instance:WaitForChild("Humanoid")
-	-- 		if not humanoid then
-	-- 			continue
-	-- 		end
-
-	-- 		humanoid.Health = 2
-	-- 	end
-	-- end
 end)
 
 return module
