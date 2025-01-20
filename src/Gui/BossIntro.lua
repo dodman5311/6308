@@ -52,9 +52,9 @@ local rewards = {
 	},
 
 	["Visage Of False Hope"] = {
-		"Coming_Soon!",
-		"Coming_Soon!",
-		"Coming_Soon!",
+		"Mag_Launcher",
+		"Burning_Souls",
+		"Galvan_Gaze",
 	},
 
 	["Phillip The Everlasting"] = "Master_Scouting",
@@ -220,9 +220,10 @@ function module.ShowIntro(player, ui, frame, bossName)
 
 		frame.MessageBox.Message.Text = dialogue.Text
 
-		dialogueWait.WaitTime = dialogue.Wait
-		dialogueWait:Run()
-		dialogueWait.OnEnded:Wait()
+		task.wait(dialogue.Wait)
+		-- dialogueWait.WaitTime = dialogue.Wait
+		-- dialogueWait:Run()
+		-- dialogueWait.OnEnded:Wait()
 
 		frame.MessageBox.Message.Visible = false
 	end

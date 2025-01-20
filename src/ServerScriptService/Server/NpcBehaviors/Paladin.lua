@@ -5,7 +5,7 @@ local stats = {
 	MoveDelay = { Min = 4, Max = 10 },
 	AttackCooldown = 0.2,
 	ProjectileSpeed = 200,
-	AttackAmount = { Min = 4, Max = 5 },
+	AttackAmount = { Min = 4, Max = 6 },
 	AttackDistance = 60,
 
 	NpcType = "Enemy",

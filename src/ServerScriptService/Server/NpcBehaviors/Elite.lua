@@ -1,10 +1,10 @@
 local stats = {
 	ViewDistance = 150,
-	AttackDelay = { Min = 1, Max = 6 },
+	AttackDelay = { Min = 2, Max = 6 },
 	MoveDelay = { Min = 5, Max = 10 },
-	AttackCooldown = 0.125,
+	AttackCooldown = 0.075,
 	ProjectileSpeed = 175,
-	AttackAmount = { Min = 1, Max = 3 },
+	AttackAmount = { Min = 6, Max = 8 },
 	NpcType = "Enemy",
 }
 
@@ -13,7 +13,7 @@ local module = {
 		{ Function = "MoveRandom", Parameters = { 60, stats.MoveDelay }, State = "Idle" },
 
 		{ Function = "SearchForTarget", Parameters = { "Player", stats.ViewDistance } },
-		{ Function = "LeadTarget", Parameters = { true, 175, 2 } },
+		{ Function = "LeadTarget", Parameters = { true, 175, 0 } },
 		{
 			Function = "ShootProjectile",
 			Parameters = { stats.AttackDelay, stats.AttackCooldown, stats.AttackAmount, stats.ProjectileSpeed },

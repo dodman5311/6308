@@ -141,6 +141,23 @@ module.Presets = {
 		Model = "RocketProjectile",
 	},
 
+	Smart_Grenade = {
+		Speed = 100,
+		Damage = 1,
+		LifeTime = 10,
+		Piercing = 0,
+		Info = {
+			Seeking = 0,
+			SeekProgression = 0.01,
+			Size = 2,
+			SplashDamage = 8,
+			SplashRange = 35,
+			Slowing = 0.35,
+			Dropping = 0.5,
+		},
+		Model = "RocketProjectile",
+	},
+
 	ExplosivePellet = {
 		Speed = 200,
 		LifeTime = 8,

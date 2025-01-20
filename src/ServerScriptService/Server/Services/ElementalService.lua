@@ -70,6 +70,13 @@ local elements = {
 
 		exit = function(npc) end,
 	},
+
+	SoulFire = {
+		time = 3,
+		enter = function(npc) end,
+
+		exit = function(npc) end,
+	},
 }
 
 local function runElementDamage(player, timer, npcModel, elementName)

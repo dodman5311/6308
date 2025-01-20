@@ -52,6 +52,10 @@ function module.dealDamage(_, subject, amount, element)
 		amount += 1
 	end
 
+	if subject:GetAttribute("SoulFire") then
+		amount *= 2
+	end
+
 	local fHealth = humanoid.Health - amount
 
 	if fHealth <= humanoid.MaxHealth then

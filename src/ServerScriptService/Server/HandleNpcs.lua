@@ -504,6 +504,11 @@ net:Connect("GiftRemoved", function(_, gift)
 	lessHealth = false
 end)
 
+net:Connect("SpawnVictim", function(_, target)
+	module.new("Victim"):Spawn(target:GetPivot().Position)
+	target:Destroy()
+end)
+
 Signals.ActivateUpgrade:Connect(function(_, upgradeName)
 	if upgradeName == "Order Wheel" then
 		Enemies.Divine:SetAttribute("Level", NumberRange.new(0, 1000))

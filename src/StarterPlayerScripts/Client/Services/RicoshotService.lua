@@ -24,7 +24,7 @@ function module.checkRicoshot(raycast)
 	local instance = raycast.Instance
 	local model = instance:FindFirstAncestorOfClass("Model")
 
-	if not model or not model:HasTag("ThrownWeapon") then
+	if not model or not model:HasTag("Ricoshot") then
 		return
 	end
 
@@ -32,12 +32,12 @@ function module.checkRicoshot(raycast)
 	rp.FilterType = Enum.RaycastFilterType.Include
 	rp.FilterDescendantsInstances = { workspace.Map }
 
-	local groundCast = workspace:Raycast(raycast.Position, Vector3.new(0, -3, 0), rp)
+	local groundCast = workspace:Raycast(raycast.Position, Vector3.new(0, -2, 0), rp)
 	if groundCast then
 		return
 	end
 
-	return model
+	return model, model:HasTag("ThrownWeapon")
 end
 
 local function checkBetweenCast(position, endPosition)
@@ -120,7 +120,13 @@ local function getNearestEnemy(position, position2)
 end
 
 function module.doRicoshot(weapon, character)
-	local weaponPosition = weapon.Grip.Position
+	local weaponPosition = weapon:GetPivot().Position
+
+	local grip = weapon:FindFirstChild("Grip")
+	if grip then
+		weaponPosition = weapon.Grip.Position
+	end
+
 	local characterPosition = character:GetPivot().Position
 
 	weapon:SetAttribute("RicoHit", true)
@@ -128,8 +134,15 @@ function module.doRicoshot(weapon, character)
 	local ricoHitbox = weapon.RicoHitbox
 
 	UiAnimationService.PlayAnimation(ricoHitbox.Ui.Shoot, 0.045)
-	ricoHitbox.Ui.Shoot.Image.ImageColor3 = Color3.new(1)
-		:Lerp(Color3.fromRGB(255, 235, 185), weapon:GetAttribute("Health") / 5)
+
+	local health = weapon:GetAttribute("Health")
+	local maxHealth = 5
+	if not health and weapon:FindFirstChild("Humanoid") then
+		health = weapon.Humanoid.Health
+		maxHealth = weapon.Humanoid.MaxHealth
+	end
+
+	ricoHitbox.Ui.Shoot.Image.ImageColor3 = Color3.new(1):Lerp(Color3.fromRGB(255, 235, 185), health / maxHealth)
 
 	local result = getNearestEnemy(characterPosition, weaponPosition)
 

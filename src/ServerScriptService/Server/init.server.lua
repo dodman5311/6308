@@ -28,6 +28,7 @@ net:RemoteEvent("UpdatePlayerHealth")
 net:RemoteEvent("LoadData")
 net:RemoteEvent("SaveData")
 net:RemoteEvent("SaveGameState")
+net:RemoteEvent("SpawnVictim")
 
 net:RemoteEvent("PauseGame")
 net:RemoteEvent("ResumeGame")

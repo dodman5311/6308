@@ -374,7 +374,7 @@ uis.InputBegan:Connect(function(input, gameProcessedEvent)
 		return
 	end
 
-	if input.KeyCode == Enum.KeyCode.E or input.KeyCode == Enum.KeyCode.ButtonL1 then
+	if input.KeyCode == Enum.KeyCode.E or input.KeyCode == Enum.KeyCode.ButtonX then
 		grapplePickup()
 	end
 

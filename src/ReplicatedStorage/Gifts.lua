@@ -322,6 +322,42 @@ and will be given extra jump in the air.
 			Desc = "Perk coming soon! (Still planning it out)",
 		},
 
+		Mag_Launcher = {
+			Icon = "rbxassetid://109605656215662",
+			Catagories = { "Arsenal" },
+			Desc = [[Fire a magnetic impact grenade that seeks out targets.
+Hold down the fire key to lock onto up to 3 enemies.
+Each lock reduces the impact damage by 4.
+
+Splash damage: 8
+Impact damage: 8
+
+20 second cooldown
+(G to fire grenade)]],
+		},
+
+		Burning_Souls = {
+			Icon = "rbxassetid://80428909931402",
+			Catagories = { "Arsenal" },
+			Desc = [[Fire a burst of super heated <b>soul fire</b>. 
+Any enemy caught in this burst will take 1 damage and be inflicted with <b>soul fire</b>.
+When inflicted with <b>soul fire</b>, enemies will take x2 damage.
+
+15 second cooldown
+(G to fire <b>soul fire</b>)]],
+		},
+
+		Galvan_Gaze = {
+			Icon = "rbxassetid://102900540660710",
+			Catagories = { "Arsenal" },
+			Desc = [[Turn an enemy, below half health, into an iron statue. 
+When shooting an iron statue, it will ricoshot to the nearest enemy up to 8 times. 
+Each ricochet deals +4 damage.
+
+20 second cooldown
+(G to turn an enemy)]],
+		},
+
 		Master_Scouting = {
 			Icon = "rbxassetid://16274497711",
 			Catagories = { "Tactical" },

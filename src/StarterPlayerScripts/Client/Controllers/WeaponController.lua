@@ -33,6 +33,10 @@ voiceSound.Volume = 1.5
 voiceSound.SoundGroup = SoundService.Voice
 
 local defaultFireRate = 0.2
+local grenadeLocks = {}
+local canUseDamagePerk = true
+local DAMAGE_PERK_COOLDOWN = 20
+local SOUL_FIRE_COOLDOWN = 15
 
 --// Modules
 local signals = require(Globals.Signals)
@@ -85,6 +89,7 @@ module.currentWeapon = nil
 local weaponData
 
 local mouseButton1Down = false
+local gKeyDown = false
 local canBlock = true
 
 local consecutiveHits = 0
@@ -123,6 +128,7 @@ local currentSlot = 1
 local hitHumanoids = {}
 
 local lockTimer = weaponTimer:new("LockOn")
+local grenadeLockTimer = weaponTimer:new("LockOn")
 local lockGuis = {}
 
 local fireTimer = Timer:new("FireDelay", 0)
@@ -804,7 +810,7 @@ local function checkImmunity(subject, source)
 	end
 end
 
-function module.dealDamage(cframe, subject, damage, source, element)
+function module.dealDamage(cframe, subject, damage, source, element, chanceOverride)
 	if not subject or Players:GetPlayerFromCharacter(subject) then
 		return
 	end
@@ -868,6 +874,7 @@ function module.dealDamage(cframe, subject, damage, source, element)
 	lastDamageSource = source
 
 	totalDamage *= critMult
+	totalDamage *= model:GetAttribute("SoulFire") and 2 or 1
 
 	if isVendingMachine then
 		totalDamage = 1
@@ -887,7 +894,7 @@ function module.dealDamage(cframe, subject, damage, source, element)
 			signals.DoUiAction:Fire("HUD", "ShowHit", true, critMult > 1)
 		end
 
-		if element then
+		if element and not chanceOverride then
 			if ChanceService.checkChance(GiftsService.CheckUpgrade("Brick Oven") and 75 or 50, true) then
 				codexService.AddEntry("Elements")
 			else
@@ -1056,13 +1063,18 @@ function module.FireHitbox(size, cframe)
 	end
 end
 
-function module.FireProjectile(projectileType, spread, damage, bulletIndex, element)
+function module.FireProjectile(projectileType, spread, damage, bulletIndex, element, offsetOverride)
 	local subjectCFrame = camera.CFrame
 	local offset = Vector3.zero
 
 	if module.currentWeapon:FindFirstChild("FirePart") then
 		offset = subjectCFrame:VectorToObjectSpace(module.currentWeapon.FirePart.Position - subjectCFrame.Position)
 	end
+
+	if offsetOverride then
+		offset = subjectCFrame:VectorToObjectSpace(offsetOverride - subjectCFrame.Position)
+	end
+
 	local origin = (subjectCFrame * CFrame.new(offset))
 
 	local locked = nil
@@ -1100,7 +1112,7 @@ projectileService.projectileHit:Connect(function(result, projectile)
 	checkForGibs()
 end)
 
-function module.FireBullet(damage, spread, distance, result, source, element)
+function module.FireBullet(damage, spread, distance, result, source, element, chanceOverride)
 	spread *= 1.2
 	local spreadResult
 
@@ -1118,28 +1130,29 @@ function module.FireBullet(damage, spread, distance, result, source, element)
 
 	placeHitEffect(result.Position)
 
-	local hitWeapon = RicoshotService.checkRicoshot(result)
+	local ricoObject, isWeapon = RicoshotService.checkRicoshot(result)
 	local hitCframe = CFrame.new(result.Position) * camera.CFrame.Rotation
+	local ricoResult
 
-	if hitWeapon then
-		hitWeapon:SetAttribute("Health", hitWeapon:GetAttribute("Health") - 1)
+	if ricoObject then
+		local hit = RicoshotService.doRicoshot(ricoObject, player.Character)
+		ricoResult = module.FireBullet(damage + 4, 0, 0, hit, "Ricoshot", element)
+	end
 
-		if hitWeapon:GetAttribute("Health") <= 0 then
+	if isWeapon then
+		ricoObject:SetAttribute("Health", ricoObject:GetAttribute("Health") - 1)
+
+		if ricoObject:GetAttribute("Health") <= 0 then
 			task.delay(0.05, function()
-				hitWeapon:Destroy()
+				ricoObject:Destroy()
 			end)
 		end
 
-		if GiftsService.CheckGift("Ricoshot") then
-			local hit = RicoshotService.doRicoshot(hitWeapon, player.Character)
-
-			return module.FireBullet(damage + 4, 0, 0, hit, "Ricoshot", element)
-
-			--return dealDamage(hitCframe, hit, damage + 3, "Ricoshot")
-		end
+		return ricoResult
 	end
 
-	local hitHumanoid, subject, damageResult = module.dealDamage(hitCframe, result.Instance, damage, source, element)
+	local hitHumanoid, subject, damageResult =
+		module.dealDamage(hitCframe, result.Instance, damage, source, element, chanceOverride)
 
 	if not hitHumanoid then
 		HitPart(result)
@@ -1269,6 +1282,38 @@ local function LockOn()
 	end
 
 	lockTimer:Run()
+end
+
+local function grenadeLockOn()
+	-- if not weaponData["LockedOn"] then
+	-- 	grenadeLocks = {}
+	-- end
+
+	if not grenadeLockTimer or grenadeLockTimer.IsRunning or #grenadeLocks >= 3 or not canUseDamagePerk then
+		return
+	end
+
+	grenadeLockTimer.WaitTime = 0.35
+	grenadeLockTimer.Function = function()
+		local target = getObjectInCenter(player, grenadeLocks)
+		if not target then
+			return
+		end
+
+		local newGui = assets.Gui.LockGui:Clone()
+		newGui.Parent = target
+		newGui.Enabled = true
+
+		UiAnimationService.PlayAnimation(newGui.Frame, 0.045, false, true)
+
+		table.insert(lockGuis, newGui)
+		table.insert(grenadeLocks, target)
+
+		assets.Sounds.Lock.PlaybackSpeed = (#grenadeLocks + 1) / 2
+		assets.Sounds.Lock:Play()
+	end
+
+	grenadeLockTimer:Run()
 end
 
 function module.Fire()
@@ -1499,6 +1544,7 @@ local function ThrowWeapon()
 	grip.RotVelocity = Vector3.new(math.random(-20, 20), math.random(10, 20), math.random(-20, 20)) * 0.8
 
 	if GiftsService.CheckGift("Ricoshot") then
+		weaponClone:AddTag("Ricoshot")
 		ricoHitbox.Ui.Enabled = true
 	end
 
@@ -1808,8 +1854,6 @@ function module.OnDied()
 	UIService.doUiAction("HUD", "HideOvercharge")
 end
 
---//Main//--
-
 local function switchWeapon()
 	if not GiftsService.CheckGift("Mule_Bags") then
 		return
@@ -1820,6 +1864,185 @@ local function switchWeapon()
 	else
 		module.SwitchToSlot(1)
 	end
+end
+
+local function releaseTrigger(gpe)
+	if module.currentWeapon and weaponData["LockAmount"] and not gpe and mouseButton1Down then
+		local conditions = acts.Condition.blacklist("Reloading", "Throwing")
+		task.spawn(acts.createTempAct, acts, "Firing", module.Fire, conditions)
+	end
+
+	mouseButton1Down = false
+end
+
+local function fireShoulderGrenade(gpe)
+	gKeyDown = false
+
+	if gpe or not canUseDamagePerk or not GiftsService.CheckGift("Mag_Launcher") then
+		return
+	end
+
+	local bulletDamage = 12
+	canUseDamagePerk = false
+
+	UIService.doUiAction("HUD", "ActivateGift", true, "Mag_Launcher")
+	UIService.doUiAction("HUD", "UpdateGiftProgress", true, "Mag_Launcher", -1)
+
+	for _, v in ipairs(lockGuis) do
+		v:Destroy()
+	end
+
+	lockTimer:Cancel()
+
+	animationService:playAnimation(viewmodel.Model, "Launch", Enum.AnimationPriority.Action2)
+	local rocketRoot: Attachment = viewmodel.Model.PrimaryPart.RocketRoot
+
+	Timer.wait(0.15)
+
+	if #grenadeLocks == 0 then
+		util.PlaySound(assets.Sounds.Launch, script, 0.1)
+
+		projectileService.createFromPreset(
+			rocketRoot.WorldCFrame,
+			0,
+			"Smart_Grenade",
+			bulletDamage,
+			nil,
+			player,
+			"Shoulder_Grenade"
+		)
+	else
+		bulletDamage -= math.ceil(#grenadeLocks * 4)
+		bulletDamage = math.clamp(bulletDamage, 1, math.huge)
+
+		for _, lock in ipairs(grenadeLocks) do
+			util.PlaySound(assets.Sounds.Launch, script, 0.1)
+
+			projectileService.createFromPreset(
+				rocketRoot.WorldCFrame,
+				0,
+				"Smart_Grenade",
+				bulletDamage,
+				{ Locked = lock },
+				player,
+				"Shoulder_Grenade"
+			)
+
+			Timer.wait(0.1)
+		end
+	end
+
+	grenadeLocks = {}
+
+	UIService.doUiAction(
+		"HUD",
+		"TweenGift",
+		true,
+		"Mag_Launcher",
+		0,
+		TweenInfo.new(DAMAGE_PERK_COOLDOWN, Enum.EasingStyle.Linear)
+	)
+
+	Timer.wait(DAMAGE_PERK_COOLDOWN)
+
+	canUseDamagePerk = true
+	assets.Sounds.GrenadeReady:Play()
+end
+
+local function fireSoulFire()
+	if not canUseDamagePerk then
+		return
+	end
+	canUseDamagePerk = false
+	animationService:playAnimation(viewmodel.Model, "Launch", Enum.AnimationPriority.Action2)
+
+	UIService.doUiAction("HUD", "ActivateGift", true, "Burning_Souls")
+	UIService.doUiAction("HUD", "UpdateGiftProgress", true, "Burning_Souls", 0)
+
+	Timer.wait(0.15)
+
+	util.PlaySound(assets.Sounds.SoulFire, script, 0.1)
+
+	local character = player.Character
+
+	local size = Vector3.new(20, 20, 42)
+	local hitboxResult = workspace:GetPartBoundsInBox(camera.CFrame * CFrame.new(0, 0, (-size.Z / 2) - 2), size)
+
+	local targetsHit = {}
+	for _, part in ipairs(hitboxResult) do
+		local target = util.checkForHumanoid(part)
+		if
+			not target
+			or target == character
+			or target:FindFirstAncestor(character.Name)
+			or table.find(targetsHit, target)
+			or part:FindFirstAncestor("Camera")
+		then
+			continue
+		end
+
+		table.insert(targetsHit, target)
+		module.FireBullet(1, 0, nil, { Instance = part, Position = part.Position }, "Burning_Souls", "SoulFire", true)
+	end
+
+	viewmodel.Model.PrimaryPart.RocketRoot.BlackFire:Emit(300)
+	viewmodel.Model.PrimaryPart.RocketRoot.Fire:Emit(300)
+
+	local cooldown = #targetsHit > 0 and SOUL_FIRE_COOLDOWN or 1
+
+	UIService.doUiAction(
+		"HUD",
+		"TweenGift",
+		true,
+		"Burning_Souls",
+		-1,
+		TweenInfo.new(cooldown, Enum.EasingStyle.Linear)
+	)
+
+	Timer.wait(cooldown)
+	canUseDamagePerk = true
+	assets.Sounds.GrenadeReady:Play()
+end
+
+local function galvanGaze()
+	if not canUseDamagePerk then
+		return
+	end
+
+	canUseDamagePerk = false
+	acts:createAct("IsBlocking")
+
+	local ti = TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
+	animationService:playAnimation(viewmodel.Model, "Gaze", Enum.AnimationPriority.Action4.Value, false, 0, 2, 1)
+
+	util.tween(camera, ti, { FieldOfView = camera.FieldOfView - 20 })
+
+	UIService.doUiAction("HUD", "ActivateGift", true, "Galvan_Gaze")
+	UIService.doUiAction("HUD", "UpdateGiftProgress", true, "Galvan_Gaze", 0)
+
+	Timer.wait(0.5)
+
+	util.tween(camera, TweenInfo.new(0.1), { FieldOfView = util.getSetting("Field of View").Value })
+
+	acts:removeAct("IsBlocking")
+	local target = getObjectInCenter(player, grenadeLocks)
+	if target then
+		local targetHumanoid = target:FindFirstChild("Humanoid")
+		if targetHumanoid and targetHumanoid.Health <= (targetHumanoid.MaxHealth / 2) then
+			net:RemoteEvent("SpawnVictim"):FireServer(target)
+		else
+			target = nil
+		end
+	end
+
+	local cooldown = target and DAMAGE_PERK_COOLDOWN or 1
+	UIService.doUiAction("HUD", "TweenGift", true, "Galvan_Gaze", -1, TweenInfo.new(cooldown, Enum.EasingStyle.Linear))
+
+	Timer.wait(cooldown)
+
+	canUseDamagePerk = true
+	assets.Sounds.GrenadeReady:Play()
 end
 
 UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
@@ -1849,6 +2072,18 @@ UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
 		end
 	end
 
+	if input.KeyCode == Enum.KeyCode.G or input.KeyCode == Enum.KeyCode.ButtonL1 then
+		gKeyDown = true
+
+		if GiftsService.CheckGift("Burning_Souls") then
+			fireSoulFire()
+		end
+
+		if GiftsService.CheckGift("Galvan_Gaze") then
+			galvanGaze()
+		end
+	end
+
 	if
 		(input.KeyCode == Enum.KeyCode.X or input.KeyCode == Enum.KeyCode.ButtonB)
 		and module.currentWeapon
@@ -1868,18 +2103,13 @@ UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
 	end
 end)
 
-local function releaseTrigger(gpe)
-	if module.currentWeapon and weaponData["LockAmount"] and not gpe and mouseButton1Down then
-		local conditions = acts.Condition.blacklist("Reloading", "Throwing")
-		task.spawn(acts.createTempAct, acts, "Firing", module.Fire, conditions)
-	end
-
-	mouseButton1Down = false
-end
-
 UserInputService.InputEnded:Connect(function(input, gpe)
 	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.KeyCode == Enum.KeyCode.ButtonR2 then
 		releaseTrigger(gpe)
+	end
+
+	if input.KeyCode == Enum.KeyCode.G or input.KeyCode == Enum.KeyCode.ButtonL1 then
+		fireShoulderGrenade(gpe)
 	end
 end)
 
@@ -1902,17 +2132,19 @@ RunService.RenderStepped:Connect(function()
 
 	logRecoil = recoilCFrame
 
-	if not mouseButton1Down or isPaused then
-		return
+	if mouseButton1Down and not isPaused then
+		if module.currentWeapon and weaponData["LockAmount"] then
+			LockOn()
+			return
+		end
+
+		local conditions = acts.Condition.blacklist("Reloading", "Throwing")
+		acts:createTempAct("Firing", module.Fire, conditions)
 	end
 
-	if module.currentWeapon and weaponData["LockAmount"] then
-		LockOn()
-		return
+	if gKeyDown and GiftsService.CheckGift("Mag_Launcher") then
+		grenadeLockOn()
 	end
-
-	local conditions = acts.Condition.blacklist("Reloading", "Throwing")
-	acts:createTempAct("Firing", module.Fire, conditions)
 end)
 
 net:Connect("EquipWeapon", module.EquipWeapon)
