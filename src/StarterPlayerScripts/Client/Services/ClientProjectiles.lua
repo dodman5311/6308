@@ -296,7 +296,7 @@ local function checkRaycast(projectile, raycastDistance)
 	return newRaycast
 end
 
-local function fireBeam(npc, damage, cframe, distance, spread)
+local function fireBeam(npc, damage, cframe, distance, spread, size)
 	local offset = CFrame.Angles(util.randomAngle(spread), util.randomAngle(spread), util.randomAngle(spread))
 	cframe *= offset
 
@@ -304,7 +304,7 @@ local function fireBeam(npc, damage, cframe, distance, spread)
 	raycastParams.FilterDescendantsInstances = { npc }
 	raycastParams.CollisionGroup = "NpcBullet"
 
-	local raycast = workspace:Spherecast(cframe.Position, 0.75, cframe.LookVector * distance, raycastParams)
+	local raycast = workspace:Spherecast(cframe.Position, size or 0.75, cframe.LookVector * distance, raycastParams)
 
 	if not raycast then
 		return

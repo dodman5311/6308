@@ -458,7 +458,7 @@ local module = {
 		{ Function = "PlayWalkingAnimation" },
 	},
 
-	InCloseRange = {
+	AtDistance = {
 		{
 			Function = "Custom",
 			Parameters = { grabPlayer },

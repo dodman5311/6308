@@ -125,18 +125,19 @@ local function MoveToRandomPosition(npc, MaxDistance, onStep)
 	module.MoveTowardsPoint(npc, PositonToMoveTo, onStep)
 end
 
-local function getTimer(npc, timerName)
+local function getTimer(npc, timerName, ...)
 	local foundTimer = npc.Timers[timerName]
 
 	if not foundTimer then
-		npc.Timers[timerName] = npc.Timer:new(timerName)
+		npc.Timers[timerName] = npc.Timer:new(timerName, ...)
+		table.insert(npc.Timers[timerName].Parameters, 1, npc)
 		return npc.Timers[timerName]
 	end
 
 	return foundTimer
 end
 
-local function checkFear(npc)
+function module.CheckFear(npc)
 	local target = npc:GetTarget()
 
 	if not target then
@@ -167,11 +168,28 @@ local function checkFear(npc)
 	end
 
 	if npc.StatusEffects["Ice"] then
-		return 110
+		return true
 	end
 end
 
 --// NPC ACTIONS //--
+
+function module.RunTimer(npc, timerName, isAttackTimer, ...)
+	local timer = getTimer(npc, timerName, ...)
+
+	if isAttackTimer then
+		local oldFunction = timer.Function
+
+		timer.Function = function()
+			if module.CheckFear(npc) then
+				return
+			end
+			oldFunction(table.unpack(timer.Parameters))
+		end
+	end
+
+	timer:Run()
+end
 
 function module.Ragdoll(npc)
 	local character = npc.Instance
@@ -295,12 +313,12 @@ local function createProjectile(speed, cframe, spread, info, modelName, sender)
 	createProjectileRemote:FireAllClients(speed, cframe, spread, nil, nil, nil, info, sender, modelName)
 end
 
-local function createHitCast(npc, damage, cframe, distance, spread)
-	Net:RemoteEvent("CreateBeam"):FireAllClients(npc.Instance, damage, cframe, distance, spread)
+local function createHitCast(npc, damage, cframe, distance, spread, size)
+	Net:RemoteEvent("CreateBeam"):FireAllClients(npc.Instance, damage, cframe, distance, spread, size)
 end
 
 function module.Shoot(npc, cooldown, amount, speed, bulletCount, info, visualModel, sender, indicateAttack)
-	if npc:GetState() == "Dead" or checkFear(npc) then
+	if npc:GetState() == "Dead" or module.CheckFear(npc) then
 		return
 	end
 
@@ -342,8 +360,8 @@ function module.Shoot(npc, cooldown, amount, speed, bulletCount, info, visualMod
 	-- end
 end
 
-function module.ShootBeam(npc, damage, chargeTime, distance, bulletCount)
-	if npc:GetState() == "Dead" or checkFear(npc) then
+function module.ShootBeam(npc, damage, chargeTime, distance, bulletCount, size)
+	if npc:GetState() == "Dead" or module.CheckFear(npc) then
 		return
 	end
 
@@ -402,12 +420,12 @@ function module.ShootBeam(npc, damage, chargeTime, distance, bulletCount)
 	local cframe = npc.Instance:GetPivot()
 
 	for _ = 1, bulletCount do
-		createHitCast(npc, damage, cframe, distance, bulletCount - 1)
+		createHitCast(npc, damage, cframe, distance, bulletCount - 1, size)
 	end
 end
 
 local function swing(npc, distance, stopMovement)
-	if npc:GetState() == "Dead" or checkFear(npc) then
+	if npc:GetState() == "Dead" or module.CheckFear(npc) then
 		return
 	end
 
@@ -504,7 +522,7 @@ function module.ShootPlayerProjectile(
 	AttackTimer:Run()
 end
 
-function module.ShootCharge(npc, shotDelay, damage, chargeTime, distance, bulletCount, amount, cooldown)
+function module.ShootCharge(npc, shotDelay, damage, chargeTime, distance, bulletCount, amount, cooldown, size)
 	if npc.Instance:GetAttribute("State") ~= "Attacking" then
 		return
 	end
@@ -514,7 +532,7 @@ function module.ShootCharge(npc, shotDelay, damage, chargeTime, distance, bullet
 	AttackTimer.WaitTime = shotDelay
 	AttackTimer.Function = function()
 		for _ = 1, amount or 1 do
-			module.ShootBeam(npc, damage, chargeTime, distance, bulletCount)
+			module.ShootBeam(npc, damage, chargeTime, distance, bulletCount, size)
 			task.wait(cooldown or 0)
 		end
 	end
@@ -707,7 +725,7 @@ function module.LeadTarget(npc, includeY, shotSpeed, randomness, ignoreDistance)
 	end
 
 	local position = target:GetPivot().Position
-	local distance = 0
+	local distance = 1
 
 	if not ignoreDistance then
 		distance = (position - npc.Instance:GetPivot().Position).Magnitude
@@ -752,12 +770,16 @@ end
 Net:Connect("GiftAdded", function(player, gift)
 	if gift == "Sierra_6308" then
 		canFear = true
+
+		workspace:SetAttribute("CanFear", true)
 	end
 end)
 
 Net:Connect("GiftRemoved", function(player, gift)
 	if gift == "Sierra_6308" then
 		canFear = false
+
+		workspace:SetAttribute("CanFear", false)
 	end
 end)
 

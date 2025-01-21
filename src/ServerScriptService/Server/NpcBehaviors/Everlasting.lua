@@ -29,7 +29,7 @@ local module = {
 		{ Function = "PlayWalkingAnimation" },
 	},
 
-	InCloseRange = {
+	AtDistance = {
 		{
 			Function = "AttackInMelee",
 			Parameters = { stats.MeleeDistance, stats.MeleeDelay, true },

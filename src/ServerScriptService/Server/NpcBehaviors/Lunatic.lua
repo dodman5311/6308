@@ -27,7 +27,7 @@ local module = {
 		{ Function = "MoveTowardsTarget" },
 	},
 
-	InCloseRange = {
+	AtDistance = {
 		{
 			Function = "AttackInMelee",
 			Parameters = { stats.AttackDistance, stats.AttackDelay, true },

@@ -1154,6 +1154,7 @@ function module.FireBullet(damage, spread, distance, result, source, element, ch
 	local hitHumanoid, subject, damageResult =
 		module.dealDamage(hitCframe, result.Instance, damage, source, element, chanceOverride)
 
+	print(hitHumanoid, subject, damageResult)
 	if not hitHumanoid then
 		HitPart(result)
 	end
@@ -1179,6 +1180,7 @@ local function FireDefault(extraBullet)
 		local hitHumanoid, subject, damage, spreadResult =
 			module.FireBullet(damageAmount, bulletCount - 1, 500, nil, "Default")
 
+		print(hitHumanoid, subject, damage, spreadResult)
 		addToGib(hitHumanoid, subject, damage)
 		addToConsecutive(hitHumanoid)
 

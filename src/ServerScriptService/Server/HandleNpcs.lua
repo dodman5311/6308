@@ -172,11 +172,14 @@ function NpcEvents.TargetLost(npc, actions)
 	return npc.Target.Changed:Connect(action)
 end
 
-function NpcEvents.InCloseRange(npc, actions, closeDistance)
+function NpcEvents.AtDistance(npc, actions, closeDistance)
 	local subject = npc.Instance
+	local inDistanceValue = npc.InDistance or Instance.new("BoolValue")
+	npc.InDistance = inDistanceValue
 
 	local func = function()
 		if not npc.Target.Value then
+			npc.InDistance.Value = false
 			return
 		end
 
@@ -184,9 +187,11 @@ function NpcEvents.InCloseRange(npc, actions, closeDistance)
 		local distance = (subject:GetPivot().Position - npc.Target.Value:GetPivot().Position).Magnitude
 
 		if distance > closeDistance then
+			npc.InDistance.Value = false
 			return
 		end
 
+		npc.InDistance.Value = true
 		doActions(npc, actions)
 	end
 
@@ -194,6 +199,38 @@ function NpcEvents.InCloseRange(npc, actions, closeDistance)
 	npc.Janitor:Add(onBeat, "Disconnect")
 
 	return onBeat
+end
+
+function NpcEvents.DistanceReached(npc, actions)
+	local inDistanceValue = npc.InDistance or Instance.new("BoolValue")
+	npc.InDistance = inDistanceValue
+
+	local onReached = npc.InDistance.Changed:Connect(function(value)
+		if not value then
+			return
+		end
+
+		doActions(npc, actions)
+	end)
+	npc.Janitor:Add(onReached, "Disconnect")
+
+	return onReached
+end
+
+function NpcEvents.DistanceLeft(npc, actions)
+	local inDistanceValue = npc.InDistance or Instance.new("BoolValue")
+	npc.InDistance = inDistanceValue
+
+	local onReached = npc.InDistance.Changed:Connect(function(value)
+		if value then
+			return
+		end
+
+		doActions(npc, actions)
+	end)
+	npc.Janitor:Add(onReached, "Disconnect")
+
+	return onReached
 end
 
 function NpcEvents.OnSpawned(npc, actions)

@@ -156,7 +156,7 @@ local module = {
 		{ Function = "PlayWalkingAnimation" },
 	},
 
-	InCloseRange = {
+	AtDistance = {
 		{ Function = "Custom", Parameters = { useToll } },
 		Parameters = { 10 },
 	},

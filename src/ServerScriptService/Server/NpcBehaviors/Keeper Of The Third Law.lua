@@ -783,7 +783,7 @@ local module = {
 		{ Function = "Custom", Parameters = { runAttackTimer } },
 	},
 
-	InCloseRange = {
+	AtDistance = {
 
 		{ Function = "Custom", Parameters = { AttackMelee } },
 

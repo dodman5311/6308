@@ -240,7 +240,7 @@ function module.spawnEnemies(currentLevel)
 			continue
 		end
 
-		local spawnAmount = math.round(math.clamp(unit:GetExtentsSize().Magnitude / 30, 2, 6))
+		local spawnAmount = math.round(math.clamp(unit:GetExtentsSize().Magnitude / 30, 1, 4))
 
 		for _ = 1, math.random(spawnAmount - 1, spawnAmount) do
 			if module.spawnInUnit(currentLevel, unit, "Enemy", Vector3.new(0, 5, 0), spawner) then

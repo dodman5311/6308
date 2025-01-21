@@ -24,7 +24,7 @@ local module = {
 		{ Function = "PlayWalkingAnimation" },
 	},
 
-	InCloseRange = {
+	AtDistance = {
 
 		{
 			Function = "ShootWithoutTimer",
