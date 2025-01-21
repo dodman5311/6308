@@ -1180,7 +1180,7 @@ local function FireDefault(extraBullet)
 		local hitHumanoid, subject, damage, spreadResult =
 			module.FireBullet(damageAmount, bulletCount - 1, 500, nil, "Default")
 
-		print(hitHumanoid, subject, damage, spreadResult)
+		print(hitHumanoid, subject, damage, spreadResult) -- WHAT THE FUCK!!!! FIX THIS SHIT!!! AAAAAH!!
 		addToGib(hitHumanoid, subject, damage)
 		addToConsecutive(hitHumanoid)
 
