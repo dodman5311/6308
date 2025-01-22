@@ -343,10 +343,14 @@ function module.Shoot(npc, cooldown, amount, speed, bulletCount, info, visualMod
 
 		AnimationService:playAnimation(npc.Instance, "Attack", Enum.AnimationPriority.Action3)
 		if npc.Instance.PrimaryPart:FindFirstChild("Attack") then
-			npc.Instance.PrimaryPart.Attack:Play()
+			Util.PlaySound(npc.Instance.PrimaryPart.Attack, npc.Instance.PrimaryPart, 0.15)
 		end
 
 		local cframe = npc.Instance:GetPivot() * CFrame.new(0, 0, -1)
+
+		if npc.Instance.PrimaryPart:FindFirstChild("FirePoint") then
+			cframe = npc.Instance.PrimaryPart.FirePoint.WorldCFrame
+		end
 
 		for _ = 1, bulletCount do
 			createProjectile(speed, cframe, bulletCount - 1, info, visualModel, sender)

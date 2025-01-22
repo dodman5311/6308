@@ -73,6 +73,9 @@ local function setAllToFalse(npc)
 
 		humanoid:SetAttribute("Invincible", false)
 	end
+
+	npc.Instance.Humanoid.HipHeight = 0
+	npc.Instance.Humanoid.PlatformStand = true
 end
 
 local module = {
@@ -90,7 +93,6 @@ local module = {
 		{ Function = "Custom", Parameters = { setAllToFalse } },
 		{ Function = "SetCollision", Parameters = { "DeadBody" } },
 		{ Function = "SwitchToState", Parameters = { "Dead" } },
-		{ Function = "Ragdoll" },
 		{ Function = "RemoveWithDelay", Parameters = { 1, true } },
 	},
 }

@@ -160,6 +160,18 @@ local commands = {
 						signals["AddGift"]:Fire("Overcharge")
 					end
 
+					if level == 10 then
+						local r = math.random(1, 3)
+
+						if r == 1 then
+							signals["AddGift"]:Fire("Galvan_Gaze")
+						elseif r == 2 then
+							signals["AddGift"]:Fire("Mag_Launcher")
+						elseif r == 3 then
+							signals["AddGift"]:Fire("Burning_Souls")
+						end
+					end
+
 					for _ = 1, combatLevel do
 						local result = kiosk.getRandomGiftFromLocalList()
 
@@ -637,7 +649,15 @@ local commands = {
 
 			Parameters = function()
 				return {
-					{ Name = "Boss", Options = { "Keeper Of The Third Law", "Phillip The Everlasting" } },
+					{
+						Name = "Boss",
+						Options = {
+							"Keeper Of The Third Law",
+							"Phillip The Everlasting",
+							"Visage Of False Hope",
+							"Specimen #09",
+						},
+					},
 				}
 			end,
 

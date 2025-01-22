@@ -3,7 +3,7 @@ local stats = {
 	ViewDistance = 400,
 	NpcType = "Enemy",
 	MoveDelay = { Min = 2, Max = 5 },
-	AttackDelay = { Min = 3, Max = 6 },
+	AttackDelay = { Min = 5, Max = 10 },
 }
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -75,26 +75,14 @@ end
 local function checkRaycast(subject: Model, target: Model)
 	local rp = RaycastParams.new()
 	rp.FilterType = Enum.RaycastFilterType.Exclude
-	rp.FilterDescendantsInstances = { subject }
+	rp.FilterDescendantsInstances = { subject, target }
 
 	local origin = subject:GetPivot().Position
 	local destination = target:GetPivot().Position - origin
 
 	local newRay = workspace:Raycast(origin, destination, rp)
 
-	if not newRay then
-		return
-	end
-	local part = newRay.Instance
-	local model = part:FindFirstAncestorOfClass("Model")
-	if not model or model == subject then
-		return
-	end
-	local humanoid = model:FindFirstChildOfClass("Humanoid")
-	if not humanoid or humanoid.Health <= 0 then
-		return
-	end
-	return humanoid
+	return not newRay
 end
 
 local function shoot(npc)
@@ -107,13 +95,13 @@ local function shoot(npc)
 
 	npc.Instance.PrimaryPart.ChargedAttack:Play()
 
-	if not npc:GetTarget() then
+	local target = npc:GetTarget()
+	if not target then
 		return
 	end
 
-	local humanoid = checkRaycast(npc.Instance, npc:GetTarget())
-	if humanoid then
-		humanoid:TakeDamage(1)
+	if checkRaycast(npc.Instance, target) then
+		target.Humanoid:TakeDamage(1)
 	end
 end
 

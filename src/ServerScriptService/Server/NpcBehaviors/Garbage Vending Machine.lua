@@ -141,7 +141,7 @@ local module = {
 		{ Function = "Custom", Parameters = { explode } },
 		{ Function = "SetCollision", Parameters = { "DeadBody" } },
 		{ Function = "SwitchToState", Parameters = { "Dead" } },
-		{ Function = "RemoveWithDelay", Parameters = { 1 } },
+		{ Function = "RemoveWithDelay", Parameters = { 0.1 } },
 	},
 }
 

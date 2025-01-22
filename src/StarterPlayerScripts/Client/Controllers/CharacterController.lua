@@ -584,7 +584,6 @@ signals.AddGift:Connect(onGiftAdded)
 net:Connect("StartExitSequence", ExitSequence)
 
 net:Connect("ArenaBegun", function(isAmbush)
-	print(isAmbush)
 	if isAmbush then
 		UIService.doUiAction("Notify", "AmbushBegun", true)
 	else
@@ -625,6 +624,10 @@ net:Connect("OpenKiosk", function()
 end)
 
 UserInputService.InputBegan:Connect(function(input, gpe)
+	if gpe then
+		return
+	end
+
 	if
 		input.KeyCode == Enum.KeyCode.Tab
 		or input.KeyCode == Enum.KeyCode.M

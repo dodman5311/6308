@@ -795,7 +795,7 @@ local function checkImmunity(subject, source)
 				end
 			end
 
-			return false
+			continue
 		end
 
 		local sourceData = require(sourceIsWeapon.Data)
@@ -1132,11 +1132,12 @@ function module.FireBullet(damage, spread, distance, result, source, element, ch
 
 	local ricoObject, isWeapon = RicoshotService.checkRicoshot(result)
 	local hitCframe = CFrame.new(result.Position) * camera.CFrame.Rotation
-	local ricoResult
+
+	local hitHumanoid, subject, damageResult, spreadResult
 
 	if ricoObject then
 		local hit = RicoshotService.doRicoshot(ricoObject, player.Character)
-		ricoResult = module.FireBullet(damage + 4, 0, 0, hit, "Ricoshot", element)
+		hitHumanoid, subject, damageResult, spreadResult = module.FireBullet(damage + 4, 0, 0, hit, "Ricoshot", element)
 	end
 
 	if isWeapon then
@@ -1148,13 +1149,12 @@ function module.FireBullet(damage, spread, distance, result, source, element, ch
 			end)
 		end
 
-		return ricoResult
+		return hitHumanoid, subject, damageResult, spreadResult
 	end
 
 	local hitHumanoid, subject, damageResult =
 		module.dealDamage(hitCframe, result.Instance, damage, source, element, chanceOverride)
 
-	print(hitHumanoid, subject, damageResult)
 	if not hitHumanoid then
 		HitPart(result)
 	end
@@ -1180,7 +1180,6 @@ local function FireDefault(extraBullet)
 		local hitHumanoid, subject, damage, spreadResult =
 			module.FireBullet(damageAmount, bulletCount - 1, 500, nil, "Default")
 
-		print(hitHumanoid, subject, damage, spreadResult) -- WHAT THE FUCK!!!! FIX THIS SHIT!!! AAAAAH!!
 		addToGib(hitHumanoid, subject, damage)
 		addToConsecutive(hitHumanoid)
 
@@ -1984,7 +1983,7 @@ local function fireSoulFire()
 		end
 
 		table.insert(targetsHit, target)
-		module.FireBullet(1, 0, nil, { Instance = part, Position = part.Position }, "Burning_Souls", "SoulFire", true)
+		module.FireBullet(0.5, 0, nil, { Instance = part, Position = part.Position }, "Burning_Souls", "SoulFire", true)
 	end
 
 	viewmodel.Model.PrimaryPart.RocketRoot.BlackFire:Emit(300)
