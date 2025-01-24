@@ -162,7 +162,7 @@ local function dealDamage(npc, humanoid, amount)
 		return
 	end
 
-	humanoid:TakeDamage(amount + npc["DamageBuff"] or 0)
+	humanoid:TakeDamage(amount)
 end
 
 local function indicateAttack(npc, color)
@@ -879,7 +879,7 @@ local module = {
 		{ Function = "Custom", Parameters = { RunGeyserCheck } },
 		{ Function = "Custom", Parameters = { spawnEnemies } },
 		{ Function = "Custom", Parameters = { runAttackTimer } },
-		{ Function = "SearchForTarget", Parameters = { "Player", math.huge } },
+		{ Function = "SearchForTarget", Parameters = { math.huge } },
 	},
 
 	OnSpawned = {

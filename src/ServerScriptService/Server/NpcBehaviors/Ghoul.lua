@@ -139,7 +139,7 @@ end
 
 local module = {
 	OnStep = {
-		{ Function = "SearchForTarget", Parameters = { "Player", stats.ViewDistance } },
+		{ Function = "SearchForTarget", Parameters = { stats.ViewDistance } },
 		{ Function = "LookAtTarget", Parameters = { true } },
 		{ Function = "Custom", Parameters = { runAttackTimer } },
 	},

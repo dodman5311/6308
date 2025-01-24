@@ -240,7 +240,7 @@ function moves.shootAttack(npc)
 	local hitHumanoid =
 		checkRaycast(subject, subject.PrimaryPart.CFrame.Position, subject.PrimaryPart.CFrame.LookVector * 500)
 	if hitHumanoid and npc:GetState() ~= "Dead" then
-		hitHumanoid:TakeDamage(2 + npc["DamageBuff"] or 0)
+		hitHumanoid:TakeDamage(2)
 	end
 	npc.Acts:removeAct("leading_shot", "inAction")
 	timer.wait(0.125)
@@ -297,7 +297,7 @@ function moves.throwAttack(npc)
 			if table.find(hitHumanoids, humanoid) or npc:GetState() == "Dead" then
 				continue
 			end
-			humanoid:TakeDamage(2 + npc["DamageBuff"] or 0)
+			humanoid:TakeDamage(2)
 			table.insert(hitHumanoids, humanoid)
 		end
 
@@ -353,14 +353,14 @@ local function grabPlayer(npc)
 	showHitBlood(subject, rootPart.AxeHit)
 
 	if npc:GetState() ~= "Dead" then
-		humanoid:TakeDamage(2 + npc["DamageBuff"] or 0)
+		humanoid:TakeDamage(2)
 	end
 
 	timer.wait(0.515)
 	showGunFire(subject, rootPart.GunFire)
 
 	if npc:GetState() ~= "Dead" then
-		humanoid:TakeDamage(2 + npc["DamageBuff"] or 0)
+		humanoid:TakeDamage(2)
 	end
 
 	beat:Disconnect()
@@ -451,7 +451,7 @@ end
 
 local module = {
 	OnStep = {
-		{ Function = "SearchForTarget", Parameters = { "Player", stats.ViewDistance } },
+		{ Function = "SearchForTarget", Parameters = { stats.ViewDistance } },
 		{ Function = "Custom", Parameters = { runAttackTimer } },
 		{ Function = "Custom", Parameters = { lead } },
 

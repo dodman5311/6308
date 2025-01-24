@@ -112,7 +112,7 @@ end
 local module = {
 	OnStep = {
 		{ Function = "MoveRandom", Parameters = { 60, stats.MoveDelay }, State = "Idle" },
-		{ Function = "SearchForTarget", Parameters = { "Player", 500 } },
+		{ Function = "SearchForTarget", Parameters = { 500 } },
 
 		{ Function = "Custom", Parameters = { lookAtTarget }, State = "Attacking" },
 		{ Function = "RunTimer", Parameters = { "Attack", true, getRandomTime(), shoot } },

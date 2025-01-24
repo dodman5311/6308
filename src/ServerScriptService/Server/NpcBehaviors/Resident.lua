@@ -11,7 +11,7 @@ local module = {
 	OnStep = {
 		{ Function = "MoveRandom", Parameters = { 60, stats.MoveDelay }, State = "Idle" },
 
-		{ Function = "SearchForTarget", Parameters = { "Player", stats.ViewDistance } },
+		{ Function = "SearchForTarget", Parameters = { stats.ViewDistance } },
 		{ Function = "LookAtTarget", Parameters = { true } },
 
 		{

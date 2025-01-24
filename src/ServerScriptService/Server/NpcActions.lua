@@ -69,9 +69,11 @@ local function lookAtPostition(npc, position: Vector3, includeY: boolean, doLerp
 	end
 end
 
-local function getNearest(npc, maxDistance, entityType)
+local function getNearest(npc, maxDistance)
+	local targetType = npc.Instance:GetAttribute("TargetType")
+
 	local getList = {}
-	if entityType == "Player" then
+	if targetType == "Player" then
 		for _, player in ipairs(Players:GetPlayers()) do
 			table.insert(getList, player.Character)
 		end
@@ -80,7 +82,7 @@ local function getNearest(npc, maxDistance, entityType)
 			table.insert(getList, player)
 		end
 	else
-		getList = CollectionService:GetTagged(entityType)
+		getList = CollectionService:GetTagged(targetType)
 	end
 
 	local closestDistance, closestModel = math.huge
@@ -224,6 +226,8 @@ end
 
 function module.AddTag(npc, Tag)
 	npc.Instance:AddTag(Tag)
+
+	npc.Instance:SetAttribute("TargetType", "Player")
 end
 
 function module.MoveToRandomUnit(npc)
@@ -486,7 +490,8 @@ function module.ShootProjectile(
 
 	attackTimer.WaitTime = shotDelay
 	attackTimer.Function = module.Shoot
-	attackTimer.Parameters = { npc, cooldown, amount, speed, bulletCount, info, visualModel, false, indicateAttack }
+	attackTimer.Parameters =
+		{ npc, cooldown, amount, speed, bulletCount, info, visualModel, npc.Instance, indicateAttack }
 
 	attackTimer:Run()
 end
@@ -497,7 +502,7 @@ function module.ShootWithoutTimer(npc, cooldown, amount, speed, bulletCount, inf
 	end
 
 	npc.MindData.CantShoot = true -- return event required
-	module.Shoot(npc, cooldown, amount, speed, bulletCount, info, visualModel, false, indicateAttack)
+	module.Shoot(npc, cooldown, amount, speed, bulletCount, info, visualModel, npc.Instance, indicateAttack)
 	return true
 end
 
@@ -696,8 +701,8 @@ function module.SwitchToState(npc, state)
 	end
 end
 
-function module.SearchForTarget(npc, targetType, maxDistance)
-	local target, distance = getNearest(npc, maxDistance, targetType)
+function module.SearchForTarget(npc, maxDistance)
+	local target, distance = getNearest(npc, maxDistance)
 	if not target or not checkSightLine(npc, target) then
 		target = nil
 	end

@@ -192,7 +192,11 @@ local function checkPlayer(subject)
 		return
 	end
 
-	if not Players:GetPlayerFromCharacter(model) and not model:HasTag("Commrad") then
+	if
+		not Players:GetPlayerFromCharacter(model)
+		and not model:HasTag("Commrad")
+		and not model:GetAttribute("TargetType") == "Enemy"
+	then
 		return
 	end
 
@@ -269,7 +273,7 @@ local function checkRaycast(projectile, raycastDistance)
 
 	local rp = RaycastParams.new()
 
-	local blacklist = { workspace.CurrentCamera }
+	local blacklist = { workspace.CurrentCamera, projectile.Sender }
 
 	for _, value in ipairs(projectile.RecentHits) do
 		table.insert(blacklist, value)
@@ -279,7 +283,7 @@ local function checkRaycast(projectile, raycastDistance)
 	rp.FilterType = Enum.RaycastFilterType.Exclude
 	rp.CollisionGroup = "Bullet"
 
-	if not projectile.Sender then
+	if projectile.Sender:GetAttribute("TargetType") == "Player" then
 		rp.CollisionGroup = "NpcBullet"
 	end
 
@@ -302,7 +306,7 @@ local function fireBeam(npc, damage, cframe, distance, spread, size)
 
 	local raycastParams = RaycastParams.new()
 	raycastParams.FilterDescendantsInstances = { npc }
-	raycastParams.CollisionGroup = "NpcBullet"
+	raycastParams.CollisionGroup = "Bullet"
 
 	local raycast = workspace:Spherecast(cframe.Position, size or 0.75, cframe.LookVector * distance, raycastParams)
 

@@ -85,7 +85,7 @@ local function createHitbox(npc, size, offset, damage, blacklist)
 			continue
 		end
 
-		humanoid:TakeDamage(damage + npc["DamageBuff"] or 0)
+		humanoid:TakeDamage(damage)
 
 		table.insert(hasHit, model)
 	end
@@ -240,7 +240,7 @@ local function parryAttack(npc, health)
 		return
 	end
 
-	enemyHumanoid:TakeDamage(healthChange + npc["DamageBuff"] or 0)
+	enemyHumanoid:TakeDamage(healthChange)
 end
 
 local function addArmor(npc)
@@ -637,7 +637,7 @@ local function setUpEnemy(npc)
 				-- hit player
 				hasHit = true
 				target.Humanoid.WalkSpeed -= 20
-				target.Humanoid:TakeDamage(1 + npc["DamageBuff"] or 0)
+				target.Humanoid:TakeDamage(1)
 				target:SetAttribute("LockSlide", true)
 
 				task.delay(6, function()
@@ -679,7 +679,7 @@ local function setUpEnemy(npc)
 					return
 				end
 
-				humanoid:TakeDamage(3 + npc["DamageBuff"] or 0)
+				humanoid:TakeDamage(3)
 
 				table.insert(enemiesHitWithChain, model)
 			end)
@@ -774,7 +774,7 @@ end
 local module = {
 	OnStep = {
 
-		{ Function = "SearchForTarget", Parameters = { "Player", 1000 }, NotState = "NoAi" },
+		{ Function = "SearchForTarget", Parameters = { 1000 }, NotState = "NoAi" },
 		{ Function = "LookAtTarget" },
 
 		{ Function = "GetToDistance", Parameters = { 4.9, true } },

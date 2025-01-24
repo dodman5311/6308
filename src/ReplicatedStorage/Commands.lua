@@ -544,10 +544,11 @@ local commands = {
 				return {
 					{ Name = "Enemy", Options = getEnemies },
 					{ Name = "Amount", Options = { "_Input" } },
+					{ Name = "TargetType", Options = { "Player", "Enemy" } },
 				}
 			end,
 
-			ExecuteServer = function(_, player, Enemy, amount)
+			ExecuteServer = function(_, player, Enemy, amount, targetType)
 				print(player, Enemy)
 
 				if not Enemy then
@@ -564,11 +565,19 @@ local commands = {
 				if amount then
 					for _ = 1, amount do
 						local npc = hnpcs.new(Enemy.Name)
-						npc:Spawn(character:GetPivot() * CFrame.new(0, 0, -10))
+						npc:Spawn(character:GetPivot() * CFrame.new(0, 1, -10))
+
+						if targetType then
+							npc.Instance:SetAttribute("TargetType", targetType)
+						end
 					end
 				else
 					local npc = hnpcs.new(Enemy.Name)
-					npc:Spawn(character:GetPivot() * CFrame.new(0, 0, -10))
+					npc:Spawn(character:GetPivot() * CFrame.new(0, 1, -10))
+
+					if targetType then
+						npc.Instance:SetAttribute("TargetType", targetType)
+					end
 				end
 			end,
 		},

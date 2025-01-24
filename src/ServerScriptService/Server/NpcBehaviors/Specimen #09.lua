@@ -132,7 +132,7 @@ local function grabPlayer(npc)
 	animationService:playAnimation(subject, "Attack", Enum.AnimationPriority.Action4.Value, false, 0, 1, 1.5)
 
 	timer.wait(0.1)
-	humanoid:TakeDamage(2 + npc["DamageBuff"] or 0)
+	humanoid:TakeDamage(2)
 
 	if not target or not target.Parent or not target.PrimaryPart then
 		return
@@ -149,7 +149,7 @@ local function hitPlayer(character, npc)
 	character.PrimaryPart.AssemblyLinearVelocity = Vector3.new(0, -200, 0)
 	local humanoid = character:FindFirstChild("Humanoid")
 
-	humanoid:TakeDamage(3 + npc["DamageBuff"] or 0)
+	humanoid:TakeDamage(3)
 end
 
 local function createAttackAt(npc, position, hasSound)
@@ -320,7 +320,7 @@ local function shootRock(npc, i)
 	if not humanoid or humanoid.Health <= 0 then
 		return
 	end
-	humanoid:TakeDamage(4 + npc["DamageBuff"] or 0)
+	humanoid:TakeDamage(4)
 end
 
 local function ShowCatwalks(npc, bossRoom)
@@ -413,7 +413,7 @@ local moves = {
 					local humanoid = character:FindFirstChild("Humanoid")
 
 					if humanoid and npc:GetState() ~= "Dead" then
-						humanoid:TakeDamage(1 + npc["DamageBuff"] or 0)
+						humanoid:TakeDamage(1)
 						lastDamage = os.clock()
 					end
 				end
@@ -519,7 +519,7 @@ local moves = {
 				if os.clock() - lastDamage < 0.25 or npc:GetState() == "Dead" then
 					continue
 				end
-				model.Humanoid:TakeDamage(1 + npc["DamageBuff"] or 0)
+				model.Humanoid:TakeDamage(1)
 
 				lastDamage = os.clock()
 			end
@@ -642,7 +642,7 @@ end
 
 local module = {
 	OnStep = {
-		{ Function = "SearchForTarget", Parameters = { "Player", stats.ViewDistance } },
+		{ Function = "SearchForTarget", Parameters = { stats.ViewDistance } },
 		--{ Function = "LeadTarget", Parameters = { true, stats.LeadCompensation, 0, true } },
 		{ Function = "Custom", Parameters = { runAttackTimer } },
 		{ Function = "Custom", Parameters = { lead } },
