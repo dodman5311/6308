@@ -2,22 +2,14 @@ local module = {}
 
 --// Services
 local Players = game:GetService("Players")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerStorage = game:GetService("ServerStorage")
 local CollectionService = game:GetService("CollectionService")
-local ServerScriptService = game:GetService("ServerScriptService")
-local RunService = game:GetService("RunService")
-local TweenService = game:GetService("TweenService")
-local Workspace = game:GetService("Workspace")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local map = workspace.Map
 
 --// Modules
-local Timer = require(Globals.Vendor.Timer)
-local Spring = require(Globals.Vendor.Spring)
 local Util = require(Globals.Vendor.Util)
 local AnimationService = require(Globals.Vendor.AnimationService)
 local Net = require(Globals.Packages.Net)
@@ -127,11 +119,11 @@ local function MoveToRandomPosition(npc, MaxDistance, onStep)
 	module.MoveTowardsPoint(npc, PositonToMoveTo, onStep)
 end
 
-local function getTimer(npc, timerName, ...)
+local function getTimer(npc, timerName, waitTime, func, ...)
 	local foundTimer = npc.Timers[timerName]
 
 	if not foundTimer then
-		npc.Timers[timerName] = npc.Timer:new(timerName, ...)
+		npc.Timers[timerName] = npc.Timer:new(timerName, waitTime, func, ...)
 		table.insert(npc.Timers[timerName].Parameters, 1, npc)
 		return npc.Timers[timerName]
 	end
@@ -176,8 +168,8 @@ end
 
 --// NPC ACTIONS //--
 
-function module.RunTimer(npc, timerName, isAttackTimer, ...)
-	local timer = getTimer(npc, timerName, ...)
+function module.RunTimer(npc, timerName, isAttackTimer, waitTime, func, ...)
+	local timer = getTimer(npc, timerName, waitTime, func, ...)
 
 	if isAttackTimer then
 		local oldFunction = timer.Function
@@ -321,7 +313,9 @@ local function createHitCast(npc, damage, cframe, distance, spread, size)
 	Net:RemoteEvent("CreateBeam"):FireAllClients(npc.Instance, damage, cframe, distance, spread, size)
 end
 
-function module.Shoot(npc, cooldown, amount, speed, bulletCount, info, visualModel, sender, indicateAttack)
+function module.Shoot(npc, sender, cooldown, amount, speed, bulletCount, info, visualModel, indicateAttack)
+	print(sender)
+
 	if npc:GetState() == "Dead" or module.CheckFear(npc) then
 		return
 	end
@@ -486,14 +480,23 @@ function module.ShootProjectile(
 		return
 	end
 
-	local attackTimer = getTimer(npc, timerIndex or "ShootAttack")
+	print(npc.Instance)
 
-	attackTimer.WaitTime = shotDelay
-	attackTimer.Function = module.Shoot
-	attackTimer.Parameters =
-		{ npc, cooldown, amount, speed, bulletCount, info, visualModel, npc.Instance, indicateAttack }
-
-	attackTimer:Run()
+	module.RunTimer(
+		npc,
+		npc.Instance,
+		timerIndex or "ShootAttack",
+		true,
+		shotDelay,
+		module.Shoot,
+		cooldown,
+		amount,
+		speed,
+		bulletCount,
+		info,
+		visualModel,
+		indicateAttack
+	)
 end
 
 function module.ShootWithoutTimer(npc, cooldown, amount, speed, bulletCount, info, visualModel, indicateAttack)
@@ -502,7 +505,7 @@ function module.ShootWithoutTimer(npc, cooldown, amount, speed, bulletCount, inf
 	end
 
 	npc.MindData.CantShoot = true -- return event required
-	module.Shoot(npc, cooldown, amount, speed, bulletCount, info, visualModel, npc.Instance, indicateAttack)
+	module.Shoot(npc, npc.Instance, cooldown, amount, speed, bulletCount, info, visualModel, indicateAttack)
 	return true
 end
 
@@ -526,7 +529,7 @@ function module.ShootPlayerProjectile(
 	AttackTimer.WaitTime = shotDelay
 	AttackTimer.Function = module.Shoot
 	AttackTimer.Parameters =
-		{ npc, cooldown, amount, speed, bulletCount, info, visualModel, Players:FindFirstChildOfClass("Player") }
+		{ npc, Players:FindFirstChildOfClass("Player"), cooldown, amount, speed, bulletCount, info, visualModel }
 
 	AttackTimer:Run()
 end
