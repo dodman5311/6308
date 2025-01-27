@@ -101,6 +101,10 @@ local function calculatePlacePosition(baseLink, newUnit, newLink)
 end
 
 local function addLink(unit)
+	if not unit:IsA("Model") then
+		return
+	end
+
 	for _, link in ipairs(unit.Links:GetChildren()) do
 		table.insert(links, link)
 	end
@@ -225,7 +229,13 @@ local function setLinks(baseLink, unit)
 	end
 end
 
-local function placeUnit(baseLink, unit, unitLink)
+local function placeUnit(baseLink: Part | CFrame, unit, unitLink, forInterior)
+	if forInterior then
+		local newDoor = replicatedStorage.Assets.Models.Door:Clone()
+		newDoor.Parent = map.Interior
+		newDoor:PivotTo(baseLink.CFrame)
+	end
+
 	local newUnit = unit:Clone()
 	local unitPosition = calculatePlacePosition(baseLink, newUnit, unitLink)
 	newUnit:PivotTo(unitPosition)
@@ -310,7 +320,7 @@ local function checkUnit(baseLink, unit)
 	end
 end
 
-local function addRandomUnit(baseLink)
+local function addRandomUnit(baseLink, forInterior)
 	local unitToPlace
 	local placeLink
 
@@ -349,7 +359,7 @@ local function addRandomUnit(baseLink)
 			end
 		end
 
-		return placeUnit(baseLink, unitToPlace, placeLink)
+		return placeUnit(baseLink, unitToPlace, placeLink, forInterior)
 		--else
 		--placeCap(baseLink)
 	end
@@ -383,13 +393,13 @@ function module.generateUnitsForLinks()
 	end
 end
 
-function module.generateUnit(linkList)
+function module.generateUnit(linkList, forInterior)
 	for _, link in ipairs(linkList) do
 		if not checkLink(link) then
 			continue
 		end
 
-		local placedUnit = addRandomUnit(link)
+		local placedUnit = addRandomUnit(link, forInterior)
 		if not placedUnit then
 			continue
 		end
@@ -527,6 +537,59 @@ function module.loadLinearMap(size)
 	spawners.spawnHazards(level)
 
 	for _, unit in ipairs(map:GetChildren()) do
+		doUnitFunction("OnLoaded", unit)
+	end
+
+	module.GeneratedAt = os.clock()
+end
+
+function module.loadInterior(size)
+	if map:FindFirstChild("Interior") then
+		map.Interior:Destroy()
+	end
+
+	local interiorFolder = Instance.new("Folder")
+	interiorFolder.Parent = map
+	interiorFolder.Name = "Interior"
+	interiorFolder:AddTag("Exclude")
+
+	units = stageFolder.Interior
+
+	local currentUnit = Shuffle(units:GetChildren())[1]
+	currentUnit = currentUnit:Clone()
+	currentUnit.Parent = interiorFolder
+	currentUnit:PivotTo(CFrame.new(0, 10000, 0))
+
+	for _, part in ipairs(currentUnit:GetChildren()) do
+		if not part:IsA("BasePart") then
+			continue
+		end
+
+		part.Transparency = 1
+
+		if part.Name ~= "Hitbox" then
+			continue
+		end
+		part.CollisionGroup = "PathfindingHitbox"
+	end
+
+	for _ = 1, math.ceil(size) do
+		if not currentUnit then
+			continue
+		end
+		currentUnit = module.generateUnit(currentUnit.Links:GetChildren(), true)
+		if currentUnit then
+			currentUnit.Parent = interiorFolder
+		end
+	end
+
+	local plusStage = (module.CurrentStage - 1) * 5
+	local level = plusStage + module.CurrentLevel
+	spawners.spawnEnemies(level, interiorFolder)
+	spawners.spawnWeapons(level, interiorFolder)
+	spawners.spawnHazards(level, interiorFolder)
+
+	for _, unit in ipairs(interiorFolder:GetChildren()) do
 		doUnitFunction("OnLoaded", unit)
 	end
 

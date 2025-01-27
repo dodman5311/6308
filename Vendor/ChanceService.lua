@@ -88,7 +88,7 @@ function module.checkChance(chance, goodLuck, PureLuck)
 		and not PureLuck
 		and giftService.CheckGift("Take_Two")
 		and player.Character
-		and rng:NextNumber(0, 100) <= player.Character:WaitForChild("Humanoid").Health * 15
+		and rng:NextNumber(0, 100) <= math.abs(player.Character:WaitForChild("Humanoid").Health - 5) * 15
 		and rng:NextNumber(0, 100) <= chance
 	then
 		resetRepLuck(goodLuck)

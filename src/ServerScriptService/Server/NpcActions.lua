@@ -223,9 +223,6 @@ function module.AddTag(npc, Tag)
 end
 
 function module.MoveToRandomUnit(npc)
-	-- local distanceToPoint = npc["MovingToPoint"] and (npc.Instance:GetPivot().Position - npc.MovingToPoint).Magnitude
-	-- 	or 0
-	--distanceToPoint <= 25 or
 	if npc.Path.Status == "Idle" then
 		local getUnit = Util.getRandomChild(workspace.Map)
 		--local point = getUnit:GetPivot().Position
@@ -238,6 +235,12 @@ function module.MoveToRandomUnit(npc)
 		local raycast = workspace:Raycast(origin.Position, origin.UpVector * -200, rp)
 
 		if raycast then
+			local distanceToPoint = (npc.Instance:GetPivot().Position - raycast.Position).Magnitude
+
+			if distanceToPoint > 6000 then
+				return
+			end
+
 			npc.MovingToPoint = raycast.Position
 		end
 	end
@@ -480,15 +483,13 @@ function module.ShootProjectile(
 		return
 	end
 
-	print(npc.Instance)
-
 	module.RunTimer(
 		npc,
-		npc.Instance,
 		timerIndex or "ShootAttack",
 		true,
 		shotDelay,
 		module.Shoot,
+		npc.Instance,
 		cooldown,
 		amount,
 		speed,

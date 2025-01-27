@@ -484,6 +484,24 @@ local commands = {
 			end,
 		},
 
+		LoadInterior = {
+			Parameters = function()
+				return {
+					{ Name = "Interior Size", Options = { "_Input" } },
+					{ Name = "Teleport To", Options = { true, false } },
+				}
+			end,
+
+			ExecuteServer = function(_, player, size, tp)
+				local mapService = require(Globals.Services.MapService)
+				mapService.loadInterior(size)
+
+				if tp then
+					player.Character:PivotTo(CFrame.new(0, 10000, 0))
+				end
+			end,
+		},
+
 		ClearEnemies = {
 
 			Parameters = function()

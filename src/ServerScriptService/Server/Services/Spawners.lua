@@ -226,10 +226,12 @@ function module.spawnInUnit(currentLevel, unit, toSpawn, offset, partToSpawnOn, 
 	return true
 end
 
-function module.spawnEnemies(currentLevel)
-	module.EnemiesSpawned = 0
+function module.spawnEnemies(currentLevel, mapOverride)
+	local spawnIn = mapOverride or map
 
-	for _, spawner in ipairs(map:GetDescendants()) do
+	local enemiesSpawned = 0
+
+	for _, spawner in ipairs(spawnIn:GetDescendants()) do
 		if spawner.Name ~= "EnemySpawn" then
 			continue
 		end
@@ -244,22 +246,53 @@ function module.spawnEnemies(currentLevel)
 
 		for _ = 1, math.random(spawnAmount - 1, spawnAmount) do
 			if module.spawnInUnit(currentLevel, unit, "Enemy", Vector3.new(0, 5, 0), spawner) then
-				module.EnemiesSpawned += 1
+				enemiesSpawned += 1
 			end
 		end
 	end
+
+	if not mapOverride then
+		module.EnemiesSpawned = enemiesSpawned
+	end
+	return enemiesSpawned
 end
 
-function module.spawnWeapons(currentLevel)
-	module.WeaponsSpawned = 0
+function module.spawnWeapons(currentLevel, mapOverride)
+	local weaponsSpawned = 0
 
-	for _, spawner in ipairs(map:GetDescendants()) do
+	local spawnIn = mapOverride or map
+	for _, spawner in ipairs(spawnIn:GetDescendants()) do
 		if spawner.Name ~= "WeaponSpawn" then
 			continue
 		end
 
 		if module.spawnInUnit(currentLevel, nil, "Weapon", Vector3.new(0, 3, 0), spawner) then
-			module.WeaponsSpawned += 1
+			weaponsSpawned += 1
+		end
+	end
+
+	if not mapOverride then
+		module.WeaponsSpawned = weaponsSpawned
+	end
+
+	return weaponsSpawned
+end
+
+function module.spawnHazards(currentLevel, mapOverride)
+	local spawnIn = mapOverride or map
+
+	for _, spawner in ipairs(spawnIn:GetDescendants()) do
+		if spawner.Name ~= "HazardSpawn" then
+			continue
+		end
+
+		local cframe = getSpawnPoint(spawner)
+		local hazardToSpawn = spawner:GetAttribute("HazardType")
+
+		if hazardToSpawn == "VendingMachine" then
+			module.placeNewObject(currentLevel, cframe, "VendingMachine")
+		else
+			module.placeNewObject(currentLevel, cframe, "Npc", hazardToSpawn)
 		end
 	end
 end
@@ -284,23 +317,6 @@ function module.SpawnBoss(bossToSpawn, unit)
 			return
 		else
 			newObject.DamageBuff = 0
-		end
-	end
-end
-
-function module.spawnHazards(currentLevel)
-	for _, spawner in ipairs(map:GetDescendants()) do
-		if spawner.Name ~= "HazardSpawn" then
-			continue
-		end
-
-		local cframe = getSpawnPoint(spawner)
-		local hazardToSpawn = spawner:GetAttribute("HazardType")
-
-		if hazardToSpawn == "VendingMachine" then
-			module.placeNewObject(currentLevel, cframe, "VendingMachine")
-		else
-			module.placeNewObject(currentLevel, cframe, "Npc", hazardToSpawn)
 		end
 	end
 end

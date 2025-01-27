@@ -292,8 +292,18 @@ end
 
 function util.getRandomChild(Parent)
 	local children = Parent:GetChildren()
-	local i = rng:NextInteger(1, #children)
-	return children[i]
+	local completeTable = {}
+
+	for _, v in ipairs(children) do
+		if v:HasTag("Exclude") then
+			continue
+		end
+
+		table.insert(completeTable, v)
+	end
+
+	local i = rng:NextInteger(1, #completeTable)
+	return completeTable[i]
 end
 
 function util.loadToTable(Parent: Instance, LoadTo: Animator)
