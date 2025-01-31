@@ -1,5 +1,5 @@
 local stats = {
-	ViewDistance = 150,
+	ViewDistance = 85,
 	AttackDelay = { Min = 2, Max = 6 },
 	MoveDelay = { Min = 5, Max = 10 },
 	AttackCooldown = 0.075,

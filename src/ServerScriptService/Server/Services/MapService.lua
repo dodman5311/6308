@@ -678,6 +678,12 @@ function module.proceedToNext(sender, onlyLoadMap)
 	workspace:SetAttribute("Stage", module.CurrentStage)
 	workspace:SetAttribute("TotalLevel", ((module.CurrentStage - 1) * 5) + module.CurrentLevel)
 
+	if module.CurrentStage == 3 then
+		Lighting.Atmosphere.Density = 0.45
+	else
+		Lighting.Atmosphere.Density = 0.55
+	end
+
 	if math.floor(module.CurrentLevel) ~= module.CurrentLevel then
 		module.loadBossRoom()
 		return
@@ -712,6 +718,23 @@ function module.exitMiniBoss()
 	exitModule.ExitSequence(room, module)
 end
 
+local function setAllPersistant(_, value)
+	for _, model: Model in ipairs(workspace:GetChildren()) do
+		if not model:IsA("Model") then
+			continue
+		end
+
+		if value then
+			model.ModelStreamingMode = Enum.ModelStreamingMode.Persistent
+		else
+			model.ModelStreamingMode = Enum.ModelStreamingMode.Default
+		end
+	end
+
+	return true
+end
+
+net:Handle("SetPersistant", setAllPersistant)
 net:Connect("BossExit", module.bossExit)
 net:Connect("MiniBossExit", module.exitMiniBoss)
 

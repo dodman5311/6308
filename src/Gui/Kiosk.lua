@@ -350,7 +350,6 @@ function module.Init(player, ui, frame)
 
 		if GiftsService.CheckUpgrade("A+ Dough") then
 			costIsDoubled = chanceService.checkChance(15, false)
-			print(costIsDoubled)
 		else
 			costIsDoubled = false
 		end

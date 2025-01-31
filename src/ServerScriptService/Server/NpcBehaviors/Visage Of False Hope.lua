@@ -1,6 +1,10 @@
 local BadgeService = game:GetService("BadgeService")
 local CollectionService = game:GetService("CollectionService")
+local AnalyticsService = game:GetService("AnalyticsService")
 local rng = Random.new()
+
+local HttpService = game:GetService("HttpService")
+funnelSessionId = HttpService:GenerateGUID()
 
 local Debris = game:GetService("Debris")
 local Lighting = game:GetService("Lighting")
@@ -162,7 +166,7 @@ local function dealDamage(npc, humanoid, amount)
 		return
 	end
 
-	humanoid:TakeDamage(amount)
+	humanoid:TakeDamage(amount + npc["DamageBuff"] or 0)
 end
 
 local function indicateAttack(npc, color)
@@ -818,6 +822,12 @@ local function onDied(npc)
 				net:RemoteEvent("DoUiAction"):FireAllClients("Notify", "AchievementUnlocked", true, 1970850586708568)
 			end
 		end)
+
+		AnalyticsService:LogFunnelStepEvent(player, "VisageFight", funnelSessionId, 2, "Fight Ended", {
+			[Enum.AnalyticsCustomFieldKeys.CustomField01] = player.Character:GetAttribute("HasHaven") and "Has Haven"
+				or "No Haven",
+			[Enum.AnalyticsCustomFieldKeys.CustomField02] = "Won",
+		})
 	end
 
 	for _, enemy in ipairs(CollectionService:GetTagged("Enemy")) do
@@ -869,6 +879,22 @@ end
 
 local function setUp(npc)
 	npc.Instance.Apature:PivotTo(CFrame.new(npc.Instance:GetPivot().Position))
+
+	for _, player in ipairs(Players:GetPlayers()) do
+		AnalyticsService:LogFunnelStepEvent(player, "VisageFight", funnelSessionId, 1, "Fight Began", {
+			[Enum.AnalyticsCustomFieldKeys.CustomField01] = player.Character:GetAttribute("HasHaven") and "Has Haven"
+				or "No Haven",
+		})
+
+		player.Character.Destroying:Connect(function()
+			AnalyticsService:LogFunnelStepEvent(player, "VisageFight", funnelSessionId, 2, "Fight Ended", {
+				[Enum.AnalyticsCustomFieldKeys.CustomField01] = player.Character:GetAttribute("HasHaven")
+						and "Has Haven"
+					or "No Haven",
+				[Enum.AnalyticsCustomFieldKeys.CustomField02] = "Lost",
+			})
+		end)
+	end
 end
 
 -- end
@@ -879,7 +905,7 @@ local module = {
 		{ Function = "Custom", Parameters = { RunGeyserCheck } },
 		{ Function = "Custom", Parameters = { spawnEnemies } },
 		{ Function = "Custom", Parameters = { runAttackTimer } },
-		{ Function = "SearchForTarget", Parameters = { math.huge } },
+		{ Function = "SearchForTarget", Parameters = { "Player", math.huge } },
 	},
 
 	OnSpawned = {

@@ -221,7 +221,6 @@ local function detectHit(partHit, launchedPart, item)
 	local _, characterHit = util.checkForHumanoid(partHit)
 
 	if not partHit:FindFirstAncestor("Map") then
-		print(not characterHit, characterHit == player.Character)
 		if not characterHit or characterHit == player.Character then
 			return
 		end

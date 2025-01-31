@@ -538,10 +538,6 @@ local moves = {
 
 		util.tween(electricSound, TweenInfo.new(1), { Volume = 0 }, false, function()
 			electricSound:Stop()
-
-			task.defer(function()
-				print(electricSound.Parent)
-			end)
 		end)
 
 		Debris:AddItem(newGround, 5)

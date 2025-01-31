@@ -1,7 +1,6 @@
 local module = {}
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local serverStorage = game:GetService("ServerStorage")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local CollectionService = game:GetService("CollectionService")
@@ -337,7 +336,7 @@ net:Connect("PickupWeapon", function(player, object)
 	object:Destroy()
 end)
 
-signals.ActivateUpgrade:Connect(function(player, upgradeName)
+signals.ActivateUpgrade:Connect(function(_, upgradeName)
 	if upgradeName == "Bigger Boxes" then
 		objectTypes.Weapon.SpawnChance -= 5
 	end

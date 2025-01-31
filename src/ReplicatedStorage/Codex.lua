@@ -199,7 +199,7 @@ Despite its differences, the Specimen still serves as a protector, but of the Vi
 
 	["Ghoul"] = {
 		Catagory = "Enemies",
-		Entry = [[<font color="#FF7800"><b>Walk backwards to avoid the goul's attacks. Shoot it's heart for an insta kill.
+		Entry = [[<font color="#FF7800"><b>Walk backwards to avoid the ghoul's attacks. Shoot its heart for an insta kill.
 		
 Immune to all weapons except Pistols.</b></font>
 		

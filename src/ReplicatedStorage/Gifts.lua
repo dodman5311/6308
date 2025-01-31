@@ -32,7 +32,7 @@ local module = {
 
 		Fast_Mags = {
 			Icon = "rbxassetid://16235738334",
-			Catagories = { "Arsenal" },
+			Catagories = { "Tactical", "Arsenal" },
 			Desc = "Reload speed is now increased. (+25%)",
 		},
 
@@ -243,11 +243,11 @@ local module = {
 			Desc = "Your combo score is now linked to your Luck. (+1 Luck per combo score, Max 20)",
 		},
 
-		Haven = {
-			Icon = "rbxassetid://16235850238",
-			Catagories = { "Soul" },
-			Desc = "When hit, you now gain 1 second of invincibility.",
-		},
+		-- Haven = {
+		-- 	Icon = "rbxassetid://16235850238",
+		-- 	Catagories = { "Soul" },
+		-- 	Desc = "When hit, you now gain 1 second of invincibility.",
+		-- },
 
 		Ultra_Slayer = {
 			Icon = "rbxassetid://16275507396",
@@ -275,7 +275,7 @@ local module = {
 			Desc = "Drav has starved to death. (You've killed your friend)",
 		},
 
-		TactiAwesome = { -- done
+		TactiAwesome = {
 			Icon = "rbxassetid://18715333039",
 			Catagories = { "Tactical" },
 			Desc = "Weapons can now be reloaded infinitely and will auto reload when ammo is depleted. (reload time = 5% of the mag size)",
@@ -310,13 +310,13 @@ and will be given extra jump in the air.
 +50% movement speed while wallrunning.]],
 		},
 
-		["Paladin's_Faith"] = { -- done
+		["Paladin's_Faith"] = {
 			Icon = "rbxassetid://18671027019",
 			Catagories = { "Soul" },
 			Desc = "At the beginning of each level, you now start with a shield around you. (30 shield health)",
 		},
 
-		["Coming_Soon!"] = { -- done
+		["Coming_Soon!"] = {
 			Icon = "rbxassetid://16422611114",
 			Catagories = { "Soul", "Tactical", "Arsenal", "Luck" },
 			Desc = "Perk coming soon! (Still planning it out)",

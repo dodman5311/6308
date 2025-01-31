@@ -5,7 +5,7 @@ local module = {
 --// Services
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local collectionService = game:GetService("CollectionService")
-local DataStoreService = game:GetService("DataStoreService")
+local AnalyticsService = game:GetService("AnalyticsService")
 local Players = game:GetService("Players")
 
 --// Instances
@@ -48,6 +48,13 @@ end
 
 Players.PlayerAdded:Connect(function(player: Player)
 	player.CharacterAdded:Connect(function(character)
+		AnalyticsService:LogProgressionStartEvent(
+			player,
+			"Campaign",
+			workspace:GetAttribute("Level"),
+			tostring(workspace:GetAttribute("Stage"))
+		)
+
 		local humanoid: Humanoid = character:WaitForChild("Humanoid")
 		humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
 
@@ -108,6 +115,32 @@ Players.PlayerAdded:Connect(function(player: Player)
 end)
 
 local function onDied(player: Player)
+	local closestDistance, closestEnemy = math.huge
+	for _, enemy in ipairs(collectionService:GetTagged("Enemy")) do
+		local distance = (player.Character:GetPivot().Position - enemy:GetPivot().Position).Magnitude
+
+		if distance < closestDistance then
+			closestEnemy = enemy
+		end
+	end
+
+	AnalyticsService:LogProgressionFailEvent(
+		player,
+		"Campaign",
+		workspace:GetAttribute("Level"),
+		tostring(workspace:GetAttribute("Stage"))
+	)
+
+	if closestEnemy then
+		AnalyticsService:LogProgressionEvent(
+			player,
+			"DiedNearEnemy",
+			Enum.AnalyticsProgressionType.Custom,
+			closestDistance,
+			closestEnemy.Name
+		)
+	end
+
 	if
 		player:GetAttribute("UpgradeName") == "Anchovies"
 		and mapService.CurrentLevel ~= math.round(mapService.CurrentLevel)
@@ -142,7 +175,7 @@ local function onDied(player: Player)
 			character:PivotTo(spawnLocation.CFrame * CFrame.new(0, 3, 0))
 		end
 
-		player.CharacterAdded:Once(function(character)
+		player.CharacterAdded:Once(function()
 			signals["ProceedToNextLevel"]:Fire(nil, true)
 		end)
 	end
@@ -247,9 +280,7 @@ net:Connect("CreateShield", function(player)
 	require(newShield.RemoveShield).OnSpawned()
 end)
 
-net:Connect("ProceedToNextLevel", function(player) end)
-
-signals.ActivateUpgrade:Connect(function(player, upgradeName)
+signals.ActivateUpgrade:Connect(function(player)
 	local character = player.Character
 	if not character then
 		return

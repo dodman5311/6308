@@ -29,7 +29,7 @@ end
 function util.getSetting(settingName)
 	local settings = require(ReplicatedStorage.Shared.GameSettings)
 
-	for i, v in ipairs(settings) do
+	for _, v in ipairs(settings) do
 		if v.Name == settingName then
 			return v
 		end

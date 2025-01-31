@@ -1294,7 +1294,7 @@ local function grenadeLockOn()
 		return
 	end
 
-	grenadeLockTimer.WaitTime = 0.35
+	grenadeLockTimer.WaitTime = 0.15
 	grenadeLockTimer.Function = function()
 		local target = getObjectInCenter(player, grenadeLocks)
 		if not target then

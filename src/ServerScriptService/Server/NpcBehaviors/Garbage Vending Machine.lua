@@ -45,7 +45,7 @@ local function explode(npc)
 end
 
 local function GiveObjects(npc)
-	local character = actions.SearchForTarget(npc, "Player", math.huge)
+	local character = actions.SearchForTarget(npc, math.huge)
 	if not character then
 		return
 	end

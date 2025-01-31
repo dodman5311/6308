@@ -7,7 +7,7 @@ local function onSpawn(npc)
 
 	for _ = 0, 10 do
 		local randomPos = npc.Instance:GetPivot().Position
-			+ Vector3.new(rng:NextNumber(-5, 5), 0, rng:NextNumber(-5, 5))
+			+ Vector3.new(rng:NextNumber(-20, 20), 0, rng:NextNumber(-20, 20))
 
 		local rp = RaycastParams.new()
 		rp.FilterType = Enum.RaycastFilterType.Include
@@ -44,7 +44,7 @@ local function makeImmortal(npc)
 		local distance = (subject:GetPivot().Position - enemy:GetPivot().Position).Magnitude
 
 		if distance > 75 then
-			humanoid:SetAttribute("Invincible", false)
+			humanoid:SetAttribute("Invincible", humanoid:GetAttribute("Invincible") - 1)
 
 			local enemyIndex = table.find(npc.loggedEnemies, enemy)
 			if enemyIndex then
@@ -54,7 +54,7 @@ local function makeImmortal(npc)
 			continue
 		end
 
-		humanoid:SetAttribute("Invincible", true)
+		humanoid:SetAttribute("Invincible", humanoid:GetAttribute("Invincible") + 1)
 
 		local enemyIndex = table.find(npc.loggedEnemies, enemy)
 

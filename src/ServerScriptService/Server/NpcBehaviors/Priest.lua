@@ -1,7 +1,7 @@
 local stats = {
 	ViewDistance = 200,
 
-	AttackDistance = 5,
+	AttackDistance = 6,
 	AttackDelay = 2,
 
 	NpcType = "Enemy",

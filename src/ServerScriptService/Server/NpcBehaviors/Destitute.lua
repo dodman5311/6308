@@ -1,9 +1,9 @@
 local stats = {
 	AttackDistance = 30,
-	ViewDistance = 400,
+	ViewDistance = 150,
 	NpcType = "Enemy",
 	MoveDelay = { Min = 2, Max = 5 },
-	AttackDelay = { Min = 5, Max = 10 },
+	AttackDelay = { Min = 5, Max = 8 },
 }
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -20,6 +20,7 @@ local function Unaim(npc)
 	if not npc.MindData.Aiming then
 		return
 	end
+	npc.Instance.AimGui.Enabled = false
 
 	local model = npc.Instance
 	animationService:stopAnimation(model, "Attack")
@@ -48,6 +49,7 @@ local function aim(npc)
 	end
 
 	npc.MindData.Aiming = true
+	npc.Instance.AimGui.Enabled = true
 
 	model.Humanoid.WalkSpeed = 0
 
@@ -112,7 +114,7 @@ end
 local module = {
 	OnStep = {
 		{ Function = "MoveRandom", Parameters = { 60, stats.MoveDelay }, State = "Idle" },
-		{ Function = "SearchForTarget", Parameters = { 500 } },
+		{ Function = "SearchForTarget", Parameters = { stats.ViewDistance } },
 
 		{ Function = "Custom", Parameters = { lookAtTarget }, State = "Attacking" },
 		{ Function = "RunTimer", Parameters = { "Attack", true, getRandomTime(), shoot } },

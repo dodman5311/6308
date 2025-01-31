@@ -88,7 +88,6 @@ local function getNearest(npc, maxDistance)
 		end
 
 		local distance = (npc.Instance:GetPivot().Position - model:GetPivot().Position).Magnitude
-
 		if distance > maxDistance or distance > closestDistance then
 			continue
 		end
@@ -119,13 +118,24 @@ local function MoveToRandomPosition(npc, MaxDistance, onStep)
 	module.MoveTowardsPoint(npc, PositonToMoveTo, onStep)
 end
 
-local function getTimer(npc, timerName, waitTime, func, ...)
+local function getTimer(npc, timerName, waitTime, func, isAttackTimer, ...)
 	local foundTimer = npc.Timers[timerName]
 
 	if not foundTimer then
-		npc.Timers[timerName] = npc.Timer:new(timerName, waitTime, func, ...)
+		foundTimer = npc.Timer:new(timerName, waitTime, func, ...)
+		npc.Timers[timerName] = foundTimer
 		table.insert(npc.Timers[timerName].Parameters, 1, npc)
-		return npc.Timers[timerName]
+
+		if isAttackTimer then
+			local oldFunction = foundTimer.Function
+
+			foundTimer.Function = function()
+				if module.CheckFear(npc) then
+					return
+				end
+				oldFunction(table.unpack(foundTimer.Parameters))
+			end
+		end
 	end
 
 	return foundTimer
@@ -169,19 +179,7 @@ end
 --// NPC ACTIONS //--
 
 function module.RunTimer(npc, timerName, isAttackTimer, waitTime, func, ...)
-	local timer = getTimer(npc, timerName, waitTime, func, ...)
-
-	if isAttackTimer then
-		local oldFunction = timer.Function
-
-		timer.Function = function()
-			if module.CheckFear(npc) then
-				return
-			end
-			oldFunction(table.unpack(timer.Parameters))
-		end
-	end
-
+	local timer = getTimer(npc, timerName, waitTime, func, isAttackTimer, ...)
 	timer:Run()
 end
 
@@ -317,8 +315,6 @@ local function createHitCast(npc, damage, cframe, distance, spread, size)
 end
 
 function module.Shoot(npc, sender, cooldown, amount, speed, bulletCount, info, visualModel, indicateAttack)
-	print(sender)
-
 	if npc:GetState() == "Dead" or module.CheckFear(npc) then
 		return
 	end
@@ -502,7 +498,7 @@ end
 
 function module.ShootWithoutTimer(npc, cooldown, amount, speed, bulletCount, info, visualModel, indicateAttack)
 	if npc.Instance:GetAttribute("State") ~= "Attacking" or npc.MindData["CantShoot"] then
-		return
+		return false
 	end
 
 	npc.MindData.CantShoot = true -- return event required
@@ -525,12 +521,20 @@ function module.ShootPlayerProjectile(
 		return
 	end
 
-	local AttackTimer = getTimer(npc, timerIndex or "ShootAttack")
-
-	AttackTimer.WaitTime = shotDelay
-	AttackTimer.Function = module.Shoot
-	AttackTimer.Parameters =
-		{ npc, Players:FindFirstChildOfClass("Player"), cooldown, amount, speed, bulletCount, info, visualModel }
+	local AttackTimer = getTimer(
+		npc,
+		timerIndex or "ShootAttack",
+		shotDelay,
+		module.Shoot,
+		true,
+		Players:FindFirstChildOfClass("Player"),
+		cooldown,
+		amount,
+		speed,
+		bulletCount,
+		info,
+		visualModel
+	)
 
 	AttackTimer:Run()
 end
@@ -540,16 +544,12 @@ function module.ShootCharge(npc, shotDelay, damage, chargeTime, distance, bullet
 		return
 	end
 
-	local AttackTimer = getTimer(npc, "ChargedAttack")
-
-	AttackTimer.WaitTime = shotDelay
-	AttackTimer.Function = function()
+	local AttackTimer = getTimer(npc, "ChargedAttack", shotDelay, function()
 		for _ = 1, amount or 1 do
 			module.ShootBeam(npc, damage, chargeTime, distance, bulletCount, size)
 			task.wait(cooldown or 0)
 		end
-	end
-	--AttackTimer.Parameters = { npc, damage, chargeTime, distance, bulletCount, cooldown, amount }
+	end, true)
 
 	AttackTimer:Run()
 end
@@ -559,22 +559,13 @@ function module.AttackInMelee(npc, distance, swingDelay, stopMovement)
 		return
 	end
 
-	local AttackTimer = getTimer(npc, "MeleeAttack")
-
-	AttackTimer.WaitTime = swingDelay
-	AttackTimer.Function = swing
-	AttackTimer.Parameters = { npc, distance, stopMovement }
+	local AttackTimer = getTimer(npc, "MeleeAttack", swingDelay, swing, true, distance, stopMovement)
 
 	AttackTimer:Run()
 end
 
 function module.MoveRandom(npc, MaxDistance, delay)
-	local MoveTimer = getTimer(npc, "MoveRandom")
-
-	MoveTimer.WaitTime = delay
-	MoveTimer.Function = MoveToRandomPosition
-	MoveTimer.Parameters = { npc, MaxDistance }
-
+	local MoveTimer = getTimer(npc, "MoveRandom", delay, MoveToRandomPosition, false, MaxDistance)
 	MoveTimer:Run()
 end
 
@@ -780,7 +771,7 @@ end
 
 --// Main //--
 
-Net:Connect("GiftAdded", function(player, gift)
+Net:Connect("GiftAdded", function(_, gift)
 	if gift == "Sierra_6308" then
 		canFear = true
 
@@ -788,7 +779,7 @@ Net:Connect("GiftAdded", function(player, gift)
 	end
 end)
 
-Net:Connect("GiftRemoved", function(player, gift)
+Net:Connect("GiftRemoved", function(_, gift)
 	if gift == "Sierra_6308" then
 		canFear = false
 

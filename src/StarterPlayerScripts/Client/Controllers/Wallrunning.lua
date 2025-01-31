@@ -93,7 +93,7 @@ local function jumpOffWall(_, state)
 	local primaryPart = character.PrimaryPart
 	local humanoid = character.Humanoid
 
-	if state ~= Enum.UserInputState.Begin then
+	if state ~= Enum.UserInputState.End then
 		return
 	end
 
@@ -110,7 +110,7 @@ local function jumpOffWall(_, state)
 end
 
 local function wallrun(distanceToCeiling)
-	if acts:checkAct("ledgeGrab", "grappling") then
+	if acts:checkAct("ledgeGrab", "grappling") or not spaceDown then
 		return
 	end
 
@@ -218,6 +218,18 @@ function module:OnDied()
 	module.vectorMod:Destroy()
 	module.direction:Destroy()
 end
+
+UserInputService.InputBegan:Connect(function(input)
+	if input.KeyCode == Enum.KeyCode.Space then
+		spaceDown = true
+	end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+	if input.KeyCode == Enum.KeyCode.Space then
+		spaceDown = false
+	end
+end)
 
 --// Actions
 rp.FilterType = Enum.RaycastFilterType.Exclude
