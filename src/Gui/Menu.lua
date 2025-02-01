@@ -639,7 +639,7 @@ local function loadMap(player, frame)
 		viewport.Map:Destroy()
 	end
 
-	local map = workspace.Map:Clone()
+	local map = ReplicatedStorage:FindFirstChild("Map"):Clone()
 	map:PivotTo(CFrame.new())
 
 	for _, v in ipairs(map:GetDescendants()) do
@@ -687,15 +687,14 @@ local function loadMap(player, frame)
 	end
 
 	for _, weapon in ipairs(CollectionService:GetTagged("Weapon")) do
-		local newWeapon = weapon:Clone()
-		newWeapon.Parent = map
-
-		for _, part in ipairs(newWeapon:GetDescendants()) do
-			if not part:IsA("BasePart") or part.Transparency == 1 then
-				continue
-			end
-			part.Transparency = 0
-		end
+		local newPart = Instance.new("Part")
+		newPart.Color = Color3.new(1, 0.921568, 0.341176)
+		newPart.Anchored = true
+		newPart.Material = Enum.Material.Neon
+		newPart.CFrame = weapon:GetPivot()
+		newPart.Size = Vector3.one * 3
+		newPart.Name = "Weapon"
+		newPart.Parent = map
 	end
 
 	for _, enemy in ipairs(CollectionService:GetTagged("Enemy")) do
@@ -711,7 +710,7 @@ local function loadMap(player, frame)
 
 	for _, machine in ipairs(CollectionService:GetTagged("VendingMachine")) do
 		local newPart = ReplicatedStorage.MapVendingMachine:Clone()
-		newPart.Color = machine.PrimaryPart.Color
+		newPart.Color = machine:GetAttribute("Color")
 		newPart.CFrame = machine:GetPivot()
 
 		newPart.Parent = map
@@ -1011,11 +1010,20 @@ function module.openMap(player, ui, frame)
 		return
 	end
 
+	hideAllMenus(frame)
 	currentMenu = "Map"
 
-	mapInFocus = false
+	-- local unitCount = net:RemoteFunction("SetAllPersistant"):InvokeServer(true)
+	-- repeat
+	-- 	task.wait()
+	-- until #workspace.Map:GetChildren() == unitCount
 
-	hideAllMenus(frame)
+	--local storedMap = net:RemoteFunction("GetStoredMap"):InvokeServer()
+
+	if currentMenu ~= "Map" then
+		return
+	end
+
 	loadMap(player, frame)
 	processCamera(frame)
 

@@ -34,6 +34,8 @@ local bossRoom
 local miniBossRoom
 local stageFolder
 
+local storedMap
+
 --// values
 local showHitboxes = false
 local newStart
@@ -644,7 +646,18 @@ signals["GenerateMap"]:Connect(function(Style, Size)
 	end
 end)
 
-function module.proceedToNext(sender, onlyLoadMap)
+local function createStoredMap()
+	if storedMap then
+		storedMap:Destroy()
+	end
+
+	local newStoredMap = workspace.Map:Clone() :: Model
+	newStoredMap.ModelStreamingMode = Enum.ModelStreamingMode.Persistent
+	newStoredMap.Parent = replicatedStorage
+	return newStoredMap
+end
+
+function module.proceedToNext(_, onlyLoadMap)
 	for _, player in ipairs(Players:GetPlayers()) do -- Teleport players to spawn
 		local character = player.Character
 		if not character then
@@ -686,13 +699,11 @@ function module.proceedToNext(sender, onlyLoadMap)
 
 	if math.floor(module.CurrentLevel) ~= module.CurrentLevel then
 		module.loadBossRoom()
+		storedMap = createStoredMap()
 		return
 	end
 	module.loadLinearMap(math.clamp(module.CurrentLevel * 4, 5, 25))
-
-	if not sender then
-		return
-	end
+	storedMap = createStoredMap()
 end
 
 signals["ProceedToNextLevel"]:Connect(module.proceedToNext)
@@ -717,26 +728,6 @@ function module.exitMiniBoss()
 
 	exitModule.ExitSequence(room, module)
 end
-
-local function setAllPersistant(_, value)
-	for _, model: Model in ipairs(workspace:GetChildren()) do
-		if not model:IsA("Model") then
-			continue
-		end
-
-		if value then
-			model.ModelStreamingMode = Enum.ModelStreamingMode.Persistent
-		else
-			model.ModelStreamingMode = Enum.ModelStreamingMode.Default
-		end
-	end
-
-	return true
-end
-
-net:Handle("SetPersistant", setAllPersistant)
-net:Connect("BossExit", module.bossExit)
-net:Connect("MiniBossExit", module.exitMiniBoss)
 
 local function detectHit(part: BasePart)
 	local model = part:FindFirstAncestorOfClass("Model")
@@ -793,5 +784,8 @@ RunService.Heartbeat:Connect(function()
 		end
 	end
 end)
+
+net:Connect("BossExit", module.bossExit)
+net:Connect("MiniBossExit", module.exitMiniBoss)
 
 return module

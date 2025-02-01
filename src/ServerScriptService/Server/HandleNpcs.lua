@@ -276,6 +276,25 @@ function module.new(NPCType)
 	newModel = newModel:Clone()
 	newModel:AddTag("Npc")
 
+	if newModel.PrimaryPart then
+		local invincibility = ReplicatedStorage.Assets.Effects.Invincibility
+		local a1 = invincibility.Invincibility_A1:Clone()
+		local a2 = invincibility.Invincibility_A2:Clone()
+
+		local shield1 = invincibility.Invincibility_Shield_1:Clone()
+		local shield2 = invincibility.Invincibility_Shield_2:Clone()
+
+		shield1.Attachment0 = a2
+		shield1.Attachment1 = a1
+		shield2.Attachment0 = a2
+		shield2.Attachment1 = a1
+
+		a1.Parent = newModel.PrimaryPart
+		a2.Parent = newModel.PrimaryPart
+		shield1.Parent = newModel.PrimaryPart
+		shield2.Parent = newModel.PrimaryPart
+	end
+
 	local humanoid = newModel:WaitForChild("Humanoid")
 
 	for _, part in ipairs(newModel:GetDescendants()) do
@@ -460,6 +479,7 @@ function module.new(NPCType)
 end
 
 --// Main //--
+local logTotems = 0
 
 RunService.Heartbeat:Connect(function()
 	for _, action in ipairs(beats) do
@@ -467,6 +487,41 @@ RunService.Heartbeat:Connect(function()
 			return
 		end
 		action()
+	end
+
+	local totems = CollectionService:GetTagged("ImmortalTotem")
+
+	if #totems == 0 and logTotems == 0 then
+		logTotems = #totems
+		return
+	end
+	logTotems = #totems
+
+	for _, enemy in ipairs(CollectionService:GetTagged("Enemy")) do
+		if enemy:HasTag("ImmortalTotem") or enemy:GetAttribute("State") == "Dead" then
+			continue
+		end
+
+		local humanoid = enemy:FindFirstChild("Humanoid")
+		if not humanoid then
+			continue
+		end
+
+		local isInvincible = false
+
+		for _, totem in ipairs(totems) do
+			local distance = (totem:GetPivot().Position - enemy:GetPivot().Position).Magnitude
+			if distance <= 75 then
+				isInvincible = true
+				break
+			end
+		end
+
+		humanoid:SetAttribute("Invincible", isInvincible)
+		if enemy.PrimaryPart then
+			enemy.PrimaryPart.Invincibility_Shield_1.Enabled = isInvincible
+			enemy.PrimaryPart.Invincibility_Shield_2.Enabled = isInvincible
+		end
 	end
 end)
 

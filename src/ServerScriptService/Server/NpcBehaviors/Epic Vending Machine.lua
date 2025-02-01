@@ -118,6 +118,8 @@ local function GiveObjects(npc)
 end
 
 local function onSpawned(npc)
+	npc.Instance:SetAttribute("Color", npc.Instance.PrimaryPart.Color)
+
 	task.delay(0.75, function()
 		if not npc.Instance["PrimaryPart"] then
 			return

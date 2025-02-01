@@ -155,6 +155,7 @@ local module = {
 	OnDied = {
 		{ Function = "SetCollision", Parameters = { "DeadBody" } },
 		{ Function = "SwitchToState", Parameters = { "Dead" } },
+		{ Function = "Ragdoll" },
 		{ Function = "RemoveWithDelay", Parameters = { 1, true } },
 	},
 }
