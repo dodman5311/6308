@@ -21,8 +21,6 @@ local function doCommand(player, catagory, commandIndex, ...)
 		return
 	end
 
-	print(commands, catagory, commandIndex)
-
 	local command = commands[catagory][commandIndex]
 
 	if not command["ExecuteServer"] then
