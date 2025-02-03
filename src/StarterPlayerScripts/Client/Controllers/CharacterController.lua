@@ -361,6 +361,30 @@ RunService.Heartbeat:Connect(function()
 		return
 	end
 
+	local rainPart = workspace:FindFirstChild("RainPart")
+	if workspace:GetAttribute("Stage") == 3 then
+		if not rainPart then
+			rainPart = assets.Effects.RainPart:Clone()
+			rainPart.Parent = workspace
+		end
+
+		local characterPosition = Player.Character:GetPivot()
+		rainPart.CFrame = characterPosition * CFrame.new(0, 25, 0)
+
+		local raycast =
+			workspace:Raycast(characterPosition.Position + Vector3.new(0, 5, 0), characterPosition.UpVector * 500)
+
+		if raycast then
+			rainPart.Emitter1.Enabled = false
+			rainPart.Emitter2.Enabled = false
+		else
+			rainPart.Emitter1.Enabled = true
+			rainPart.Emitter2.Enabled = true
+		end
+	elseif rainPart then
+		rainPart:Destroy()
+	end
+
 	if giftService.CheckGift("Heavenly_Fortune") and humanoid.FloorMaterial == Enum.Material.Air then
 		ChanceService.airluck = true
 	else

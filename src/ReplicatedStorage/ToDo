@@ -467,10 +467,10 @@ change atmosphere offset
 
 make priest
 
-Make rain!! --
+Make rain!! *
 
 make parry sword:
 Block if far, swing if close. Long parry time. Cooldown.
 1 Damage.
-If damaging an element inflicted enemy, armor will drop
+If damaging an element inflicted enemy, armor will drop. Drops more armor if inflicted with an element.
 ----------------------------------------------------------------------------------------
