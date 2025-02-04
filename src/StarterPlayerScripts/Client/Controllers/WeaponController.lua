@@ -39,26 +39,28 @@ local DAMAGE_PERK_COOLDOWN = 20
 local SOUL_FIRE_COOLDOWN = 15
 
 --// Modules
+
 local signals = require(Globals.Signals)
-local viewmodelService = require(Globals.Vendor.ViewmodelService)
-local animationService = require(Globals.Vendor.AnimationService)
-local UiAnimationService = require(Globals.Vendor.UIAnimationService)
 local acts = require(Globals.Vendor.Acts)
 local util = require(Globals.Vendor.Util)
 local spring = require(Globals.Vendor.Spring)
-local GiftsService = require(Globals.Client.Services.GiftsService)
-local dropService = require(Globals.Shared.DropService)
+local elements = require(Globals.Shared.Elements)
 local Janitor = require(Globals.Packages.Janitor)
-local RicoshotService = require(Globals.Client.Services.RicoshotService)
+local dropService = require(Globals.Shared.DropService)
 local BloodEffects = require(Globals.Shared.BloodEffects)
-local ComboService = require(Globals.Client.Services.ComboService)
-local WeakspotService = require(Globals.Client.Services.WeakspotService)
-local explosionService = require(Globals.Client.Services.ExplosionService)
 local UIService = require(Globals.Client.Services.UIService)
+local viewmodelService = require(Globals.Vendor.ViewmodelService)
+local animationService = require(Globals.Vendor.AnimationService)
+local GiftsService = require(Globals.Client.Services.GiftsService)
+local ComboService = require(Globals.Client.Services.ComboService)
 local soulsService = require(Globals.Client.Services.SoulsService)
 local codexService = require(Globals.Client.Services.CodexService)
 local wallrunning = require(Globals.Client.Controllers.Wallrunning)
-
+local UiAnimationService = require(Globals.Vendor.UIAnimationService)
+local airController = require(Globals.Client.Controllers.AirController)
+local RicoshotService = require(Globals.Client.Services.RicoshotService)
+local WeakspotService = require(Globals.Client.Services.WeakspotService)
+local explosionService = require(Globals.Client.Services.ExplosionService)
 local projectileService = require(Globals.Client.Services.ClientProjectiles)
 
 local Timer = require(Globals.Vendor.Timer)
@@ -1687,9 +1689,116 @@ function module.Throw(outOfAmmo, dontSwitchToDefault)
 	acts:removeAct("Throwing")
 end
 
+local canUseSword = true
+
+local function onSwordHit(subject)
+	if not player.Character then
+		return
+	end
+
+	local primaryPart = player.Character.PrimaryPart
+	primaryPart.AssemblyLinearVelocity = (camera.CFrame.LookVector * -30) + Vector3.new(0, 10, 0)
+	airController.change()
+
+	local isAfflicted = false
+	for elementName, _ in pairs(elements) do
+		print(subject, elementName, subject:GetAttribute(elementName))
+
+		if subject:GetAttribute(elementName) then
+			isAfflicted = true
+		end
+	end
+	local dropAmount = isAfflicted and math.random(3, 4) or math.random(1, 2)
+	print(isAfflicted, dropAmount)
+
+	for _ = 1, dropAmount do
+		dropService.CreateDrop(subject:GetPivot().Position, "Armor")
+	end
+
+	util.PlaySound(assets.Sounds.MaidenlessSwing, script)
+end
+
+function module.UseSword()
+	if not canBlock or not canUseSword or acts:checkAct("IsBlocking") then
+		return
+	end
+
+	acts:createAct("IsBlocking")
+	canBlock = false
+	canUseSword = false
+
+	local playingAnimation
+
+	local newSword = assets.Models.MaidenlessSword:Clone()
+	newSword.Parent = viewmodel.Model
+	local newM6D = Instance.new("Motor6D")
+	newM6D.Parent = newSword
+	newM6D.Part0 = viewmodel.Model.RightGrip
+	newM6D.Part1 = newSword.SwordGrip
+
+	local hitHumanoid = module.FireBullet(1, 0, Vector3.new(10, 10, 15), nil, "Maidenless")
+	if hitHumanoid then
+		playingAnimation = animationService:playAnimation(
+			viewmodel.Model,
+			"MaidenlessSwing",
+			Enum.AnimationPriority.Action4.Value,
+			false,
+			0,
+			2,
+			1
+		)
+
+		task.delay(0.015, function()
+			newSword.Blade_2.Trail.Enabled = true
+			task.wait(0.2)
+			newSword.Blade_2.Trail.Enabled = false
+		end)
+
+		Recoil(Vector3.new(-1.5, 0.5, 0), Vector3.new(0.25, 0.25, 5), 1.15, 0.5)
+		onSwordHit(hitHumanoid.Parent)
+	else
+		playingAnimation = animationService:playAnimation(
+			viewmodel.Model,
+			"MaidenlessBlock",
+			Enum.AnimationPriority.Action4.Value,
+			false,
+			0,
+			2,
+			1
+		)
+
+		Recoil(Vector3.new(0, 0.25, 0), Vector3.new(0.25, 0.25, 2), 1, 0.35)
+		util.PlaySound(assets.Sounds.MaidenlessBlock, script)
+	end
+
+	playingAnimation.Stopped:Once(function()
+		newSword:Destroy()
+	end)
+
+	net:RemoteEvent("SetBlocking"):FireServer(true)
+	task.wait(1)
+
+	playingAnimation.Priority = Enum.AnimationPriority.Action.Value
+
+	net:RemoteEvent("SetBlocking"):FireServer(false)
+
+	acts:removeAct("IsBlocking")
+
+	task.wait(0.25)
+	canBlock = true
+	task.wait(1.25)
+	canUseSword = true
+
+	return true
+end
+
 function module.Block()
 	local punch = GiftsService.CheckGift("Ultra_Slayer")
-	if not canBlock or not punch and (not module.currentWeapon or not weaponData.BlockTime) then
+	if
+		not canBlock
+		or not punch and (not module.currentWeapon or not weaponData.BlockTime)
+		or acts:checkAct("IsBlocking")
+	then
 		return
 	end
 
@@ -1740,6 +1849,7 @@ function module.Block()
 	task.wait(0.25)
 
 	canBlock = true
+	return true
 end
 
 function module.OnBlock()
@@ -2057,6 +2167,10 @@ UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
 
 	if input.UserInputType == Enum.UserInputType.MouseButton2 or input.KeyCode == Enum.KeyCode.ButtonL2 then
 		module.Block()
+	end
+
+	if input.KeyCode == Enum.KeyCode.F or input.KeyCode == Enum.KeyCode.Thumbstick1 then
+		module.UseSword()
 	end
 
 	if input.KeyCode == Enum.KeyCode.R or input.KeyCode == Enum.KeyCode.ButtonX then

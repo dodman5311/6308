@@ -447,7 +447,7 @@ rebalance arenas (cross, pillars)
 
 Fixed and slightly rebalanced paladins *
 
-Remake miniboss perk UI
+Remake miniboss perk UI *
 
 Add grapple swing when held
 
@@ -472,5 +472,6 @@ Make rain!! *
 make parry sword:
 Block if far, swing if close. Long parry time. Cooldown.
 1 Damage.
-If damaging an element inflicted enemy, armor will drop. Drops more armor if inflicted with an element.
+Faulters an enemy for 1 second.
+If damaging an element inflicted enemy, armor will drop 1 - 2. Drops more armor if inflicted with an element. 3 - 5
 ----------------------------------------------------------------------------------------

@@ -6,7 +6,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Globals = require(ReplicatedStorage.Shared.Globals)
 
 local npcHandler = require(Globals.Server.HandleNpcs)
-local animationService = require(Globals.Vendor.AnimationService)
 local net = require(Globals.Packages.Net)
 local vfx = net:RemoteEvent("ReplicateEffect")
 local doUiAction = net:RemoteEvent("DoUiAction")
@@ -14,70 +13,7 @@ local signals = require(Globals.Signals)
 
 net:RemoteEvent("ApplyElement")
 
-local elements = {
-	Electricity = {
-		time = 3,
-		enter = function(npc)
-			local humanoid = npc.Instance:FindFirstChild("Humanoid")
-
-			npc.LogWalkspeed = humanoid.WalkSpeed
-			humanoid.WalkSpeed /= 5
-		end,
-
-		exit = function(npc)
-			local humanoid = npc.Instance:FindFirstChild("Humanoid")
-
-			humanoid.WalkSpeed = npc.LogWalkspeed
-		end,
-	},
-	Fire = {
-		time = 4,
-		enter = function(npc) end,
-
-		exit = function(npc) end,
-	},
-	Ice = {
-		time = 2,
-		enter = function(npc)
-			npc.Instance.PrimaryPart.Anchored = true
-
-			local animations = animationService:getLoadedAnimations(npc.Instance)
-			if not animations then
-				return
-			end
-			for _, anim in pairs(animations) do
-				anim:AdjustSpeed(0)
-			end
-		end,
-
-		exit = function(npc)
-			if npc.Name ~= "Visage Of False Hope" then
-				npc.Instance.PrimaryPart.Anchored = false
-			end
-
-			local animations = animationService:getLoadedAnimations(npc.Instance)
-			if not animations then
-				return
-			end
-			for _, anim in pairs(animations) do
-				anim:AdjustSpeed(1)
-			end
-		end,
-	},
-	Soul = {
-		time = 2.5,
-		enter = function(npc) end,
-
-		exit = function(npc) end,
-	},
-
-	SoulFire = {
-		time = 3,
-		enter = function(npc) end,
-
-		exit = function(npc) end,
-	},
-}
+local elements = require(Globals.Shared.Elements)
 
 local function runElementDamage(player, timer, npcModel, elementName)
 	if

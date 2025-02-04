@@ -342,62 +342,27 @@ function module.showDescription(frame, gift)
 	end)
 end
 
-local function getRandomGiftFromDictionary()
-	local dictionary = Gifts.Upgrades
-	local array = {}
-
-	for key, _ in pairs(dictionary) do
-		if GiftsService.CheckGift(key) then
-			continue
-		end
-
-		table.insert(array, key)
-	end
-
-	if #array == 0 then
-		return
-	end
-
-	local selectedKey = array[math.random(1, #array)]
-	return selectedKey, dictionary[selectedKey]
-end
-
-local function loadToGiftsSlot(frame)
-	local spin = frame.Spin
-
-	for _ = 0, spin.Size.Y.Scale do
-		local _, gift = getRandomGiftFromDictionary()
-
-		local dummy = spin.A1:Clone()
-		dummy.Name = "Dummy"
-		dummy.Parent = spin
-		dummy.Visible = true
-		dummy.Image = gift.Icon
-	end
-end
-
 function module.chooseGift(player, ui, frame, bossName)
 	local name = rewards[bossName]
 	local randomGift = gifts.Specials[name]
 
-	loadToGiftsSlot(frame)
-
-	local spin = frame.Spin
-	spin.A1.Image = randomGift.Icon
-	spin.A1.ImageTransparency = 0
+	local spin = frame.Gift.A1
+	spin.Image = randomGift.Icon
+	spin.ImageTransparency = 0
 
 	local spinTween = TweenInfo.new(1.5, Enum.EasingStyle.Quart, Enum.EasingDirection.In)
 	local ti_0 = TweenInfo.new(0.5, Enum.EasingStyle.Elastic)
 	local ti = TweenInfo.new(0.5, Enum.EasingStyle.Linear)
 
-	spin.Position = UDim2.new(0.5, 0, -spin.Size.Y.Scale, 0)
-
 	sounds.SpinSound.TimePosition = 1.5
 	sounds.SpinSound:Play()
 
-	util.tween(spin, spinTween, { Position = UDim2.new(0.5, 0, 0, 0) }, true)
-	spin.Position = UDim2.fromScale(0.75, 0)
-	util.tween(spin, ti_0, { Position = UDim2.new(0.5, 0, 0, 0) })
+	spin.Size = UDim2.fromScale(2, 2)
+	spin.ImageTransparency = 1
+
+	util.tween(spin, spinTween, { Size = UDim2.fromScale(1, 1), ImageTransparency = 0 }, true)
+	spin.Position = UDim2.fromScale(0.75, 0.5)
+	util.tween(spin, ti_0, { Position = UDim2.fromScale(0.5, 0.5) })
 
 	sounds.SpinSound:Stop()
 	sounds.SpinSound.TimePosition = 0
@@ -428,14 +393,6 @@ function module.showChoices(player, ui, frame, bossName)
 	local ti_0 = TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
 
 	if typeof(rewards[bossName]) == "string" then
-		for _, imageLabel in ipairs(frame.Spin:GetChildren()) do
-			if imageLabel.Name ~= "Dummy" then
-				continue
-			end
-
-			imageLabel:Destroy()
-		end
-
 		local award = frame.Award
 		award.Awarded.TextTransparency = 1
 		award.GiftName.TextTransparency = 1
