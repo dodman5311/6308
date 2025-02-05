@@ -172,6 +172,10 @@ local commands = {
 						end
 					end
 
+					if level == 13 then
+						signals["AddGift"]:Fire("Maidenless")
+					end
+
 					for _ = 1, combatLevel do
 						local result = kiosk.getRandomGiftFromLocalList()
 

@@ -46,8 +46,11 @@ local function switchTrack()
 		musicTimer:Run()
 	else
 		musicTimer:Cancel()
+
+		local volume = track:GetAttribute("Volume") or 0.35
+
 		util.tween(calm, ti, { Volume = 0 })
-		util.tween(track, ti, { Volume = 0.35 })
+		util.tween(track, ti, { Volume = volume })
 	end
 end
 

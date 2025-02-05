@@ -5,7 +5,9 @@ local net = require(Globals.Packages.Net)
 local util = require(Globals.Vendor.Util)
 
 local function onSpawn(npc)
-	net:RemoteEvent("ReplicateEffect"):FireAllClients("emitObject", "Server", true, npc.Instance.Particle.Explode)
+	task.delay(0.1, function()
+		net:RemoteEvent("ReplicateEffect"):FireAllClients("emitObject", "Server", true, npc.Instance.Particle.Explode)
+	end)
 
 	util.PlaySound(util.getRandomChild(ReplicatedStorage.Assets.Sounds.RockHits), npc.Instance.PrimaryPart, 0.1)
 	util.PlaySound(npc.Instance.Spawn, npc.Instance.PrimaryPart, 0.1)

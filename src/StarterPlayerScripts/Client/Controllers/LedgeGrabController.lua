@@ -51,7 +51,6 @@ local function grabLedge()
 		primaryPart.Anchored = true
 		primaryPart.AssemblyLinearVelocity = Vector3.zero
 		airController.cancel()
-		--airController.change()
 
 		local goal = primaryPart.CFrame * module.topDown.CFrame * CFrame.new(0, 1.5, -1)
 
@@ -66,17 +65,17 @@ local function grabLedge()
 end
 
 local function castRays()
-	if not player.Character then
-		return
-	end
 	if
-		not player.Character:FindFirstChild("Humanoid")
+		not player.Character
+		or not player.Character.PrimaryPart
+		or not player.Character:FindFirstChild("Humanoid")
 		or player.Character.Humanoid.FloorMaterial ~= Enum.Material.Air
 	then
 		return
 	end
 
 	local primaryPart = player.Character.PrimaryPart
+
 	rp.FilterDescendantsInstances = { workspace.Map }
 
 	local catchRay =
@@ -114,11 +113,8 @@ end
 
 function module:OnSpawn()
 	createRaycastRig()
-	rs:BindToRenderStep("ledgeGrab", Enum.RenderPriority.Last.Value, castRays)
 end
 
-function module:OnDied()
-	rs:UnbindFromRenderStep("ledgeGrab")
-end
+rs.Heartbeat:Connect(castRays)
 
 return module

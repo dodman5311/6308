@@ -57,7 +57,7 @@ local rewards = {
 		"Galvan_Gaze",
 	},
 
-	["Phillip The Everlasting"] = "Master_Scouting",
+	["Phillip The Everlasting"] = "Maidenless", --"Master_Scouting",
 	["Specimen #09"] = "Overcharge",
 }
 

@@ -249,12 +249,6 @@ local module = {
 		-- 	Desc = "When hit, you now gain 1 second of invincibility.",
 		-- },
 
-		Ultra_Slayer = {
-			Icon = "rbxassetid://16275507396",
-			Catagories = { "Arsenal" },
-			Desc = "You can now perform a parrying punch attack. (Right click to melee)",
-		},
-
 		Sierra_6308 = {
 			Icon = "rbxassetid://16442104214",
 			Catagories = { "Tactical", "Soul" },
@@ -367,9 +361,28 @@ Each ricochet deals +4 damage.
 		Overcharge = {
 			Icon = "rbxassetid://120254924259541",
 			Catagories = { "Arsenal" },
-			Desc = [[pistols damage now adds to <b>overcharge</b>.
+			Desc = [[Damage from pistols and the <b>Maiden's Blade</b> now adds to <b>overcharge</b>.
 Other weapon damage activates <b>overcharge</b>.
 When active, you gain +50% firerate, and infinite ammo for 3 seconds. (20 hits for an <b>overcharge</b>)]],
+		},
+
+		Maidenless = {
+			Icon = "rbxassetid://16275507396",
+			Catagories = { "Arsenal", "Soul" },
+			Desc = [[You can now press F to use the <b>Maiden's blade</b>.
+If there are no enemies within range, you will perform a parrying block.
+If there are enemies, you will perform a parrying attack dealing 1 damage.
+
+Damaging an enemy with the <b>Maiden's blade</b> will drop 1 - 2 armor.
+If an enemy is inflicted with an element, 3 - 4 armor will drop.
+(1 second parry time, 1.5 second cooldown)
+			]],
+		},
+
+		Ultra_Slayer = {
+			Icon = "rbxassetid://16275507396",
+			Catagories = { "Arsenal" },
+			Desc = "You can now perform a parrying punch attack. (Right click to melee)",
 		},
 	},
 }

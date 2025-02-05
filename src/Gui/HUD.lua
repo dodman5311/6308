@@ -611,21 +611,6 @@ function module.RefreshSideBar(player, ui, frame)
 	end
 end
 
-function module.ShowOvercharge(player, ui, frame)
-	local overChargeBar = frame.OverchargeBar
-
-	overChargeBar.Visible = true
-	overChargeBar.BarFrame.Bar.Size = UDim2.fromScale(1, 0)
-
-	UiAnimator.PlayAnimation(frame.OverchargeBar.BarFrame.Bar.BarAnimation, 0.1, true)
-end
-
-function module.HideOvercharge(player, ui, frame)
-	frame.OverchargeBar.Visible = false
-
-	UiAnimator.StopAnimation(frame.OverchargeBar.BarFrame.Bar.BarAnimation)
-end
-
 function module.ToggleReloadPrompt(player, ui, frame, value)
 	local reloadPrompt = frame.ReloadPrompt
 
@@ -672,17 +657,33 @@ function module.GrappleCooldown(player, ui, frame, cooldownTime, goal)
 	util.tween(gradient, ti, { Offset = Vector2.new(0, -goal) })
 end
 
-function module.UpdateOvercharge(player, ui, frame, number)
-	local ti = TweenInfo.new(0.25, Enum.EasingStyle.Quad)
+function module.ShowOvercharge(player, ui, frame, isArsenalBar)
+	local overChargeBar = isArsenalBar and frame.ArsenalBar or frame.OverchargeBar
 
-	local overChargeBar = frame.OverchargeBar
+	overChargeBar.Visible = true
+	overChargeBar.BarFrame.Bar.Size = UDim2.fromScale(1, 0)
+
+	UiAnimator.PlayAnimation(overChargeBar.BarFrame.Bar.BarAnimation, 0.1, true)
+end
+
+function module.HideOvercharge(player, ui, frame, isArsenalBar)
+	local overChargeBar = isArsenalBar and frame.ArsenalBar or frame.OverchargeBar
+	overChargeBar.Visible = false
+
+	UiAnimator.StopAnimation(overChargeBar.BarFrame.Bar.BarAnimation)
+end
+
+function module.UpdateOvercharge(player, ui, frame, number, isArsenalBar)
+	local ti = TweenInfo.new(0.1, Enum.EasingStyle.Quad)
+
+	local overChargeBar = isArsenalBar and frame.ArsenalBar or frame.OverchargeBar
 	util.tween(overChargeBar.BarFrame.Bar, ti, { Size = UDim2.fromScale(1, number) })
 end
 
-function module.EmptyOvercharge(player, ui, frame, emptyTime)
+function module.EmptyOvercharge(player, ui, frame, emptyTime, isArsenalBar)
 	local ti = TweenInfo.new(emptyTime, Enum.EasingStyle.Linear)
 
-	local overChargeBar = frame.OverchargeBar
+	local overChargeBar = isArsenalBar and frame.ArsenalBar or frame.OverchargeBar
 	util.tween(overChargeBar.BarFrame.Bar, ti, { Size = UDim2.fromScale(1, 0) })
 end
 

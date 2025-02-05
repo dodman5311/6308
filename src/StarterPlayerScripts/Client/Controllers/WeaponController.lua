@@ -70,6 +70,7 @@ local ChanceService = require(Globals.Vendor.ChanceService)
 
 local weaponTimer = require(Globals.Vendor.Timer):newQueue()
 local weaponReloadTimer = weaponTimer:new("WeaponReload")
+local damagePerkTimer = weaponTimer:new("DamagePerkCooldown")
 
 --// Values
 
@@ -93,6 +94,7 @@ local weaponData
 local mouseButton1Down = false
 local gKeyDown = false
 local canBlock = true
+local overchargeDebounce = false
 
 local consecutiveHits = 0
 local Overcharge = 0
@@ -700,7 +702,20 @@ local function activateOvercharge()
 	end)
 end
 
-local overchargeDebounce = false
+local function addToOvercharge(amount)
+	if Overcharge >= 20 or overchargeDebounce then
+		return
+	end
+
+	Overcharge += amount
+	overchargeDebounce = true
+
+	UIService.doUiAction("HUD", "UpdateOvercharge", true, Overcharge / 20)
+
+	task.delay(0.01, function()
+		overchargeDebounce = false
+	end)
+end
 
 local function addToConsecutive(hit)
 	if not hit or not GiftsService.CheckGift("Boring_Bullets") then
@@ -713,16 +728,7 @@ local function addToConsecutive(hit)
 		-- make pistol exlusive
 
 		if not module.currentWeapon or weaponData.Type == "Pistol" then
-			if Overcharge < 20 then
-				Overcharge += 1
-				overchargeDebounce = true
-
-				signals.DoUiAction:Fire("HUD", "UpdateOvercharge", true, Overcharge / 20)
-
-				task.delay(0.01, function()
-					overchargeDebounce = false
-				end)
-			end
+			addToOvercharge(1)
 		else
 			if Overcharge >= 20 then
 				activateOvercharge()
@@ -944,6 +950,10 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 	if GiftsService.CheckGift("Life_Steal") and soulsService.Souls <= 1 and critMult > 1 then
 		net:RemoteEvent("Damage"):FireServer(player.Character, -1)
 		signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Life_Steal")
+	end
+
+	if source == "Maidenless" then
+		addToOvercharge(1)
 	end
 
 	return humanoid, subject, totalDamage
@@ -1702,8 +1712,6 @@ local function onSwordHit(subject)
 
 	local isAfflicted = false
 	for elementName, _ in pairs(elements) do
-		print(subject, elementName, subject:GetAttribute(elementName))
-
 		if subject:GetAttribute(elementName) then
 			isAfflicted = true
 		end
@@ -1719,7 +1727,7 @@ local function onSwordHit(subject)
 end
 
 function module.UseSword()
-	if not canBlock or not canUseSword or acts:checkAct("IsBlocking") then
+	if not GiftsService.CheckGift("Maidenless") or not canBlock or not canUseSword or acts:checkAct("IsBlocking") then
 		return
 	end
 
@@ -1962,7 +1970,6 @@ end
 function module.OnDied()
 	mouseButton1Down = false
 	Overcharge = 0
-	UIService.doUiAction("HUD", "HideOvercharge")
 end
 
 local function switchWeapon()
@@ -1986,6 +1993,21 @@ local function releaseTrigger(gpe)
 	mouseButton1Down = false
 end
 
+local function runDamagePerkCooldown(cooldown, giftName)
+	damagePerkTimer.WaitTime = cooldown
+	local onStep = damagePerkTimer.OnTimerStepped:Connect(function(currentTime)
+		UIService.doUiAction("HUD", "UpdateGiftProgress", true, giftName, currentTime / cooldown)
+		UIService.doUiAction("HUD", "UpdateOvercharge", true, currentTime / cooldown, true)
+	end)
+	damagePerkTimer.Function = function()
+		onStep:Disconnect()
+		canUseDamagePerk = true
+		assets.Sounds.GrenadeReady:Play()
+	end
+
+	damagePerkTimer:Run()
+end
+
 local function fireShoulderGrenade(gpe)
 	gKeyDown = false
 
@@ -1997,7 +2019,6 @@ local function fireShoulderGrenade(gpe)
 	canUseDamagePerk = false
 
 	UIService.doUiAction("HUD", "ActivateGift", true, "Mag_Launcher")
-	UIService.doUiAction("HUD", "UpdateGiftProgress", true, "Mag_Launcher", -1)
 
 	for _, v in ipairs(lockGuis) do
 		v:Destroy()
@@ -2045,19 +2066,7 @@ local function fireShoulderGrenade(gpe)
 
 	grenadeLocks = {}
 
-	UIService.doUiAction(
-		"HUD",
-		"TweenGift",
-		true,
-		"Mag_Launcher",
-		0,
-		TweenInfo.new(DAMAGE_PERK_COOLDOWN, Enum.EasingStyle.Linear)
-	)
-
-	Timer.wait(DAMAGE_PERK_COOLDOWN)
-
-	canUseDamagePerk = true
-	assets.Sounds.GrenadeReady:Play()
+	runDamagePerkCooldown(DAMAGE_PERK_COOLDOWN, "Mag_Launcher")
 end
 
 local function fireSoulFire()
@@ -2068,7 +2077,6 @@ local function fireSoulFire()
 	animationService:playAnimation(viewmodel.Model, "Launch", Enum.AnimationPriority.Action2)
 
 	UIService.doUiAction("HUD", "ActivateGift", true, "Burning_Souls")
-	UIService.doUiAction("HUD", "UpdateGiftProgress", true, "Burning_Souls", 0)
 
 	Timer.wait(0.15)
 
@@ -2101,18 +2109,7 @@ local function fireSoulFire()
 
 	local cooldown = #targetsHit > 0 and SOUL_FIRE_COOLDOWN or 1
 
-	UIService.doUiAction(
-		"HUD",
-		"TweenGift",
-		true,
-		"Burning_Souls",
-		-1,
-		TweenInfo.new(cooldown, Enum.EasingStyle.Linear)
-	)
-
-	Timer.wait(cooldown)
-	canUseDamagePerk = true
-	assets.Sounds.GrenadeReady:Play()
+	runDamagePerkCooldown(cooldown, "Burning_Souls")
 end
 
 local function galvanGaze()
@@ -2130,7 +2127,6 @@ local function galvanGaze()
 	util.tween(camera, ti, { FieldOfView = camera.FieldOfView - 20 })
 
 	UIService.doUiAction("HUD", "ActivateGift", true, "Galvan_Gaze")
-	UIService.doUiAction("HUD", "UpdateGiftProgress", true, "Galvan_Gaze", 0)
 
 	Timer.wait(0.5)
 
@@ -2148,12 +2144,8 @@ local function galvanGaze()
 	end
 
 	local cooldown = target and DAMAGE_PERK_COOLDOWN or 1
-	UIService.doUiAction("HUD", "TweenGift", true, "Galvan_Gaze", -1, TweenInfo.new(cooldown, Enum.EasingStyle.Linear))
 
-	Timer.wait(cooldown)
-
-	canUseDamagePerk = true
-	assets.Sounds.GrenadeReady:Play()
+	runDamagePerkCooldown(cooldown, "Galvan_Gaze")
 end
 
 UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
@@ -2362,16 +2354,25 @@ explosionService.explosiveHit:Connect(function(subject, preHealth, postHealth, d
 end)
 
 GiftsService.OnGiftAdded:Connect(function(gift)
-	if gift ~= "Overcharge" then
-		return
+	if gift == "Overcharge" then
+		UIService.doUiAction("HUD", "ShowOvercharge")
 	end
-
-	UIService.doUiAction("HUD", "ShowOvercharge")
+	if gift == "Mag_Launcher" or gift == "Burning_Souls" or gift == "Galvan_Gaze" then
+		UIService.doUiAction("HUD", "UpdateGiftProgress", true, gift, 1)
+		UIService.doUiAction("HUD", "ShowOvercharge", true, true)
+		UIService.doUiAction("HUD", "UpdateOvercharge", true, 1, true)
+	end
 end)
 
 GiftsService.OnGiftRemoved:Connect(function(gift)
 	if gift == "Tacticool" then
 		UIService.doUiAction("HUD", "ToggleReloadPrompt", true, false)
+	end
+	if gift == "Overcharge" then
+		UIService.doUiAction("HUD", "HideOvercharge")
+	end
+	if gift == "Mag_Launcher" or gift == "Burning_Souls" or gift == "Galvan_Gaze" then
+		UIService.doUiAction("HUD", "HideOvercharge", true, true)
 	end
 end)
 
