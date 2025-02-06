@@ -21,6 +21,7 @@ local ComboService = require(Globals.Client.Services.ComboService)
 local ChanceService = require(Globals.Vendor.ChanceService)
 local GiftsService = require(Globals.Client.Services.GiftsService)
 local util = require(Globals.Vendor.Util)
+local UIService = require(Globals.Client.Services.UIService)
 
 --// Values
 
@@ -74,14 +75,15 @@ function module.DropSoul(position, chanceModifier)
 
 	playDropSound()
 
-	dropService.CreateDrop(position, "Soul").Sound:Play()
+	dropService.CreateDrop(position, "Soul").PrimaryPart.Sound:Play()
 
 	if GiftsService.CheckGift("Echoed_Souls") and ChanceService.checkChance(20, true) then
 		local soulDrop = dropService.CreateDrop(position, "Soul")
-		soulDrop.Sound:Play()
+		soulDrop.PrimaryPart.Sound:Play()
 		Debris:AddItem(soulDrop, 5)
 
-		Signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Echoed_Souls")
+		soulDrop.PrimaryPart.Particles.Color = ColorSequence.new(Color3.fromRGB(240, 255, 76))
+		UIService.doUiAction("HUD", "ActivateGift", "Echoed_Souls")
 	end
 end
 
@@ -92,7 +94,7 @@ end
 local function checkIronWill()
 	ironWillActive = GiftsService.CheckGift("Iron_Will") and ChanceService.checkChance(20)
 
-	Signals.DoUiAction:Fire("HUD", "UpdateGiftProgress", true, "Iron_Will", ironWillActive and 1 or 0)
+	UIService.doUiAction("HUD", "UpdateGiftProgress", "Iron_Will", ironWillActive and 1 or 0)
 
 	checkProtected()
 end
@@ -117,10 +119,10 @@ function module.AddSoul(amount)
 	end
 
 	module.Souls += math.round(amount)
-	Signals.DoUiAction:Fire("HUD", "UpdateSouls", true, module.Souls)
+	UIService.doUiAction("HUD", "UpdateSouls", module.Souls)
 
 	if GiftsService.CheckGift("Steel_Souls") and ChanceService.checkChance(20, true) then
-		Signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Steel_Souls")
+		UIService.doUiAction("HUD", "ActivateGift", "Steel_Souls")
 		AddArmor(1)
 	end
 
@@ -133,7 +135,7 @@ function module.RemoveSoul(amount)
 	end
 
 	module.Souls -= math.round(amount)
-	Signals.DoUiAction:Fire("HUD", "UpdateSouls", true, module.Souls)
+	UIService.doUiAction("HUD", "UpdateSouls", module.Souls)
 
 	checkProtected()
 end
@@ -160,13 +162,13 @@ end)
 
 net:Connect("CheckProtected", function()
 	assets.Sounds.Revive:Play()
-	Signals.DoUiAction:Fire("Effects", "Pulse", true, Color3.fromRGB(27, 255, 206), 0.75)
+	UIService.doUiAction("Effects", "Pulse", Color3.fromRGB(27, 255, 206), 0.75)
 
 	if not ironWillActive then
-		Signals.DoUiAction:Fire("HUD", "RemoveSouls", true, 1)
+		UIService.doUiAction("HUD", "RemoveSouls", 1)
 
 		if ironWillActive then
-			Signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Iron_Will")
+			UIService.doUiAction("HUD", "ActivateGift", "Iron_Will")
 			return
 		end
 
@@ -174,7 +176,7 @@ net:Connect("CheckProtected", function()
 	end
 
 	if GiftsService.CheckGift("Unending_Fortress") and ChanceService.checkChance(25, true) then
-		Signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Unending_Fortress")
+		UIService.doUiAction("HUD", "ActivateGift", "Unending_Fortress")
 		net:RemoteEvent("SetArmor"):FireServer(5)
 	end
 

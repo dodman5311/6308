@@ -29,7 +29,7 @@ local function runElementDamage(player, timer, npcModel, elementName)
 		if math.floor(currentTimeInTimer) ~= lastStepTime then
 			local humanoid = npcModel:FindFirstChild("Humanoid")
 			humanoid:TakeDamage(1)
-			doUiAction:FireAllClients("HUD", "ShowHit", true)
+			doUiAction:FireAllClients("HUD", "ShowHit")
 		end
 
 		lastStepTime = math.floor(currentTimeInTimer)

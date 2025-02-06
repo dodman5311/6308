@@ -189,7 +189,7 @@ function module.ShowScreen(player, ui, frame)
 	module.UpdateSouls(player, ui, frame, SoulsService.Souls)
 
 	local ti = TweenInfo.new(0.25, Enum.EasingStyle.Linear)
-	Signals.DoUiAction:Fire("Cursor", "Toggle", true, true)
+	Signals.DoUiAction:Fire("Cursor", "Toggle", true)
 
 	frame.DeliveryAmount.Text = "0%"
 
@@ -234,7 +234,7 @@ function module.ShowScreen(player, ui, frame)
 		end
 
 		if deliveryAmount <= 0 or SoulsService.Souls <= 1 or not getRandomGiftFromDictionary(giftType) then
-			Signals.DoUiAction:Fire("Cursor", "Toggle", true, false)
+			Signals.DoUiAction:Fire("Cursor", "Toggle", false)
 
 			util.tween(frame.Fade, ti, { BackgroundTransparency = 0 }, true)
 
@@ -247,7 +247,7 @@ function module.ShowScreen(player, ui, frame)
 
 			frame.Frame.Visible = false
 			frame.Background.Visible = false
-			Signals.DoUiAction:Fire("Cursor", "Toggle", true, false)
+			Signals.DoUiAction:Fire("Cursor", "Toggle", false)
 
 			util.tween(frame.Fade, ti, { BackgroundTransparency = 1 })
 
@@ -385,7 +385,7 @@ function module.TakeDelivery(player, ui, frame, gift)
 	frame.IncreaseButton.Visible = false
 	frame.DecreaseButton.Visible = false
 	frame.DeliveryAmount.Visible = false
-	Signals.DoUiAction:Fire("Cursor", "Toggle", true, false)
+	Signals.DoUiAction:Fire("Cursor", "Toggle", false)
 
 	frame.Demon.Visible = false
 	frame.Box.Visible = false
@@ -429,7 +429,7 @@ function module.TakeDelivery(player, ui, frame, gift)
 		end
 
 		frame.Background.Visible = false
-		Signals.DoUiAction:Fire("Cursor", "Toggle", true, false)
+		Signals.DoUiAction:Fire("Cursor", "Toggle", false)
 
 		util.tween(frame.Fade, ti, { BackgroundTransparency = 1 })
 

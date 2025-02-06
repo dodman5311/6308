@@ -261,7 +261,7 @@ local function exit(frame)
 
 	frame.Frame.Visible = false
 	frame.Background.Visible = false
-	Signals.DoUiAction:Fire("Cursor", "Toggle", true, false)
+	Signals.DoUiAction:Fire("Cursor", "Toggle", false)
 
 	util.tween(frame.Fade, ti, { BackgroundTransparency = 1 }, false, function()
 		frame.Gui.Enabled = false
@@ -460,7 +460,7 @@ function module.ShowScreen(player, ui, frame, playerSouls)
 	module.UpdateSouls(player, ui, frame, SoulsService.Souls)
 
 	local ti = TweenInfo.new(0.25, Enum.EasingStyle.Linear)
-	Signals.DoUiAction:Fire("Cursor", "Toggle", true, true)
+	Signals.DoUiAction:Fire("Cursor", "Toggle", true)
 
 	frame.SelectButtons.Visible = true
 	frame.CatagoryButtons.Visible = false
@@ -718,7 +718,7 @@ local function showDescription(frame, gift, rapido)
 end
 
 function module.TakeDelivery(player, ui, frame, gift, rapido)
-	Signals.DoUiAction:Fire("Cursor", "Toggle", true, false)
+	Signals.DoUiAction:Fire("Cursor", "Toggle", false)
 
 	showDescription(frame, gift, rapido)
 
@@ -729,7 +729,7 @@ function module.TakeDelivery(player, ui, frame, gift, rapido)
 	frame.SwitchFrame.Image.Position = UDim2.fromScale(0, 0)
 	frame.SelectButtons.Visible = true
 	frame.CatagoryButtons.Visible = false
-	Signals.DoUiAction:Fire("Cursor", "Toggle", true, true)
+	Signals.DoUiAction:Fire("Cursor", "Toggle", true)
 	frame.ExitButton.Visible = true
 
 	frame.SoulCost.Visible = true

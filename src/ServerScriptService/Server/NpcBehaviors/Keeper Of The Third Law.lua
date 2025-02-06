@@ -725,7 +725,7 @@ local function onDied(npc)
 	for _, player in ipairs(Players:GetPlayers()) do
 		task.spawn(function()
 			if BadgeService:AwardBadge(player.UserId, 2275688768196496) then
-				net:RemoteEvent("DoUiAction"):FireAllClients("Notify", "AchievementUnlocked", true, 2275688768196496)
+				net:RemoteEvent("DoUiAction"):FireAllClients("Notify", "AchievementUnlocked", 2275688768196496)
 			end
 		end)
 	end
@@ -741,8 +741,8 @@ local function onDied(npc)
 
 		net:RemoteEvent("StopMusic"):FireAllClients("Keeper Of The Third Law")
 		timer.wait(2)
-		net:RemoteEvent("DoUiAction"):FireAllClients("BossIntro", "ShowCompleted", true, npc.Instance.Name)
-		net:RemoteEvent("DoUiAction"):FireAllClients("HUD", "HideBossBar", true)
+		net:RemoteEvent("DoUiAction"):FireAllClients("BossIntro", "ShowCompleted", npc.Instance.Name)
+		net:RemoteEvent("DoUiAction"):FireAllClients("HUD", "HideBossBar")
 
 		return
 	end
@@ -758,8 +758,8 @@ local function onDied(npc)
 	local animation = animationService:playAnimation(npc.Instance, "Death", Enum.AnimationPriority.Action4, false, 0)
 
 	task.delay(19, function()
-		net:RemoteEvent("DoUiAction"):FireAllClients("BossIntro", "ShowCompleted", true, npc.Instance.Name)
-		net:RemoteEvent("DoUiAction"):FireAllClients("HUD", "HideBossBar", true)
+		net:RemoteEvent("DoUiAction"):FireAllClients("BossIntro", "ShowCompleted", npc.Instance.Name)
+		net:RemoteEvent("DoUiAction"):FireAllClients("HUD", "HideBossBar")
 	end)
 
 	repeat

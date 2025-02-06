@@ -21,12 +21,10 @@ local timer = require(Globals.Vendor.Timer)
 local vfx = net:RemoteEvent("ReplicateEffect")
 local createProjectileRemote = net:RemoteEvent("CreateProjectile")
 
-local assets = ReplicatedStorage.Assets
-
 local moveChances = {
-	{ "Acid", 10 }, -- 10
+	{ "Acid", 10 },
 
-	{ "Sacrifice", 20 }, -- 20
+	{ "Sacrifice", 20 },
 	{ "Geysers", 25 },
 
 	{ "Grenades", 30 },
@@ -819,7 +817,7 @@ local function onDied(npc)
 	for _, player in ipairs(Players:GetPlayers()) do
 		task.spawn(function()
 			if BadgeService:AwardBadge(player.UserId, 1970850586708568) then
-				net:RemoteEvent("DoUiAction"):FireAllClients("Notify", "AchievementUnlocked", true, 1970850586708568)
+				net:RemoteEvent("DoUiAction"):FireAllClients("Notify", "AchievementUnlocked", 1970850586708568)
 			end
 		end)
 
@@ -872,8 +870,8 @@ local function onDied(npc)
 
 		task.wait(3)
 
-		net:RemoteEvent("DoUiAction"):FireAllClients("BossIntro", "ShowCompleted", true, "Visage Of False Hope")
-		net:RemoteEvent("DoUiAction"):FireAllClients("HUD", "HideBossBar", true)
+		net:RemoteEvent("DoUiAction"):FireAllClients("BossIntro", "ShowCompleted", "Visage Of False Hope")
+		net:RemoteEvent("DoUiAction"):FireAllClients("HUD", "HideBossBar")
 	end)
 end
 

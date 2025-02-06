@@ -179,6 +179,10 @@ end
 --// Unit functions
 
 local function clearMap()
+	if storedMap then
+		storedMap:Destroy()
+	end
+
 	blacklistedUnits = {}
 
 	for _, unit in ipairs(map:GetChildren()) do
@@ -436,8 +440,10 @@ function module.placeExit()
 		warn("Exit not placed (no caps found)")
 		return
 	end
+
 	local newExit = exit:Clone()
 	newExit.Parent = cap.Parent
+
 	newExit:PivotTo(cap:GetPivot())
 
 	cap:Destroy()
@@ -530,7 +536,10 @@ function module.loadLinearMap(size)
 
 	placeCaps()
 
+	--repeat
 	module.placeExit()
+	--task.wait()
+	--until map:FindFirstChild("Exit", true)
 
 	local plusStage = (module.CurrentStage - 1) * 5
 	local level = plusStage + module.CurrentLevel

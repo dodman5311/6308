@@ -235,6 +235,8 @@ function module.spawnEnemies(currentLevel, mapOverride)
 			continue
 		end
 
+		print("FoundSpawner")
+
 		local unit = spawner.Parent
 
 		if string.match(unit.Name, "Start") or string.match(unit.Name, "Arena") then

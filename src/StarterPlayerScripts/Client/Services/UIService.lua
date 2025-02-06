@@ -19,7 +19,6 @@ local player = players.LocalPlayer
 
 --// Modules
 local signals = require(Globals.Signals)
-local acts = require(Globals.Vendor.Acts)
 local net = require(Globals.Packages.Net)
 
 --// Values
@@ -53,7 +52,7 @@ function module.getFullUi()
 	module.isLoaded = true
 end
 
-function module.doUiAction(uiName, action, doWithoutAct, ...)
+function module.doUiAction(uiName, action, ...)
 	local getModule = uiMods[uiName]
 	if not getModule then
 		warn("No ui module by the name of ", uiName, " was found.")
@@ -65,15 +64,7 @@ function module.doUiAction(uiName, action, doWithoutAct, ...)
 		return
 	end
 
-	local args = { ... }
-
-	--if doWithoutAct then
 	return getModule[action](player, module.fullUi, module.fullUi[uiName], ...)
-	-- else
-	-- 	return acts:createTempAct(uiName .. "_" .. action, function()
-	-- 		return getModule[action](player, module.fullUi, module.fullUi[uiName], table.unpack(args))
-	-- 	end)
-	-- end
 end
 
 function module.CleanUp(uiToClean)

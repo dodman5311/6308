@@ -644,7 +644,8 @@ local commands = {
 				end
 
 				local soulsService = require(Globals.Client.Services.SoulsService)
-				signals["DoUiAction"]:Fire("DeliveryUi", "ShowScreen", true, soulsService.Souls)
+				local uiService = require(Globals.Client.Services.UIService)
+				uiService.doUiAction("DeliveryUi", "ShowScreen", soulsService.Souls)
 			end,
 		},
 
@@ -670,9 +671,10 @@ local commands = {
 				end
 
 				local MusicService = require(Globals.Client.Services.MusicService)
+				local uiService = require(Globals.Client.Services.UIService)
 				MusicService.stopMusic()
 
-				signals["DoUiAction"]:Fire("BossIntro", "ShowIntro", true, boss)
+				uiService.doUiAction("BossIntro", "ShowIntro", boss)
 			end,
 		},
 
@@ -697,7 +699,9 @@ local commands = {
 					return
 				end
 
-				signals["DoUiAction"]:Fire("BossIntro", "ShowCompleted", true, boss)
+				local uiService = require(Globals.Client.Services.UIService)
+
+				uiService.doUiAction("BossIntro", "ShowCompleted", boss)
 			end,
 		},
 
@@ -711,7 +715,7 @@ local commands = {
 
 			ExecuteClient = function(_, unlock)
 				require(ReplicatedStorage.Gui.DeathScreen).unlocked = unlock
-				require(Globals.Client.Services.UIService).doUiAction("DeathScreen", "ShowDeathScreen", true)
+				require(Globals.Client.Services.UIService).doUiAction("DeathScreen", "ShowDeathScreen")
 			end,
 		},
 
@@ -729,7 +733,8 @@ local commands = {
 				end
 
 				local soulsService = require(Globals.Client.Services.SoulsService)
-				signals["DoUiAction"]:Fire("Kiosk", "ShowScreen", true, soulsService.Souls)
+				local uiService = require(Globals.Client.Services.UIService)
+				uiService.doUiAction("Kiosk", "ShowScreen", soulsService.Souls)
 			end,
 		},
 
@@ -741,7 +746,8 @@ local commands = {
 			end,
 
 			ExecuteClient = function(_, NotifyAction)
-				signals["DoUiAction"]:Fire("Notify", NotifyAction, true)
+				local uiService = require(Globals.Client.Services.UIService)
+				uiService.doUiAction("Notify", NotifyAction)
 			end,
 		},
 	},

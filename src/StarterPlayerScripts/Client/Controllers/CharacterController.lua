@@ -61,7 +61,7 @@ module.camShake = cameraShaker.new(Enum.RenderPriority.Camera.Value + 3, ShakeCa
 module.camShake:Start()
 
 local function PlayHitEffect()
-	signals.DoUiAction:Fire("HUD", "DamagePulse")
+	UIService.doUiAction("HUD", "DamagePulse")
 	module.camShake:Shake(cameraShaker.Presets["Hit"])
 end
 
@@ -119,7 +119,7 @@ function module:OnSpawn(character, humanoid)
 		ChanceService.repetitionLuck = 0
 	end
 
-	signals.DoUiAction:Fire("HUD", "Cleanup", true, humanoid.Health, humanoid.MaxHealth)
+	UIService.doUiAction("HUD", "Cleanup", humanoid.Health, humanoid.MaxHealth)
 
 	if giftService.CheckUpgrade("Order Wheel") then
 		signals.AddGift:Fire("Speed_Demon")
@@ -142,12 +142,11 @@ function module:OnSpawn(character, humanoid)
 		progressTo(4)
 	end
 
-	signals.DoUiAction:Fire("Kiosk", "resetCost", true)
-	signals.DoUiAction:Fire("HUD", "UpdatePlayerHealth", true, humanoid.Health, humanoid.MaxHealth)
-	signals.DoUiAction:Fire(
+	UIService.doUiAction("Kiosk", "resetCost")
+	UIService.doUiAction("HUD", "UpdatePlayerHealth", humanoid.Health, humanoid.MaxHealth)
+	UIService.doUiAction(
 		"HUD",
 		"UpdatePlayerHealth",
-		true,
 		humanoid:GetAttribute("Armor"),
 		humanoid:GetAttribute("MaxArmor"),
 		true
@@ -166,10 +165,9 @@ function module:OnSpawn(character, humanoid)
 	logHealth = humanoid.Health
 
 	humanoid:GetAttributeChangedSignal("Armor"):Connect(function()
-		signals.DoUiAction:Fire(
+		UIService.doUiAction(
 			"HUD",
 			"UpdatePlayerHealth",
-			true,
 			humanoid:GetAttribute("Armor"),
 			humanoid:GetAttribute("MaxArmor"),
 			true
@@ -177,25 +175,19 @@ function module:OnSpawn(character, humanoid)
 	end)
 
 	humanoid.HealthChanged:Connect(function(health)
-		signals.DoUiAction:Fire("HUD", "UpdatePlayerHealth", true, health, humanoid.MaxHealth)
+		UIService.doUiAction("HUD", "UpdatePlayerHealth", health, humanoid.MaxHealth)
 
-		signals.DoUiAction:Fire(
-			"HUD",
-			"UpdateGiftProgress",
-			true,
-			"Take_Two",
-			health / Player:GetAttribute("MaxHealth")
-		)
+		UIService.doUiAction("HUD", "UpdateGiftProgress", "Take_Two", health / Player:GetAttribute("MaxHealth"))
 
 		if health < logHealth then
 			if giftService.CheckGift("Haven") then
-				signals.DoUiAction:Fire("HUD", "ShowInvincible", true)
+				UIService.doUiAction("HUD", "ShowInvincible")
 
-				signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Haven")
-				signals.DoUiAction:Fire("HUD", "CooldownGift", true, "Haven", 1)
+				UIService.doUiAction("HUD", "ActivateGift", "Haven")
+				UIService.doUiAction("HUD", "CooldownGift", "Haven", 1)
 
 				task.delay(1, function()
-					signals.DoUiAction:Fire("HUD", "HideInvincible", true)
+					UIService.doUiAction("HUD", "HideInvincible")
 				end)
 			end
 
@@ -272,8 +264,8 @@ function module:OnDied()
 	end
 
 	deathEffect()
-	UIService.doUiAction("HUD", "HideBossBar", true)
-	signals.DoUiAction:Fire("DeathScreen", "ShowDeathScreen")
+	UIService.doUiAction("HUD", "HideBossBar")
+	UIService.doUiAction("DeathScreen", "ShowDeathScreen")
 	net:RemoteEvent("OnPlayerDied"):FireServer()
 end
 
@@ -303,10 +295,10 @@ local function checkForHeal()
 		collectedBlood = 0
 		util.PlaySound(assets.Sounds.BloodFuel, script, 0.1)
 		net:RemoteEvent("Damage"):FireServer(Player.Character, -1)
-		signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Sauce_Is_Fuel")
+		UIService.doUiAction("HUD", "ActivateGift", "Sauce_Is_Fuel")
 	end
 
-	signals.DoUiAction:Fire("HUD", "UpdateGiftProgress", true, "Sauce_Is_Fuel", collectedBlood / 20)
+	UIService.doUiAction("HUD", "UpdateGiftProgress", "Sauce_Is_Fuel", collectedBlood / 20)
 end
 
 mouseTarget.Changed:Connect(function(value)
@@ -406,9 +398,9 @@ RunService.Heartbeat:Connect(function()
 	end
 
 	if inDamageZone then
-		signals.DoUiAction:Fire("HUD", "showDanger", true, inDamageZone)
+		UIService.doUiAction("HUD", "showDanger", inDamageZone)
 	else
-		signals.DoUiAction:Fire("HUD", "hideDanger")
+		UIService.doUiAction("HUD", "hideDanger")
 	end
 
 	if playerPivot.Position.Y < -150 and workspace:GetAttribute("Stage") ~= 2 then
@@ -464,7 +456,7 @@ local function exitS2(extraSouls, totalLevel, level, stageBoss, miniBoss, stage)
 
 	if giftService.CheckGift("Paladin's_Faith") then
 		net:RemoteEvent("CreateShield"):FireServer()
-		signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Paladin's_Faith")
+		UIService.doUiAction("HUD", "ActivateGift", "Paladin's_Faith")
 	end
 
 	if stage == 1 then
@@ -475,20 +467,20 @@ local function exitS2(extraSouls, totalLevel, level, stageBoss, miniBoss, stage)
 
 	if level == 5 then
 		MusicService.stopMusic()
-		local onBiHidden = UIService.doUiAction("BossIntro", "ShowIntro", true, stageBoss)
+		local onBiHidden = UIService.doUiAction("BossIntro", "ShowIntro", stageBoss)
 		onBiHidden:Once(function()
 			net:RemoteEvent("SpawnBoss"):FireServer("MainBoss")
 
 			if soulsService.Souls < 3 then
 				soulsService.AddSoul(3 - soulsService.Souls)
-				UIService.doUiAction("HUD", "UpdateSouls", true, 3)
+				UIService.doUiAction("HUD", "UpdateSouls", 3)
 			end
 		end)
 	elseif level == 2 then
 		net:RemoteEvent("SpawnBoss"):FireServer("MiniBoss")
 		if soulsService.Souls < 1 then
 			soulsService.AddSoul(1)
-			UIService.doUiAction("HUD", "UpdateSouls", true, 1)
+			UIService.doUiAction("HUD", "UpdateSouls", 1)
 		end
 
 		MusicService.playTrack(miniBoss)
@@ -528,18 +520,18 @@ local function ExitSequence(levelData, level, stageBoss, miniBoss, stage)
 
 	module.attemptPause("EndPause")
 
-	local extraSouls = UIService.doUiAction("LevelEnd", "ShowLevelEnd", true, levelData)
+	local extraSouls = UIService.doUiAction("LevelEnd", "ShowLevelEnd", levelData)
 	local onHidden
 
 	if level <= 5 and level ~= 2.5 then
-		onHidden = UIService.doUiAction("DeliveryUi", "ShowScreen", true, soulsService.Souls)
+		onHidden = UIService.doUiAction("DeliveryUi", "ShowScreen", soulsService.Souls)
 
 		onHidden:Once(function()
 			exitS2(extraSouls, totalLevel, level, stageBoss, miniBoss, stage)
-			UIService.doUiAction("HUD", "HideBossBar", true)
+			UIService.doUiAction("HUD", "HideBossBar")
 		end)
 	else
-		UIService.doUiAction("DeliveryUi", "fakeScreen", true)
+		UIService.doUiAction("DeliveryUi", "fakeScreen")
 		task.delay(1, exitS2, extraSouls, totalLevel, level, stageBoss, miniBoss, stage)
 	end
 
@@ -611,14 +603,14 @@ net:Connect("StartExitSequence", ExitSequence)
 
 net:Connect("ArenaBegun", function(isAmbush)
 	if isAmbush then
-		UIService.doUiAction("Notify", "AmbushBegun", true)
+		UIService.doUiAction("Notify", "AmbushBegun")
 	else
-		UIService.doUiAction("Notify", "ArenaBegun", true)
+		UIService.doUiAction("Notify", "ArenaBegun")
 	end
 end)
 
 net:Connect("ArenaEnd", function(result)
-	UIService.doUiAction("Notify", "ArenaComplete", true, ChanceService.checkChance(15, true), result)
+	UIService.doUiAction("Notify", "ArenaComplete", ChanceService.checkChance(15, true), result)
 end)
 
 signals.PauseGame:Connect(function()
@@ -646,7 +638,7 @@ net:Connect("OpenKiosk", function()
 	-- 	signals.PauseGame:Fire()
 	-- end
 
-	UIService.doUiAction("Kiosk", "ShowScreen", true, soulsService.Souls)
+	UIService.doUiAction("Kiosk", "ShowScreen", soulsService.Souls)
 end)
 
 UserInputService.InputBegan:Connect(function(input, gpe)
@@ -660,24 +652,24 @@ UserInputService.InputBegan:Connect(function(input, gpe)
 		or input.KeyCode == Enum.KeyCode.ButtonSelect
 	then
 		GuiService.SelectedObject = nil
-		signals.DoUiAction:Fire("Menu", "Toggle", true)
+		signals.DoUiAction:Fire("Menu", "Toggle")
 	end
 end)
 
 signals.ToggleMenu:Connect(function()
-	signals.DoUiAction:Fire("Menu", "Toggle", true)
+	signals.DoUiAction:Fire("Menu", "Toggle")
 end)
 
 GuiService.MenuOpened:Connect(function()
-	StarterGui:SetCore("ResetButtonCallback", false)
+	StarterGui:SetCore("ResetButtonCallback")
 
 	module.attemptPause("RegPause")
-	UIService.doUiAction("Paused", "Pause", true, true)
+	UIService.doUiAction("Paused", "Pause", true)
 end)
 
 GuiService.MenuClosed:Connect(function()
 	module.attemptResume("RegPause")
-	UIService.doUiAction("Paused", "Pause", true, false)
+	UIService.doUiAction("Paused", "Pause", false)
 end)
 
 return module

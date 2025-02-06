@@ -161,19 +161,19 @@ local function dealDamage(characterHit)
 
 	onInvCooldown = true
 
-	Net:RemoteEvent("SetInvincible", true)
-	uiService.doUiAction("HUD", "ShowInvincible", true)
+	Net:RemoteEvent("SetInvincible")
+	uiService.doUiAction("HUD", "ShowInvincible")
 
-	uiService.doUiAction("HUD", "ActivateGift", true, "Brick_Hook")
-	uiService.doUiAction("HUD", "CooldownGift", true, "Brick_Hook", 1)
+	uiService.doUiAction("HUD", "ActivateGift", "Brick_Hook")
+	uiService.doUiAction("HUD", "CooldownGift", "Brick_Hook", 1)
 
-	uiService.doUiAction("HUD", "GrappleCooldown", true, 1, 0)
+	uiService.doUiAction("HUD", "GrappleCooldown", 1, 0)
 
 	timer.wait(1)
 	Net:RemoteEvent("SetInvincible", false)
-	uiService.doUiAction("HUD", "HideInvincible", true)
+	uiService.doUiAction("HUD", "HideInvincible")
 
-	uiService.doUiAction("HUD", "GrappleCooldown", true, 1, 1)
+	uiService.doUiAction("HUD", "GrappleCooldown", 1, 1)
 
 	timer.wait(1)
 	onInvCooldown = false
@@ -334,7 +334,7 @@ local function grappleMovement()
 	end
 
 	onCooldown = true
-	uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", true, 0.9)
+	uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", 0.9)
 
 	module.Activate()
 
@@ -342,7 +342,7 @@ local function grappleMovement()
 
 	onCooldown = false
 	if GiftsService.CheckGift("Brick_Hook") then
-		uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", true, 0)
+		uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", 0)
 	end
 end
 
@@ -355,7 +355,7 @@ local function grapplePickup()
 
 	if GiftsService.CheckGift("Stuff_Hook") and item then
 		onCooldown = true
-		uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", true, 0.9)
+		uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", 0.9)
 
 		module.Activate(item)
 
@@ -363,7 +363,7 @@ local function grapplePickup()
 		onCooldown = false
 
 		if GiftsService.CheckGift("Stuff_Hook") then
-			uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", true, 0)
+			uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", 0)
 		end
 	end
 end
@@ -402,14 +402,14 @@ end)
 
 GiftsService.OnGiftAdded:Connect(function(gift)
 	if gift == "Brick_Hook" then
-		uiService.doUiAction("HUD", "GrappleCooldown", true, 0.1, 1)
-		uiService.doUiAction("HUD", "ToggleGrappleIndicator", true, true)
+		uiService.doUiAction("HUD", "GrappleCooldown", 0.1, 1)
+		uiService.doUiAction("HUD", "ToggleGrappleIndicator", true)
 	end
 end)
 
 GiftsService.OnGiftRemoved:Connect(function(gift)
 	if gift == "Brick_Hook" then
-		uiService.doUiAction("HUD", "ToggleGrappleIndicator", true, false)
+		uiService.doUiAction("HUD", "ToggleGrappleIndicator", false)
 	end
 end)
 

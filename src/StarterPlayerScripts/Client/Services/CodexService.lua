@@ -12,6 +12,8 @@ local signals = require(Globals.Signals)
 local codex = require(Globals.Shared.Codex)
 local net = require(Globals.Packages.Net)
 
+local UIService = require(Globals.Client.Services.UIService)
+
 --// Values
 
 module.CodexEntries = {}
@@ -51,7 +53,7 @@ function module.AddEntry(entryIndex: string, quiet: boolean?, doNotSave: boolean
 		module.saveCurrentCodex()
 	end
 
-	signals.DoUiAction:Fire("Notify", "AddEntry", true, entryIndex, isImportant)
+	UIService.doUiAction("Notify", "AddEntry", entryIndex, isImportant)
 end
 
 signals.AddEntry:Connect(module.AddEntry)

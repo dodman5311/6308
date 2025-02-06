@@ -29,10 +29,11 @@ function module.CreateDrop(position, dropType)
 
 	newDrop.Parent = workspace
 
-	newDrop.CFrame = CFrame.new(position)
-	newDrop.AssemblyLinearVelocity = Vector3.new(math.random(-30, 30), math.random(40, 50), math.random(-30, 30))
+	newDrop:PivotTo(CFrame.new(position))
+	newDrop.PrimaryPart.AssemblyLinearVelocity =
+		Vector3.new(math.random(-30, 30), math.random(40, 50), math.random(-30, 30))
 
-	newDrop.CollisionGroup = "Drop"
+	newDrop.PrimaryPart.CollisionGroup = "Drop"
 	newDrop:SetAttribute("DropType", dropType)
 	task.delay(0.1, function()
 		CollectionService:AddTag(newDrop, "Drop")
@@ -53,12 +54,12 @@ local function checkForDrops()
 	local characterPosition = characterCFrame.Position
 
 	for _, drop in ipairs(CollectionService:GetTagged("Drop")) do
-		local distance = (drop.Position - characterPosition).Magnitude
+		local distance = (drop:GetPivot().Position - characterPosition).Magnitude
 
 		local beyondMaxDistance = distance > module.MaxDistance
 
-		drop.Anchored = not beyondMaxDistance
-		drop.CanCollide = beyondMaxDistance
+		drop.PrimaryPart.Anchored = not beyondMaxDistance
+		drop.PrimaryPart.CanCollide = beyondMaxDistance
 
 		if beyondMaxDistance then
 			continue
@@ -70,7 +71,7 @@ local function checkForDrops()
 			return
 		end
 
-		drop.CFrame = drop.CFrame:Lerp(characterCFrame, 0.25)
+		drop:PivotTo(drop:GetPivot():Lerp(characterCFrame, 0.25))
 	end
 end
 

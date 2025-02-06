@@ -1146,7 +1146,7 @@ end
 function module.Open(player, ui, frame)
 	ui.HUD.OpenMenuPrompt_T.Visible = false
 	mapInFocus = false
-	Signals.DoUiAction:Fire("Cursor", "Toggle", true, true)
+	Signals.DoUiAction:Fire("Cursor", "Toggle", true)
 	Signals["SetMobileControlsVisible"]:Fire(false)
 
 	setDownSelection(frame)
@@ -1179,7 +1179,7 @@ function module.Close(player, ui, frame)
 	hideAllMenus(frame)
 	Signals["SetMobileControlsVisible"]:Fire(true)
 
-	Signals.DoUiAction:Fire("Cursor", "Toggle", true, false)
+	Signals.DoUiAction:Fire("Cursor", "Toggle", false)
 
 	Lighting.PauseBlur.Enabled = false
 	frame.Gui.Enabled = false

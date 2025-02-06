@@ -263,7 +263,7 @@ function module.UpdateAmmo(amount)
 
 	amount = math.round(amount)
 	currentAmmo = amount
-	signals.DoUiAction:Fire("HUD", "UpdateAmmo", true, currentAmmo)
+	UIService.doUiAction("HUD", "UpdateAmmo", currentAmmo)
 
 	if
 		GiftsService.CheckGift("Tacticool")
@@ -271,9 +271,9 @@ function module.UpdateAmmo(amount)
 		and currentAmmo == 1
 		and not weaponData.HasReloaded
 	then
-		UIService.doUiAction("HUD", "ToggleReloadPrompt", true, true)
+		UIService.doUiAction("HUD", "ToggleReloadPrompt")
 	else
-		UIService.doUiAction("HUD", "ToggleReloadPrompt", true, false)
+		UIService.doUiAction("HUD", "ToggleReloadPrompt", false)
 	end
 
 	module.UpdateSlot()
@@ -290,7 +290,7 @@ local function playVoiceLine()
 end
 
 function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloaded)
-	signals.DoUiAction:Fire("HUD", "hideReload", true)
+	UIService.doUiAction("HUD", "hideReload")
 
 	lockTimer:Cancel()
 
@@ -303,7 +303,7 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 	acts:createAct("Equipping")
 
 	if pickupType ~= "SlotSwitch" and pickupType ~= "FakeDefault" then
-		signals.DoUiAction:Fire("Notify", "ShowWeapon", true, weaponName)
+		UIService.doUiAction("Notify", "ShowWeapon", weaponName)
 	end
 
 	if pickupType ~= "SlotSwitch" and module.currentWeapon then
@@ -337,7 +337,7 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 
 	weaponData = require(newWeapon.Data)
 
-	signals.DoUiAction:Fire("HUD", "SetCrosshair", true, crosshairs[weaponData.Crosshair])
+	UIService.doUiAction("HUD", "SetCrosshair", crosshairs[weaponData.Crosshair])
 
 	local newM6d = Instance.new("Motor6D")
 	newM6d.Parent = newWeapon
@@ -422,7 +422,7 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 end
 
 local function EquipDefault(ignoreAmmo)
-	signals.DoUiAction:Fire("HUD", "hideReload", true)
+	UIService.doUiAction("HUD", "hideReload")
 
 	if GiftsService.CheckUpgrade("Gourmet Kitchen Knife") then
 		module.EquipWeapon("Katana", "FakeDefault", nil, math.huge, true, true)
@@ -439,7 +439,7 @@ local function EquipDefault(ignoreAmmo)
 
 	animationService:playAnimation(viewmodel.Model, "DefaultEquip", Enum.AnimationPriority.Action3.Value, false, 0)
 
-	signals.DoUiAction:Fire("HUD", "SetCrosshair", true, crosshairs.Default, true)
+	UIService.doUiAction("HUD", "SetCrosshair", crosshairs.Default, true)
 
 	--fireTimer:Complete()
 	defaultWeapon.Parent = viewmodel.Model
@@ -518,7 +518,7 @@ local function ReloadDefault()
 		)
 
 		local reloadAnimation: AnimationTrack = animationService:getAnimation(viewmodel.Model, "ReloadOut")
-		UIService.doUiAction("HUD", "reload", true, reloadAnimation.Length / reloadTime)
+		UIService.doUiAction("HUD", "reload", reloadAnimation.Length / reloadTime)
 
 		reloadAnimation.Stopped:Wait()
 	else
@@ -532,7 +532,7 @@ local function ReloadDefault()
 			reloadTime
 		)
 		local reloadAnimation: AnimationTrack = animationService:getAnimation(viewmodel.Model, "Reload")
-		UIService.doUiAction("HUD", "reload", true, reloadAnimation.Length / reloadTime)
+		UIService.doUiAction("HUD", "reload", reloadAnimation.Length / reloadTime)
 
 		reloadAnimation.Stopped:Wait()
 	end
@@ -584,7 +584,7 @@ local function reload(infiniteReloads)
 
 	acts:createAct("Reloading")
 
-	UIService.doUiAction("HUD", "ToggleReloadPrompt", true, false)
+	UIService.doUiAction("HUD", "ToggleReloadPrompt", false)
 
 	local defWeapon = assets.Models.Weapons:FindFirstChild(module.currentWeapon.Name)
 	local defWeaponData = require(defWeapon.Data)
@@ -605,7 +605,7 @@ local function reload(infiniteReloads)
 		end
 	end)
 
-	UIService.doUiAction("HUD", "reload", true, reloadTime)
+	UIService.doUiAction("HUD", "reload", reloadTime)
 
 	weaponReloadTimer.WaitTime = reloadTime
 	weaponReloadTimer.Function = completeReload
@@ -690,7 +690,7 @@ local function activateOvercharge()
 		ti,
 		{ Brightness = 0.8, Contrast = 2, Saturation = -1, TintColor = Color3.fromRGB(255, 185, 85) }
 	)
-	signals.DoUiAction:Fire("HUD", "EmptyOvercharge", true, 3)
+	UIService.doUiAction("HUD", "EmptyOvercharge", 3)
 	task.delay(3, function()
 		acts:removeAct("Overcharged")
 
@@ -710,7 +710,7 @@ local function addToOvercharge(amount)
 	Overcharge += amount
 	overchargeDebounce = true
 
-	UIService.doUiAction("HUD", "UpdateOvercharge", true, Overcharge / 20)
+	UIService.doUiAction("HUD", "UpdateOvercharge", Overcharge / 20)
 
 	task.delay(0.01, function()
 		overchargeDebounce = false
@@ -736,8 +736,8 @@ local function addToConsecutive(hit)
 		end
 	end
 
-	signals.DoUiAction:Fire("HUD", "UpdateGiftProgress", true, "Overcharge", Overcharge / 20)
-	signals.DoUiAction:Fire("HUD", "UpdateGiftProgress", true, "Boring_Bullets", consecutiveHits / 10)
+	UIService.doUiAction("HUD", "UpdateGiftProgress", "Overcharge", Overcharge / 20)
+	UIService.doUiAction("HUD", "UpdateGiftProgress", "Boring_Bullets", consecutiveHits / 10)
 end
 
 local function createFakeWeakpoint(subject, part, position)
@@ -751,7 +751,7 @@ local function createFakeWeakpoint(subject, part, position)
 		end
 	end
 
-	signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Open_Wounds")
+	UIService.doUiAction("HUD", "ActivateGift", "Open_Wounds")
 	local newWeakpoint = assets.Models.Weakspot:Clone()
 
 	newWeakpoint.Parent = subject
@@ -846,13 +846,13 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 	local isImmune = checkImmunity(model, source)
 
 	if isImmune and humanoid.Health > 0 and (weakspotDamage == 0 or model:HasTag("FullImmunity")) then
-		signals.DoUiAction:Fire("HUD", "ShowImmune", true)
+		UIService.doUiAction("HUD", "ShowImmune")
 		return
 	end
 
 	local siuDamage = 0
 	if source ~= lastDamageSource and GiftsService.CheckGift("Switch_It_Up") then
-		signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Switch_It_Up")
+		UIService.doUiAction("HUD", "ActivateGift", "Switch_It_Up")
 		siuDamage = 1
 	end
 
@@ -899,7 +899,7 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		end
 
 		if humanoid.Health > 0 then
-			signals.DoUiAction:Fire("HUD", "ShowHit", true, critMult > 1)
+			UIService.doUiAction("HUD", "ShowHit", critMult > 1)
 		end
 
 		if element and not chanceOverride then
@@ -938,18 +938,12 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 
 	if GiftsService.CheckGift("Gambler's_Fallacy") then
 		ChanceService.repetitionLuck = math.clamp(ChanceService.repetitionLuck + 1, 0, 20)
-		signals.DoUiAction:Fire(
-			"HUD",
-			"UpdateGiftProgress",
-			true,
-			"Gambler's_Fallacy",
-			ChanceService.repetitionLuck / 20
-		)
+		UIService.doUiAction("HUD", "UpdateGiftProgress", "Gambler's_Fallacy", ChanceService.repetitionLuck / 20)
 	end
 
 	if GiftsService.CheckGift("Life_Steal") and soulsService.Souls <= 1 and critMult > 1 then
 		net:RemoteEvent("Damage"):FireServer(player.Character, -1)
-		signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Life_Steal")
+		UIService.doUiAction("HUD", "ActivateGift", "Life_Steal")
 	end
 
 	if source == "Maidenless" then
@@ -1219,7 +1213,7 @@ local function FireDefault(extraBullet)
 	end
 
 	if defaultIndex == 0 then
-		signals.DoUiAction:Fire("HUD", "PumpCrosshair", true)
+		UIService.doUiAction("HUD", "PumpCrosshair")
 		task.wait(0.03)
 		animationService:playAnimation(
 			viewmodel.Model,
@@ -1235,7 +1229,7 @@ local function FireDefault(extraBullet)
 
 		defaultIndex = 1
 	else
-		signals.DoUiAction:Fire("HUD", "PumpCrosshair", true, true)
+		UIService.doUiAction("HUD", "PumpCrosshair")
 		task.wait(0.03)
 		animationService:playAnimation(
 			viewmodel.Model,
@@ -1345,7 +1339,7 @@ function module.Fire()
 	local extraBullet = 0
 
 	if GiftsService.CheckGift("Double_Shot") and ChanceService.checkChance(5, true) then
-		signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Double_Shot")
+		UIService.doUiAction("HUD", "ActivateGift", "Double_Shot")
 		extraBullet = 1
 	end
 
@@ -1354,7 +1348,7 @@ function module.Fire()
 		return
 	end
 
-	signals.DoUiAction:Fire("HUD", "PumpCrosshair", true)
+	UIService.doUiAction("HUD", "PumpCrosshair")
 
 	local bulletDamage = weaponData.Damage
 	local bulletCount = weaponData.BulletCount
@@ -1373,7 +1367,7 @@ function module.Fire()
 	end
 
 	if string.match(module.currentWeapon.Name, " Shot") and GiftsService.CheckGift("1994") then
-		signals.DoUiAction:Fire("HUD", "ActivateGift", true, "1994")
+		UIService.doUiAction("HUD", "ActivateGift", "1994")
 		bulletCount += 2
 	end
 
@@ -1896,7 +1890,7 @@ function module.OnBlock()
 	if GiftsService.CheckGift("Martial_Grace") and ChanceService.checkChance(30, true) then
 		assets.Sounds.MartialHeal:Play()
 
-		signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Martial_Grace")
+		UIService.doUiAction("HUD", "ActivateGift", "Martial_Grace")
 		net:RemoteEvent("Damage"):FireServer(player.Character, -1)
 	end
 
@@ -2010,8 +2004,8 @@ end
 local function runDamagePerkCooldown(cooldown, giftName)
 	damagePerkTimer.WaitTime = cooldown
 	local onStep = damagePerkTimer.OnTimerStepped:Connect(function(currentTime)
-		UIService.doUiAction("HUD", "UpdateGiftProgress", true, giftName, currentTime / cooldown)
-		UIService.doUiAction("HUD", "UpdateOvercharge", true, currentTime / cooldown, true)
+		UIService.doUiAction("HUD", "UpdateGiftProgress", giftName, currentTime / cooldown)
+		UIService.doUiAction("HUD", "UpdateOvercharge", currentTime / cooldown, true)
 	end)
 	damagePerkTimer.Function = function()
 		onStep:Disconnect()
@@ -2032,7 +2026,7 @@ local function fireShoulderGrenade(gpe)
 	local bulletDamage = 12
 	canUseDamagePerk = false
 
-	UIService.doUiAction("HUD", "ActivateGift", true, "Mag_Launcher")
+	UIService.doUiAction("HUD", "ActivateGift", "Mag_Launcher")
 
 	for _, v in ipairs(lockGuis) do
 		v:Destroy()
@@ -2090,7 +2084,7 @@ local function fireSoulFire()
 	canUseDamagePerk = false
 	animationService:playAnimation(viewmodel.Model, "Launch", Enum.AnimationPriority.Action2)
 
-	UIService.doUiAction("HUD", "ActivateGift", true, "Burning_Souls")
+	UIService.doUiAction("HUD", "ActivateGift", "Burning_Souls")
 
 	Timer.wait(0.15)
 
@@ -2140,7 +2134,7 @@ local function galvanGaze()
 
 	util.tween(camera, ti, { FieldOfView = camera.FieldOfView - 20 })
 
-	UIService.doUiAction("HUD", "ActivateGift", true, "Galvan_Gaze")
+	UIService.doUiAction("HUD", "ActivateGift", "Galvan_Gaze")
 
 	Timer.wait(0.5)
 
@@ -2350,7 +2344,7 @@ explosionService.explosiveHit:Connect(function(subject, preHealth, postHealth, d
 	local sourceIsWeapon = module.currentWeapon and source == module.currentWeapon.Name or source == "Default"
 
 	if preHealth > 0 then
-		signals.DoUiAction:Fire("HUD", "ShowHit", true)
+		UIService.doUiAction("HUD", "ShowHit")
 
 		if GiftsService.CheckGift("Burn_Hell") and ChanceService.checkChance(50, true) then
 			if not sourceIsWeapon and source ~= "ThrownWeapon" then
@@ -2372,21 +2366,21 @@ GiftsService.OnGiftAdded:Connect(function(gift)
 		UIService.doUiAction("HUD", "ShowOvercharge")
 	end
 	if gift == "Mag_Launcher" or gift == "Burning_Souls" or gift == "Galvan_Gaze" then
-		UIService.doUiAction("HUD", "UpdateGiftProgress", true, gift, 1)
-		UIService.doUiAction("HUD", "ShowOvercharge", true, true)
-		UIService.doUiAction("HUD", "UpdateOvercharge", true, 1, true)
+		UIService.doUiAction("HUD", "UpdateGiftProgress", gift, 1)
+		UIService.doUiAction("HUD", "ShowOvercharge", true)
+		UIService.doUiAction("HUD", "UpdateOvercharge", 1, true)
 	end
 end)
 
 GiftsService.OnGiftRemoved:Connect(function(gift)
 	if gift == "Tacticool" then
-		UIService.doUiAction("HUD", "ToggleReloadPrompt", true, false)
+		UIService.doUiAction("HUD", "ToggleReloadPrompt", false)
 	end
 	if gift == "Overcharge" then
 		UIService.doUiAction("HUD", "HideOvercharge")
 	end
 	if gift == "Mag_Launcher" or gift == "Burning_Souls" or gift == "Galvan_Gaze" then
-		UIService.doUiAction("HUD", "HideOvercharge", true, true)
+		UIService.doUiAction("HUD", "HideOvercharge", true)
 	end
 end)
 

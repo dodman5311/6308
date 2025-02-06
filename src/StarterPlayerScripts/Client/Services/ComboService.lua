@@ -35,7 +35,7 @@ function module.AddToCombo(amount)
 	comboTimer:Reset()
 	comboTimer:Run()
 
-	UIService.doUiAction("HUD", "SetCombo", true, module.CurrentCombo)
+	UIService.doUiAction("HUD", "SetCombo", module.CurrentCombo)
 
 	if module.CurrentCombo > 0 then
 		UIService.fullUi.HUD.ComboFrame.Visible = true
@@ -49,7 +49,7 @@ end
 function module.ReduceCombo(amount)
 	module.CurrentCombo -= amount
 
-	UIService.doUiAction("HUD", "SetCombo", true, module.CurrentCombo)
+	UIService.doUiAction("HUD", "SetCombo", module.CurrentCombo)
 
 	if module.CurrentCombo <= 0 then
 		module.ResetCombo()

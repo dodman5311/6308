@@ -10,7 +10,6 @@ local CollectionService = game:GetService("CollectionService")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
-local camera = workspace.CurrentCamera
 
 local assets = ReplicatedStorage.Assets
 local sounds = assets.Sounds
@@ -29,15 +28,10 @@ local Signal = require(Globals.Packages.Signal)
 local musicService = require(Globals.Client.Services.MusicService)
 local gifts = require(Globals.Shared.Gifts)
 local MouseOver = require(Globals.Vendor.MouseOverModule)
-local GiftsService = require(Globals.Client.Services.GiftsService)
-local Gifts = require(Globals.Shared.Gifts)
 
 local net = require(Globals.Packages.Net)
 
 module.onHidden = Signal.new()
-
-local timer = require(Globals.Vendor.Timer):newQueue()
-local dialogueWait = timer:new("DialogueWait")
 
 --// Values
 
@@ -57,7 +51,7 @@ local rewards = {
 		"Galvan_Gaze",
 	},
 
-	["Phillip The Everlasting"] = "Maidenless", --"Master_Scouting",
+	["Phillip The Everlasting"] = "Master_Scouting",
 	["Specimen #09"] = "Overcharge",
 }
 
@@ -80,7 +74,7 @@ local function connectButtonHover(button)
 end
 
 local function givePerk(frame, button)
-	Signals.DoUiAction:Fire("Cursor", "Toggle", true, false)
+	Signals.DoUiAction:Fire("Cursor", "Toggle", false)
 
 	local ti = TweenInfo.new(1, Enum.EasingStyle.Linear)
 	local title = button.Parent.Title.Text
@@ -408,7 +402,7 @@ function module.showChoices(player, ui, frame, bossName)
 	end
 
 	local choices = frame.Choices
-	Signals.DoUiAction:Fire("Cursor", "Toggle", true, true)
+	Signals.DoUiAction:Fire("Cursor", "Toggle", true)
 
 	for index, perkName in ipairs(rewards[bossName]) do
 		local perk = gifts.Specials[perkName]

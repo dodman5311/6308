@@ -170,7 +170,7 @@ function module.CheckFear(npc)
 		chance = Net:RemoteFunction("CheckChance"):InvokeClient(player, 15, true)
 
 		if chance then
-			Net:RemoteEvent("DoUiAction"):FireClient(player, "Notify", "ShowFeared", true, npc.Instance)
+			Net:RemoteEvent("DoUiAction"):FireClient(player, "Notify", "ShowFeared", npc.Instance)
 		end
 
 		return chance

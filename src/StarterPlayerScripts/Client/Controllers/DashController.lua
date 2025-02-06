@@ -59,9 +59,9 @@ function module.Dash(subject)
 			util.tween(camera, TweenInfo.new(1), { FieldOfView = util.getSetting("Field of View").Value })
 		end)
 
-		uiService.doUiAction("HUD", "UpdateGiftProgress", true, "Righteous_Motion", module.dashes / 3)
+		uiService.doUiAction("HUD", "UpdateGiftProgress", "Righteous_Motion", module.dashes / 3)
 
-		uiService.doUiAction("HUD", "UpdateSideBar", true, module.dashes)
+		uiService.doUiAction("HUD", "UpdateSideBar", module.dashes)
 
 		humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, false)
 
@@ -105,7 +105,7 @@ function module.Dash(subject)
 			module.canDash = true
 			module.dashes = 3
 
-			uiService.doUiAction("HUD", "UpdateGiftProgress", true, "Righteous_Motion", module.dashes / 3)
+			uiService.doUiAction("HUD", "UpdateGiftProgress", "Righteous_Motion", module.dashes / 3)
 			uiService.doUiAction("HUD", "RefreshSideBar")
 			--script.LoadedUI:Play()
 		end

@@ -57,7 +57,7 @@ function module.Init(player, ui, frame)
 		frame.Unlock.Visible = false
 		frame.ReturnToMenu.Visible = false
 
-		Signals.DoUiAction:Fire("Cursor", "Toggle", true, false)
+		Signals.DoUiAction:Fire("Cursor", "Toggle", false)
 	end)
 
 	frame.ReturnButton.MouseButton1Click:Connect(function()
@@ -164,7 +164,7 @@ local function showUnlock(player, ui, frame)
 			frame.ReturnToMenu.Visible = true
 			frame.ReturnToMenu.GroupTransparency = 1
 			util.tween(frame.ReturnToMenu, ti, { GroupTransparency = 0 })
-			Signals.DoUiAction:Fire("Cursor", "Toggle", true, true)
+			Signals.DoUiAction:Fire("Cursor", "Toggle", true)
 		end)
 	end)
 end

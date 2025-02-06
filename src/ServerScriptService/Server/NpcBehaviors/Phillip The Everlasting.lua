@@ -401,15 +401,15 @@ local function onDied(npc)
 	for _, player in ipairs(Players:GetPlayers()) do
 		task.spawn(function()
 			if BadgeService:AwardBadge(player.UserId, 982889213750283) then
-				net:RemoteEvent("DoUiAction"):FireAllClients("Notify", "AchievementUnlocked", true, 982889213750283)
+				net:RemoteEvent("DoUiAction"):FireAllClients("Notify", "AchievementUnlocked", 982889213750283)
 			end
 		end)
 	end
 
 	net:RemoteEvent("StopMusic"):FireAllClients("Phillip The Everlasting")
 	timer.wait(1)
-	net:RemoteEvent("DoUiAction"):FireAllClients("BossIntro", "ShowCompleted", true, npc.Instance.Name)
-	net:RemoteEvent("DoUiAction"):FireAllClients("HUD", "HideBossBar", true)
+	net:RemoteEvent("DoUiAction"):FireAllClients("BossIntro", "ShowCompleted", npc.Instance.Name)
+	net:RemoteEvent("DoUiAction"):FireAllClients("HUD", "HideBossBar")
 end
 
 local function lead(npc)

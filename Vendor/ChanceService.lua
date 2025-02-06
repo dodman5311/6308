@@ -14,6 +14,7 @@ local Globals = require(ReplicatedStorage.Shared.Globals)
 local giftService = require(Globals.Client.Services.GiftsService)
 local comboService = require(Globals.Client.Services.ComboService)
 local Net = require(Globals.Packages.Net)
+local UIService = require(Globals.Client.Services.UIService)
 
 local assets = ReplicatedStorage.Assets
 
@@ -58,11 +59,11 @@ local function resetRepLuck(value)
 	end
 
 	if module.repetitionLuck > 0 then
-		signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Gambler's_Fallacy")
+		UIService.doUiAction("HUD", "ActivateGift", "Gambler's_Fallacy")
 	end
 
 	module.repetitionLuck = 0
-	signals.DoUiAction:Fire("HUD", "UpdateGiftProgress", true, "Gambler's_Fallacy", 0)
+	UIService.doUiAction("HUD", "UpdateGiftProgress", "Gambler's_Fallacy", 0)
 end
 
 function module.checkChance(chance, goodLuck, PureLuck)
@@ -93,7 +94,7 @@ function module.checkChance(chance, goodLuck, PureLuck)
 	then
 		resetRepLuck(goodLuck)
 
-		signals.DoUiAction:Fire("HUD", "ActivateGift", true, "Take_Two")
+		UIService.doUiAction("HUD", "ActivateGift", "Take_Two")
 		assets.Sounds.TakeTwo:Play()
 		return true
 	end

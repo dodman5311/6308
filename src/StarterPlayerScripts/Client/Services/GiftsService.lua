@@ -18,6 +18,8 @@ local signals = require(Globals.Signals)
 local gifts = require(Globals.Shared.Gifts)
 local net = require(Globals.Packages.Net)
 
+local UIService = require(Globals.Client.Services.UIService)
+
 --// Values
 
 module.AquiredGifts = {}
@@ -52,7 +54,7 @@ local function AddGift(gift)
 		codexService.AddEntry("Luck")
 	end
 
-	signals.DoUiAction:Fire("HUD", "AddGift", true, giftData.Icon, gift)
+	UIService.doUiAction("HUD", "AddGift", giftData.Icon, gift)
 	module.OnGiftAdded:Fire(gift, giftData)
 	net:RemoteEvent("GiftAdded"):FireServer(gift, giftData)
 end
@@ -64,7 +66,7 @@ local function ClearGifts()
 	end
 
 	module.AquiredGifts = {}
-	signals.DoUiAction:Fire("HUD", "ClearGifts", true)
+	UIService.doUiAction("HUD", "ClearGifts")
 end
 
 function module.CheckUpgrade(upgradeName)
