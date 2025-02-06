@@ -5,9 +5,8 @@ local net = require(Globals.Packages.Net)
 
 local stats = {
 	ViewDistance = 200,
-	AttackDelay = { Min = 2, Max = 10 },
-	AltAttackDelay = { Min = 7, Max = 13 },
-	MoveDelay = { Min = 2, Max = 7 },
+	AttackDelay = NumberRange.new(2, 5),
+	AltAttackDelay = NumberRange.new(5, 10),
 	AttackCooldown = 0.125,
 	ProjectileSpeed = 300,
 	AltProjectileSpeed = 75,

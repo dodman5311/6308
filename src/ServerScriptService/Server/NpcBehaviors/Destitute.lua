@@ -2,8 +2,8 @@ local stats = {
 	AttackDistance = 30,
 	ViewDistance = 150,
 	NpcType = "Enemy",
-	MoveDelay = { Min = 2, Max = 5 },
-	AttackDelay = { Min = 5, Max = 8 },
+	MoveDelay = NumberRange.new(2, 5),
+	AttackDelay = NumberRange.new(5, 8),
 }
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -11,9 +11,16 @@ local RunService = game:GetService("RunService")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local animationService = require(Globals.Vendor.AnimationService)
+local net = require(Globals.Packages.Net)
+local timer = require(Globals.Vendor.Timer)
 
 local function getRandomTime()
 	return Random.new():NextNumber(stats.AttackDelay.Min, stats.AttackDelay.Max)
+end
+
+local function indicateAttack(npc, color)
+	net:RemoteEvent("ReplicateEffect"):FireAllClients("IndicateAttack", "Server", true, npc.Instance, color)
+	timer.wait(0.5)
 end
 
 local function Unaim(npc)
@@ -102,6 +109,8 @@ local function shoot(npc)
 		return
 	end
 
+	indicateAttack(npc, Color3.fromRGB(255, 135, 135))
+
 	if checkRaycast(npc.Instance, target) then
 		target.Humanoid:TakeDamage(1)
 	end
@@ -117,7 +126,7 @@ local module = {
 		{ Function = "SearchForTarget", Parameters = { stats.ViewDistance } },
 
 		{ Function = "Custom", Parameters = { lookAtTarget }, State = "Attacking" },
-		{ Function = "RunTimer", Parameters = { "Attack", true, getRandomTime(), shoot } },
+		{ Function = "RunTimer", Parameters = { "Attack", getRandomTime(), shoot, true } },
 
 		{ Function = "PlayWalkingAnimation" },
 	},

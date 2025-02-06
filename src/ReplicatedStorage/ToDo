@@ -469,9 +469,5 @@ make priest
 
 Make rain!! *
 
-make parry sword:
-Block if far, swing if close. Long parry time. Cooldown.
-1 Damage.
-Faulters an enemy for 1 second.
-If damaging an element inflicted enemy, armor will drop 1 - 2. Drops more armor if inflicted with an element. 3 - 5
+make parry sword: *
 ----------------------------------------------------------------------------------------

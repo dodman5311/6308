@@ -1,15 +1,7 @@
 local stats = {
 	ViewDistance = 200,
-	AttackDelay = { Min = 3, Max = 8 },
-	MoveDelay = { Min = 4, Max = 10 },
-	AttackCharge = 0.6,
 	LeadCompensation = 750,
 	AttackDistance = 30,
-
-	MeleeDistance = 15,
-	MeleeDelay = { Min = 0.75, Max = 1 },
-
-	NpcType = "Enemy",
 }
 
 local BadgeService = game:GetService("BadgeService")
@@ -17,14 +9,12 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Debris = game:GetService("Debris")
-local SoundService = game:GetService("SoundService")
 
 local assets = ReplicatedStorage.Assets
 local effects = assets.Effects
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local util = require(Globals.Vendor.Util)
-local npcAction = require(Globals.Server.NpcActions)
 local UIAnimator = require(Globals.Vendor.UIAnimationService)
 local animationService = require(Globals.Vendor.AnimationService)
 
@@ -145,7 +135,7 @@ local function grabPlayer(npc)
 	npc.Acts:removeAct("inAction", "inGrab")
 end
 
-local function hitPlayer(character, npc)
+local function hitPlayer(character)
 	character.PrimaryPart.AssemblyLinearVelocity = Vector3.new(0, -200, 0)
 	local humanoid = character:FindFirstChild("Humanoid")
 
@@ -323,7 +313,7 @@ local function shootRock(npc, i)
 	humanoid:TakeDamage(4)
 end
 
-local function ShowCatwalks(npc, bossRoom)
+local function ShowCatwalks(_, bossRoom)
 	local ti = TweenInfo.new(0.3)
 
 	if not bossRoom:GetAttribute("CatsOut") then

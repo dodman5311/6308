@@ -1,8 +1,8 @@
 local stats = {
 	ViewDistance = 200,
-	AttackDelay = { Min = 2, Max = 6 },
-	AltAttackDelay = { Min = 6, Max = 8 },
-	MoveDelay = { Min = 4, Max = 9 },
+	AttackDelay = NumberRange.new(1, 5),
+	AltAttackDelay = NumberRange.new(5, 6),
+	MoveDelay = NumberRange.new(4, 8),
 	AttackCooldown = 0,
 	ProjectileSpeed = 400,
 	AltProjectileSpeed = 300,

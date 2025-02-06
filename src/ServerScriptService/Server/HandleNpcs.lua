@@ -113,13 +113,7 @@ local function doAction(action, npc, ...)
 	local parameters = {}
 
 	if action.Parameters then
-		for _, parameter in ipairs(action.Parameters) do
-			if typeof(parameter) == "table" and parameter["Min"] and parameter["Max"] then
-				parameter = rng:NextNumber(parameter["Min"], parameter["Max"])
-			end
-
-			table.insert(parameters, parameter)
-		end
+		parameters = table.clone(action.Parameters)
 	end
 
 	if not action["IgnoreEventParams"] then

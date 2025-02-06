@@ -25,6 +25,14 @@ local canFear = false
 
 --// Library Functions
 
+local function getNumber(input: number | NumberRange)
+	if typeof(input) == "NumberRange" then
+		return rng:NextNumber(input.Min, input.Max)
+	end
+
+	return input
+end
+
 local function unpackNpcInstance(npc)
 	return npc.Instance, npc.Instance:FindFirstChild("Humanoid")
 end
@@ -122,6 +130,8 @@ local function getTimer(npc, timerName, waitTime, func, isAttackTimer, ...)
 	local foundTimer = npc.Timers[timerName]
 
 	if not foundTimer then
+		waitTime = getNumber(waitTime)
+
 		foundTimer = npc.Timer:new(timerName, waitTime, func, ...)
 		npc.Timers[timerName] = foundTimer
 		table.insert(npc.Timers[timerName].Parameters, 1, npc)
@@ -133,6 +143,7 @@ local function getTimer(npc, timerName, waitTime, func, isAttackTimer, ...)
 				if module.CheckFear(npc) then
 					return
 				end
+
 				oldFunction(table.unpack(foundTimer.Parameters))
 			end
 		end
@@ -178,9 +189,10 @@ end
 
 --// NPC ACTIONS //--
 
-function module.RunTimer(npc, timerName, isAttackTimer, waitTime, func, ...)
+function module.RunTimer(npc, timerName, waitTime, func, isAttackTimer, ...)
 	local timer = getTimer(npc, timerName, waitTime, func, isAttackTimer, ...)
 	timer:Run()
+	return timer
 end
 
 function module.Ragdoll(npc)
@@ -315,7 +327,12 @@ local function createHitCast(npc, damage, cframe, distance, spread, size)
 end
 
 function module.Shoot(npc, sender, cooldown, amount, speed, bulletCount, info, visualModel, indicateAttack)
-	if npc:GetState() == "Dead" or module.CheckFear(npc) then
+	cooldown = getNumber(cooldown)
+	amount = getNumber(amount)
+	speed = getNumber(speed)
+	bulletCount = getNumber(bulletCount)
+
+	if npc:GetState() == "Dead" then
 		return
 	end
 
@@ -362,7 +379,11 @@ function module.Shoot(npc, sender, cooldown, amount, speed, bulletCount, info, v
 end
 
 function module.ShootBeam(npc, damage, chargeTime, distance, bulletCount, size)
-	if npc:GetState() == "Dead" or module.CheckFear(npc) then
+	chargeTime = getNumber(chargeTime)
+	bulletCount = getNumber(bulletCount)
+	distance = getNumber(distance)
+
+	if npc:GetState() == "Dead" then
 		return
 	end
 
@@ -426,9 +447,11 @@ function module.ShootBeam(npc, damage, chargeTime, distance, bulletCount, size)
 end
 
 local function swing(npc, distance, stopMovement)
-	if npc:GetState() == "Dead" or module.CheckFear(npc) then
+	if npc:GetState() == "Dead" then
 		return
 	end
+
+	distance = getNumber(distance)
 
 	--AnimationService:stopAnimation(npc.Instance, "Attack", 0)
 	local animation = AnimationService:playAnimation(npc.Instance, "Attack", Enum.AnimationPriority.Action3)
@@ -479,12 +502,12 @@ function module.ShootProjectile(
 		return
 	end
 
-	module.RunTimer(
+	local AttackTimer = getTimer(
 		npc,
 		timerIndex or "ShootAttack",
-		true,
 		shotDelay,
 		module.Shoot,
+		true,
 		npc.Instance,
 		cooldown,
 		amount,
@@ -494,6 +517,11 @@ function module.ShootProjectile(
 		visualModel,
 		indicateAttack
 	)
+
+	AttackTimer.OnEnded:Once(function()
+		AttackTimer.WaitTime = getNumber(shotDelay)
+	end)
+	AttackTimer:Run()
 end
 
 function module.ShootWithoutTimer(npc, cooldown, amount, speed, bulletCount, info, visualModel, indicateAttack)
@@ -536,6 +564,9 @@ function module.ShootPlayerProjectile(
 		visualModel
 	)
 
+	AttackTimer.OnEnded:Once(function()
+		AttackTimer.WaitTime = getNumber(shotDelay)
+	end)
 	AttackTimer:Run()
 end
 
@@ -551,6 +582,9 @@ function module.ShootCharge(npc, shotDelay, damage, chargeTime, distance, bullet
 		end
 	end, true)
 
+	AttackTimer.OnEnded:Once(function()
+		AttackTimer.WaitTime = getNumber(shotDelay)
+	end)
 	AttackTimer:Run()
 end
 
@@ -561,11 +595,17 @@ function module.AttackInMelee(npc, distance, swingDelay, stopMovement)
 
 	local AttackTimer = getTimer(npc, "MeleeAttack", swingDelay, swing, true, distance, stopMovement)
 
+	AttackTimer.OnEnded:Once(function()
+		AttackTimer.WaitTime = getNumber(swingDelay)
+	end)
 	AttackTimer:Run()
 end
 
 function module.MoveRandom(npc, MaxDistance, delay)
 	local MoveTimer = getTimer(npc, "MoveRandom", delay, MoveToRandomPosition, false, MaxDistance)
+	MoveTimer.OnEnded:Once(function()
+		MoveTimer.WaitTime = getNumber(delay)
+	end)
 	MoveTimer:Run()
 end
 

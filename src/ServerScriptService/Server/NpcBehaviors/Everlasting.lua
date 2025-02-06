@@ -1,13 +1,13 @@
 local stats = {
 	ViewDistance = 200,
-	AttackDelay = { Min = 3, Max = 8 },
-	MoveDelay = { Min = 4, Max = 10 },
+	AttackDelay = NumberRange.new(2, 6),
+	MoveDelay = NumberRange.new(2, 8),
 	AttackCharge = 0.6,
 	LeadCompensation = 750,
 	AttackDistance = 30,
 
 	MeleeDistance = 15,
-	MeleeDelay = { Min = 0.75, Max = 1 },
+	MeleeDelay = NumberRange.new(0.75, 1),
 
 	NpcType = "Enemy",
 }

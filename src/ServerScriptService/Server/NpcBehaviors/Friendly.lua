@@ -2,8 +2,8 @@ local players = game:GetService("Players")
 
 local stats = {
 	ViewDistance = 150,
-	AttackDelay = { Min = 1, Max = 6 },
-	MoveDelay = { Min = 8, Max = 15 },
+	AttackDelay = NumberRange.new(1, 5),
+	MoveDelay = NumberRange.new(8, 15),
 	AttackCooldown = 0.15,
 	ProjectileSpeed = 180,
 	AttackAmount = 1,

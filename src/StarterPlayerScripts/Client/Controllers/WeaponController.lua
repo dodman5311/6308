@@ -1717,13 +1717,23 @@ local function onSwordHit(subject)
 		end
 	end
 	local dropAmount = isAfflicted and math.random(3, 4) or math.random(1, 2)
-	print(isAfflicted, dropAmount)
-
 	for _ = 1, dropAmount do
 		dropService.CreateDrop(subject:GetPivot().Position, "Armor")
 	end
 
 	util.PlaySound(assets.Sounds.MaidenlessSwing, script)
+end
+
+local function fadeBladeRune(blade)
+	local ti = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0.25)
+	for _, surfaceGui in ipairs(blade:GetChildren()) do
+		if not surfaceGui:IsA("SurfaceGui") then
+			continue
+		end
+
+		surfaceGui.ImageLabel.ImageTransparency = 0
+		util.tween(surfaceGui.ImageLabel, ti, { ImageTransparency = 1 })
+	end
 end
 
 function module.UseSword()
@@ -1743,6 +1753,10 @@ function module.UseSword()
 	newM6D.Parent = newSword
 	newM6D.Part0 = viewmodel.Model.RightGrip
 	newM6D.Part1 = newSword.SwordGrip
+
+	for i = 0, 2 do
+		fadeBladeRune(newSword["Blade_" .. i])
+	end
 
 	local hitHumanoid = module.FireBullet(1, 0, Vector3.new(10, 10, 15), nil, "Maidenless")
 	if hitHumanoid then
@@ -1784,7 +1798,7 @@ function module.UseSword()
 	end)
 
 	net:RemoteEvent("SetBlocking"):FireServer(true)
-	task.wait(1)
+	Timer.wait(1)
 
 	playingAnimation.Priority = Enum.AnimationPriority.Action.Value
 
@@ -1792,9 +1806,9 @@ function module.UseSword()
 
 	acts:removeAct("IsBlocking")
 
-	task.wait(0.25)
+	Timer.wait(0.25)
 	canBlock = true
-	task.wait(1.25)
+	Timer.wait(2)
 	canUseSword = true
 
 	return true

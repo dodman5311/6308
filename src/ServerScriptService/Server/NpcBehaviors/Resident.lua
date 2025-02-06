@@ -1,7 +1,7 @@
 local stats = {
 	ViewDistance = 150,
-	AltAttackDelay = { Min = 3, Max = 6 },
-	MoveDelay = { Min = 4, Max = 9 },
+	AltAttackDelay = NumberRange.new(1.5, 4),
+	MoveDelay = NumberRange.new(3, 8),
 	AttackCooldown = 0,
 	AltProjectileSpeed = 300,
 	NpcType = "Enemy",

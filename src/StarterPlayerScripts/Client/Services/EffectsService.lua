@@ -290,6 +290,25 @@ function module.RemoveElementalEffect(elementName, npcModel)
 	end
 end
 
+function module.HealingEffect(npcModel: Model)
+	local primaryPart = npcModel.PrimaryPart
+	if not primaryPart then
+		return
+	end
+
+	local particle_0 = effects.HealingSparkles:Clone()
+	local particle_1 = effects.HealingSwirls:Clone()
+
+	particle_0.Parent = primaryPart
+	particle_1.Parent = primaryPart
+
+	module.emitObject(particle_0)
+	module.emitObject(particle_1)
+
+	DEBRIS:AddItem(particle_0, 2)
+	DEBRIS:AddItem(particle_1, 2)
+end
+
 function module.fadeEnemy(enemyModel: Model, fadeTime: number)
 	local ti = TweenInfo.new(fadeTime, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
 

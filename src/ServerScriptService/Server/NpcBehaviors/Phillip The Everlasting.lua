@@ -1,15 +1,5 @@
 local stats = {
 	ViewDistance = 200,
-	AttackDelay = { Min = 3, Max = 8 },
-	MoveDelay = { Min = 4, Max = 10 },
-	AttackCharge = 0.6,
-	LeadCompensation = 750,
-	AttackDistance = 30,
-
-	MeleeDistance = 15,
-	MeleeDelay = { Min = 0.75, Max = 1 },
-
-	NpcType = "Enemy",
 }
 
 local BadgeService = game:GetService("BadgeService")
@@ -24,7 +14,6 @@ local globalSounds = assets.Sounds.EverlastingBoss
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local util = require(Globals.Vendor.Util)
 local animationService = require(Globals.Vendor.AnimationService)
-local mapService = require(Globals.Server.Services.MapService)
 local timer = require(Globals.Vendor.Timer)
 
 local net = require(Globals.Packages.Net)
@@ -113,7 +102,7 @@ end
 local function showHitBlood(subject, sound)
 	sound:Play()
 	local hitPart = subject.MeleeHitPart
-	for i, v in ipairs(hitPart:GetChildren()) do
+	for _, v in ipairs(hitPart:GetChildren()) do
 		if v.Name ~= "BloodEffect" then
 			continue
 		end

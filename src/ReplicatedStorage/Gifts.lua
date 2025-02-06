@@ -375,8 +375,7 @@ If there are enemies, you will perform a parrying attack dealing 1 damage.
 
 Damaging an enemy with the <b>Maiden's blade</b> will drop 1 - 2 armor.
 If an enemy is inflicted with an element, 3 - 4 armor will drop.
-(1 second parry time, 1.5 second cooldown)
-			]],
+(1 second parry time, 1.5 second cooldown)]],
 		},
 
 		Ultra_Slayer = {

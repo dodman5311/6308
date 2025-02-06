@@ -377,9 +377,11 @@ RunService.Heartbeat:Connect(function()
 		if raycast then
 			rainPart.Emitter1.Enabled = false
 			rainPart.Emitter2.Enabled = false
+			rainPart.Emitter3.Enabled = false
 		else
 			rainPart.Emitter1.Enabled = true
 			rainPart.Emitter2.Enabled = true
+			rainPart.Emitter3.Enabled = true
 		end
 	elseif rainPart then
 		rainPart:Destroy()

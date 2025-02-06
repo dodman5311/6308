@@ -1,7 +1,7 @@
 local stats = {
 	ViewDistance = 200,
-	AttackDelay = { Min = 2, Max = 10 },
-	MoveDelay = { Min = 2, Max = 7 },
+	AttackDelay = NumberRange.new(1.5, 5),
+	MoveDelay = NumberRange.new(2, 5),
 	AttackCooldown = 0.1,
 	ProjectileSpeed = 400,
 	AttackAmount = 3,
