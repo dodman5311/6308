@@ -289,6 +289,27 @@ local function playVoiceLine()
 	end
 end
 
+local function createShell(shellType: string)
+	local chamber: Part = viewmodel.Model:FindFirstChild("Chamber", true)
+	if not chamber then
+		return
+	end
+	local shell: Part = assets.Effects.Shells:FindFirstChild(shellType):Clone()
+
+	shell.Parent = workspace
+	shell.CollisionGroup = "DeadBody"
+
+	shell.CFrame = chamber.CFrame
+	shell.AssemblyLinearVelocity = (chamber.CFrame * CFrame.Angles(
+		math.rad(rng:NextNumber(5, -5)),
+		math.rad(rng:NextNumber(5, -5)),
+		math.rad(rng:NextNumber(5, -5))
+	)).LookVector * 25
+	shell.AssemblyAngularVelocity = Vector3.new(0, rng:NextNumber(-45, -20), 0)
+
+	Debris:AddItem(shell, 5)
+end
+
 function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloaded)
 	UIService.doUiAction("HUD", "hideReload")
 
@@ -359,6 +380,11 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 	animationService:stopAnimation(viewmodel.Model, "DefaultEquip", 0)
 
 	animationService:loadAnimations(viewmodel.Model, newWeapon.Animations)
+
+	local fireAnimation = animationService:getAnimation(viewmodel.Model, "Fire")
+	if fireAnimation then
+		fireAnimation:GetMarkerReachedSignal("CreateShell"):Connect(createShell)
+	end
 
 	if newWeapon.Animations:FindFirstChild("Equip") then
 		animationService:playAnimation(viewmodel.Model, "Equip", Enum.AnimationPriority.Action4.Value, false, 0)

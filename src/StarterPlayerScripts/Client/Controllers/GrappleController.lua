@@ -33,8 +33,11 @@ local sounds = assets.Sounds
 local ViewModel
 
 local grapplePart
+local rope
+local antiGrav
 local onCooldown = false
 local onInvCooldown = false
+local keyDown = false
 
 --// Connections
 local InputEnded
@@ -48,13 +51,67 @@ local ti1 = TweenInfo.new(0.5, Enum.EasingStyle.Elastic, Enum.EasingDirection.Ou
 local ti2 = TweenInfo.new(0.175, Enum.EasingStyle.Linear)
 local ti3 = TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
 
-local function getObjectInCenter(blacklist)
+local function createRope(c, distance, a1)
+	local newRope = Instance.new("RopeConstraint")
+	newRope.Parent = player.Character
+
+	newRope.Length = distance
+	newRope.Attachment0 = player.Character.PrimaryPart.RootAttachment
+	newRope.Attachment1 = a1
+	newRope.Restitution = 0
+	newRope.WinchEnabled = true
+	newRope.WinchResponsiveness = 40
+	newRope.WinchSpeed = 40
+	newRope.WinchForce = 10000
+
+	newRope.Visible = true
+
+	newRope.Destroying:Once(function()
+		print("END")
+	end)
+
+	return newRope
+end
+
+local function getMass(character)
+	local mass = 0
+	for _, v in ipairs(character:GetDescendants()) do
+		if not v:IsA("BasePart") then
+			continue
+		end
+		mass += v:GetMass()
+	end
+
+	return mass
+end
+
+local function createAntiGrav(c)
+	local newG = Instance.new("VectorForce")
+
+	newG.Attachment0 = c.PrimaryPart.RootAttachment
+	newG.RelativeTo = Enum.ActuatorRelativeTo.World
+	newG.Parent = c
+
+	local r
+	r = runService.RenderStepped:Connect(function()
+		if not newG.Parent then
+			r:Disconnect()
+		end
+
+		local md = module.h.MoveDirection * 600
+		newG.Force = Vector3.new(md.X, 0, md.Z) -- workspace.Gravity * getMass(c)
+	end)
+
+	return newG
+end
+
+local function getObjectInCenter(blacklist, whitelist, ignoreDistance)
 	local inCenter
 	local objectsOnScreen = {}
 	local leastDistance = math.huge
 	local getObject
 
-	for _, model in ipairs(CollectionService:GetTagged("Pickup")) do
+	for _, model in ipairs(CollectionService:GetTagged(whitelist or "Pickup")) do
 		if blacklist and table.find(blacklist, model) then
 			continue
 		end
@@ -65,7 +122,7 @@ local function getObjectInCenter(blacklist)
 
 		local getPosition, onScreen = camera:WorldToScreenPoint(modelPosition)
 
-		if getPosition.Z > 100 or not onScreen then
+		if (not ignoreDistance and getPosition.Z > 100) or not onScreen then
 			continue
 		end
 
@@ -85,7 +142,7 @@ local function getObjectInCenter(blacklist)
 		local cameraPosition = camera.CFrame.Position
 		local ray = workspace:Raycast(cameraPosition, modelPosition - cameraPosition, raycastParams)
 
-		if ray then
+		if ray and ray.Instance.Parent ~= model then
 			continue
 		end
 
@@ -102,6 +159,21 @@ local function getObjectInCenter(blacklist)
 		inCenter = nil
 	end
 	return inCenter, objectsOnScreen, leastDistance
+end
+
+local function startSwingGrapple(c, position)
+	acts:createAct("grappling")
+	module.h.PlatformStand = true
+
+	local distance = (camera.CFrame.Position - position).Magnitude
+	--grapplePoint = position
+
+	local rope = createRope(c, distance, grapplePart.Attachment)
+	local antiGrav = createAntiGrav(c)
+
+	sounds.Grappling:Play()
+
+	return rope, antiGrav
 end
 
 local function startGrapple(c, position, item)
@@ -195,6 +267,11 @@ local function endGrapple()
 
 	local barrel = ViewModel["Left Arm"].Barrel
 
+	if rope then
+		rope:Destroy()
+		antiGrav:Destroy()
+	end
+
 	local ropeBeam = ViewModel.RopeBeam
 	ropeBeam.CurveSize0 = 5
 	ropeBeam.CurveSize1 = -10
@@ -217,7 +294,7 @@ local function endGrapple()
 	grapplePart = nil
 end
 
-local function detectHit(partHit, launchedPart, item)
+local function detectHit(partHit, launchedPart, item, swing)
 	local _, characterHit = util.checkForHumanoid(partHit)
 
 	if not partHit:FindFirstAncestor("Map") then
@@ -238,11 +315,16 @@ local function detectHit(partHit, launchedPart, item)
 
 	--task.spawn(dealDamage, characterHit, launchedPart)
 
-	launchedPart.Weld.Part0 = partHit
+	grapplePart.Weld.Part0 = partHit
+	grapplePart.Anchored = true
 
 	sounds.GrappleHit:Play()
 
-	startGrapple(module.c, launchedPart.Position, item)
+	if swing then
+		rope, antiGrav = startSwingGrapple(module.c, grapplePart.Position)
+	else
+		startGrapple(module.c, grapplePart.Position, item)
+	end
 
 	local ropeBeam = ViewModel.RopeBeam
 	ropeBeam.Attachment1 = grapplePart.Attachment
@@ -252,12 +334,12 @@ local function detectHit(partHit, launchedPart, item)
 	return true
 end
 
-local function firePart(item)
+local function firePart(item, endPoint)
 	local newHook = assets.Models.Hook:Clone()
 	grapplePart = newHook.PrimaryPart
 
 	hitDetected = grapplePart.Touched:Connect(function(partHit)
-		if detectHit(partHit, grapplePart, item) then
+		if detectHit(partHit, grapplePart, item, endPoint) then
 			hitDetected:Disconnect()
 		end
 	end)
@@ -275,7 +357,83 @@ local function firePart(item)
 	util.tween(ropeBeam, ti, { CurveSize0 = 5, CurveSize1 = -10 })
 
 	newHook.Parent = workspace.Ignore
-	grapplePart.AssemblyLinearVelocity = camera.CFrame.LookVector * 800
+	grapplePart.AssemblyLinearVelocity = endPoint
+			and CFrame.lookAt(newHook:GetPivot().Position, endPoint).LookVector * 800
+		or camera.CFrame.LookVector * 800
+end
+
+local function onInputEnded(input)
+	if input.KeyCode == Enum.KeyCode.LeftShift or input.KeyCode == Enum.KeyCode.ButtonR1 then
+		keyDown = false
+	end
+end
+
+function module.AltActivate(endPoint)
+	if not GiftsService.CheckGift("Brick_Hook") then
+		return
+	end
+
+	module.c, module.h = player.Character, player.Character:WaitForChild("Humanoid")
+	ViewModel = viewModelService.viewModels[1].Model
+
+	keyDown = true
+	InputEnded = uis.InputEnded:Connect(onInputEnded)
+
+	acts:createTempAct("ability_invasive", function()
+		local startTime = os.clock()
+		local vm = ViewModel
+		local animation = animationService:getAnimation(vm, "Grapple")
+
+		sounds.GrappleActivate:Play()
+		firePart(nil, endPoint)
+
+		-- local keyReached = animation.KeyframeReached:Connect(function(keyName)
+		-- 	if keyName == "Launch" then
+		-- 		firePart(item)
+		-- 	end
+		-- end)
+
+		animationService:playAnimation(vm, "Grapple", Enum.AnimationPriority.Action4.Value, false, 0, 2, 1)
+
+		repeat
+			task.wait()
+		until animation.Length > 0 -- wait for anim to load
+
+		task.wait(animation.Length - 0.1)
+		animation:AdjustSpeed(0)
+
+		local distance = math.huge
+
+		repeat
+			task.wait()
+			if not grapplePart then
+				continue
+			end
+
+			distance = (module.c:GetPivot().Position - grapplePart.Position).Magnitude
+		until distance <= 10
+			or module.c.PrimaryPart.AssemblyLinearVelocity.Magnitude <= 10
+			or not keyDown
+			or os.clock() - startTime >= 3
+			or (os.clock() - startTime >= 10 and not grapplePart.Weld.Part0)
+
+		-- task.spawn(function()
+		-- 	endGrapple()
+		-- end)
+
+		-- animation:AdjustSpeed(1)
+
+		-- animationService:playAnimation(vm, "DeactivateGrapple", Enum.AnimationPriority.Action4.Value, false, 0, 2, 1)
+
+		-- timer.delay(animationService:getAnimation(vm, "DeactivateGrapple").Length - 0.01, function()
+		-- 	animationService:stopAnimation(vm, "DeactivateGrapple", 0)
+		-- end)
+
+		-- animations["Deactivate"].Stopped:Wait()
+		-- animations["Exit"]:Play(0, 2, 1)
+
+		--keyReached:Disconnect()
+	end)
 end
 
 function module.Activate(item)
@@ -336,7 +494,12 @@ local function grappleMovement()
 	onCooldown = true
 	uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", 0.9)
 
-	module.Activate()
+	local point = getObjectInCenter(nil, "GrapplePoint", true)
+	if point then
+		module.AltActivate(point:GetPivot().Position)
+	else
+		module.Activate()
+	end
 
 	timer.wait(cooldown)
 

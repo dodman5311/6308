@@ -543,9 +543,32 @@ function module.loadLinearMap(size)
 
 	local plusStage = (module.CurrentStage - 1) * 5
 	local level = plusStage + module.CurrentLevel
-	spawners.spawnEnemies(level)
+	--spawners.spawnEnemies(level)
 	spawners.spawnWeapons(level)
 	spawners.spawnHazards(level)
+
+	if module.CurrentStage == 3 then
+		for _, link in ipairs(links) do
+			local placeAt = link.CFrame * CFrame.new(0, 20, 0)
+
+			local skip = false
+			for _, point in ipairs(collectionService:GetTagged("GrapplePoint")) do
+				if point:GetPivot() == placeAt then
+					skip = true
+					break
+				end
+			end
+
+			if skip then
+				continue
+			end
+
+			local newPoint = replicatedStorage.Assets.Models.GrapplePoint:Clone()
+			newPoint.Parent = link.Parent
+			newPoint:AddTag("GrapplePoint")
+			newPoint:PivotTo(placeAt)
+		end
+	end
 
 	for _, unit in ipairs(map:GetChildren()) do
 		doUnitFunction("OnLoaded", unit)
