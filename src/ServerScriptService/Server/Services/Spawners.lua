@@ -304,22 +304,6 @@ function module.SpawnBoss(bossToSpawn, unit)
 
 	newObject.Instance:AddTag("Enemy")
 	newObject.Parent = workspace
-
-	local totalLevel = workspace:GetAttribute("TotalLevel")
-
-	for _, player in ipairs(Players:GetPlayers()) do -- @TODO FIX DIS
-		if
-			player:GetAttribute("UpgradeName") == "Aged Cheese"
-			and totalLevel < player:GetAttribute("furthestLevel")
-		then
-			local humanoid = newObject.Instance:FindFirstChildOfClass("Humanoid")
-			humanoid.Health /= 2
-			newObject.DamageBuff = 1
-			return
-		else
-			newObject.DamageBuff = 0
-		end
-	end
 end
 
 net:Connect("PickupWeapon", function(player, object)

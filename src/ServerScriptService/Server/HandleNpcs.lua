@@ -600,6 +600,11 @@ Signals.ActivateUpgrade:Connect(function(_, upgradeName)
 		Enemies.Divine:SetAttribute("Level", NumberRange.new(0, 1000))
 	end
 
+	if upgradeName == "Aged Cheese" then
+		Enemies.Everlasting:SetAttribute("Level", NumberRange.new(2, 5))
+		Enemies.Specimen:SetAttribute("Level", NumberRange.new(7, 10))
+	end
+
 	if upgradeName == "Spicy Pepperoni" then
 		moreHealth = true
 

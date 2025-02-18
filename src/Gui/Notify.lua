@@ -102,6 +102,34 @@ function module.ArenaBegun(player, ui, frame)
 	end)
 end
 
+local tipsShown = {}
+
+function module.ShowTip(player, ui, frame, tip: string, showOnce: boolean?, condition: boolean?)
+	if condition == false then
+		return
+	end
+
+	if showOnce then
+		if table.find(tipsShown, tip) then
+			return
+		end
+		table.insert(tipsShown, tip)
+	end
+
+	frame.Ratio.Visible = true
+	frame.TipFrame.Visible = true
+
+	local ti = TweenInfo.new(0.25)
+	frame.TipFrame.Tip.Message.Text = tip
+
+	UiAnimator.PlayAnimation(frame.TipFrame.Tip.DravIcon, 0.1, true)
+
+	util.tween(frame.TipFrame.Tip, ti, { Position = UDim2.fromScale(0, 0) })
+	task.delay(5, function()
+		util.tween(frame.TipFrame.Tip, ti, { Position = UDim2.fromScale(0, -1) })
+	end)
+end
+
 function module.AmbushBegun(player, ui, frame)
 	frame.Ambush.Visible = true
 

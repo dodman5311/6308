@@ -48,7 +48,7 @@ local module = {
 			Desc = "Break action shotguns now shoot more pellets. (+2 Pellets)",
 		},
 
-		Double_Shot = {
+		Loose_Cannon = {
 			Icon = "rbxassetid://16442072158",
 			Catagories = { "Arsenal" },
 			Desc = "Shots will now have a small chance of firing an additional bullet. (5% chance)",
@@ -102,35 +102,41 @@ local module = {
 			Desc = "Any hits, not from a weapon, now has a chance to deal 1 point of fire damage - lighting the said enemy on fire. (50% chance)",
 		},
 
-		-- Freeze_Heaven = { -- unfinished
-		-- 	Icon = "rbxassetid://18731039717",
-		-- 	Catagories = { "Soul", "Tactical" },
-		-- 	Desc = "When inflicting an element, you now have a chance to freeze the enemy (25% chance)",
-		-- },
+		Freeze_Heaven = {
+			Icon = "rbxassetid://105121369961432",
+			Catagories = { "Soul", "Tactical" },
+			Desc = "When inflicting an element, you now have a chance to freeze the enemy (50% chance)",
+		},
 
-		-- Before_The_Storm = { -- unfinished
-		-- 	Icon = "rbxassetid://18731039717",
-		-- 	Catagories = { "Tactical" },
-		-- 	Desc = "When entering an ambush or arena, combo and ammo will now be refreshed.",
-		-- },
+		Before_The_Storm = {
+			Icon = "rbxassetid://81150499590074",
+			Catagories = { "Tactical" },
+			Desc = "When entering an ambush or arena, combo and ammo will now be refreshed.",
+		},
 
-		-- Bye_2_Get_1 = { -- unfinished
-		-- 	Icon = "rbxassetid://18731039717",
-		-- 	Catagories = { "Tactical" },
-		-- 	Desc = "Every 2 rolls at the kiosk, the next roll now has a 50% chance to be free.",
-		-- },
+		Buy_1_Get_1 = {
+			Icon = "rbxassetid://81150499590074",
+			Catagories = { "Luck" },
+			Desc = "Every other roll at the kiosk now has a 25% chance to be free.",
+		},
 
-		-- ["20_Sided_Die"] = { -- unfinished
-		-- 	Icon = "rbxassetid://18731039717",
-		-- 	Catagories = { "Luck" },
-		-- 	Desc = "Thrown weapons now have +20 luck when hitting an enemy.",
-		-- },
+		["20_Sided_Die"] = {
+			Icon = "rbxassetid://98248628217405",
+			Catagories = { "Luck" },
+			Desc = "Thrown weapons now have +20 luck when hitting an enemy.",
+		},
 
-		-- Returned_Change = { -- unfinished
-		-- 	Icon = "rbxassetid://18731039717",
-		-- 	Catagories = { "Soul" },
-		-- 	Desc = "Vending machines now have a chance to drop a soul upon being destroyed. (10% chance)",
-		-- },
+		Returned_Change = { -- unfinished
+			Icon = "rbxassetid://82117553571324",
+			Catagories = { "Soul" },
+			Desc = "Vending machines now have a chance to drop a soul upon being destroyed. (10% chance)",
+		},
+
+		Lead_Vampire = {
+			Icon = "rbxassetid://130012431987895",
+			Catagories = { "Tactical" },
+			Desc = "Upon taking damage, you now have a chance to gain +1 ammo. (10% chance)",
+		},
 	},
 
 	Upgrades = {

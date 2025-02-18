@@ -49,6 +49,10 @@ function module.applyElement(player, npcModel, elementName)
 
 	local element = elements[elementName]
 
+	if not element then
+		return
+	end
+
 	local elementTimer = npc:GetTimer(elementName)
 	elementTimer.WaitTime = element.time
 

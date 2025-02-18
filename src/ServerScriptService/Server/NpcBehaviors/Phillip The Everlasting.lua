@@ -130,7 +130,7 @@ function moves.addArmor(npc)
 	local humanoid = subject.Humanoid
 	local logHealth = humanoid.Health
 	local damageIndicator = subject.PrimaryPart.DamageBoard
-	local maxDamage = humanoid.MaxHealth / math.random(18, 22)
+	local maxDamage = humanoid.MaxHealth / math.random(20, 23)
 	local damageAccumulated = 0
 
 	humanoid.WalkSpeed = 0.05
@@ -229,7 +229,7 @@ function moves.shootAttack(npc)
 	local hitHumanoid =
 		checkRaycast(subject, subject.PrimaryPart.CFrame.Position, subject.PrimaryPart.CFrame.LookVector * 500)
 	if hitHumanoid and npc:GetState() ~= "Dead" then
-		hitHumanoid:TakeDamage(2)
+		hitHumanoid:TakeDamage(1)
 	end
 	npc.Acts:removeAct("leading_shot", "inAction")
 	timer.wait(0.125)

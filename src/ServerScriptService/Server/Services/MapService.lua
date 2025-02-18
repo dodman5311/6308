@@ -286,6 +286,10 @@ local function placeCap(baseLink)
 	cap.Parent = baseLink.Parent
 	cap:PivotTo(baseLink.CFrame * CFrame.Angles(0, math.rad(180), 0))
 
+	if not cap.PrimaryPart then
+		cap.PrimaryPart = cap:FindFirstChild("CapLink", true)
+	end
+
 	baseLink.LinkedTo.Value = cap.PrimaryPart
 end
 
@@ -543,13 +547,13 @@ function module.loadLinearMap(size)
 
 	local plusStage = (module.CurrentStage - 1) * 5
 	local level = plusStage + module.CurrentLevel
-	--spawners.spawnEnemies(level)
+	spawners.spawnEnemies(level)
 	spawners.spawnWeapons(level)
 	spawners.spawnHazards(level)
 
 	if module.CurrentStage == 3 then
 		for _, link in ipairs(links) do
-			local placeAt = link.CFrame * CFrame.new(0, 20, 0)
+			local placeAt = link.CFrame * CFrame.new(0, 50, 0)
 
 			local skip = false
 			for _, point in ipairs(collectionService:GetTagged("GrapplePoint")) do
@@ -635,7 +639,7 @@ function module.loadBossRoom()
 
 	local newRoom
 
-	if module.CurrentLevel > 5 then
+	if module.CurrentLevel > 5.25 then
 		newRoom = bossRoom:Clone()
 	else
 		newRoom = miniBossRoom:Clone()
@@ -645,13 +649,15 @@ function module.loadBossRoom()
 
 	doUnitFunction("OnPlaced", newRoom)
 
-	while newRoom.Parent do
-		local plusStage = (module.CurrentStage - 1) * 5
-		local level = plusStage + module.CurrentLevel
+	task.spawn(function()
+		while newRoom.Parent do
+			local plusStage = (module.CurrentStage - 1) * 5
+			local level = plusStage + module.CurrentLevel
 
-		spawners.spawnWeapons(level)
-		task.wait(10)
-	end
+			spawners.spawnWeapons(level)
+			task.wait(10)
+		end
+	end)
 end
 
 local function spawnBoss(_, type)
@@ -690,7 +696,12 @@ local function createStoredMap()
 end
 
 function module.proceedToNext(_, onlyLoadMap)
+	local hasCheese = false
 	for _, player in ipairs(Players:GetPlayers()) do -- Teleport players to spawn
+		if player:GetAttribute("UpgradeName") == "Aged Cheese" then
+			hasCheese = true
+		end
+
 		local character = player.Character
 		if not character then
 			continue
@@ -707,16 +718,20 @@ function module.proceedToNext(_, onlyLoadMap)
 	end
 
 	if not onlyLoadMap then
-		if module.CurrentLevel == 5 or module.CurrentLevel == 2 then
-			module.CurrentLevel += 0.5
+		if module.CurrentLevel == 5 or module.CurrentLevel == (hasCheese and 5.25 or 2) then
+			module.CurrentLevel += (hasCheese and 0.25 or 0.5)
 		else
 			module.CurrentLevel = math.floor(module.CurrentLevel + 1)
 		end
 
-		if module.CurrentLevel > 5.5 then
+		if module.CurrentLevel > 5.5 then -- amount of levels in a stage
 			module.CurrentLevel = 1
 			module.CurrentStage += 1
 		end
+	end
+
+	if module.CurrentStage == 5 then
+		module.CurrentStage = 1
 	end
 
 	workspace:SetAttribute("Level", module.CurrentLevel)

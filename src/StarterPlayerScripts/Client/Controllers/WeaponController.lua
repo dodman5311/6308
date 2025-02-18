@@ -279,6 +279,10 @@ function module.UpdateAmmo(amount)
 	module.UpdateSlot()
 end
 
+function module.AddAmmo(amount)
+	module.UpdateAmmo(currentAmmo + amount)
+end
+
 local function playVoiceLine()
 	if ChanceService.checkChance(1, true, true) then
 		local voiceLines = assets.Sounds.VoiceLines
@@ -799,6 +803,14 @@ local function awardKill(model, position)
 	signals.AddEntry:Fire(model.Name)
 
 	if
+		GiftsService.CheckGift("Returned_Change")
+		and string.match(model.Name, "Vending Machine")
+		and ChanceService.checkChance(10, true)
+	then
+		soulsService.DropSoul(position, 1000)
+	end
+
+	if
 		GiftsService.CheckGift("Aggressive_Forgery")
 		and ComboService.CurrentCombo >= 5
 		and ChanceService.checkChance(10, true)
@@ -898,17 +910,15 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		end
 	end
 
-	local soulElementDamage = model:GetAttribute("Soul") and 1 or 0
 	local deadshotDamage = checkDeadshot()
 	local boringDamage = consecutiveHits >= 5 and 1 or 0
 	local subjectPosition = subject:GetPivot().Position
 
-	local totalDamage = damage + deadshotDamage + weakspotDamage + boringDamage + siuDamage + soulElementDamage
+	local totalDamage = damage + deadshotDamage + weakspotDamage + boringDamage + siuDamage
 
 	lastDamageSource = source
 
 	totalDamage *= critMult
-	totalDamage *= model:GetAttribute("SoulFire") and 2 or 1
 
 	if isVendingMachine then
 		totalDamage = 1
@@ -931,6 +941,10 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		if element and not chanceOverride then
 			if ChanceService.checkChance(GiftsService.CheckUpgrade("Brick Oven") and 75 or 50, true) then
 				codexService.AddEntry("Elements")
+
+				if GiftsService.CheckGift("Freeze_Heaven") and ChanceService.checkChance(50, true) then
+					net:RemoteEvent("Damage"):FireServer(model, 0, "Ice")
+				end
 			else
 				element = nil
 			end
@@ -943,6 +957,10 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		if GiftsService.CheckGift("Burn_Hell") and ChanceService.checkChance(50, true) then
 			if not sourceIsWeapon and source ~= "ThrownWeapon" then
 				net:RemoteEvent("Damage"):FireServer(model, 1, "Fire")
+
+				if GiftsService.CheckGift("Freeze_Heaven") and ChanceService.checkChance(50, true) then
+					net:RemoteEvent("Damage"):FireServer(model, 0, "Ice")
+				end
 			end
 		end
 
@@ -1135,12 +1153,13 @@ projectileService.projectileHit:Connect(function(result, projectile)
 	local hitHumanoid, subject, damageResult =
 		module.FireBullet(projectile.Damage, 0, nil, result, projectile.Source, projectile.Info["Element"])
 
+	addToConsecutive(hitHumanoid)
+
 	if not hitHumanoid then
 		return
 	end
 
 	addToGib(hitHumanoid, subject, damageResult)
-	addToConsecutive(hitHumanoid)
 	checkForGibs()
 end)
 
@@ -1364,8 +1383,8 @@ function module.Fire()
 
 	local extraBullet = 0
 
-	if GiftsService.CheckGift("Double_Shot") and ChanceService.checkChance(5, true) then
-		UIService.doUiAction("HUD", "ActivateGift", "Double_Shot")
+	if GiftsService.CheckGift("Loose_Cannon") and ChanceService.checkChance(5, true) then
+		UIService.doUiAction("HUD", "ActivateGift", "Loose_Cannon")
 		extraBullet = 1
 	end
 
@@ -1595,7 +1614,18 @@ local function ThrowWeapon()
 			for _, hit in ipairs(hits) do
 				local hitCframe = CFrame.new(hit.Position) * camera.CFrame.Rotation
 
+				if GiftsService.CheckGift("20_Sided_Die") then
+					ChanceService.luck += 20
+					UIService.doUiAction("HUD", "ActivateGift", "20_Sided_Die")
+				end
+
 				local humanoid = module.dealDamage(hitCframe, hit, 2, "ThrownWeapon")
+
+				if GiftsService.CheckGift("20_Sided_Die") then
+					task.delay(0.05, function()
+						ChanceService.luck -= 20
+					end)
+				end
 
 				if not humanoid or humanoid.Health <= 0 then
 					continue
@@ -1606,6 +1636,7 @@ local function ThrowWeapon()
 				hasHitTarget = true
 				return
 			end
+
 		until grip.AssemblyLinearVelocity.Magnitude < 30 or hasHitTarget
 	end)
 
@@ -2342,7 +2373,7 @@ signals.AddAmmo:Connect(function(bigMag)
 		amount = baseAmmo * 0.25
 	end
 
-	module.UpdateAmmo(currentAmmo + amount)
+	module.AddAmmo(amount)
 end)
 
 net:Connect("StartExitSequence", function()
@@ -2375,6 +2406,10 @@ explosionService.explosiveHit:Connect(function(subject, preHealth, postHealth, d
 		if GiftsService.CheckGift("Burn_Hell") and ChanceService.checkChance(50, true) then
 			if not sourceIsWeapon and source ~= "ThrownWeapon" then
 				net:RemoteEvent("Damage"):FireServer(subject, 1, "Fire")
+
+				if GiftsService.CheckGift("Freeze_Heaven") and ChanceService.checkChance(50, true) then
+					net:RemoteEvent("Damage"):FireServer(subject, 0, "Ice")
+				end
 			end
 		end
 	end
@@ -2385,6 +2420,30 @@ explosionService.explosiveHit:Connect(function(subject, preHealth, postHealth, d
 
 	addToGib(subject:FindFirstChild("Humanoid"), subject, damageDelt)
 	checkForGibs()
+end)
+
+net:Connect("ArenaBegun", function()
+	if not GiftsService.CheckGift("Before_The_Storm") then
+		return
+	end
+
+	UIService.doUiAction("HUD", "ActivateGift", "Before_The_Storm")
+
+	if weaponData then
+		local defWeapon = assets.Models.Weapons:FindFirstChild(module.currentWeapon.Name)
+		local defWeaponData = require(defWeapon.Data)
+		local magSize = defWeaponData.Ammo
+
+		if currentAmmo >= magSize then
+			return
+		end
+
+		module.UpdateAmmo(magSize)
+	elseif currentAmmo < module.defaultMagSize then
+		module.UpdateAmmo(module.defaultMagSize)
+	end
+
+	ComboService.RestartTimer()
 end)
 
 GiftsService.OnGiftAdded:Connect(function(gift)

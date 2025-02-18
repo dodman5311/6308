@@ -1,13 +1,22 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local Globals = require(ReplicatedStorage.Shared.Globals)
+
 local module = {}
 
-local signal = require(script.signal)
-local RunService = game:GetService("RunService")
+local signal = require(Globals.Packages.Signal)
+local acts = require(Globals.Vendor.Acts)
 
 local animations = {}
 
-function module.PlayAnimation(frame, frameDelay, loop, stayOnLastFrame)
+function module.PlayAnimation(
+	frame: GuiObject,
+	frameDelay: number,
+	loop: boolean?,
+	stayOnLastFrame: boolean?,
+	startOnFrame: number?
+)
 	if animations[frame] then
-		animations[frame].Connection:Disconnect()
 		animations[frame] = nil
 	end
 
@@ -28,10 +37,28 @@ function module.PlayAnimation(frame, frameDelay, loop, stayOnLastFrame)
 	local currentFrame = 0
 
 	local newAnimation = {
-		Connection = nil,
+		NextFrame = function()
+			x += 1
+			currentFrames -= 1
+			currentFrame += 1
+
+			if x > image.Size.X.Scale - 1 then
+				y += 1
+				x = 0
+			end
+		end,
+
+		SetToFrame = function(self, frameNumber: number)
+			x = 0
+			y = 0
+			for _ = 1, frameNumber do
+				self:NextFrame()
+			end
+			image.Position = UDim2.fromScale(-x, -y)
+		end,
 
 		RunAnimation = function(self)
-			if self.Paused then
+			if self.Paused or acts:checkAct("Paused") then
 				lastFrameStep = os.clock()
 				return
 			end
@@ -45,14 +72,8 @@ function module.PlayAnimation(frame, frameDelay, loop, stayOnLastFrame)
 				return
 			end
 
-			x += 1
-			currentFrames -= 1
-			currentFrame += 1
-
-			if x > image.Size.X.Scale - 1 then
-				y += 1
-				x = 0
-			end
+			self:NextFrame()
+			self.OnStepped:Fire(currentFrame)
 
 			if currentFrames <= 0 then
 				currentFrames = frames
@@ -67,7 +88,6 @@ function module.PlayAnimation(frame, frameDelay, loop, stayOnLastFrame)
 						image.Position = UDim2.fromScale(x, y)
 					end
 
-					animations[frame].Connection:Disconnect()
 					animations[frame] = nil
 					return
 				end
@@ -96,6 +116,8 @@ function module.PlayAnimation(frame, frameDelay, loop, stayOnLastFrame)
 			return reachedSignal
 		end,
 
+		OnStepped = signal.new(),
+
 		Pause = function(self)
 			self.Paused = true
 		end,
@@ -105,20 +127,25 @@ function module.PlayAnimation(frame, frameDelay, loop, stayOnLastFrame)
 		end,
 	}
 
-	newAnimation.Connection = RunService.Heartbeat:Connect(function()
-		newAnimation:RunAnimation()
-	end)
+	if startOnFrame then
+		newAnimation:SetToFrame(startOnFrame)
+	end
 
 	animations[frame] = newAnimation
 	return animations[frame]
 end
 
+function module.CheckPlaying(frame) -- returns the animation if it's playing
+	if animations[frame] then
+		return animations[frame]
+	end
+end
+
 function module.StopAnimation(frame)
-	if not animations[frame] then
+	if not module.CheckPlaying(frame) then
 		return
 	end
 
-	animations[frame].Connection:Disconnect()
 	animations[frame] = nil
 
 	if not frame or not frame.Parent then
@@ -127,5 +154,11 @@ function module.StopAnimation(frame)
 
 	frame.Image.Position = UDim2.fromScale(0, 0)
 end
+
+RunService.Heartbeat:Connect(function()
+	for _, animation in pairs(animations) do
+		animation:RunAnimation()
+	end
+end)
 
 return module

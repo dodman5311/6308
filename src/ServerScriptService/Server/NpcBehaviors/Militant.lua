@@ -20,26 +20,26 @@ local module = {
 			true,
 		},
 
-		{
-			Function = "ShootProjectile",
-			Parameters = {
-				math.random(8, 15),
-				1,
-				1,
-				75,
-				1,
-				{
-					Dropping = 0.35,
-					Bouncing = true,
-					SplashRange = 30,
-					SplashDamage = 2,
-					Slowing = 0.65,
-				},
-				"EnemyGrenadeProjectile",
-				"ThrowGrenade",
-				1,
-			},
-		},
+		-- {
+		-- 	Function = "ShootProjectile",
+		-- 	Parameters = {
+		-- 		math.random(8, 15),
+		-- 		1,
+		-- 		1,
+		-- 		75,
+		-- 		1,
+		-- 		{
+		-- 			Dropping = 0.35,
+		-- 			Bouncing = true,
+		-- 			SplashRange = 30,
+		-- 			SplashDamage = 2,
+		-- 			Slowing = 0.65,
+		-- 		},
+		-- 		"EnemyGrenadeProjectile",
+		-- 		"ThrowGrenade",
+		-- 		1,
+		-- 	},
+		--},
 
 		{ Function = "GetToDistance", Parameters = { 30, true } },
 		{ Function = "PlayWalkingAnimation" },

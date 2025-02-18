@@ -91,7 +91,14 @@ local function progressTo(level)
 		signals["AddGift"]:Fire("Master_Scouting")
 	end
 
-	if level >= 2 then
+	if
+		level >= 2
+		and not (
+			giftService.CheckGift("Brick_Hook")
+			or giftService.CheckGift("Righteous_Motion")
+			or giftService.CheckGift("Spiked_Sabatons")
+		)
+	then
 		local r = math.random(1, 3)
 
 		if r == 1 then
@@ -119,11 +126,25 @@ function module:OnSpawn(character, humanoid)
 		ChanceService.repetitionLuck = 0
 	end
 
+	task.delay(1, function()
+		UIService.doUiAction(
+			"Notify",
+			"ShowTip",
+			"Alright, PG. You ready?",
+			true,
+			Player:GetAttribute("furthestLevel") <= 1
+		)
+	end)
+
 	UIService.doUiAction("HUD", "Cleanup", humanoid.Health, humanoid.MaxHealth)
 
 	if giftService.CheckUpgrade("Order Wheel") then
 		signals.AddGift:Fire("Speed_Demon")
 		signals.AddGift:Fire("SpeedRunner")
+	end
+
+	if giftService.CheckUpgrade("Aged Cheese") then
+		signals.AddGift:Fire("Master_Scouting")
 	end
 
 	if giftService.CheckUpgrade("Insurance") then
@@ -189,6 +210,10 @@ function module:OnSpawn(character, humanoid)
 				task.delay(1, function()
 					UIService.doUiAction("HUD", "HideInvincible")
 				end)
+			end
+
+			if giftService.CheckGift("Lead_Vampire") and ChanceService.checkChance(10, true) then
+				weaponService.AddAmmo(1)
 			end
 
 			PlayHitEffect()
@@ -262,6 +287,8 @@ function module:OnDied()
 	if render then
 		render:Disconnect()
 	end
+
+	kiosk.tickets = 0
 
 	deathEffect()
 	UIService.doUiAction("HUD", "HideBossBar")
@@ -456,16 +483,20 @@ local function exitS2(extraSouls, totalLevel, level, stageBoss, miniBoss, stage)
 
 	if giftService.CheckGift("Paladin's_Faith") then
 		net:RemoteEvent("CreateShield"):FireServer()
-		UIService.doUiAction("HUD", "ActivateGift", "Paladin's_Faith")
+		signals.DoUiAction:Fire("HUD", "ActivateGift", "Paladin's_Faith")
 	end
 
-	if stage == 1 then
+	if workspace:GetAttribute("Stage") == 1 then
 		codexService.AddEntry("The Suburbs")
-	elseif stage == 2 then
+	elseif workspace:GetAttribute("Stage") == 2 then
 		codexService.AddEntry("The Sewers")
+
+		if giftService.CheckUpgrade("Aged Cheese") then
+			signals.AddGift:Fire("Overcharge")
+		end
 	end
 
-	if level == 5 then
+	if level == (giftService.CheckUpgrade("Aged Cheese") and 5.25 or 5) then
 		MusicService.stopMusic()
 		local onBiHidden = UIService.doUiAction("BossIntro", "ShowIntro", stageBoss)
 		onBiHidden:Once(function()
@@ -476,7 +507,7 @@ local function exitS2(extraSouls, totalLevel, level, stageBoss, miniBoss, stage)
 				UIService.doUiAction("HUD", "UpdateSouls", 3)
 			end
 		end)
-	elseif level == 2 then
+	elseif level == (giftService.CheckUpgrade("Aged Cheese") and 5 or 2) then
 		net:RemoteEvent("SpawnBoss"):FireServer("MiniBoss")
 		if soulsService.Souls < 1 then
 			soulsService.AddSoul(1)
@@ -513,7 +544,6 @@ local function exitS2(extraSouls, totalLevel, level, stageBoss, miniBoss, stage)
 
 	util.tween(camera, ti, { FieldOfView = util.getSetting("Field of View").Value })
 end
-
 local function ExitSequence(levelData, level, stageBoss, miniBoss, stage)
 	local plusStage = (stage - 1) * 5
 	local totalLevel = plusStage + level

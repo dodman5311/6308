@@ -239,7 +239,7 @@ local function processAnchovies(player, frame)
 		end
 
 		MusicService.playTrack(workspace:GetAttribute("LastBoss"))
-	elseif level == 2.5 then
+	elseif level == 2.5 or 5.25 then
 		net:RemoteEvent("SpawnBoss"):FireServer("MiniBoss")
 		if soulsService.Souls < 1 then
 			soulsService.AddSoul(1)

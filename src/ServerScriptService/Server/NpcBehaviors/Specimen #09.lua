@@ -25,6 +25,7 @@ local rockUp = assets.Sounds.RockUp
 local rockHits = assets.Sounds.RockHits
 
 local net = require(Globals.Packages.Net)
+local doUiAction = net:RemoteEvent("DoUiAction")
 
 local rng = Random.new()
 
@@ -32,7 +33,7 @@ local vfx = net:RemoteEvent("ReplicateEffect")
 
 local moveChances = {
 	{ "GroundElectrify", 15 },
-	{ "BlackHole", 25 },
+	{ "BlackHole", 20 },
 	{ "ShootRocks", 45 },
 	{ "GravityPattern", 100 },
 }
@@ -152,6 +153,7 @@ local function createAttackAt(npc, position, hasSound)
 	end
 
 	local effect = effects.GravityAttack:Clone()
+	npc.Janitor:Add(effect)
 	effect.Parent = workspace
 	effect:PivotTo(CFrame.new(raycast.Position) * CFrame.Angles(0, 0, math.rad(90)))
 
@@ -269,6 +271,7 @@ local function shootRock(npc, i)
 	local ti = TweenInfo.new(0.5, Enum.EasingStyle.Back)
 
 	newRock.Parent = workspace
+	npc.Janitor:Add(newRock)
 	util.PlaySound(util.getRandomChild(rockUp), newRock)
 
 	local origin = npcCFrame * CFrame.Angles(0, math.rad(25 * -i), 0)
@@ -368,6 +371,17 @@ end
 
 local moves = {
 	BlackHole = function(npc)
+		for _, player in ipairs(Players:GetPlayers()) do
+			doUiAction:FireClient(
+				player,
+				"Notify",
+				"ShowTip",
+				[[Gotta <font color="#FF7800">Shoot the black hole</font> to destabalize it's mass!]],
+				true,
+				player:GetAttribute("furthestLevel") <= 7.5
+			)
+		end
+
 		npc.Acts:createAct("InAttack", "inAction", "Blackhole")
 
 		local newBlackHole: Model = assets.Effects["Black Hole"]:Clone()
@@ -475,9 +489,10 @@ local moves = {
 
 		local newGround = effects.ElectricSmoke:Clone()
 		newGround.Parent = workspace
-		newGround.Position = npc.Instance:GetPivot().Position + Vector3.new(0, -4, 0)
+		local pos = npc.Instance:GetPivot().Position + Vector3.new(0, -4, 0)
+		newGround:PivotTo(CFrame.new(pos.X, pos.Y, pos.Z))
 
-		vfx:FireAllClients("ElectrifyPart", "Server", true, newGround)
+		vfx:FireAllClients("ElectrifyPart", "Server", true, newGround.PrimaryPart)
 
 		timer.wait(0.25)
 
@@ -498,7 +513,7 @@ local moves = {
 		local electricSound = util.PlaySound(assets.Sounds.Electricity, ReplicatedStorage)
 
 		local connection = RunService.Heartbeat:Connect(function()
-			local getPartsHit = workspace:GetPartBoundsInBox(newGround.CFrame, newGround.Size)
+			local getPartsHit = workspace:GetPartBoundsInBox(newGround:GetPivot(), newGround.PrimaryPart.Size)
 
 			for _, part in ipairs(getPartsHit) do
 				local model = part:FindFirstAncestorOfClass("Model")

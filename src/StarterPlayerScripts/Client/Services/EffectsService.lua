@@ -310,9 +310,12 @@ function module.HealingEffect(npcModel: Model)
 end
 
 function module.fadeEnemy(enemyModel: Model, fadeTime: number)
+	if not enemyModel then
+		return
+	end
 	local ti = TweenInfo.new(fadeTime, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
 
-	for index, part in ipairs(enemyModel:GetDescendants()) do
+	for _, part in ipairs(enemyModel:GetDescendants()) do
 		if not part:IsA("BasePart") then
 			continue
 		end

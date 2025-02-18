@@ -229,7 +229,11 @@ end
 function module.AddTag(npc, Tag)
 	npc.Instance:AddTag(Tag)
 
-	npc.Instance:SetAttribute("TargetType", "Player")
+	if Tag == "Commrad" then
+		npc.Instance:SetAttribute("TargetType", "Enemy")
+	else
+		npc.Instance:SetAttribute("TargetType", "Player")
+	end
 end
 
 function module.MoveToRandomUnit(npc)

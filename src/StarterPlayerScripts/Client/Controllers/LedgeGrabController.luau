@@ -81,7 +81,7 @@ local function castRays()
 	local catchRay =
 		workspace:Spherecast(primaryPart.Position + Vector3.new(0, 1, 0), 1, primaryPart.CFrame.LookVector * 4, rp)
 
-	if not catchRay then
+	if not catchRay or catchRay.Instance.Transparency == 1 or not catchRay.Instance.CanCollide then
 		return
 	end
 

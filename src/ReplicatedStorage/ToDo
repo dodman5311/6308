@@ -459,15 +459,62 @@ Generate map -> generate ziprails -> generate buildings in a 50x50 grid
 
 ziprails
 
-grapple point
+grapple point *
 
 dash refils
 
 change atmosphere offset
 
-make priest
+make priest *
 
 Make rain!! *
 
 make parry sword: *
+
+add player health bar when adding more HP
+
+Fixed specimen #09 cleanup issues *
+
+Fixed perk tickets persisting after death *
+
+Fixed boring bullets not resetting with projectile misses *
+
+Make resistance codex page
+
 ----------------------------------------------------------------------------------------
+
+--Stuff you seemed to agree with :
+
+    Adding back the missing suburbs unit *
+
+    New enemy/barrel spawn in the stone stairs unit *
+
+    Weakpoints for paladins *
+
+    Adding signs with skulls at the entrance of arenas
+    Arena wave/spawn patterns
+    Arena difficulty indicator
+    Despawning animation for ambushes/arenas
+    Outlines for remaining enemies in arena wave
+
+    Redesigning the big acid pit sewer arena
+    Enlarging the sewer doorway unit
+
+    Double shot perk rename into "Loose Cannon" *
+
+    Prevent enemies from walking into hampter room on stage 3
+
+--Stuff for cream soda :
+
+    public park arena unit ?
+    new background decorations ?
+
+--Stuff that seemed hard to put in place :
+
+    Preventing teleporters from spawning in arenas
+    Fixing the missing pathway of that one arena unit
+
+Personal preferences I didn't get to go over / get an answer for :
+
+    Making luck a little rarer in the kiosk (to make luck perks more interesting to get and making arsenal chance perks less op)
+    Deadshot / Double Shot (aka Loose Cannon) / Boring Bullets nerf ?

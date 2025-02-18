@@ -48,12 +48,8 @@ function module.dealDamage(_, subject, amount, element)
 
 	local preHealth = humanoid.Health
 
-	if subject:GetAttribute("Soul") then
+	if subject:GetAttribute("Soul") or subject:GetAttribute("SoulFire") then
 		amount += 1
-	end
-
-	if subject:GetAttribute("SoulFire") then
-		amount *= 2
 	end
 
 	local fHealth = humanoid.Health - amount

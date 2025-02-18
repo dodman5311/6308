@@ -20,6 +20,7 @@ local timer = require(Globals.Vendor.Timer)
 
 local vfx = net:RemoteEvent("ReplicateEffect")
 local createProjectileRemote = net:RemoteEvent("CreateProjectile")
+local doUiAction = net:RemoteEvent("DoUiAction")
 
 local moveChances = {
 	{ "Acid", 10 },
@@ -633,6 +634,17 @@ local moves = {
 			return
 		end
 
+		for _, player in ipairs(Players:GetPlayers()) do
+			doUiAction:FireClient(
+				player,
+				"Notify",
+				"ShowTip",
+				[[<font color="#FF7800">GO UP</font>, PG! Gotta avoid that acid!]],
+				true,
+				player:GetAttribute("furthestLevel") <= 10.5
+			)
+		end
+
 		togglePlatforms(1)
 
 		npc.Acts:createAct("AcidAttack")
@@ -903,7 +915,7 @@ local module = {
 		{ Function = "Custom", Parameters = { RunGeyserCheck } },
 		{ Function = "Custom", Parameters = { spawnEnemies } },
 		{ Function = "Custom", Parameters = { runAttackTimer } },
-		{ Function = "SearchForTarget", Parameters = { "Player", math.huge } },
+		{ Function = "SearchForTarget", Parameters = { math.huge } },
 	},
 
 	OnSpawned = {

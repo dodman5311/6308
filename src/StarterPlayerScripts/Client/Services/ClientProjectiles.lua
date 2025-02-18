@@ -133,12 +133,12 @@ module.Presets = {
 	},
 
 	ShotgunProjectile = {
-		Speed = 200,
-		LifeTime = 8,
+		Speed = 400,
+		LifeTime = 6,
 		Info = {},
 		Damage = 1,
-		Piercing = 0,
-		Model = "RocketProjectile",
+		Piercing = 1,
+		Model = "PlayerProjectile",
 	},
 
 	Smart_Grenade = {

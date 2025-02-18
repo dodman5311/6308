@@ -2,8 +2,8 @@ local stats = {
 	ViewDistance = 200,
 	AttackDelay = NumberRange.new(1.5, 5),
 	MoveDelay = NumberRange.new(2, 5),
-	AttackCooldown = 0.1,
-	ProjectileSpeed = 400,
+	AttackCooldown = 0.125,
+	ProjectileSpeed = 390,
 	AttackAmount = 3,
 	NpcType = "Enemy",
 }

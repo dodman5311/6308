@@ -322,12 +322,14 @@ function module.ShowImmune(_, _, frame)
 	local x = frame.CrosshairFrame.X
 	x.Visible = true
 
-	for _ = 0, 4 do
-		x.Position = UDim2.fromScale(rng:NextNumber(0.45, 0.55), rng:NextNumber(0.45, 0.55))
-		task.wait()
-	end
-	x.Position = UDim2.fromScale(0.5, 0.5)
-	x.Visible = false
+	task.spawn(function()
+		for _ = 0, 4 do
+			x.Position = UDim2.fromScale(rng:NextNumber(0.45, 0.55), rng:NextNumber(0.45, 0.55))
+			task.wait()
+		end
+		x.Position = UDim2.fromScale(0.5, 0.5)
+		x.Visible = false
+	end)
 end
 
 function module.UpdateAmmo(_, _, frame, amount)

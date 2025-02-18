@@ -138,7 +138,6 @@ local function startArena(unit, level, isAmbush)
 	arenaBeginEvent:FireAllClients(isAmbush)
 
 	runArenaPromise = promise.new(function(resolve, reject, onCancel)
-		timer.wait(1)
 		local result = runArena(encounter, unit, level)
 		acts:removeAct("InArena")
 		resolve(gates, result, isAmbush)

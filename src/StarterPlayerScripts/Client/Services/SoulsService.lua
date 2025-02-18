@@ -4,9 +4,11 @@ local module = {
 }
 
 --// Services
+local CollectionService = game:GetService("CollectionService")
 local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
 local assets = ReplicatedStorage.Assets
 
 --// Instances
@@ -34,11 +36,13 @@ function module.CalculateDropChance(chanceMod)
 	local chance = (module.DropChance * combo) + chanceMod
 	--chance += ChanceService.getLuck()
 
+	local soulCount = module.Souls + #CollectionService:GetTagged("SoulDrop")
+
 	if module.Souls <= 0 then
 		chance *= 5
 	end
 
-	chance /= (1 + (module.Souls / 5))
+	chance /= (1 + TweenService:GetValue(soulCount / 12, Enum.EasingStyle.Quart, Enum.EasingDirection.In) * 5)
 
 	if GiftsService.CheckUpgrade("Quality Sauce") then
 		chance /= 1.15
@@ -75,7 +79,9 @@ function module.DropSoul(position, chanceModifier)
 
 	playDropSound()
 
-	dropService.CreateDrop(position, "Soul").PrimaryPart.Sound:Play()
+	local drop = dropService.CreateDrop(position, "Soul")
+	drop.PrimaryPart.Sound:Play()
+	drop:AddTag("SoulDrop")
 
 	if GiftsService.CheckGift("Echoed_Souls") and ChanceService.checkChance(20, true) then
 		local soulDrop = dropService.CreateDrop(position, "Soul")

@@ -143,7 +143,8 @@ local spinGifts = {
 	},
 }
 
-local costIsDoubled = false
+local isOther = false
+local costMult = 1
 
 --// Functions
 
@@ -334,27 +335,29 @@ function module.Init(player, ui, frame)
 	end)
 
 	frame.UseSoul.MouseButton1Click:Connect(function()
-		if (costIsDoubled and SoulsService.Souls < module.soulCost * 2) or SoulsService.Souls < module.soulCost then
+		if SoulsService.Souls < module.soulCost * costMult then
 			return
 		end
 
 		sfx.KioskBuy:Play()
 
-		SoulsService.RemoveSoul(costIsDoubled and module.soulCost * 2 or module.soulCost)
+		SoulsService.RemoveSoul(module.soulCost * costMult)
 
 		frame.SelectButtons.Visible = false
 		frame.ExitButton.Visible = false
 
 		module.UpdateSouls(player, ui, frame, math.round(SoulsService.Souls))
-		--module.soulCost = math.clamp(module.soulCost + 1, 1, 25)
+		--module.soulCost = math.clamp(module.soulCost + 1, 1, 25) -- ADD ONTO COST
 
-		if GiftsService.CheckUpgrade("A+ Dough") then
-			costIsDoubled = chanceService.checkChance(15, false)
-		else
-			costIsDoubled = false
+		costMult = (GiftsService.CheckUpgrade("A+ Dough") and chanceService.checkChance(15, false)) and 2 or 1
+
+		if GiftsService.CheckGift("Buy_1_Get_1") then
+			costMult = (isOther and chanceService.checkChance(25, true)) and 0 or costMult
+
+			isOther = not isOther
 		end
 
-		frame.SoulCost.Text = costIsDoubled and -module.soulCost * 2 or -module.soulCost
+		frame.SoulCost.Text = -module.soulCost * costMult
 
 		local chosenGift = module.chooseRandomGift(player, ui, frame)
 		module.TakeDelivery(player, ui, frame, chosenGift, true)
@@ -450,7 +453,7 @@ function module.ShowScreen(player, ui, frame, playerSouls)
 	MusicService.playTrack("TheKiosk")
 
 	SoulsService.Souls = playerSouls
-	frame.SoulCost.Text = costIsDoubled and -module.soulCost * 2 or -module.soulCost
+	frame.SoulCost.Text = -module.soulCost * costMult
 
 	frame.Tickets.Count.Text = module.tickets
 	module.UpdateStats(player, ui, frame)
