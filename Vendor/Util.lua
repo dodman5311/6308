@@ -62,7 +62,7 @@ local function tween(instance, tweenInfo, propertyTable)
 	return newTween
 end
 
-function util.getNearestEnemy(position, maxDistance, list)
+function util.getNearestEnemy(position: Vector3, maxDistance: number, list: {}, blacklist: {}?)
 	local closest = math.huge
 	local enemy
 	local enemyPosition
@@ -84,11 +84,17 @@ function util.getNearestEnemy(position, maxDistance, list)
 			continue
 		end
 
-		if distance < closest then
-			closest = distance
-			enemy = foundEnemy
-			enemyPosition = enemy:GetPivot().Position
+		if distance >= closest then
+			continue
 		end
+
+		if blacklist and table.find(blacklist, foundEnemy) then
+			continue
+		end
+
+		closest = distance
+		enemy = foundEnemy
+		enemyPosition = enemy:GetPivot().Position
 	end
 
 	return enemy, closest, enemyPosition

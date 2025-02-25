@@ -3,6 +3,7 @@ local module = {
 	canDash = true,
 }
 
+local CollectionService = game:GetService("CollectionService")
 local Lighting = game:GetService("Lighting")
 local ProximityPromptService = game:GetService("ProximityPromptService")
 local rs = game:GetService("RunService")
@@ -28,6 +29,15 @@ local util = require(Globals.Vendor.Util)
 local giftService = require(Globals.Client.Services.GiftsService)
 local momentum = require(Globals.Client.Controllers.AirController)
 local uiService = require(Globals.Client.Services.UIService)
+
+function module.fillDashes()
+	module.canDash = true
+	module.dashes = 3
+
+	uiService.doUiAction("HUD", "UpdateGiftProgress", "Righteous_Motion", module.dashes / 3)
+	uiService.doUiAction("HUD", "RefreshSideBar")
+	--script.LoadedUI:Play()
+end
 
 function module.Dash(subject)
 	if not module.canDash or not giftService.CheckGift("Righteous_Motion") then
@@ -70,7 +80,7 @@ function module.Dash(subject)
 		velocityAttachment.Parent = primaryPart
 
 		local linearVelocity = Instance.new("LinearVelocity")
-		--linearVelocity.MaxForce = 100000
+		linearVelocity.MaxForce = 200
 		linearVelocity.ForceLimitsEnabled = false
 		linearVelocity.Parent = primaryPart
 		linearVelocity.Attachment0 = velocityAttachment
@@ -97,17 +107,12 @@ function module.Dash(subject)
 
 	for i = module.dashes, 3.1, 0.1 do
 		task.wait(0.05)
-		if acts:checkAct("dashing") then
+		if acts:checkAct("dashing") or module.dashes == 3 then
 			break
 		end
 
 		if i >= 3 then
-			module.canDash = true
-			module.dashes = 3
-
-			uiService.doUiAction("HUD", "UpdateGiftProgress", "Righteous_Motion", module.dashes / 3)
-			uiService.doUiAction("HUD", "RefreshSideBar")
-			--script.LoadedUI:Play()
+			module.fillDashes()
 		end
 	end
 end
@@ -149,6 +154,29 @@ giftService.OnGiftAdded:Connect(function(gift)
 
 	uiService.doUiAction("HUD", "ShowSideBar")
 end)
+
+local function assignRefill(object)
+	object.PrimaryPart.Touched:Connect(function()
+		if not object:GetAttribute("CanUse") then
+			return
+		end
+
+		object:SetAttribute("CanUse", false)
+		module.fillDashes()
+
+		object.PointUi.Center.ImageTransparency = 0.95
+		task.wait(5)
+		object:SetAttribute("CanUse", true)
+	end)
+end
+
+CollectionService:GetInstanceAddedSignal("DashRefill"):Connect(function(tagged: Instance)
+	assignRefill(tagged)
+end)
+
+for _, object in ipairs(CollectionService:GetTagged("DashRefill")) do
+	assignRefill(object)
+end
 
 function module:OnDied()
 	input:Disconnect()

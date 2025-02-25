@@ -34,6 +34,17 @@ local function clearEnemiesList(enemies)
 	end
 end
 
+local function setArenaStatus(unit, status)
+	local altMap = ReplicatedStorage:FindFirstChild("Map")
+	local altUnit = altMap and altMap:FindFirstChild(unit.Name)
+
+	if altUnit then
+		altUnit:SetAttribute("Status", status)
+	end
+
+	unit:SetAttribute("Status", status)
+end
+
 local function runArena(encounter, unit, level, isAmbush)
 	encounter = require(encounter)
 
@@ -93,6 +104,8 @@ local function runArena(encounter, unit, level, isAmbush)
 
 			if #waveEnemies / maxEnemies > 0.6 then
 				clearEnemiesList(table.clone(waveEnemies))
+				setArenaStatus(unit, "Failed")
+
 				return "Failure"
 			end
 
@@ -105,6 +118,7 @@ local function runArena(encounter, unit, level, isAmbush)
 		end
 	end
 
+	setArenaStatus(unit, "Completed")
 	return "Success"
 end
 

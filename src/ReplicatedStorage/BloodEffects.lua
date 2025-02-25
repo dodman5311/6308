@@ -137,6 +137,14 @@ function module.bloodsplosion(position, explosionType)
 	util.addToCache(newBloodEffect, 2)
 
 	for _, particle in ipairs(newBloodEffect:GetChildren()) do
+		if particle.Name == "GutsAndGas" then
+			if giftService.CheckGift("Guts_And_Gas") then
+				particle:Emit(1)
+			end
+
+			continue
+		end
+
 		particle.Enabled = true
 		task.delay(0.1, function()
 			particle.Enabled = false

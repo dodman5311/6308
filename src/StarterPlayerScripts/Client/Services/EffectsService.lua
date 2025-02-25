@@ -1,9 +1,11 @@
 local module = {}
 
 --// Services
+local CollectionService = game:GetService("CollectionService")
 local PLAYERS = game:GetService("Players")
 local REPLICATED_STORAGE = game:GetService("ReplicatedStorage")
 local DEBRIS = game:GetService("Debris")
+local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 
 --// Instances
@@ -181,6 +183,38 @@ function module.EnemySpawned(position)
 	util.PlaySound(sounds.Voices, spawnEffect, 0.1)
 end
 
+function module.OpenShieldEffect(shield)
+	shield.Root.Connection.Flash:Emit(1)
+	shield.Root.Connection.Meta:Emit(1)
+	task.delay(0.2, function()
+		shield.Root.Hand.Enabled = true
+		shield.Root.Hands.Enabled = true
+		shield.ShieldPart.Transparency = 0
+	end)
+end
+
+function module.CloseShieldEffect(shield)
+	shield.Root.Connection.Flash:Emit(1)
+	shield.ShieldPart.Transparency = 1
+	shield.Root.Hand.Enabled = false
+	shield.Root.Hands.Enabled = false
+end
+
+function module.DashEffect(npcModel: Model, startCFrame: CFrame, endCFrame: CFrame)
+	for i = 0, 1, 0.25 do
+		if not npcModel.Parent then
+			return
+		end
+
+		local newNpc = npcModel:Clone()
+		newNpc.Parent = player.PlayerGui.ScreenEffects.ReplicateEffect
+		newNpc:PivotTo(startCFrame:Lerp(endCFrame, i))
+		DEBRIS:AddItem(newNpc, 0.15)
+
+		RunService.Heartbeat:Wait()
+	end
+end
+
 function module.Dash(subject, goal)
 	local newEffect = effects.DashEffect:Clone()
 	newEffect.Parent = workspace
@@ -337,5 +371,9 @@ function module.createEffect(effectName, sender, replicated, ...)
 end
 
 net:Connect("ReplicateEffect", module.createEffect)
+
+CollectionService:GetInstanceAddedSignal("ApostleShield"):Connect(function(shield)
+	module.OpenShieldEffect(shield)
+end)
 
 return module

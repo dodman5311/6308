@@ -1,5 +1,6 @@
 local modules = {}
 
+local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
@@ -45,6 +46,7 @@ net:RemoteEvent("DropArmor")
 net:RemoteEvent("PickupWeapon")
 
 net:RemoteFunction("CheckChance")
+net:RemoteFunction("GetEnemies")
 
 net:Connect("PauseGame", function()
 	workspace:SetAttribute("GamePaused", true)

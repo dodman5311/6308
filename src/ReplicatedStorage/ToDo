@@ -479,7 +479,17 @@ Fixed perk tickets persisting after death *
 
 Fixed boring bullets not resetting with projectile misses *
 
-Make resistance codex page
+Make immunity codex page
+
+APOSTLE:
+
+Dash dodge damage 50% chance
+Replicate model to viewport frame for every step
+
+Walk backwards
+
+shield effect
+
 
 ----------------------------------------------------------------------------------------
 

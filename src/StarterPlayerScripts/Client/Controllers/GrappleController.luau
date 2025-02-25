@@ -169,10 +169,12 @@ local function worldCFrameRotationToC0ObjectSpace(motor6DJoint, worldCFrame)
 	return goalC0CFrame
 end
 
-local function aimArm()
+local function aimArm(align)
 	if not grapplePart then
 		return
 	end
+
+	align.CFrame = camera.CFrame
 
 	local grapplePoint = grapplePart.Position
 
@@ -414,7 +416,17 @@ function module.AltActivate(endPoint)
 
 	keyDown = true
 	InputEnded = uis.InputEnded:Connect(onInputEnded)
-	local d = runService.RenderStepped:Connect(aimArm)
+
+	local newAlign = Instance.new("AlignOrientation")
+	newAlign.MaxTorque = 100000
+	newAlign.MaxAngularVelocity = 100000
+	newAlign.Responsiveness = 200
+	newAlign.RigidityEnabled = true
+	newAlign.Mode = Enum.OrientationAlignmentMode.OneAttachment
+	newAlign.Attachment0 = module.c.PrimaryPart:FindFirstChildOfClass("Attachment")
+	newAlign.Parent = module.c
+
+	local d = runService.RenderStepped:Connect(aimArm, newAlign)
 
 	acts:createTempAct("ability_invasive", function()
 		local startTime = os.clock()
@@ -462,6 +474,7 @@ function module.AltActivate(endPoint)
 
 		animation.Stopped:Wait()
 		d:Disconnect()
+		newAlign:Destroy()
 
 		local leftShoulder = vm.Base["Left Shoulder"]
 

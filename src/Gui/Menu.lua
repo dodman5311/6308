@@ -48,6 +48,8 @@ local padDeltaRight = Vector2.zero
 
 local lastMouseUp = os.clock()
 
+local getEnemiesFunction = net:RemoteFunction("GetEnemies")
+
 --// Functions
 
 local weaponIcons = {
@@ -665,25 +667,46 @@ local function loadMap(player, frame)
 		if v:IsA("BasePart") then
 			local arena = v:FindFirstAncestor("Arena")
 
-			v.Material = Enum.Material.ForceField
-			if v:FindFirstAncestor("Exit") then
-				v.Color = Color3.fromRGB(255, 0, 0)
-			elseif v:FindFirstAncestor("Start_" .. workspace:GetAttribute("Stage")) then
-				v.Color = Color3.fromRGB(50, 255, 0)
-			elseif v:FindFirstAncestor("Kiosk") then
-				v.Color = Color3.fromRGB(0, 255, 175)
-			elseif arena and arena:FindFirstChild("ArenaHitbox") then
-				v.Color = Color3.fromRGB(255, 0, 255)
-			elseif arena then
-				v.Color = Color3.fromRGB(150, 150, 150)
+			if arena then
+				local getArenaStatus = arena:GetAttribute("Status")
+
+				if getArenaStatus == "Completed" then
+					v.Color = Color3.fromRGB(150, 150, 150)
+				elseif getArenaStatus == "Failed" then
+					v.Color = Color3.fromRGB(255, 0, 0)
+				else
+					v.Color = Color3.fromRGB(255, 0, 255)
+				end
 			else
-				v.Color = Color3.fromRGB(255, 200, 0)
+				if v:FindFirstAncestor("Exit") then
+					v.Color = Color3.fromRGB(255, 0, 0)
+				elseif v:FindFirstAncestor("Start_" .. workspace:GetAttribute("Stage")) then
+					v.Color = Color3.fromRGB(50, 255, 0)
+				elseif v:FindFirstAncestor("Kiosk") then
+					v.Color = Color3.fromRGB(0, 255, 175)
+				else
+					v.Color = Color3.fromRGB(255, 200, 0)
+				end
 			end
+
+			v.Material = Enum.Material.ForceField
 		end
 
 		if v:IsA("ParticleEmitter") then
 			v:Destroy()
 		end
+	end
+
+	local cframes = getEnemiesFunction:InvokeServer()
+	for _, enemyCFrame in ipairs(cframes) do
+		local newPart = Instance.new("Part")
+		newPart.Color = Color3.new(1)
+		newPart.Anchored = true
+		newPart.Material = Enum.Material.Neon
+		newPart.CFrame = enemyCFrame
+		newPart.Size = Vector3.new(2, 4, 2)
+		newPart.Name = "Enemy"
+		newPart.Parent = map
 	end
 
 	for _, weapon in ipairs(CollectionService:GetTagged("Weapon")) do
@@ -694,17 +717,6 @@ local function loadMap(player, frame)
 		newPart.CFrame = weapon:GetPivot()
 		newPart.Size = Vector3.one * 3
 		newPart.Name = "Weapon"
-		newPart.Parent = map
-	end
-
-	for _, enemy in ipairs(CollectionService:GetTagged("Enemy")) do
-		local newPart = Instance.new("Part")
-		newPart.Color = Color3.new(1)
-		newPart.Anchored = true
-		newPart.Material = Enum.Material.Neon
-		newPart.CFrame = enemy:GetPivot()
-		newPart.Size = Vector3.new(2, 4, 2)
-		newPart.Name = "Enemy"
 		newPart.Parent = map
 	end
 

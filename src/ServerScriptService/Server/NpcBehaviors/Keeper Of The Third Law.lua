@@ -755,18 +755,19 @@ local function onDied(npc)
 
 	net:RemoteEvent("StopMusic"):FireAllClients("Keeper Of The Third Law")
 
-	local animation = animationService:playAnimation(npc.Instance, "Death", Enum.AnimationPriority.Action4, false, 0)
+	local animation =
+		animationService:playAnimation(npc.Instance, "Death", Enum.AnimationPriority.Action4, false, 0, 1, 0.65)
 
-	task.delay(19, function()
-		net:RemoteEvent("DoUiAction"):FireAllClients("BossIntro", "ShowCompleted", npc.Instance.Name)
-		net:RemoteEvent("DoUiAction"):FireAllClients("HUD", "HideBossBar")
+	task.delay(30, function()
+		net:RemoteEvent("DoUiAction"):FireAllClients("BossIntro", "ShowCompleted", true, npc.Instance.Name)
+		net:RemoteEvent("DoUiAction"):FireAllClients("HUD", "HideBossBar", true)
 	end)
 
 	repeat
 		timer.wait()
 	until animation.Length > 0
 
-	task.delay(animation.Length - 5, function()
+	task.delay(animation.Length + 7, function()
 		DeathEffect(npc)
 	end)
 end

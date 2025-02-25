@@ -233,20 +233,7 @@ function module:OnSpawn(character, humanoid)
 
 	humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
 	humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
-
-	local newAlign = Instance.new("AlignOrientation")
-	newAlign.MaxTorque = 100000
-	newAlign.MaxAngularVelocity = 100000
-	newAlign.Responsiveness = 200
-	newAlign.RigidityEnabled = true
-	newAlign.Mode = Enum.OrientationAlignmentMode.OneAttachment
-	newAlign.Attachment0 = character.PrimaryPart:FindFirstChildOfClass("Attachment")
-	newAlign.Parent = character.PrimaryPart
-
-	render = RunService.RenderStepped:Connect(function()
-		newAlign.CFrame = camera.CFrame
-	end)
-end
+end -- @TODO Fix dash
 
 local function deathEffect()
 	local anchovies = Player:GetAttribute("Anchovies")

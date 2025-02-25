@@ -117,9 +117,7 @@ This transformation usually occurs in militants, as their lifestyle glorifies th
 
 	["Everlasting"] = {
 		Catagory = "Enemies",
-		Entry = [[<font color="#FF7800"><b>Shoot their heart for extra damage.
-
-Immune to shotguns.</b></font>
+		Entry = [[<font color="#FF7800"><b>Shoot their heart for extra damage.</b></font>
 		
 An Everlasting is created when a weak demon is overpowered by its host's undying will to survive.
 

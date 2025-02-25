@@ -1040,6 +1040,27 @@ local function placeHitEffect(position)
 	Debris:AddItem(newEffect, 0.5) -- Change
 end
 
+local function dealGibDamage(subject)
+	if not GiftsService.CheckGift("Guts_And_Gas") then
+		return
+	end
+
+	for _, enemy: Model in ipairs(CollectionService:GetTagged("Enemy")) do
+		if enemy == subject then
+			continue
+		end
+
+		local enemyCFrame = enemy:GetPivot()
+		local enemyPosition = enemyCFrame.Position
+		local subjectPosition = subject:GetPivot().Position
+		local distance = (enemyPosition - subjectPosition).Magnitude
+
+		if distance <= 12 then
+			module.dealDamage(enemyCFrame, enemy, 1, "Guts and Gas")
+		end
+	end
+end
+
 local function checkForGibs()
 	for humanoid, data in pairs(hitHumanoids) do
 		if weaponData and weaponData.AntiGib then
@@ -1055,6 +1076,7 @@ local function checkForGibs()
 		end
 
 		BloodEffects.gibEnemy(data.Model)
+		dealGibDamage(humanoid.Parent)
 		playVoiceLine()
 	end
 end
@@ -1149,20 +1171,6 @@ function module.FireProjectile(projectileType, spread, damage, bulletIndex, elem
 	)
 end
 
-projectileService.projectileHit:Connect(function(result, projectile)
-	local hitHumanoid, subject, damageResult =
-		module.FireBullet(projectile.Damage, 0, nil, result, projectile.Source, projectile.Info["Element"])
-
-	addToConsecutive(hitHumanoid)
-
-	if not hitHumanoid then
-		return
-	end
-
-	addToGib(hitHumanoid, subject, damageResult)
-	checkForGibs()
-end)
-
 function module.FireBullet(damage, spread, distance, result, source, element, chanceOverride)
 	spread *= 1.2
 	local spreadResult
@@ -1212,6 +1220,20 @@ function module.FireBullet(damage, spread, distance, result, source, element, ch
 
 	return hitHumanoid, subject, damageResult, spreadResult
 end
+
+projectileService.projectileHit:Connect(function(result, projectile)
+	local hitHumanoid, subject, damageResult =
+		module.FireBullet(projectile.Damage, 0, nil, result, projectile.Source, projectile.Info["Element"])
+
+	addToConsecutive(hitHumanoid)
+
+	if not hitHumanoid then
+		return
+	end
+
+	addToGib(hitHumanoid, subject, damageResult)
+	checkForGibs()
+end)
 
 local function FireDefault(extraBullet)
 	local default = viewmodel.Model.Default

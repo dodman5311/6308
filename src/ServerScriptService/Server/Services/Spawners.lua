@@ -235,15 +235,13 @@ function module.spawnEnemies(currentLevel, mapOverride)
 			continue
 		end
 
-		print("FoundSpawner")
-
 		local unit = spawner.Parent
 
 		if string.match(unit.Name, "Start") or string.match(unit.Name, "Arena") then
 			continue
 		end
 
-		local spawnAmount = math.round(math.clamp(unit:GetExtentsSize().Magnitude / 30, 1, 4))
+		local spawnAmount = math.round(math.clamp(unit:GetExtentsSize().Magnitude / 30, 1, 6))
 
 		for _ = 1, math.random(spawnAmount - 1, spawnAmount) do
 			if module.spawnInUnit(currentLevel, unit, "Enemy", Vector3.new(0, 5, 0), spawner) then
@@ -306,6 +304,47 @@ function module.SpawnBoss(bossToSpawn, unit)
 	newObject.Parent = workspace
 end
 
+local function placeGrapplePointAt(spawnPoint)
+	local placeAt = spawnPoint.CFrame * CFrame.new(0, 50, 0)
+
+	for _, point in ipairs(CollectionService:GetTagged("GrapplePoint")) do
+		if point:GetPivot() == placeAt then
+			return
+		end
+	end
+
+	local newPoint = ReplicatedStorage.Assets.Models.GrapplePoint:Clone()
+	newPoint.Parent = spawnPoint.Parent
+	newPoint:AddTag("GrapplePoint")
+	newPoint:PivotTo(placeAt)
+end
+
+local function placeDashRefill(spawnPoint)
+	local placeAt = spawnPoint.CFrame * CFrame.new(0, 15, 0)
+
+	for _, point in ipairs(CollectionService:GetTagged("DashRefill")) do
+		if point:GetPivot() == placeAt then
+			return
+		end
+	end
+
+	local newPoint = ReplicatedStorage.Assets.Models.DashRefill:Clone()
+	newPoint.Parent = spawnPoint.Parent
+	newPoint:AddTag("DashRefill")
+	newPoint:PivotTo(placeAt)
+end
+
+function module.SpawnMovementPoints()
+	for _, link in ipairs(workspace.Map:GetDescendants()) do
+		if link.Name ~= "Link" then
+			continue
+		end
+
+		placeGrapplePointAt(link)
+		placeDashRefill(link)
+	end
+end
+
 net:Connect("PickupWeapon", function(player, object)
 	if not object or not object:HasTag("Weapon") then
 		return
@@ -320,6 +359,16 @@ net:Connect("PickupWeapon", function(player, object)
 	)
 
 	object:Destroy()
+end)
+
+net:Handle("GetEnemies", function()
+	local enemyCFrames = {}
+
+	for _, enemy in ipairs(CollectionService:GetTagged("Enemy")) do
+		table.insert(enemyCFrames, enemy:GetPivot())
+	end
+
+	return enemyCFrames
 end)
 
 signals.ActivateUpgrade:Connect(function(_, upgradeName)

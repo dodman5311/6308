@@ -32,7 +32,9 @@ module.Exit = function(player, start_time, stage_number, level_number, bossBeate
 
 		table.insert(arenas, arena)
 
-		if arena:FindFirstChild("ArenaHitbox") then
+		print(arena:GetAttribute("Status"))
+
+		if arena:GetAttribute("Status") == "Completed" then
 			table.insert(arenasCompleted, arena)
 		end
 	end

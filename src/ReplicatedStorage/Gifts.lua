@@ -108,7 +108,7 @@ local module = {
 			Desc = "When inflicting an element, you now have a chance to freeze the enemy (50% chance)",
 		},
 
-		Before_The_Storm = {
+		Before_The_Storm = { -- ICON NEEDED
 			Icon = "rbxassetid://81150499590074",
 			Catagories = { "Tactical" },
 			Desc = "When entering an ambush or arena, combo and ammo will now be refreshed.",
@@ -126,7 +126,7 @@ local module = {
 			Desc = "Thrown weapons now have +20 luck when hitting an enemy.",
 		},
 
-		Returned_Change = { -- unfinished
+		Returned_Change = {
 			Icon = "rbxassetid://82117553571324",
 			Catagories = { "Soul" },
 			Desc = "Vending machines now have a chance to drop a soul upon being destroyed. (10% chance)",
@@ -136,6 +136,12 @@ local module = {
 			Icon = "rbxassetid://130012431987895",
 			Catagories = { "Tactical" },
 			Desc = "Upon taking damage, you now have a chance to gain +1 ammo. (10% chance)",
+		},
+
+		Guts_And_Gas = { -- ICON NEEDED
+			Icon = "rbxassetid://130012431987895",
+			Catagories = { "Arsenal" },
+			Desc = "Gibbing enemies now deals 1 point of splash damage.",
 		},
 	},
 
