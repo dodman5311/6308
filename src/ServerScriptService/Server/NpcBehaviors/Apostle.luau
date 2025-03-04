@@ -1,11 +1,11 @@
 local stats = {
-	ViewDistance = 150,
-	AttackDelay = NumberRange.new(1, 6),
+	ViewDistance = 165,
+	AttackDelay = NumberRange.new(2, 4),
 	MoveDelay = NumberRange.new(5, 10),
-	AttackCooldown = 0.15,
-	ProjectileSpeed = 200,
+	AttackCooldown = 0.25,
+	ProjectileSpeed = 100,
 	dodgeDistance = 10,
-	AttackAmount = NumberRange.new(1, 4),
+	AttackAmount = NumberRange.new(3, 5),
 	NpcType = "Enemy",
 }
 
@@ -65,6 +65,8 @@ local function dodge(npc, currentHealth)
 		return
 	end
 
+	util.PlaySound(npc.Instance.PrimaryPart.Dash, npc.Instance.PrimaryPart, 0.1)
+
 	local originalCFrame = npc.Instance:GetPivot()
 	net:RemoteEvent("ReplicateEffect")
 		:FireAllClients("DashEffect", "Server", true, npc.Instance, originalCFrame, endCFrame)
@@ -107,6 +109,13 @@ local function createShield(npc, position)
 
 	npc.Instance.ShieldBeam.Attachment1 = newShield.Root.Connection
 
+	task.delay(5, function()
+		destroyShield(npc)
+		npc.MindData.ShieldOnCooldown = true
+		task.wait(rng:NextNumber(3, 6))
+		npc.MindData.ShieldOnCooldown = false
+	end)
+
 	return newShield
 end
 
@@ -122,7 +131,7 @@ local function castShield(npc)
 	end
 
 	local nearestEnemy, _, enemyPosition =
-		util.getNearestEnemy(target:GetPivot().Position, 60, CollectionService:GetTagged("Enemy"), { npc.Instance })
+		util.getNearestEnemy(target:GetPivot().Position, 60, CollectionService:GetTagged("Enemy"), { "Apostle" })
 
 	if not nearestEnemy then
 		destroyShield(npc)
@@ -139,13 +148,6 @@ local function castShield(npc)
 
 	alignPos.Position = enemyPosition
 	alignOr.CFrame = CFrame.lookAt(enemyPosition, target:GetPivot().Position)
-
-	task.delay(5, function()
-		destroyShield(npc)
-		npc.MindData.ShieldOnCooldown = true
-		task.wait(4)
-		npc.MindData.ShieldOnCooldown = false
-	end)
 end
 
 local module = {
@@ -153,14 +155,35 @@ local module = {
 		{ Function = "MoveRandom", Parameters = { 60, stats.MoveDelay }, State = "Idle" },
 
 		{ Function = "SearchForTarget", Parameters = { stats.ViewDistance } },
-		{ Function = "LeadTarget", Parameters = { false, 200, 0 } },
+		{ Function = "LeadTarget", Parameters = { true, 105, 0 } },
 
 		{ Function = "Custom", Parameters = { castShield }, State = "Attacking" },
 		{ Function = "PlayWalkingAnimation" },
+		{ Function = "MoveAwayFromDistance", Parameters = { 25, true } },
 	},
 
 	OnDamaged = {
 		{ Function = "Custom", Parameters = { dodge } },
+	},
+
+	AtDistance = {
+
+		{
+			Function = "ShootProjectile",
+			Parameters = {
+				stats.AttackDelay,
+				stats.AttackCooldown,
+				stats.AttackAmount,
+				stats.ProjectileSpeed,
+				1,
+				{ Size = 1 },
+				"ElectricProjectile",
+				false,
+				0.5,
+			},
+		},
+
+		Parameters = { 40 },
 	},
 
 	TargetFound = {

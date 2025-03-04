@@ -756,18 +756,18 @@ local function onDied(npc)
 	net:RemoteEvent("StopMusic"):FireAllClients("Keeper Of The Third Law")
 
 	local animation =
-		animationService:playAnimation(npc.Instance, "Death", Enum.AnimationPriority.Action4, false, 0, 1, 0.65)
+		animationService:playAnimation(npc.Instance, "Death", Enum.AnimationPriority.Action4, false, 0, 1, 0.5)
 
-	task.delay(30, function()
-		net:RemoteEvent("DoUiAction"):FireAllClients("BossIntro", "ShowCompleted", true, npc.Instance.Name)
-		net:RemoteEvent("DoUiAction"):FireAllClients("HUD", "HideBossBar", true)
+	task.delay(27, function()
+		net:RemoteEvent("DoUiAction"):FireAllClients("BossIntro", "ShowCompleted", npc.Instance.Name)
+		net:RemoteEvent("DoUiAction"):FireAllClients("HUD", "HideBossBar")
 	end)
 
 	repeat
 		timer.wait()
 	until animation.Length > 0
 
-	task.delay(animation.Length + 7, function()
+	task.delay(animation.Length + 5, function()
 		DeathEffect(npc)
 	end)
 end
@@ -775,7 +775,7 @@ end
 local module = {
 	OnStep = {
 
-		{ Function = "SearchForTarget", Parameters = { 1000 }, NotState = "NoAi" },
+		{ Function = "SearchForTarget", Parameters = { 1000 } },
 		{ Function = "LookAtTarget" },
 
 		{ Function = "GetToDistance", Parameters = { 4.9, true } },
@@ -805,7 +805,7 @@ local module = {
 		{ Function = "SetCollision", Parameters = { "DeadBody" } },
 		{ Function = "SwitchToState", Parameters = { "Dead" } },
 		{ Function = "Custom", Parameters = { onDied } },
-		{ Function = "RemoveWithDelay", Parameters = { 20 } },
+		{ Function = "RemoveWithDelay", Parameters = { 30 } },
 	},
 }
 

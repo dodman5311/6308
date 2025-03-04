@@ -5,7 +5,7 @@ local stats = {
 	MoveDelay = NumberRange.new(2, 8),
 	AttackCooldown = 0.2,
 	ProjectileSpeed = 200,
-	AttackAmount = 5,
+	AttackAmount = 4,
 	AttackDistance = 60,
 
 	NpcType = "Enemy",
@@ -28,7 +28,7 @@ local module = {
 
 		{
 			Function = "ShootWithoutTimer",
-			Parameters = { stats.AttackCooldown, stats.AttackAmount, stats.ProjectileSpeed, 5 },
+			Parameters = { stats.AttackCooldown, stats.AttackAmount, stats.ProjectileSpeed, 4 },
 			ReturnFunction = function(npc, result)
 				if not result then
 					return

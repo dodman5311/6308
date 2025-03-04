@@ -730,7 +730,14 @@ function module.proceedToNext(_, onlyLoadMap)
 		storedMap = createStoredMap()
 		return
 	end
-	module.loadLinearMap(math.clamp(module.CurrentLevel * 4, 5, 25))
+
+	local mapSize = math.clamp(module.CurrentLevel * 4, 5, 25)
+
+	if module.CurrentStage == 3 then
+		mapSize /= 2
+	end
+
+	module.loadLinearMap(mapSize)
 	storedMap = createStoredMap()
 end
 

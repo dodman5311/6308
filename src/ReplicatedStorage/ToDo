@@ -449,8 +449,6 @@ Fixed and slightly rebalanced paladins *
 
 Remake miniboss perk UI *
 
-Add grapple swing when held
-
 lower fog *
 
 add ledge grab *
@@ -481,15 +479,21 @@ Fixed boring bullets not resetting with projectile misses *
 
 Make immunity codex page
 
-APOSTLE:
+Apostles feel a liiittle weak (More health, faster bullets)
 
-Dash dodge damage 50% chance
-Replicate model to viewport frame for every step
+FIX GRAPPLE CLIPPING (All clipping in stage 2)
+FIX Keeper death
+FIX Arena pausing
+Add soul walls
+Add ambush walls for stage 2
+make ambush walls destroy when ambush ends
+Fix clipping on teleport (Velocity + loading glitch)
 
-Walk backwards
+When caught in a GIB, add blood screen
 
-shield effect
+add waterfall particle effects
 
+Attempt water screen effects
 
 ----------------------------------------------------------------------------------------
 

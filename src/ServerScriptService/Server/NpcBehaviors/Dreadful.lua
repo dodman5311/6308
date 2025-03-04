@@ -91,7 +91,7 @@ local module = {
 				1,
 				{ SplashRange = 6, SplashDamage = 1, Seeking = 0.12, Size = 1.5, SeekProgression = -0.001 },
 				"SmartRocketProjectile",
-				"SpecialAttack",
+				"SpecialAttackSnd",
 			},
 		},
 	},

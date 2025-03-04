@@ -109,7 +109,7 @@ local module = {
 		},
 
 		Before_The_Storm = { -- ICON NEEDED
-			Icon = "rbxassetid://81150499590074",
+			Icon = "rbxassetid://83356362608672",
 			Catagories = { "Tactical" },
 			Desc = "When entering an ambush or arena, combo and ammo will now be refreshed.",
 		},
@@ -139,7 +139,7 @@ local module = {
 		},
 
 		Guts_And_Gas = { -- ICON NEEDED
-			Icon = "rbxassetid://130012431987895",
+			Icon = "rbxassetid://71409350218402",
 			Catagories = { "Arsenal" },
 			Desc = "Gibbing enemies now deals 1 point of splash damage.",
 		},
@@ -231,6 +231,12 @@ local module = {
 			Desc = "Shooting a thrown weapon mid air will now ricochet shots to the nearest enemy with increased damage. (+4 Damage)",
 		},
 
+		Red_Eyes = {
+			Icon = "rbxassetid://114616276497068",
+			Catagories = { "Tactical" },
+			Desc = "When gibbing an enemy, all nearby enemies will be blinded for 5 seconds. (Blinded enemies are unable to target you)",
+		},
+
 		Mule_Bags = {
 			Icon = "rbxassetid://16053616222",
 			Catagories = { "Tactical" },
@@ -253,6 +259,18 @@ local module = {
 			Icon = "rbxassetid://16235430594",
 			Catagories = { "Luck" },
 			Desc = "Your combo score is now linked to your Luck. (+1 Luck per combo score, Max 20)",
+		},
+
+		Dead_Bolt = {
+			Icon = "rbxassetid://119974210879654",
+			Catagories = { "Arsenal" },
+			Desc = "You can now aim with non-parrying weapons and shoot a Critical Bolt. Critical Bolts have +1 damage and +35% crit chance. (3 second cooldown. Right click to aim)",
+		},
+
+		Daisy_Chain = {
+			Icon = "rbxassetid://91240165726447",
+			Catagories = { "Arsenal" },
+			Desc = "When shooting an enemy, the next one hit will now be linked to it. Damage to either enemy is delt to the other as electric damage.",
 		},
 
 		-- Haven = {

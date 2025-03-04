@@ -156,7 +156,8 @@ Even in the early stages of this infection, their fight is futile. They will ult
 
 	["Tollsman"] = {
 		Catagory = "Enemies",
-		Entry = [[The Tollsman represent the piteous final stage of the Red Sickness. 
+		Entry = [[<font color="#FF7800"><b>Shooting the red box on their divice causes more damage and will explode upon a kill.</b></font>
+The Tollsman represent the piteous final stage of the Red Sickness. 
 Their flesh is consumed, their minds broken and lost. Their entire being is surrendered to the Visage of Hope.
 
 They now roam the sewers, adorned with the tools of a hopeful ceremony, tolling for the Visage so that all may witness his infinite power and infectious hope.]],

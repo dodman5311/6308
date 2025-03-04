@@ -32,12 +32,6 @@ voiceSound.Parent = script
 voiceSound.Volume = 1.5
 voiceSound.SoundGroup = SoundService.Voice
 
-local defaultFireRate = 0.2
-local grenadeLocks = {}
-local canUseDamagePerk = true
-local DAMAGE_PERK_COOLDOWN = 20
-local SOUL_FIRE_COOLDOWN = 15
-
 --// Modules
 
 local signals = require(Globals.Signals)
@@ -72,7 +66,19 @@ local weaponTimer = require(Globals.Vendor.Timer):newQueue()
 local weaponReloadTimer = weaponTimer:new("WeaponReload")
 local damagePerkTimer = weaponTimer:new("DamagePerkCooldown")
 
+local daisySubject_A
+local daisySubject_B
+
 --// Values
+
+local defaultFireRate = 0.2
+local grenadeLocks = {}
+local canUseDamagePerk = true
+local DAMAGE_PERK_COOLDOWN = 20
+local SOUL_FIRE_COOLDOWN = 15
+local DEADBOLT_COOLDOWN = 3
+local deadBoltActive = false
+local onDeadBoltCooldown = false
 
 local crosshairs = {
 	Default = "rbxassetid://16453731677",
@@ -771,6 +777,10 @@ local function addToConsecutive(hit)
 end
 
 local function createFakeWeakpoint(subject, part, position)
+	if part:IsA("Model") then
+		part = part:FindFirstChildOfClass("Part")
+	end
+
 	for _, partInSubject in ipairs(subject:GetChildren()) do
 		if partInSubject.Name ~= "Weakspot" then
 			continue
@@ -856,7 +866,55 @@ local function checkImmunity(subject, source)
 	end
 end
 
-function module.dealDamage(cframe, subject, damage, source, element, chanceOverride)
+local function getCritChance(source, chanceToAdd)
+	local chance = 0
+	if not chanceToAdd then
+		chanceToAdd = 0
+	end
+
+	if module.currentWeapon and source == module.currentWeapon.Name then
+		chance = module.critChances[weaponData.Type] + chanceToAdd
+	elseif source == "Default" then
+		chance = module.critChances.Pistol + chanceToAdd
+	end
+
+	return chance
+end
+
+local function checkChainSub(a)
+	return not a or not a.Parent or a.Humanoid.Health == 0
+end
+
+local function assignDaisyChain(subject: Model)
+	local model = subject:IsA("Model") and subject or subject:FindFirstAncestorOfClass("Model")
+
+	if checkChainSub(daisySubject_A) then
+		daisySubject_A = subject
+	elseif checkChainSub(daisySubject_B) and subject ~= daisySubject_A then
+		daisySubject_B = subject
+	else
+		return
+	end
+
+	local beam = workspace.DaisyBeam
+
+	if not model.PrimaryPart then
+		return
+	end
+	local attachment = model.PrimaryPart:FindFirstChild("RootAttachment")
+		or model.PrimaryPart:FindFirstChildOfClass("Attachment")
+	if not attachment then
+		return
+	end
+
+	if not beam.Attachment0 then
+		beam.Attachment0 = attachment
+	elseif not beam.Attachment1 then
+		beam.Attachment1 = attachment
+	end
+end
+
+function module.dealDamage(cframe, subject, damage, source, element, chanceOverride, critChanceAddition)
 	if not subject or Players:GetPlayerFromCharacter(subject) then
 		return
 	end
@@ -876,7 +934,7 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		module.HasHitMachine = true
 	end
 
-	if GiftsService.CheckGift("Open_Wounds") and ChanceService.checkChance(10, true) then
+	if GiftsService.CheckGift("Open_Wounds") and ChanceService.checkChance(10, true) and not isVendingMachine then
 		createFakeWeakpoint(model, subject, cframe.Position)
 	end
 
@@ -895,19 +953,9 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 	end
 
 	local critMult = 1
-
-	if module.currentWeapon and source == module.currentWeapon.Name then
-		if ChanceService.checkChance(module.critChances[weaponData.Type], true) then
-			critMult = 2
-
-			util.PlaySound(assets.Sounds.Crit, script, 0.05)
-		end
-	elseif source == "Default" then
-		if ChanceService.checkChance(module.critChances.Pistol, true) then
-			critMult = 2
-
-			util.PlaySound(assets.Sounds.Crit, script, 0.05)
-		end
+	if ChanceService.checkChance(getCritChance(source, critChanceAddition), true) then
+		critMult = 2
+		util.PlaySound(assets.Sounds.Crit, script, 0.05)
 	end
 
 	local deadshotDamage = checkDeadshot()
@@ -994,6 +1042,32 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		addToOvercharge(1)
 	end
 
+	if source ~= "DaisyChain" and GiftsService.CheckGift("Daisy_Chain") and not isVendingMachine then
+		assignDaisyChain(model)
+
+		if model == daisySubject_A and daisySubject_B then
+			module.dealDamage(
+				cframe,
+				daisySubject_B,
+				damage,
+				"DaisyChain",
+				"Electricity",
+				chanceOverride,
+				critChanceAddition
+			)
+		elseif model == daisySubject_B and daisySubject_A then
+			module.dealDamage(
+				cframe,
+				daisySubject_A,
+				damage,
+				"DaisyChain",
+				"Electricity",
+				chanceOverride,
+				critChanceAddition
+			)
+		end
+	end
+
 	return humanoid, subject, totalDamage
 end
 
@@ -1041,7 +1115,7 @@ local function placeHitEffect(position)
 end
 
 local function dealGibDamage(subject)
-	if not GiftsService.CheckGift("Guts_And_Gas") then
+	if not GiftsService.CheckGift("Guts_And_Gas") and not GiftsService.CheckGift("Red_Eyes") then
 		return
 	end
 
@@ -1055,8 +1129,18 @@ local function dealGibDamage(subject)
 		local subjectPosition = subject:GetPivot().Position
 		local distance = (enemyPosition - subjectPosition).Magnitude
 
-		if distance <= 12 then
+		if distance > 15 then
+			continue
+		end
+
+		if GiftsService.CheckGift("Guts_And_Gas") then
 			module.dealDamage(enemyCFrame, enemy, 1, "Guts and Gas")
+			UIService.doUiAction("HUD", "ActivateGift", "Guts_And_Gas")
+		end
+
+		if GiftsService.CheckGift("Red_Eyes") then
+			net:RemoteEvent("BlindEnemy"):FireServer(enemy)
+			UIService.doUiAction("HUD", "ActivateGift", "Red_Eyes")
 		end
 	end
 end
@@ -1171,7 +1255,7 @@ function module.FireProjectile(projectileType, spread, damage, bulletIndex, elem
 	)
 end
 
-function module.FireBullet(damage, spread, distance, result, source, element, chanceOverride)
+function module.FireBullet(damage, spread, distance, result, source, element, chanceOverride, critChanceAddition)
 	spread *= 1.2
 	local spreadResult
 
@@ -1212,7 +1296,7 @@ function module.FireBullet(damage, spread, distance, result, source, element, ch
 	end
 
 	local hitHumanoid, subject, damageResult =
-		module.dealDamage(hitCframe, result.Instance, damage, source, element, chanceOverride)
+		module.dealDamage(hitCframe, result.Instance, damage, source, element, chanceOverride, critChanceAddition)
 
 	if not hitHumanoid then
 		HitPart(result)
@@ -1235,7 +1319,34 @@ projectileService.projectileHit:Connect(function(result, projectile)
 	checkForGibs()
 end)
 
+local function fireDeadBolt(extraBullet, bulletDamage, weaponName, element)
+	onDeadBoltCooldown = true
+	UIService.doUiAction("HUD", "CooldownDeadBolt", DEADBOLT_COOLDOWN)
+	UIService.doUiAction("HUD", "ActivateGift", "Dead_Bolt")
+	UIService.doUiAction("HUD", "CooldownGift", "Dead_Bolt", DEADBOLT_COOLDOWN)
+
+	for _ = 1, extraBullet + 1 do
+		local hitHumanoid, subject, damage =
+			module.FireBullet(bulletDamage + 1, 0, 500, nil, weaponName, element, 0, 35)
+
+		addToGib(hitHumanoid, subject, damage)
+		addToConsecutive(hitHumanoid)
+	end
+
+	util.PlaySound(assets.Sounds.DeadBolt, script, 0.15)
+
+	Recoil(Vector3.new(0, 2, 0), Vector3.new(0.5, 0, 0), 2, 0.5)
+
+	Timer.delay(DEADBOLT_COOLDOWN, function()
+		onDeadBoltCooldown = false
+	end)
+end
+
 local function FireDefault(extraBullet)
+	if deadBoltActive and onDeadBoltCooldown then
+		return
+	end
+
 	local default = viewmodel.Model.Default
 	local bulletCount = 1 + extraBullet
 
@@ -1249,19 +1360,24 @@ local function FireDefault(extraBullet)
 		damageAmount = 2
 	end
 
-	for _ = 1, bulletCount do
-		local hitHumanoid, subject, damage, spreadResult =
-			module.FireBullet(damageAmount, bulletCount - 1, 500, nil, "Default")
+	if deadBoltActive then
+		fireDeadBolt(extraBullet, damageAmount, "Default")
+	else
+		for _ = 1, bulletCount do
+			local hitHumanoid, subject, damage, spreadResult =
+				module.FireBullet(damageAmount, bulletCount - 1, 500, nil, "Default")
 
-		addToGib(hitHumanoid, subject, damage)
-		addToConsecutive(hitHumanoid)
+			addToGib(hitHumanoid, subject, damage)
+			addToConsecutive(hitHumanoid)
 
-		if defaultIndex == 0 then
-			showMuzzleFlash(default.Right.FirePart, spreadResult)
-		else
-			showMuzzleFlash(default.Left.FirePart, spreadResult)
+			if defaultIndex == 0 then
+				showMuzzleFlash(default.Right.FirePart, spreadResult)
+			else
+				showMuzzleFlash(default.Left.FirePart, spreadResult)
+			end
 		end
 	end
+
 	checkForGibs()
 
 	module.UpdateAmmo(currentAmmo - 1)
@@ -1292,11 +1408,13 @@ local function FireDefault(extraBullet)
 			1
 		)
 
-		Recoil(recoilVector + Vector3.new(-1.75), Vector3.new(0.2, 0.1, 4), recoilMagnitude, 0.75)
+		if not deadBoltActive then
+			Recoil(recoilVector + Vector3.new(-1.75), Vector3.new(0.2, 0.1, 4), recoilMagnitude, 0.75)
+		end
 
 		defaultIndex = 1
 	else
-		UIService.doUiAction("HUD", "PumpCrosshair")
+		UIService.doUiAction("HUD", "PumpCrosshair", true)
 		task.wait(0.03)
 		animationService:playAnimation(
 			viewmodel.Model,
@@ -1308,7 +1426,9 @@ local function FireDefault(extraBullet)
 			1
 		)
 
-		Recoil(recoilVector + Vector3.new(1.75), Vector3.new(0.2, 0.1, 4), recoilMagnitude, 0.75)
+		if not deadBoltActive then
+			Recoil(recoilVector + Vector3.new(1.75), Vector3.new(0.2, 0.1, 4), recoilMagnitude, 0.75)
+		end
 
 		defaultIndex = 0
 	end
@@ -1363,34 +1483,42 @@ local function grenadeLockOn()
 	-- 	grenadeLocks = {}
 	-- end
 
-	if not grenadeLockTimer or grenadeLockTimer.IsRunning or #grenadeLocks >= 3 or not canUseDamagePerk then
+	-- if not grenadeLockTimer or grenadeLockTimer.IsRunning or #grenadeLocks >= 3 or not canUseDamagePerk then
+	-- 	return
+	-- end
+
+	if #grenadeLocks >= 3 or not canUseDamagePerk then
 		return
 	end
 
-	grenadeLockTimer.WaitTime = 0.15
-	grenadeLockTimer.Function = function()
-		local target = getObjectInCenter(player, grenadeLocks)
-		if not target then
-			return
-		end
-
-		local newGui = assets.Gui.LockGui:Clone()
-		newGui.Parent = target
-		newGui.Enabled = true
-
-		UiAnimationService.PlayAnimation(newGui.Frame, 0.045, false, true)
-
-		table.insert(lockGuis, newGui)
-		table.insert(grenadeLocks, target)
-
-		assets.Sounds.Lock.PlaybackSpeed = (#grenadeLocks + 1) / 2
-		assets.Sounds.Lock:Play()
+	--grenadeLockTimer.WaitTime = 0.15
+	--grenadeLockTimer.Function = function()
+	local target = getObjectInCenter(player, grenadeLocks)
+	if not target then
+		return
 	end
 
-	grenadeLockTimer:Run()
+	local newGui = assets.Gui.LockGui:Clone()
+	newGui.Parent = target
+	newGui.Enabled = true
+
+	UiAnimationService.PlayAnimation(newGui.Frame, 0.045, false, true)
+
+	table.insert(lockGuis, newGui)
+	table.insert(grenadeLocks, target)
+
+	assets.Sounds.Lock.PlaybackSpeed = (#grenadeLocks + 1) / 2
+	assets.Sounds.Lock:Play()
+	--end
+
+	--grenadeLockTimer:Run()
 end
 
 function module.Fire()
+	if deadBoltActive and onDeadBoltCooldown then
+		return
+	end
+
 	if acts:checkAct("IsBlocking", "Reloading") or currentAmmo == 0 then
 		return
 	end
@@ -1440,19 +1568,29 @@ function module.Fire()
 
 	local maxDistance = weaponData.MaxDistance or 500
 
-	for index = 1, bulletCount do
-		local spread = index == 1 and 0 or index
+	if deadBoltActive then
+		fireDeadBolt(extraBullet, bulletDamage, module.currentWeapon.Name, weaponData["Element"])
+	else
+		for index = 1, bulletCount do
+			local spread = index == 1 and 0 or index
 
-		if weaponData.Projectile then
-			module.FireProjectile(weaponData.Projectile, spread, bulletDamage, index, weaponData["Element"])
-			continue
+			if weaponData.Projectile then
+				module.FireProjectile(weaponData.Projectile, spread, bulletDamage, index, weaponData["Element"])
+				continue
+			end
+
+			local hitHumanoid, subject, damage = module.FireBullet(
+				bulletDamage,
+				spread,
+				maxDistance,
+				nil,
+				module.currentWeapon.Name,
+				weaponData["Element"]
+			)
+
+			addToGib(hitHumanoid, subject, damage)
+			addToConsecutive(hitHumanoid)
 		end
-
-		local hitHumanoid, subject, damage =
-			module.FireBullet(bulletDamage, spread, maxDistance, nil, module.currentWeapon.Name, weaponData["Element"])
-
-		addToGib(hitHumanoid, subject, damage)
-		addToConsecutive(hitHumanoid)
 	end
 
 	if weaponData.LockedOn then
@@ -1514,12 +1652,14 @@ function module.Fire()
 		onStopped:Disconnect()
 	end)
 
-	Recoil(
-		weaponData.Recoil.RecoilVector,
-		weaponData.Recoil.RandomVector,
-		weaponData.Recoil.Magnitude,
-		weaponData.Recoil.Speed
-	)
+	if not deadBoltActive then
+		Recoil(
+			weaponData.Recoil.RecoilVector,
+			weaponData.Recoil.RandomVector,
+			weaponData.Recoil.Magnitude,
+			weaponData.Recoil.Speed
+		)
+	end
 
 	if currentAmmo <= 0 then
 		if acts:checkAct("Throwing") then
@@ -1881,7 +2021,7 @@ function module.UseSword()
 
 	Timer.wait(0.25)
 	canBlock = true
-	Timer.wait(2)
+	Timer.wait(0.75)
 	canUseSword = true
 
 	return true
@@ -1986,6 +2126,33 @@ function module.OnBlock()
 	module.currentWeapon.BlockPart.Blocked:Emit(20)
 end
 
+function module.OpenDeadBolt()
+	if deadBoltActive or not GiftsService.CheckGift("Dead_Bolt") then
+		return
+	end
+	deadBoltActive = true
+
+	viewmodel:SetOffset("HideDeadBolt", "FromCamera", CFrame.new(0, 0, 10))
+
+	UIService.doUiAction(
+		"HUD",
+		"ShowDeadBolt",
+		getCritChance(module.currentWeapon and module.currentWeapon.Name),
+		module.currentWeapon and weaponData.Type
+	)
+end
+
+function module.CloseDeadBolt()
+	if not deadBoltActive or not GiftsService.CheckGift("Dead_Bolt") then
+		return
+	end
+	deadBoltActive = false
+
+	viewmodel:RemoveOffset("HideDeadBolt")
+
+	UIService.doUiAction("HUD", "HideDeadBolt", module.currentWeapon)
+end
+
 local function actOnAnimation(parameter)
 	if parameter == "MagOut" then
 		util.PlaySound(reloadSounds.MagOut, script, 0.1, 1)
@@ -2022,6 +2189,7 @@ function module:GameInit()
 end
 
 function module:OnSpawn()
+	deadBoltActive = false
 	consecutiveHits = 0
 
 	if module.currentWeapon then
@@ -2245,7 +2413,9 @@ UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
 	end
 
 	if input.UserInputType == Enum.UserInputType.MouseButton2 or input.KeyCode == Enum.KeyCode.ButtonL2 then
-		module.Block()
+		if not module.Block() and not (module.currentWeapon and weaponData.BlockTime) then
+			module.OpenDeadBolt()
+		end
 	end
 
 	if input.KeyCode == Enum.KeyCode.F or input.KeyCode == Enum.KeyCode.Thumbstick1 then
@@ -2276,6 +2446,12 @@ UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
 		if GiftsService.CheckGift("Galvan_Gaze") then
 			galvanGaze()
 		end
+
+		if GiftsService.CheckGift("Mag_Launcher") then
+			for _ = 1, 3 do
+				grenadeLockOn()
+			end
+		end
 	end
 
 	if
@@ -2300,6 +2476,10 @@ end)
 UserInputService.InputEnded:Connect(function(input, gpe)
 	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.KeyCode == Enum.KeyCode.ButtonR2 then
 		releaseTrigger(gpe)
+	end
+
+	if input.UserInputType == Enum.UserInputType.MouseButton2 or input.KeyCode == Enum.KeyCode.ButtonL2 then
+		module.CloseDeadBolt()
 	end
 
 	if input.KeyCode == Enum.KeyCode.G or input.KeyCode == Enum.KeyCode.ButtonL1 then
@@ -2337,7 +2517,7 @@ RunService.RenderStepped:Connect(function()
 	end
 
 	if gKeyDown and GiftsService.CheckGift("Mag_Launcher") then
-		grenadeLockOn()
+		--grenadeLockOn()
 	end
 end)
 
@@ -2488,6 +2668,9 @@ GiftsService.OnGiftRemoved:Connect(function(gift)
 	end
 	if gift == "Mag_Launcher" or gift == "Burning_Souls" or gift == "Galvan_Gaze" then
 		UIService.doUiAction("HUD", "HideOvercharge", true)
+	end
+	if gift == "Dead_Bolt" then
+		module.CloseDeadBolt()
 	end
 end)
 

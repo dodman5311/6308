@@ -21,7 +21,7 @@ local module = {
 				stats.ProjectileSpeed,
 				1,
 				{},
-				false,
+				"EnemyPlasmaProjectile",
 				false,
 				0.5,
 			},

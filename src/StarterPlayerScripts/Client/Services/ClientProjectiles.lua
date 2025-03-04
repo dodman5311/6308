@@ -359,7 +359,7 @@ local function processStep(distanceToMove, projectile: Projectile)
 			position = nearestEnemy:GetPivot().Position
 		else
 			nearestEnemy, distanceToMove, position =
-				util.getNearestEnemy(projectile.Instance.Position, projectile.Info["SeekDistance"] or 40, list, true)
+				util.getNearestEnemy(projectile.Instance.Position, projectile.Info["SeekDistance"] or 40, list)
 		end
 
 		if nearestEnemy then

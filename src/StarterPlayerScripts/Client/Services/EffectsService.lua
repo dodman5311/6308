@@ -186,6 +186,8 @@ end
 function module.OpenShieldEffect(shield)
 	shield.Root.Connection.Flash:Emit(1)
 	shield.Root.Connection.Meta:Emit(1)
+	shield.Root.Activate:Play()
+	shield.Root.Active:Play()
 	task.delay(0.2, function()
 		shield.Root.Hand.Enabled = true
 		shield.Root.Hands.Enabled = true
@@ -198,6 +200,8 @@ function module.CloseShieldEffect(shield)
 	shield.ShieldPart.Transparency = 1
 	shield.Root.Hand.Enabled = false
 	shield.Root.Hands.Enabled = false
+	shield.Root.Active:Stop()
+	shield.Root.Deactivate:Play()
 end
 
 function module.DashEffect(npcModel: Model, startCFrame: CFrame, endCFrame: CFrame)

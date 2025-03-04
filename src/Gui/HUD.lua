@@ -1,5 +1,6 @@
 local module = {}
 --// Services
+local Lighting = game:GetService("Lighting")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -18,6 +19,7 @@ local UiAnimator = require(Globals.Vendor.UIAnimationService)
 local SoulsService = require(Globals.Client.Services.SoulsService)
 local GiftsService = require(Globals.Client.Services.GiftsService)
 local spring = require(Globals.Vendor.Spring)
+local chanceService = require(Globals.Vendor.ChanceService)
 
 local grappleIncicatorSpring = spring.new(Vector2.zero)
 grappleIncicatorSpring.Damper = 0.5
@@ -642,6 +644,97 @@ function module.ToggleReloadPrompt(player, ui, frame, value)
 
 		until not reloadPrompt.Visible
 	end)
+end
+
+function module.ShowDeadBolt(player, ui, frame, crit, weaponType)
+	frame.LeftCrosshairFrame.Visible = false
+	frame.CrosshairFrame.Visible = false
+
+	weaponType = weaponType or "Pistol"
+
+	local deadBoltUi = frame.DeadBoltReticle
+	local deadBoltVin = frame.DeadBoltVin
+
+	local ti = TweenInfo.new(0.5, Enum.EasingStyle.Quart)
+
+	deadBoltUi.Size = UDim2.fromScale(1.5, 1.5)
+	deadBoltUi.ImageTransparency = 1
+	deadBoltUi.Visible = true
+
+	deadBoltVin.Size = UDim2.fromScale(1, 1)
+	deadBoltVin.ImageTransparency = 1
+	deadBoltVin.Visible = true
+
+	util.PlaySound(sounds.DeadBoltAim, script)
+
+	Lighting.DeadBoltBlur.Size = 25
+
+	util.tween(deadBoltUi, ti, { Size = UDim2.fromScale(1, 1), ImageTransparency = 0 })
+	util.tween(deadBoltVin, ti, { Size = UDim2.fromScale(1.75, 1.75), ImageTransparency = 0 })
+	util.tween(camera, ti, { FieldOfView = 45 })
+	util.tween(Lighting.DeadBoltBlur, ti, { Size = 0 })
+
+	local luckValue = Instance.new("NumberValue")
+	local critValue = Instance.new("NumberValue")
+	local chanceValue = Instance.new("NumberValue")
+
+	luckValue.Value = 0
+	critValue.Value = 0
+	chanceValue.Value = 0
+
+	deadBoltUi.Luck.Text = "Luck: 0"
+	deadBoltUi.Crit.Text = weaponType .. ": 0"
+	deadBoltUi.Chance.Text = "0%"
+
+	local luck = chanceService.getLuck()
+
+	luckValue.Changed:Connect(function(value)
+		deadBoltUi.Luck.Text = "Luck: " .. math.round(value)
+	end)
+
+	critValue.Changed:Connect(function(value)
+		deadBoltUi.Crit.Text = weaponType .. ": " .. math.round(value) .. "%"
+	end)
+
+	chanceValue.Changed:Connect(function(value)
+		deadBoltUi.Chance.Text = math.round(value) .. "%"
+	end)
+
+	util.tween(luckValue, ti, { Value = luck })
+	util.tween(critValue, ti, { Value = crit })
+	util.tween(chanceValue, ti, { Value = crit + (luck / 2) + 35 }, false, function()
+		luckValue:Destroy()
+		critValue:Destroy()
+		chanceValue:Destroy()
+	end)
+end
+
+function module.HideDeadBolt(player, ui, frame, weaponEquipped)
+	frame.CrosshairFrame.Visible = true
+
+	if not weaponEquipped then
+		frame.LeftCrosshairFrame.Visible = true
+	end
+
+	local deadBoltUi = frame.DeadBoltReticle
+	local deadBoltVin = frame.DeadBoltVin
+
+	local ti = TweenInfo.new(0.25, Enum.EasingStyle.Quad)
+	local ti_0 = TweenInfo.new(0.5, Enum.EasingStyle.Quad)
+
+	deadBoltUi.Visible = false
+	deadBoltVin.Visible = false
+
+	util.tween(camera, ti, { FieldOfView = util.getSetting("Field of View").Value }) --ads
+	util.tween(util.PlaySound(sounds.DeadBoltAim, script), ti_0, { PlaybackSpeed = 0.5 })
+end
+
+function module.CooldownDeadBolt(player, ui, frame, cooldownTime)
+	local deadBoltUi = frame.DeadBoltReticle
+	local ti = TweenInfo.new(cooldownTime, Enum.EasingStyle.Linear)
+
+	deadBoltUi.Cooldown.Size = UDim2.fromScale(0, 1)
+	util.tween(deadBoltUi.Cooldown, ti, { Size = UDim2.fromScale(0.28, 1) })
 end
 
 function module.ToggleGrappleIndicator(player, ui, frame, value)

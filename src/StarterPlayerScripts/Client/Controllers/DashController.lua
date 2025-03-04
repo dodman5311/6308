@@ -156,7 +156,11 @@ giftService.OnGiftAdded:Connect(function(gift)
 end)
 
 local function assignRefill(object)
-	object.PrimaryPart.Touched:Connect(function()
+	local point = object:WaitForChild("Point")
+	if not point then
+		return
+	end
+	point.Touched:Connect(function()
 		if not object:GetAttribute("CanUse") then
 			return
 		end

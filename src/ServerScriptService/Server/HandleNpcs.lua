@@ -2,6 +2,7 @@ local module = {}
 
 --// Services
 local CollectionService = game:GetService("CollectionService")
+local Debris = game:GetService("Debris")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
@@ -593,6 +594,15 @@ end)
 net:Connect("SpawnVictim", function(_, target)
 	module.new("Victim"):Spawn(target:GetPivot().Position)
 	target:Destroy()
+end)
+
+net:Connect("BlindEnemy", function(_, enemy)
+	enemy:SetAttribute("Blind", true)
+	local newGui = ReplicatedStorage.Assets.Gui.Blind:Clone()
+	newGui.Parent = enemy.PrimaryPart
+	Debris:AddItem(newGui, 5)
+	task.wait(5)
+	enemy:SetAttribute("Blind", false)
 end)
 
 Signals.ActivateUpgrade:Connect(function(_, upgradeName)

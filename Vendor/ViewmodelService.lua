@@ -146,26 +146,32 @@ function module.new()
 		PositionViewModel(self)
 	end
 
-	function viewModel:SetOffset(Index, Type, Cframe: CFrame)
+	function viewModel:SetOffset(Index: string, Type: "FromCamera" | "FromBase", Cframe: CFrame)
 		self.Offsets[Index] = { ["Type"] = Type, ["CFrame"] = Cframe }
 
 		HandleBaseOffsets(self, baseC0)
 		return self.Offsets[Index]
 	end
 
-	function viewModel:UpdateOffset(Index, Cframe: CFrame)
+	function viewModel:UpdateOffset(Index: string, Cframe: CFrame)
 		self.Offsets[Index].CFrame = Cframe
 
 		HandleBaseOffsets(self, baseC0)
 	end
 
-	function viewModel:RemoveOffset(Index)
+	function viewModel:RemoveOffset(Index: string)
 		self.Offsets[Index] = nil
 
 		HandleBaseOffsets(self, baseC0)
 	end
 
-	function viewModel:SetSpring(Index, Type, Value, Speed, Damper)
+	function viewModel:SetSpring(
+		Index: string,
+		Type: "Rotation" | "Position",
+		Value: Vector3 | Vector2 | number,
+		Speed: number,
+		Damper: number
+	)
 		local newSpring = spring.new(Value)
 		newSpring.Speed = Speed
 		newSpring.Damper = Damper
@@ -175,11 +181,11 @@ function module.new()
 		return self.Springs[Index]
 	end
 
-	function viewModel:UpdateSpring(Index, Property, Value)
+	function viewModel:UpdateSpring(Index: string, Property: string, Value: any)
 		self.Springs[Index].Spring[Property] = Value
 	end
 
-	function viewModel:RemoveSpring(Index)
+	function viewModel:RemoveSpring(Index: string)
 		self.Springs[Index] = nil
 	end
 

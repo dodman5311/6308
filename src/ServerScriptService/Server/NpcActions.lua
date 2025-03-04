@@ -107,6 +107,10 @@ local function getNearest(npc, maxDistance)
 end
 
 local function checkSightLine(npc, target)
+	if npc.Instance:GetAttribute("Blind") then
+		return false
+	end
+
 	local rp = RaycastParams.new()
 
 	rp.FilterType = Enum.RaycastFilterType.Include
@@ -330,7 +334,7 @@ local function createHitCast(npc, damage, cframe, distance, spread, size)
 	Net:RemoteEvent("CreateBeam"):FireAllClients(npc.Instance, damage, cframe, distance, spread, size)
 end
 
-function module.Shoot(npc, sender, cooldown, amount, speed, bulletCount, info, visualModel, indicateAttack)
+function module.Shoot(npc, sender, cooldown, amount, speed, bulletCount, info, visualModel, indicateAttack, timerIndex)
 	cooldown = getNumber(cooldown)
 	amount = getNumber(amount)
 	speed = getNumber(speed)
@@ -359,9 +363,14 @@ function module.Shoot(npc, sender, cooldown, amount, speed, bulletCount, info, v
 			return
 		end
 
+		local soundName = "Attack"
+		if timerIndex == "SpecialAttackSnd" then
+			soundName = "Special"
+		end
+
 		AnimationService:playAnimation(npc.Instance, "Attack", Enum.AnimationPriority.Action3)
-		if npc.Instance.PrimaryPart:FindFirstChild("Attack") then
-			Util.PlaySound(npc.Instance.PrimaryPart.Attack, npc.Instance.PrimaryPart, 0.15)
+		if npc.Instance.PrimaryPart:FindFirstChild(soundName) then
+			Util.PlaySound(npc.Instance.PrimaryPart[soundName], npc.Instance.PrimaryPart, 0.15)
 		end
 
 		local cframe = npc.Instance:GetPivot() * CFrame.new(0, 0, -1)
@@ -519,7 +528,8 @@ function module.ShootProjectile(
 		bulletCount,
 		info,
 		visualModel,
-		indicateAttack
+		indicateAttack,
+		timerIndex
 	)
 
 	AttackTimer.OnEnded:Once(function()

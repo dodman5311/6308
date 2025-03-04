@@ -4,7 +4,7 @@ local stats = {
 	MoveDelay = NumberRange.new(2, 7),
 	AttackCooldown = 0.1,
 	ProjectileSpeed = 250,
-	AttackAmount = NumberRange.new(20, 30),
+	AttackAmount = NumberRange.new(5, 10),
 	NpcType = "Enemy",
 }
 

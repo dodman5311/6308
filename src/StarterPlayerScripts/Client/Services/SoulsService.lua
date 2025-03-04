@@ -140,7 +140,7 @@ function module.RemoveSoul(amount)
 		return
 	end
 
-	module.Souls -= math.round(amount)
+	module.Souls -= math.floor(amount)
 	UIService.doUiAction("HUD", "UpdateSouls", module.Souls)
 
 	checkProtected()

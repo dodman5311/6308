@@ -88,7 +88,7 @@ function util.getNearestEnemy(position: Vector3, maxDistance: number, list: {}, 
 			continue
 		end
 
-		if blacklist and table.find(blacklist, foundEnemy) then
+		if blacklist and (table.find(blacklist, foundEnemy) or table.find(blacklist, foundEnemy.Name)) then
 			continue
 		end
 
