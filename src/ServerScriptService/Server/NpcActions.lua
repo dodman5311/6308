@@ -363,7 +363,11 @@ function module.Shoot(npc, sender, cooldown, amount, speed, bulletCount, info, v
 			return
 		end
 
+		local castingFrame
+		local endPosition
+		local projectileCframe
 		local soundName = "Attack"
+
 		if timerIndex == "SpecialAttackSnd" then
 			soundName = "Special"
 		end
@@ -373,22 +377,37 @@ function module.Shoot(npc, sender, cooldown, amount, speed, bulletCount, info, v
 			Util.PlaySound(npc.Instance.PrimaryPart[soundName], npc.Instance.PrimaryPart, 0.15)
 		end
 
-		local cframe = npc.Instance:GetPivot() * CFrame.new(0, 0, -1)
+		local npcCframe = npc.Instance:GetPivot()
+		local origin = npcCframe * CFrame.new(0, 0, -1)
 
 		if npc.Instance.PrimaryPart:FindFirstChild("FirePoint") then
-			cframe = npc.Instance.PrimaryPart.FirePoint.WorldCFrame
+			origin = npc.Instance.PrimaryPart.FirePoint.WorldCFrame
 		end
 
+		if npc.MindData.AimCFrame then
+			castingFrame = npc.MindData.AimCFrame
+		else
+			castingFrame = npcCframe
+		end
+
+		local params = RaycastParams.new()
+		params.FilterDescendantsInstances = { npc.Instance }
+		local raycast = workspace:Raycast(npcCframe.Position, castingFrame.LookVector * 500, params)
+
+		if raycast then
+			endPosition = raycast.Position
+		else
+			endPosition = (castingFrame * CFrame.new(0, 0, -500)).Position
+		end
+
+		projectileCframe = CFrame.lookAt(origin.Position, endPosition)
+
 		for _ = 1, bulletCount do
-			createProjectile(speed, cframe, bulletCount - 1, info, visualModel, sender)
+			createProjectile(speed, projectileCframe, bulletCount - 1, info, visualModel, sender)
 		end
 
 		task.wait(cooldown)
 	end
-
-	-- if npc.Instance.PrimaryPart and npc.Instance.PrimaryPart:FindFirstChild("AttackEnd") then
-	-- 	npc.Instance.PrimaryPart.AttackEnd:Play()
-	-- end
 end
 
 function module.ShootBeam(npc, damage, chargeTime, distance, bulletCount, size)
@@ -452,7 +471,13 @@ function module.ShootBeam(npc, damage, chargeTime, distance, bulletCount, size)
 		attackSound:Play()
 	end
 
-	local cframe = npc.Instance:GetPivot()
+	local cframe
+
+	if npc.MindData.AimCFrame then
+		cframe = npc.MindData.AimCFrame
+	else
+		cframe = npc.Instance:GetPivot()
+	end
 
 	for _ = 1, bulletCount do
 		createHitCast(npc, damage, cframe, distance, bulletCount - 1, size)
@@ -479,7 +504,13 @@ local function swing(npc, distance, stopMovement)
 		npc.Instance.PrimaryPart.Attack:Play()
 	end
 
-	local cframe = npc.Instance:GetPivot()
+	local cframe
+
+	if npc.MindData.AimCFrame then
+		cframe = npc.MindData.AimCFrame
+	else
+		cframe = npc.Instance:GetPivot()
+	end
 
 	local raycastParams = RaycastParams.new()
 	raycastParams.FilterDescendantsInstances = { npc }
@@ -733,6 +764,16 @@ function module.MoveTowardsPoint(npc, point, onStep)
 	end)
 end
 
+function module.MoveInfrontOfHarbinger(npc)
+	if not npc.MindData.HarbingerToProtect then
+		return
+	end
+
+	local point = (npc.MindData.HarbingerToProtect:GetPivot() * CFrame.new(0, 0, -10)).Position
+
+	module.MoveTowardsPoint(npc, point, true)
+end
+
 function module.SwitchToState(npc, state)
 	npc.Instance:SetAttribute("State", state)
 
@@ -776,7 +817,18 @@ function module.LookAtTarget(npc, includeY, doLerp, lerpAlpha)
 	lookAtPostition(npc, position, includeY, doLerp, lerpAlpha)
 end
 
-function module.LeadTarget(npc, includeY, shotSpeed, randomness, ignoreDistance)
+function module.AimAtTarget(npc, doLerp, lerpAlpha)
+	local target = npc.Target.Value
+	if not target then
+		return
+	end
+
+	local position = target:GetPivot().Position
+
+	npc.MindData.AimCFrame = CFrame.lookAt(npc.Instance:GetPivot().Position, position)
+end
+
+function module.LeadTarget(npc, shotSpeed, randomness, ignoreDistance)
 	local target = npc.Target.Value
 	if not target then
 		return
@@ -787,6 +839,10 @@ function module.LeadTarget(npc, includeY, shotSpeed, randomness, ignoreDistance)
 
 	if not ignoreDistance then
 		distance = (position - npc.Instance:GetPivot().Position).Magnitude
+	end
+
+	if not randomness then
+		randomness = 0
 	end
 
 	local randomVector = Vector3.new(
@@ -801,7 +857,12 @@ function module.LeadTarget(npc, includeY, shotSpeed, randomness, ignoreDistance)
 		position += randomVector
 	end
 
-	lookAtPostition(npc, position, includeY)
+	npc.MindData.AimCFrame = CFrame.lookAt(npc.Instance:GetPivot().Position, position)
+
+	if npc.Instance.PrimaryPart:FindFirstChild("ChargedAttachment") then
+		npc.Instance.PrimaryPart.ChargedAttachment.WorldCFrame = npc.MindData.AimCFrame * CFrame.new(0, 0, -250)
+	end
+	--lookAtPostition(npc, position, includeY)
 	return position
 end
 

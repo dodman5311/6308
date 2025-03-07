@@ -1177,7 +1177,7 @@ local function addToGib(humanoid, subject, damage)
 	hitHumanoids[humanoid].Damage += damage
 end
 
-function module.FireRaycast(spread, distance)
+function module.FireRaycast(spread, distance, direction)
 	local raycastParams = RaycastParams.new()
 	raycastParams.FilterDescendantsInstances = { camera, player.Character }
 	raycastParams.CollisionGroup = "Bullet"
@@ -1186,7 +1186,7 @@ function module.FireRaycast(spread, distance)
 	local cf = camera.CFrame * offset
 
 	local origin = camera.CFrame.Position
-	local direction = cf.LookVector * distance
+	direction = direction or cf.LookVector * distance
 
 	local raycast = workspace:Raycast(origin, direction, raycastParams)
 
@@ -1204,18 +1204,14 @@ function module.FireHitbox(size, cframe)
 
 	local targetsHit = {}
 	for _, part in ipairs(hitboxResult) do
-		local target = util.checkForHumanoid(part)
-		if
-			not target
-			or target == character
-			or target:FindFirstAncestor(character.Name)
-			or table.find(targetsHit, target)
-			or part:FindFirstAncestor("Camera")
-		then
+		local target, model = util.checkForHumanoid(part)
+		if not target or model == character or table.find(targetsHit, target) or part:FindFirstAncestor("Camera") then
 			continue
 		end
 
-		return { Instance = part, Position = part.Position }
+		local raycast = module.FireRaycast(0, 0, model:GetPivot().Position - camera.CFrame.Position)
+
+		return raycast
 	end
 end
 

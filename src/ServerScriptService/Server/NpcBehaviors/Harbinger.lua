@@ -2,8 +2,8 @@ local stats = {
 	ViewDistance = 100,
 	AttackDelay = NumberRange.new(3, 7),
 	MoveDelay = NumberRange.new(2, 7),
-	AttackCooldown = 0.1,
-	ProjectileSpeed = 250,
+	AttackCooldown = 0.5,
+	ProjectileSpeed = 50,
 	AttackAmount = NumberRange.new(5, 10),
 	NpcType = "Enemy",
 }
@@ -13,7 +13,8 @@ local module = {
 		{ Function = "MoveRandom", Parameters = { 60, stats.MoveDelay }, State = "Idle" },
 
 		{ Function = "SearchForTarget", Parameters = { stats.ViewDistance } },
-		{ Function = "LeadTarget", Parameters = { true, 300, 1 } },
+		{ Function = "LeadTarget", Parameters = { 300, 1 } },
+		{ Function = "LookAtTarget" },
 		{
 			Function = "ShootProjectile",
 			Parameters = {
@@ -22,8 +23,8 @@ local module = {
 				stats.AttackAmount,
 				stats.ProjectileSpeed,
 				1,
-				{ SplashRange = 6, SplashDamage = 1 },
-				false,
+				{ SplashRange = 6, SplashDamage = 1, Size = 2.5 },
+				"WaveProjectile",
 				false,
 				0.5,
 			},

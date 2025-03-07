@@ -3,11 +3,10 @@ local stats = {
 	ViewDistance = 150,
 	NpcType = "Enemy",
 	MoveDelay = NumberRange.new(2, 5),
-	AttackDelay = NumberRange.new(8, 16),
+	AttackDelay = NumberRange.new(6, 10),
 }
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local animationService = require(Globals.Vendor.AnimationService)

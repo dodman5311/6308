@@ -616,7 +616,7 @@ local moves = {
 		repeat
 			timer.wait(0.5)
 			npc.Instance.Humanoid.Health += 1
-		until not workspace:FindFirstChild("Betrayed")
+		until not workspace:FindFirstChild("Betrayed", true)
 
 		timer.wait(1)
 
@@ -780,7 +780,7 @@ local function spawnEnemies(npc) -- 250 studs
 
 	spawnTimer.WaitTime = 7
 	spawnTimer.Function = function()
-		if #CollectionService:GetTagged("Enemy") > 8 or workspace:FindFirstChild("Betrayed") then
+		if #CollectionService:GetTagged("Enemy") > 8 or workspace:FindFirstChild("Betrayed", true) then
 			return
 		end
 

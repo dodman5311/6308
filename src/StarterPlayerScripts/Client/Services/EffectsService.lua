@@ -184,6 +184,9 @@ function module.EnemySpawned(position)
 end
 
 function module.OpenShieldEffect(shield)
+	if not shield then
+		return
+	end
 	shield.Root.Connection.Flash:Emit(1)
 	shield.Root.Connection.Meta:Emit(1)
 	shield.Root.Activate:Play()
@@ -191,13 +194,14 @@ function module.OpenShieldEffect(shield)
 	task.delay(0.2, function()
 		shield.Root.Hand.Enabled = true
 		shield.Root.Hands.Enabled = true
-		shield.ShieldPart.Transparency = 0
 	end)
 end
 
 function module.CloseShieldEffect(shield)
+	if not shield then
+		return
+	end
 	shield.Root.Connection.Flash:Emit(1)
-	shield.ShieldPart.Transparency = 1
 	shield.Root.Hand.Enabled = false
 	shield.Root.Hands.Enabled = false
 	shield.Root.Active:Stop()

@@ -393,7 +393,7 @@ end
 local function removeProjectileInstance(projectile)
 	projectile.Instance.Transparency = 1
 
-	for _, effect in ipairs(projectile.Instance:GetChildren()) do
+	for _, effect in ipairs(projectile.Instance:GetDescendants()) do
 		if not (effect:IsA("PointLight") or effect:IsA("ParticleEmitter") or effect:IsA("Trail")) then
 			continue
 		end

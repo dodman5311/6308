@@ -409,7 +409,7 @@ function module.new(NPCType)
 	end
 
 	function Npc:Place(position) -- will place into the world without running
-		self.Instance.Parent = workspace
+		self.Instance.Parent = workspace.Enemies
 
 		if typeof(position) == "Vector3" then
 			self.Instance:PivotTo(CFrame.new(position + Vector3.new(0, 2.5, 0)))
@@ -600,6 +600,7 @@ net:Connect("BlindEnemy", function(_, enemy)
 	enemy:SetAttribute("Blind", true)
 	local newGui = ReplicatedStorage.Assets.Gui.Blind:Clone()
 	newGui.Parent = enemy.PrimaryPart
+	newGui.Enabled = true
 	Debris:AddItem(newGui, 5)
 	task.wait(5)
 	enemy:SetAttribute("Blind", false)

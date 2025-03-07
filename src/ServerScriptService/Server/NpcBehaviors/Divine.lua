@@ -11,7 +11,8 @@ local stats = {
 local module = {
 	OnStep = {
 		{ Function = "SearchForTarget", Parameters = { stats.ViewDistance } },
-		{ Function = "LeadTarget", Parameters = { true, 400, 0 } },
+		{ Function = "LookAtTarget" },
+		{ Function = "LeadTarget", Parameters = { 400 } },
 		{
 			Function = "ShootProjectile",
 			Parameters = {

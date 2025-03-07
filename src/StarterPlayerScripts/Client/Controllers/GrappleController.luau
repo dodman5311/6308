@@ -60,7 +60,7 @@ local function createRope(c, distance, a1)
 	newRope.Attachment1 = a1
 	newRope.WinchEnabled = true
 	newRope.WinchResponsiveness = 50
-	newRope.WinchSpeed = 75
+	newRope.WinchSpeed = 45
 	newRope.WinchForce = 30000
 	newRope.WinchTarget = 0
 

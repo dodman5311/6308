@@ -12,7 +12,8 @@ local module = {
 		{ Function = "MoveToRandomUnit", State = "Idle" },
 
 		{ Function = "SearchForTarget", Parameters = { stats.ViewDistance } },
-		{ Function = "LookAtTarget", Parameters = { true } },
+		{ Function = "LookAtTarget" },
+		{ Function = "AimAtTarget" },
 
 		{ Function = "GetToDistance", Parameters = { stats.AttackDistance - 2, true } },
 		{ Function = "PlayWalkingAnimation" },

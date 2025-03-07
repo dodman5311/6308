@@ -12,7 +12,8 @@ local module = {
 		{ Function = "MoveRandom", Parameters = { 60, stats.MoveDelay }, State = "Idle" },
 
 		{ Function = "SearchForTarget", Parameters = { stats.ViewDistance } },
-		{ Function = "LookAtTarget", Parameters = { true } },
+		{ Function = "LookAtTarget" },
+		{ Function = "AimAtTarget" },
 
 		{
 			Function = "ShootProjectile",

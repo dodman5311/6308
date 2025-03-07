@@ -1,7 +1,7 @@
 local stats = {
 	ViewDistance = 150,
 	AttackDelay = NumberRange.new(1, 4),
-	MoveDelay = NumberRange.new(1, 4),
+	MoveDelay = NumberRange.new(0, 3),
 	AttackCooldown = 0.05,
 	ProjectileSpeed = 100,
 	AttackAmount = NumberRange.new(1, 6),
@@ -10,17 +10,17 @@ local stats = {
 
 local module = {
 	OnStep = {
-		{ Function = "MoveRandom", Parameters = { 60, stats.MoveDelay } },
+		{ Function = "MoveRandom", Parameters = { 120, stats.MoveDelay } },
 
 		{ Function = "SearchForTarget", Parameters = { stats.ViewDistance } },
-		{ Function = "LeadTarget", Parameters = { true, 200, 0 } },
+		{ Function = "LookAtTarget" },
+		{ Function = "LeadTarget", Parameters = { 200 } },
 		{
 			Function = "ShootProjectile",
 			Parameters = { stats.AttackDelay, stats.AttackCooldown, stats.AttackAmount, stats.ProjectileSpeed },
 			true,
 		},
 
-		{ Function = "GetToDistance", Parameters = { 30, true } },
 		{ Function = "PlayWalkingAnimation" },
 	},
 

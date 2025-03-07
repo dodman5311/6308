@@ -10,7 +10,7 @@ local function onSpawn(npc)
 	util.PlaySound(util.getRandomChild(ReplicatedStorage.Assets.Sounds.RockHits), npc.Instance.PrimaryPart, 0.1)
 	util.PlaySound(util.getRandomChild(npc.Instance.Screams), npc.Instance.PrimaryPart, 0.1)
 
-	local getVisage = workspace:FindFirstChild("Visage Of False Hope")
+	local getVisage = workspace:FindFirstChild("Visage Of False Hope", true)
 
 	if not getVisage then
 		return
