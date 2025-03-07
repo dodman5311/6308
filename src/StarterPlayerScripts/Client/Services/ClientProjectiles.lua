@@ -288,16 +288,18 @@ local function checkRaycast(projectile, raycastDistance)
 	end
 
 	local newRaycast
+	local ignoreMap = false
 
 	local size = projectile.Info["Size"]
 
-	if size == 0 then
-		newRaycast = workspace:Raycast(cframe.Position, cframe.LookVector * raycastDistance, rp)
-	else
+	newRaycast = workspace:Raycast(cframe.Position, cframe.LookVector * raycastDistance, rp)
+
+	if not newRaycast and size and size > 0 then
+		ignoreMap = true
 		newRaycast = workspace:Spherecast(cframe.Position, size or 0.25, cframe.LookVector * raycastDistance, rp)
 	end
 
-	return newRaycast
+	return newRaycast, ignoreMap
 end
 
 local function fireBeam(npc, damage, cframe, distance, spread, size)
@@ -446,7 +448,7 @@ RunService.Heartbeat:Connect(function()
 		projectile.Age += timePassed
 
 		local distanceToMove = timePassed * projectile.Speed
-		local raycast = checkRaycast(projectile, distanceToMove + 0.1)
+		local raycast, ignoreMap = checkRaycast(projectile, distanceToMove + 0.1)
 
 		processStep(distanceToMove, projectile)
 
@@ -458,6 +460,10 @@ RunService.Heartbeat:Connect(function()
 
 		if projectile.Info["Bouncing"] and isMap then
 			module.reflectProjectile(projectile, raycast)
+			continue
+		end
+
+		if ignoreMap and isMap then
 			continue
 		end
 
@@ -493,7 +499,7 @@ RunService.Heartbeat:Connect(function()
 
 		table.insert(projectile.RecentHits, hitModel)
 
-		if not hitModel or hitModel.Name == "Map" then
+		if not hitModel or isMap then
 			projectile.Piercing -= 1
 		end
 

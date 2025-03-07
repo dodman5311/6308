@@ -82,72 +82,55 @@ local function dodge(npc, currentHealth)
 	end
 end
 
-local function destroyShield(npc)
-	local shield = npc.MindData.shield
+local function startHealing(npc)
+	local healingSound: Sound = npc.Instance.PrimaryPart.Healing
 
-	if shield then
-		net:RemoteEvent("ReplicateEffect"):FireAllClients("CloseShieldEffect", "Server", true, shield)
-		Debris:AddItem(shield, 1)
-	end
-	npc.MindData.shield = nil
-end
-
-local function createShield(npc, position)
-	if npc.MindData.shield then
-		return
-	end
-
-	npc.MindData.shield = assets.Models.ApostleShield:Clone()
-
-	local newShield = npc.MindData.shield
-
-	npc.Janitor:Add(newShield, "Destroy")
-	newShield.Parent = workspace
-	newShield:PivotTo(CFrame.new(position))
-
-	newShield:AddTag("ApostleShield")
-
-	npc.Instance.ShieldBeam.Attachment1 = newShield.Root.Connection
-
-	task.delay(5, function()
-		destroyShield(npc)
-		npc.MindData.ShieldOnCooldown = true
-		task.wait(rng:NextNumber(3, 6))
-		npc.MindData.ShieldOnCooldown = false
-	end)
-
-	return newShield
-end
-
-local function castShield(npc)
-	if npc.MindData.ShieldOnCooldown then
+	if npc.MindData.OnHealCooldown then
 		return
 	end
 
 	local target = npc:GetTarget()
 	if not target then
-		destroyShield(npc)
+		healingSound:Pause()
 		return
 	end
 
-	local nearestEnemy, _, enemyPosition =
+	local nearestEnemy =
 		util.getNearestEnemy(target:GetPivot().Position, 60, CollectionService:GetTagged("Enemy"), { "Apostle" })
 
 	if not nearestEnemy then
-		destroyShield(npc)
+		healingSound:Pause()
 		return
 	end
 
-	local shield = npc.MindData.shield
-	if not shield then
-		shield = createShield(npc, enemyPosition)
-	end
+	healingSound:Resume()
 
-	local alignPos: AlignPosition = shield.AlignPosition
-	local alignOr: AlignOrientation = shield.AlignOrientation
+	npc.MindData.OnHealCooldown = true
 
-	alignPos.Position = enemyPosition
-	alignOr.CFrame = CFrame.lookAt(enemyPosition, target:GetPivot().Position)
+	nearestEnemy.Humanoid.Health += 1
+	npc.Instance.HealBeam.Attachment1 = nearestEnemy.PrimaryPart.RootAttachment
+
+	net:RemoteEvent("ReplicateEffect"):FireAllClients("HealingEffect", "Server", true, nearestEnemy)
+
+	task.delay(0.25, function()
+		npc.MindData.OnHealCooldown = false
+	end)
+end
+
+local function setup(npc)
+	local healingSound: Sound = npc.Instance.PrimaryPart.Healing
+
+	healingSound.Resumed:Connect(function()
+		local ti = TweenInfo.new(1, Enum.EasingStyle.Linear)
+		util.tween(healingSound, ti, { Volume = 0.5 })
+
+		npc.Instance.PrimaryPart.Activate:Play()
+	end)
+
+	healingSound.Paused:Connect(function()
+		healingSound.Volume = 0
+		npc.Instance.PrimaryPart.Deactivate:Play()
+	end)
 end
 
 local module = {
@@ -158,7 +141,7 @@ local module = {
 		{ Function = "LookAtTarget" },
 		{ Function = "LeadTarget", Parameters = { 105 } },
 
-		{ Function = "Custom", Parameters = { castShield }, State = "Attacking" },
+		{ Function = "Custom", Parameters = { startHealing }, State = "Attacking" },
 		{ Function = "PlayWalkingAnimation" },
 		{ Function = "MoveAwayFromDistance", Parameters = { 25, true } },
 	},
@@ -199,6 +182,7 @@ local module = {
 	},
 
 	OnSpawned = {
+		{ Function = "Custom", Parameters = { setup } },
 		{ Function = "PlayAnimation", Parameters = { "Idle", Enum.AnimationPriority.Core } },
 		{ Function = "AddTag", Parameters = { "Enemy" } },
 	},

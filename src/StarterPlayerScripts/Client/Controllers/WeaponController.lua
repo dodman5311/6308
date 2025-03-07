@@ -1229,6 +1229,17 @@ function module.FireProjectile(projectileType, spread, damage, bulletIndex, elem
 
 	local origin = (subjectCFrame * CFrame.new(offset))
 
+	local rp = RaycastParams.new()
+	rp.FilterDescendantsInstances = { camera, player.Character }
+
+	local cast = workspace:Raycast(subjectCFrame.Position, subjectCFrame.LookVector * 500, rp)
+
+	if cast then
+		origin = CFrame.lookAt(origin.Position, cast.Position)
+	else
+		origin = CFrame.lookAt(origin.Position, (subjectCFrame * CFrame.new(0, 0, -500)).Position)
+	end
+
 	local locked = nil
 	if weaponData.LockedOn then
 		locked = weaponData.LockedOn[bulletIndex]
