@@ -5,6 +5,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local collectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
+local Teams = game:GetService("Teams")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
@@ -47,6 +48,24 @@ module.Presets = {
 		Damage = 1,
 		Piercing = 0,
 		Model = "SmartProjectile",
+	},
+
+	HeavyBolt = {
+		Speed = 2000,
+		LifeTime = 1,
+		Info = { Size = 1 },
+		Damage = 2,
+		Piercing = 0,
+		Model = "HeavyProjectile",
+	},
+
+	ElectricBolt = {
+		Speed = 2000,
+		LifeTime = 1,
+		Info = { Size = 1 },
+		Damage = 2,
+		Piercing = 0,
+		Model = "HeavyElectricProjectile",
 	},
 
 	SmartSawBlade = {
@@ -103,6 +122,15 @@ module.Presets = {
 		Damage = 1,
 		Piercing = 0,
 		Model = "PlayerProjectile",
+	},
+
+	ElectricBullet = {
+		Speed = 500,
+		LifeTime = 5,
+		Info = {},
+		Damage = 1,
+		Piercing = 0,
+		Model = "ElectricProjectile",
 	},
 
 	Plasma = {
@@ -192,11 +220,7 @@ local function checkPlayer(subject)
 		return
 	end
 
-	if
-		not Players:GetPlayerFromCharacter(model)
-		and not model:HasTag("Commrad")
-		and not model:GetAttribute("TargetType") == "Enemy"
-	then
+	if not Players:GetPlayerFromCharacter(model) and not model:HasTag("OnTeam_Player") then
 		return
 	end
 
@@ -273,18 +297,33 @@ local function checkRaycast(projectile, raycastDistance)
 
 	local rp = RaycastParams.new()
 
-	local blacklist = { workspace.CurrentCamera, projectile.Sender }
-
-	for _, value in ipairs(projectile.RecentHits) do
-		table.insert(blacklist, value)
-	end
-
-	rp.FilterDescendantsInstances = blacklist
+	rp.FilterDescendantsInstances = { workspace.CurrentCamera, projectile.Sender }
 	rp.FilterType = Enum.RaycastFilterType.Exclude
 	rp.CollisionGroup = "Bullet"
 
-	if projectile.Sender:GetAttribute("TargetType") == "Player" then
-		rp.CollisionGroup = "NpcBullet"
+	for _, value in ipairs(projectile.RecentHits) do
+		table.insert(rp.FilterDescendantsInstances, value)
+	end
+
+	if projectile.Sender then
+		for _, team: Team in ipairs(Teams:GetTeams()) do
+			if
+				not projectile.Sender:HasTag("OnTeam_" .. team.Name)
+				or (projectile.Sender:IsA("Player") and projectile.Sender.Team == team)
+			then
+				continue
+			end
+
+			for _, teamMember: Model in ipairs(collectionService:GetTagged("OnTeam_" .. team.Name)) do
+				table.insert(rp.FilterDescendantsInstances, teamMember)
+			end
+
+			for _, teamMember: Player in ipairs(team:GetPlayers()) do
+				if teamMember.Character then
+					table.insert(rp.FilterDescendantsInstances, teamMember.Character)
+				end
+			end
+		end
 	end
 
 	local newRaycast

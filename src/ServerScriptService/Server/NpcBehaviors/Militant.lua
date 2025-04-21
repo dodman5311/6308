@@ -14,7 +14,7 @@ local module = {
 
 		{ Function = "SearchForTarget", Parameters = { stats.ViewDistance } },
 		{ Function = "LookAtTarget" },
-		{ Function = "LeadTarget", Parameters = { 200, 5 } },
+		{ Function = "LeadTarget", Parameters = { 200, 1 } },
 		{
 			Function = "ShootProjectile",
 			Parameters = { stats.AttackDelay, stats.AttackCooldown, stats.AttackAmount, stats.ProjectileSpeed },

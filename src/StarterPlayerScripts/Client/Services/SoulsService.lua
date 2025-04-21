@@ -1,6 +1,7 @@
 local module = {
 	Souls = 0,
 	DropChance = 2,
+	currentMult = 0,
 }
 
 --// Services
@@ -32,17 +33,33 @@ local ironWillActive = false
 --// Functions
 
 function module.CalculateDropChance(chanceMod)
+	chanceMod = chanceMod or 0
 	local combo = math.clamp(ComboService.CurrentCombo, 1, 100)
 	local chance = (module.DropChance * combo) + chanceMod
 	--chance += ChanceService.getLuck()
 
 	local soulCount = module.Souls + #CollectionService:GetTagged("SoulDrop")
 
-	if module.Souls <= 0 then
-		chance *= 5
+	if module.Souls <= 0 and soulCount <= 1 then
+		module.currentMult = 5
+
+		if player.Character then
+			module.currentMult += 5 - player.Character.Humanoid.Health
+		end
+		chance *= module.currentMult
+
+		UIService.doUiAction(
+			"HUD",
+			"ShowSoulChanceMult",
+			module.currentMult,
+			workspace:GetAttribute("EnemiesInCombat") > 0
+		)
+	else
+		module.currentMult = 0
+		UIService.doUiAction("HUD", "ShowSoulChanceMult", module.currentMult, false)
 	end
 
-	chance /= (1 + TweenService:GetValue(soulCount / 12, Enum.EasingStyle.Quart, Enum.EasingDirection.In) * 5)
+	chance /= (1 + TweenService:GetValue(soulCount / 15, Enum.EasingStyle.Quart, Enum.EasingDirection.In) * 5)
 
 	if GiftsService.CheckUpgrade("Quality Sauce") then
 		chance /= 1.15
@@ -53,10 +70,10 @@ function module.CalculateDropChance(chanceMod)
 	end
 
 	if GiftsService.CheckGift("Drav_Is_Dead") then
-		return 0
+		return 0, 0
 	end
 
-	return chance
+	return chance, module.currentMult
 end
 
 local function playDropSound()
@@ -124,6 +141,8 @@ function module.AddSoul(amount)
 		return
 	end
 
+	module.CalculateDropChance()
+
 	module.Souls += math.round(amount)
 	UIService.doUiAction("HUD", "UpdateSouls", module.Souls)
 
@@ -136,6 +155,8 @@ function module.AddSoul(amount)
 end
 
 function module.RemoveSoul(amount)
+	module.CalculateDropChance()
+
 	if module.Souls <= 0 then
 		return
 	end

@@ -4,6 +4,7 @@ local module = {}
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
+local Teams = game:GetService("Teams")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
@@ -70,19 +71,25 @@ local function lookAtPostition(npc, position: Vector3, includeY: boolean, doLerp
 end
 
 local function getNearest(npc, maxDistance)
-	local targetType = npc.Instance:GetAttribute("TargetType")
+	--local targetType = npc.Instance:GetAttribute("TargetType")
+	local team: Team = Teams:FindFirstChild(npc.TeamName)
 
 	local getList = {}
-	if targetType == "Player" then
-		for _, player in ipairs(Players:GetPlayers()) do
-			table.insert(getList, player.Character)
+	local teamEnemies = team.Enemies
+
+	for _, enemyValue: ObjectValue in ipairs(teamEnemies:GetChildren()) do
+		local enemyTeam: Team = enemyValue.Value
+
+		for _, teamMember: Model in ipairs(CollectionService:GetTagged("OnTeam_" .. enemyTeam.Name)) do
+			table.insert(getList, teamMember)
 		end
 
-		for _, player in ipairs(CollectionService:GetTagged("Commrad")) do
-			table.insert(getList, player)
+		for _, teamMember: Player in ipairs(enemyTeam:GetPlayers()) do
+			if not teamMember.Character then
+				continue
+			end
+			table.insert(getList, teamMember.Character)
 		end
-	else
-		getList = CollectionService:GetTagged(targetType)
 	end
 
 	local closestDistance, closestModel = math.huge
@@ -232,12 +239,6 @@ end
 
 function module.AddTag(npc, Tag)
 	npc.Instance:AddTag(Tag)
-
-	if Tag == "Commrad" then
-		npc.Instance:SetAttribute("TargetType", "Enemy")
-	else
-		npc.Instance:SetAttribute("TargetType", "Player")
-	end
 end
 
 function module.MoveToRandomUnit(npc)
@@ -835,15 +836,9 @@ function module.LeadTarget(npc, shotSpeed, randomness, ignoreDistance)
 	end
 
 	local position = target:GetPivot().Position
-	local distance = 1
+	local distance = ignoreDistance and 1 or (position - npc.Instance:GetPivot().Position).Magnitude
 
-	if not ignoreDistance then
-		distance = (position - npc.Instance:GetPivot().Position).Magnitude
-	end
-
-	if not randomness then
-		randomness = 0
-	end
+	randomness = randomness or 0
 
 	local randomVector = Vector3.new(
 		rng:NextNumber(-randomness, randomness),

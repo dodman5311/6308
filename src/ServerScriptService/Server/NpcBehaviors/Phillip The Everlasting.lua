@@ -2,6 +2,7 @@ local stats = {
 	ViewDistance = 200,
 }
 
+local WALKSPEED = 12
 local BadgeService = game:GetService("BadgeService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -15,6 +16,7 @@ local Globals = require(ReplicatedStorage.Shared.Globals)
 local util = require(Globals.Vendor.Util)
 local animationService = require(Globals.Vendor.AnimationService)
 local timer = require(Globals.Vendor.Timer)
+local weakspotService = require(Globals.Vendor.WeakspotService)
 
 local net = require(Globals.Packages.Net)
 
@@ -27,11 +29,11 @@ local moveChances = {
 }
 local moves = {}
 
-local function getTimer(npc, timerName)
+local function getTimer(npc, timerName, defaultTime)
 	local foundTimer = npc.Timers[timerName]
 
 	if not foundTimer then
-		npc.Timers[timerName] = npc.Timer:new(timerName)
+		npc.Timers[timerName] = npc.Timer:new(timerName, defaultTime)
 		return npc.Timers[timerName]
 	end
 
@@ -120,7 +122,7 @@ local function stunEnemy(npc)
 	animationService:playAnimation(npc.Instance, "Stun", Enum.AnimationPriority.Action4.Value, false, 0, 1, 1.25)
 	globalSounds.Stun:Play()
 	timer.wait(2.8)
-	humanoid.WalkSpeed = 15
+	humanoid.WalkSpeed = WALKSPEED
 end
 
 function moves.addArmor(npc)
@@ -170,7 +172,7 @@ function moves.addArmor(npc)
 		humanoid.Health += 10
 	end
 
-	humanoid.WalkSpeed = 15
+	humanoid.WalkSpeed = WALKSPEED
 
 	npc.Acts:removeAct("inAction", "inHeal")
 end
@@ -194,7 +196,7 @@ local function checkRaycast(subject: Model, origin, destination)
 	if not humanoid or humanoid.Health <= 0 then
 		return
 	end
-	return humanoid
+	return humanoid, part
 end
 
 function moves.shootAttack(npc)
@@ -226,15 +228,15 @@ function moves.shootAttack(npc)
 	beam.Enabled = false
 	timer.wait(0.1)
 	showGunFire(subject, rootPart.GunFire)
-	local hitHumanoid =
+	local hitHumanoid, part =
 		checkRaycast(subject, subject.PrimaryPart.CFrame.Position, subject.PrimaryPart.CFrame.LookVector * 500)
 	if hitHumanoid and npc:GetState() ~= "Dead" then
-		hitHumanoid:TakeDamage(1)
+		hitHumanoid:TakeDamage(1 + weakspotService.doWeakspotHit(part))
 	end
 	npc.Acts:removeAct("leading_shot", "inAction")
 	timer.wait(0.125)
 
-	subject.Humanoid.WalkSpeed = 15
+	subject.Humanoid.WalkSpeed = WALKSPEED
 end
 
 local function diedExit()
@@ -286,7 +288,10 @@ function moves.throwAttack(npc)
 			if table.find(hitHumanoids, humanoid) or npc:GetState() == "Dead" then
 				continue
 			end
-			humanoid:TakeDamage(2)
+
+			local exDmg = weakspotService.doWeakspotHit(humanoid.Parent:FindFirstChild("Weakspot"))
+
+			humanoid:TakeDamage(2 + exDmg)
 			table.insert(hitHumanoids, humanoid)
 		end
 
@@ -299,7 +304,7 @@ function moves.throwAttack(npc)
 	npc.Acts:removeAct("leading_shot_wdistance", "inAction")
 	timer.wait(1)
 
-	subject.Humanoid.WalkSpeed = 15
+	subject.Humanoid.WalkSpeed = WALKSPEED
 end
 
 local function grabPlayer(npc)
@@ -307,11 +312,8 @@ local function grabPlayer(npc)
 		return
 	end
 
-	npc.Acts:createAct("inAction", "inGrab")
 	local target = npc:GetTarget()
 	local subject = npc.Instance
-
-	subject.Humanoid.WalkSpeed = 0.05
 
 	local size = target:GetExtentsSize().Magnitude
 	if size > 15 then
@@ -324,11 +326,14 @@ local function grabPlayer(npc)
 	end
 	local rootPart = subject.PrimaryPart
 
+	npc.Acts:createAct("inAction", "inGrab")
+	subject.Humanoid.WalkSpeed = 0.05
 	animationService:playAnimation(subject, "Grab", Enum.AnimationPriority.Action4.Value, false, 0, 1, 1.5)
 
 	local beat
 	beat = RunService.Heartbeat:Connect(function()
-		if not npc:GetState() == "Dead" or not npc.Instance.Parent or not target then
+		if not npc:GetState() == "Dead" or not npc.Instance.Parent or not target or not target.PrimaryPart then
+			npc.Acts:removeAct("inAction", "inGrab")
 			beat:Disconnect()
 			return
 		end
@@ -342,14 +347,16 @@ local function grabPlayer(npc)
 	showHitBlood(subject, rootPart.AxeHit)
 
 	if npc:GetState() ~= "Dead" then
-		humanoid:TakeDamage(2)
+		local exDmg = weakspotService.doWeakspotHit(humanoid.Parent:FindFirstChild("Weakspot"))
+		humanoid:TakeDamage(2 + exDmg)
 	end
 
 	timer.wait(0.515)
 	showGunFire(subject, rootPart.GunFire)
 
 	if npc:GetState() ~= "Dead" then
-		humanoid:TakeDamage(2)
+		local exDmg = weakspotService.doWeakspotHit(humanoid.Parent:FindFirstChild("Weakspot"))
+		humanoid:TakeDamage(2 + exDmg)
 	end
 
 	beat:Disconnect()
@@ -362,7 +369,7 @@ local function grabPlayer(npc)
 	createImpulse(target, 65, impulseDirection, 0.1)
 	timer.wait(1)
 
-	subject.Humanoid.WalkSpeed = 15
+	subject.Humanoid.WalkSpeed = WALKSPEED
 	npc.Acts:removeAct("inAction", "inGrab")
 end
 
@@ -371,10 +378,11 @@ local function runAttackTimer(npc)
 		return
 	end
 
-	local AttackTimer = getTimer(npc, "Special")
+	local AttackTimer = getTimer(npc, "Special", 3)
 
-	AttackTimer.WaitTime = rng:NextNumber(2, 4)
 	AttackTimer.Function = function()
+		AttackTimer.WaitTime = rng:NextNumber(2, 4)
+
 		for _, value in ipairs(util.ShuffleTable(moveChances)) do
 			if rng:NextNumber(0, 100) > value[2] then
 				continue
@@ -394,6 +402,13 @@ end
 
 local function moveTowardsPosition(subject: Model, position: Vector3)
 	local getHumanoid = subject:FindFirstChildOfClass("Humanoid")
+
+	local distanceToPos = (subject:GetPivot().Position - position).Magnitude
+
+	if distanceToPos <= 5 then
+		subject:PivotTo(CFrame.lookAt(subject:GetPivot().Position, position) * CFrame.new(0, 0, 0.01))
+		return
+	end
 	getHumanoid:MoveTo(position)
 end
 

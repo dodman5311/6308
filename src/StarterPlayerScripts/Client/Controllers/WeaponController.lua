@@ -53,7 +53,7 @@ local wallrunning = require(Globals.Client.Controllers.Wallrunning)
 local UiAnimationService = require(Globals.Vendor.UIAnimationService)
 local airController = require(Globals.Client.Controllers.AirController)
 local RicoshotService = require(Globals.Client.Services.RicoshotService)
-local WeakspotService = require(Globals.Client.Services.WeakspotService)
+local WeakspotService = require(Globals.Vendor.WeakspotService)
 local explosionService = require(Globals.Client.Services.ExplosionService)
 local projectileService = require(Globals.Client.Services.ClientProjectiles)
 
@@ -277,7 +277,7 @@ function module.UpdateAmmo(amount)
 		and currentAmmo == 1
 		and not weaponData.HasReloaded
 	then
-		UIService.doUiAction("HUD", "ToggleReloadPrompt")
+		UIService.doUiAction("HUD", "ToggleReloadPrompt", true)
 	else
 		UIService.doUiAction("HUD", "ToggleReloadPrompt", false)
 	end
@@ -391,10 +391,10 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 
 	animationService:loadAnimations(viewmodel.Model, newWeapon.Animations)
 
-	local fireAnimation = animationService:getAnimation(viewmodel.Model, "Fire")
-	if fireAnimation then
-		fireAnimation:GetMarkerReachedSignal("CreateShell"):Connect(createShell)
-	end
+	--local fireAnimation = animationService:getAnimation(viewmodel.Model, "Fire")
+	-- if fireAnimation then
+	-- 	fireAnimation:GetMarkerReachedSignal("CreateShell"):Connect(createShell)
+	-- end
 
 	if newWeapon.Animations:FindFirstChild("Equip") then
 		animationService:playAnimation(viewmodel.Model, "Equip", Enum.AnimationPriority.Action4.Value, false, 0)
@@ -940,6 +940,10 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 
 	local weakspotDamage = WeakspotService.doWeakspotHit(subject)
 	local isImmune = checkImmunity(model, source)
+
+	if weakspotDamage > 0 then
+		ComboService.RestartTimer()
+	end
 
 	if isImmune and humanoid.Health > 0 and (weakspotDamage == 0 or model:HasTag("FullImmunity")) then
 		UIService.doUiAction("HUD", "ShowImmune")
@@ -2144,7 +2148,7 @@ function module.OpenDeadBolt()
 	UIService.doUiAction(
 		"HUD",
 		"ShowDeadBolt",
-		getCritChance(module.currentWeapon and module.currentWeapon.Name),
+		getCritChance(module.currentWeapon and module.currentWeapon.Name or "Default"),
 		module.currentWeapon and weaponData.Type
 	)
 end
@@ -2512,7 +2516,9 @@ RunService.RenderStepped:Connect(function()
 	camera.CFrame *= recoilCFrame
 
 	logRecoil = recoilCFrame
+end)
 
+RunService.Heartbeat:Connect(function()
 	if mouseButton1Down and not isPaused then
 		if module.currentWeapon and weaponData["LockAmount"] then
 			LockOn()

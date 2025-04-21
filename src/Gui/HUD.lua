@@ -106,6 +106,7 @@ function module.Init(player, ui, frame)
 	frame.Ammo.Count.Text = 0
 	frame.Souls.Count.Text = 0
 
+	local c = true
 	RunService.RenderStepped:Connect(function()
 		local inCenter = module.getObjectInCenter(frame.CenterFrame, player)
 		targetEnemy.Value = inCenter
@@ -115,10 +116,19 @@ function module.Init(player, ui, frame)
 
 		frame.GrappleReady.Position =
 			UDim2.new(0.5, grappleIncicatorSpring.Position.X, 0.5, grappleIncicatorSpring.Position.Y)
+
+		if c then
+			c = false
+			frame.Souls.Mult.Position = UDim2.new(0.9, math.random(-3, 3), 0.9, math.random(-3, 3))
+			task.wait(0.025)
+			c = true
+		end
 	end)
 
 	local currentHealthChanged
 	local currentBossHealthChanged
+
+	UiAnimator.PlayAnimation(frame.Flame, 0.1, true)
 
 	targetEnemy.Changed:Connect(function(value)
 		if currentHealthChanged then
@@ -780,6 +790,13 @@ function module.EmptyOvercharge(player, ui, frame, emptyTime, isArsenalBar)
 
 	local overChargeBar = isArsenalBar and frame.ArsenalBar or frame.OverchargeBar
 	util.tween(overChargeBar.BarFrame.Bar, ti, { Size = UDim2.fromScale(1, 0) })
+end
+
+function module.ShowSoulChanceMult(player, ui, frame, value, show)
+	frame.Souls.Mult.Visible = show
+	frame.Flame.Visible = show
+
+	frame.Souls.Mult.Text = "X" .. math.round(value) .. " Chance"
 end
 
 return module

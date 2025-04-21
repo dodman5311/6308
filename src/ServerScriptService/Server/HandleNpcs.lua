@@ -305,6 +305,7 @@ function module.new(NPCType)
 		Name = "",
 		Behavior = nil,
 		MindData = {},
+		TeamName = "Enemies",
 
 		Path = SimplePath.new(newModel),
 		Acts = Acts:new(),
@@ -344,6 +345,14 @@ function module.new(NPCType)
 		self.Target = targetValue
 
 		subject:SetAttribute("State", "Idle")
+	end
+
+	function Npc:SetTeam(teamName)
+		local instance: Instance = Npc.Instance
+		instance:RemoveTag("OnTeam_" .. Npc.TeamName)
+
+		Npc.TeamName = teamName
+		instance:AddTag("OnTeam_" .. Npc.TeamName)
 	end
 
 	function Npc:GetBehavior()
@@ -410,6 +419,7 @@ function module.new(NPCType)
 
 	function Npc:Place(position) -- will place into the world without running
 		self.Instance.Parent = workspace.Enemies
+		self:SetTeam(self.TeamName)
 
 		if typeof(position) == "Vector3" then
 			self.Instance:PivotTo(CFrame.new(position + Vector3.new(0, 2.5, 0)))

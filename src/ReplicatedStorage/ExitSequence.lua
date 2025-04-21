@@ -25,7 +25,7 @@ module.Exit = function(player, start_time, stage_number, level_number, bossBeate
 	local boss_name = stageFolder:GetAttribute("MainBoss")
 	local miniboss_name = stageFolder:GetAttribute("MiniBoss")
 
-	for _, arena in ipairs(workspace.Map:GetChildren()) do
+	for _, arena in ipairs(ReplicatedStorage.Map:GetChildren()) do
 		if not string.match(arena.Name, "Arena_") then
 			continue
 		end
@@ -41,8 +41,8 @@ module.Exit = function(player, start_time, stage_number, level_number, bossBeate
 
 	local enemies = CollectionService:GetTagged("Enemy") or {}
 
-	local spawnedArenas = #arenas
-	local arenaCount = #arenasCompleted
+	local spawnedArenas = math.clamp(#arenas, 1, math.huge)
+	local arenaCount = math.clamp(#arenasCompleted, 1, math.huge)
 	local enemyCount = #enemies
 
 	for _, enemy in ipairs(enemies) do
@@ -59,7 +59,7 @@ module.Exit = function(player, start_time, stage_number, level_number, bossBeate
 		Name = bossBeaten or title .. " : " .. level_number,
 		TimeTaken = math.round(os.clock() - start_time),
 		EnemiesKilled = reverse(enemyCount, spawners.EnemiesSpawned) * 100,
-		ArenasCompleted = reverse(arenaCount, spawnedArenas) * 100,
+		ArenasCompleted = arenaCount / spawnedArenas * 100,
 		MaxCombo = bossBeaten and 10 or net:RemoteFunction("GetMaxCombo"):InvokeClient(player),
 	}
 

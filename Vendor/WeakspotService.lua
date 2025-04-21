@@ -1,8 +1,8 @@
 local module = {}
 
-local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 
@@ -10,11 +10,8 @@ local sounds = ReplicatedStorage.Assets.Sounds
 
 local util = require(Globals.Vendor.Util)
 
-local ComboService = require(Globals.Client.Services.ComboService)
-local explosionService = require(Globals.Client.Services.ExplosionService)
-
-function module.doWeakspotHit(part: BasePart)
-	if part.Name ~= "Weakspot" then
+function module.doWeakspotHit(part: BasePart): number
+	if not part or part.Name ~= "Weakspot" then
 		return 0
 	end
 
@@ -58,19 +55,17 @@ function module.doWeakspotHit(part: BasePart)
 	elseif spotType == "ExplodeOnDeath" then
 		local humanoid = util.checkForHumanoid(part)
 
-		if humanoid and humanoid.Health - Damage <= 0 then
-			explosionService.createExplosion(
+		if humanoid and humanoid.Health - Damage <= 0 and RunService:IsClient() then
+			require(Globals.Client.Services.ExplosionService).createExplosion(
 				part.Position,
 				part:GetAttribute("SplashSize"),
 				part:GetAttribute("SplashDamage"),
-				Players.LocalPlayer
+				Players:GetPlayers()[1]
 			)
 		end
 	end
 
 	part.Effect:Emit(part.Effect:GetAttribute("EmitCount"))
-
-	ComboService.RestartTimer()
 
 	return Damage or 0
 end

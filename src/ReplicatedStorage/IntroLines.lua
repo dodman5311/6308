@@ -33,36 +33,36 @@ return {
 	},
 
 	["Visage Of False Hope"] = {
-		{
-			Text = "How are you alive? Your soul. It's... unweathered.",
-			Sound = "rbxassetid://18836748498",
-			Wait = 1,
-		},
-		{
-			Text = "You truly are a monster, aren't you?",
-			Sound = "rbxassetid://18836748110",
-			Wait = 0.75,
-		},
-		{
-			Text = "It does not matter to me.",
-			Sound = "rbxassetid://18836749094",
-			Wait = 0.65,
-		},
-		{
-			Text = "For I am all. I am stronger than Iron, than light, than all that is.",
-			Sound = "rbxassetid://18836748821",
-			Wait = 1,
-		},
-		{
-			Text = "Kneel monster.",
-			Sound = "rbxassetid://18836749480",
-			Wait = 0.5,
-		},
-		{
-			Text = "For your penance... is upon you.",
-			Sound = "rbxassetid://18836749860",
-			Wait = 2,
-		},
+		-- {
+		-- 	Text = "How are you alive? Your soul. It's... unweathered.",
+		-- 	Sound = "rbxassetid://18836748498",
+		-- 	Wait = 1,
+		-- },
+		-- {
+		-- 	Text = "You truly are a monster, aren't you?",
+		-- 	Sound = "rbxassetid://18836748110",
+		-- 	Wait = 0.75,
+		-- },
+		-- {
+		-- 	Text = "It does not matter to me.",
+		-- 	Sound = "rbxassetid://18836749094",
+		-- 	Wait = 0.65,
+		-- },
+		-- {
+		-- 	Text = "For I am all. I am stronger than Iron, than light, than all that is.",
+		-- 	Sound = "rbxassetid://18836748821",
+		-- 	Wait = 1,
+		-- },
+		-- {
+		-- 	Text = "Kneel monster.",
+		-- 	Sound = "rbxassetid://18836749480",
+		-- 	Wait = 0.5,
+		-- },
+		-- {
+		-- 	Text = "For your penance... is upon you.",
+		-- 	Sound = "rbxassetid://18836749860",
+		-- 	Wait = 2,
+		-- },
 	},
 
 	["Right Hand Of Iron"] = {

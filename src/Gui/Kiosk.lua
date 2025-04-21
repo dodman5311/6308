@@ -143,6 +143,97 @@ local spinGifts = {
 	},
 }
 
+local DOTDRewards = {
+	Knights_Crit_Epic = {
+		Icon = "rbxassetid://71018731900051",
+		Catagories = { "Arsenal" },
+		Desc = "You gain a chance to deal double damage with melees. (+3% chance)",
+		Chance = 20,
+		GoodLuck = true,
+	},
+
+	Knights_Crit_Basic = {
+		Icon = "rbxassetid://94935834596142",
+		Catagories = { "Arsenal" },
+		Desc = "You gain a chance to deal double damage with melees. (+2% chance)",
+		Chance = 35,
+		GoodLuck = true,
+	},
+
+	Knights_Crit = spinGifts.Knights_Crit,
+
+	Breachers_Crit_Epic = {
+		Icon = "rbxassetid://75394778830247",
+		Catagories = { "Arsenal" },
+		Desc = "You gain a chance to deal double damage with shotguns. (+3% chance)",
+		Chance = 20,
+		GoodLuck = true,
+	},
+
+	Breachers_Crit_Basic = {
+		Icon = "rbxassetid://114545430175184",
+		Catagories = { "Arsenal" },
+		Desc = "You gain a chance to deal double damage with shotguns. (+2% chance)",
+		Chance = 35,
+		GoodLuck = true,
+	},
+
+	Breachers_Crit = spinGifts.Breachers_Crit,
+
+	Gun_Slingers_Crit_Epic = {
+		Icon = "rbxassetid://81678962975610",
+		Catagories = { "Arsenal" },
+		Desc = "You gain a chance to deal double damage with pistols. (+3% chance)",
+		Chance = 20,
+		GoodLuck = true,
+	},
+
+	Gun_Slingers_Crit_Basic = {
+		Icon = "rbxassetid://88555793620121",
+		Catagories = { "Arsenal" },
+		Desc = "You gain a chance to deal double damage with pistols. (+2% chance)",
+		Chance = 35,
+		GoodLuck = true,
+	},
+
+	Gun_Slingers_Crit = spinGifts.Gun_Slingers_Crit,
+
+	Riflemans_Crit_Epic = {
+		Icon = "rbxassetid://117248909088054",
+		Catagories = { "Arsenal" },
+		Desc = "You gain a chance to deal double damage with rifles. (+3% chance)",
+		Chance = 20,
+		GoodLuck = true,
+	},
+
+	Riflemans_Crit_Basic = {
+		Icon = "rbxassetid://75886915571130",
+		Catagories = { "Arsenal" },
+		Desc = "You gain a chance to deal double damage with rifles. (+2% chance)",
+		Chance = 35,
+		GoodLuck = true,
+	},
+
+	Riflemans_Crit = spinGifts.Riflemans_Crit,
+
+	Massive_Clover = {
+		Icon = "rbxassetid://91764404178551",
+		Catagories = { "Luck" },
+		Desc = "You gain a ton of luck. (+3)",
+		Chance = 20,
+		GoodLuck = true,
+	},
+
+	Large_Clover = spinGifts.Large_Clover,
+	Clover = spinGifts.Clover,
+
+	Perk_Ticket = spinGifts.Perk_Ticket,
+}
+
+local dailyDeal = {}
+local dailyDealCost = 0
+local dealSold = false
+
 local isOther = false
 local costMult = 1
 
@@ -181,10 +272,11 @@ local function connectButtonHoverUnderHand(frame, button)
 	end)
 end
 
-function module.getRandomGiftFromLocalList()
+function module.getRandomGiftFromLocalList(list)
 	local array = {}
+	local list = list or spinGifts
 
-	for key, gift in pairs(spinGifts) do
+	for key, gift in pairs(list) do
 		if not chanceService.checkChance(gift.Chance, gift.GoodLuck) then
 			continue
 		end
@@ -197,7 +289,7 @@ function module.getRandomGiftFromLocalList()
 	end
 
 	local selectedKey = array[math.random(1, #array)]
-	return selectedKey, spinGifts[selectedKey]
+	return selectedKey, list[selectedKey]
 end
 
 local function getRandomGift(catagory)
@@ -315,7 +407,28 @@ local function useTicket(player, frame, catagory)
 	module.TakeDelivery(nil, nil, frame, chosenGift)
 end
 
+local function resetDOTD()
+	dailyDeal = {}
+	local chance = 0
+
+	for _ = 1, 4 do
+		local name, gift = module.getRandomGiftFromLocalList(DOTDRewards)
+		table.insert(dailyDeal, { name, gift })
+
+		chance += gift.Chance
+	end
+
+	dailyDealCost = math.round((280 / chance) * 4.5)
+	dealSold = false
+end
+
 function module.Init(player, ui, frame)
+	local ti = TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut, -1, true)
+	for i = 1, 4 do
+		frame.Deal["A" .. i].Rotation = 5
+		util.tween(frame.Deal["A" .. i], ti, { Rotation = -5 })
+	end
+
 	frame.Gui.Enabled = false
 	frame.Frame.Visible = false
 	frame.Background.Visible = false
@@ -328,10 +441,53 @@ function module.Init(player, ui, frame)
 	connectButtonHover(frame.LuckButton)
 	connectButtonHover(frame.SoulButton)
 	connectButtonHover(frame.ExitButton)
+	connectButtonHover(frame.UseDOTD)
+
+	local enter, leave = MouseOver.MouseEnterLeaveEvent(frame.ShowTag)
+	local ti2 = TweenInfo.new(0.35, Enum.EasingStyle.Quart)
+
+	enter:Connect(function()
+		util.tween(frame.Tag, ti2, { Position = UDim2.fromScale(-0.184, 0) })
+	end)
+
+	leave:Connect(function()
+		util.tween(frame.Tag, ti2, { Position = UDim2.fromScale(-0.5, 0) })
+	end)
 
 	frame.ExitButton.Visible = true
 	frame.ExitButton.MouseButton1Click:Connect(function()
 		exit(frame)
+	end)
+
+	frame.UseDOTD.MouseButton1Click:Connect(function()
+		if SoulsService.Souls < dailyDealCost or dealSold then
+			return
+		end
+		local ti = TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+		local ti_2 = TweenInfo.new(1, Enum.EasingStyle.Elastic)
+
+		dealSold = true
+		sfx.KioskBuy:Play()
+
+		SoulsService.RemoveSoul(dailyDealCost)
+
+		for _, giftTable in ipairs(dailyDeal) do
+			module.applyGiftChange(giftTable[1])
+		end
+
+		module.UpdateSouls(player, ui, frame, math.round(SoulsService.Souls))
+		module.UpdateStats(player, ui, frame)
+		frame.Tickets.Count.Text = module.tickets
+
+		frame.DealSold.Size = UDim2.fromScale(0.25, 0.25)
+		frame.DealSold.Rotation = -5
+
+		sfx.Collect:Play()
+
+		util.tween(frame.DealSold, ti, { Size = UDim2.fromScale(0.175, 0.175), Rotation = 5, TextTransparency = 0 })
+		util.tween(frame.DealSold.UIStroke, ti, { Transparency = 0 }, true)
+
+		util.tween(frame.DealSold, ti_2, { Rotation = 15 })
 	end)
 
 	frame.UseSoul.MouseButton1Click:Connect(function()
@@ -340,7 +496,6 @@ function module.Init(player, ui, frame)
 		end
 
 		sfx.KioskBuy:Play()
-
 		SoulsService.RemoveSoul(module.soulCost * costMult)
 
 		frame.SelectButtons.Visible = false
@@ -444,6 +599,29 @@ function module.ShowScreen(player, ui, frame, playerSouls)
 		spinGifts.Nothing = nil
 		spinGifts.Small_Magazine = nil
 		spinGifts.Kevlar = nil
+	end
+
+	if #dailyDeal == 0 then
+		resetDOTD()
+	end
+
+	for i = 1, 4 do -- LOAD DOTD
+		frame.Deal["A" .. i].Image = dailyDeal[i][2].Icon
+	end
+
+	if not dealSold then
+		frame.DealSold.TextTransparency = 1
+		frame.DealSold.UIStroke.Transparency = 1
+	end
+
+	frame.DealCost.Text = "-" .. dailyDealCost
+
+	if dailyDealCost >= 8 then
+		frame.Tag.ImageColor3 = Color3.fromRGB(255, 225, 120)
+	elseif dailyDealCost >= 6 then
+		frame.Tag.ImageColor3 = Color3.fromRGB(120, 225, 255)
+	else
+		frame.Tag.ImageColor3 = Color3.new(1, 1, 1)
 	end
 
 	acts:createAct("InActiveMenu")
@@ -570,6 +748,55 @@ local function addArmor(player, amount)
 	net:RemoteEvent("SetArmor"):FireServer(humanoid:GetAttribute("Armor") + amount)
 end
 
+function module.applyGiftChange(name)
+	if name == "Perk_Ticket" then
+		module.tickets += 1
+	elseif name == "Clover" then
+		codexService.AddEntry("Luck")
+		chanceService.luck += 1
+	elseif name == "Large_Clover" then
+		codexService.AddEntry("Luck")
+		chanceService.luck += 2
+	elseif name == "Massive_Clover" then
+		codexService.AddEntry("Luck")
+		chanceService.luck += 2
+	elseif name == "Kevlar" then
+		addArmor(Players.LocalPlayer, 1)
+	elseif name == "Holy_Kevlar" then
+		addArmor(Players.LocalPlayer, 2)
+	elseif name == "Small_Magazine" then
+		Signals.AddAmmo:Fire()
+	elseif name == "Big_Magazine" then
+		Signals.AddAmmo:Fire(true)
+	elseif name == "Riflemans_Crit" then
+		weapons.critChances.AR += 1
+	elseif name == "Breachers_Crit" then
+		weapons.critChances.Shotgun += 1
+	elseif name == "Gun_Slingers_Crit" then
+		weapons.critChances.Pistol += 1
+	elseif name == "Knights_Crit" then
+		weapons.critChances.Melee += 1
+	elseif name == "Riflemans_Crit_Basic" then
+		weapons.critChances.AR += 2
+	elseif name == "Breachers_Crit_Basic" then
+		weapons.critChances.Shotgun += 2
+	elseif name == "Gun_Slingers_Crit_Basic" then
+		weapons.critChances.Pistol += 2
+	elseif name == "Knights_Crit_Basic" then
+		weapons.critChances.Melee += 2
+	elseif name == "Riflemans_Crit_Epic" then
+		weapons.critChances.AR += 3
+	elseif name == "Breachers_Crit_Epic" then
+		weapons.critChances.Shotgun += 3
+	elseif name == "Gun_Slingers_Crit_Epic" then
+		weapons.critChances.Pistol += 3
+	elseif name == "Knights_Crit_Epic" then
+		weapons.critChances.Melee += 3
+	end
+
+	print(weapons.critChances)
+end
+
 function module.chooseRandomGift(player, ui, frame, catagory)
 	frame.ExitButton.Visible = false
 
@@ -624,31 +851,7 @@ function module.chooseRandomGift(player, ui, frame, catagory)
 	if catagory then
 		Signals.AddGift:Fire(name)
 	else
-		if name == "Perk_Ticket" then
-			module.tickets += 1
-		elseif name == "Clover" then
-			codexService.AddEntry("Luck")
-			chanceService.luck += 1
-		elseif name == "Large_Clover" then
-			codexService.AddEntry("Luck")
-			chanceService.luck += 2
-		elseif name == "Kevlar" then
-			addArmor(player, 1)
-		elseif name == "Holy_Kevlar" then
-			addArmor(player, 2)
-		elseif name == "Small_Magazine" then
-			Signals.AddAmmo:Fire()
-		elseif name == "Big_Magazine" then
-			Signals.AddAmmo:Fire(true)
-		elseif name == "Riflemans_Crit" then
-			weapons.critChances.AR += 1
-		elseif name == "Breachers_Crit" then
-			weapons.critChances.Shotgun += 1
-		elseif name == "Gun_Slingers_Crit" then
-			weapons.critChances.Pistol += 1
-		elseif name == "Knights_Crit" then
-			weapons.critChances.Melee += 1
-		end
+		module.applyGiftChange(name)
 	end
 
 	frame.Tickets.Count.Text = module.tickets
@@ -757,6 +960,7 @@ end)
 
 net:Connect("StartExitSequence", function()
 	module.soulCost = math.clamp(module.soulCost - 2, 1, 25)
+	resetDOTD()
 end)
 
 return module

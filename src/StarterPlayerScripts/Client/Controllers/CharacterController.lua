@@ -43,7 +43,6 @@ local isPaused = false
 local lastOnGroundPosition = Vector3.zero
 local render
 local mouse = Player:GetMouse()
-local hasLookedAtMachine = false
 
 local mouseTarget = Instance.new("ObjectValue")
 
@@ -217,7 +216,7 @@ function module:OnSpawn(character, humanoid)
 			end
 
 			PlayHitEffect()
-			comboService.ReduceCombo(2)
+			comboService.ReduceCombo(1)
 		end
 
 		logHealth = health

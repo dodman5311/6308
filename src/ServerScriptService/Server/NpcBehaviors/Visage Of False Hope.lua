@@ -165,7 +165,7 @@ local function dealDamage(npc, humanoid, amount)
 		return
 	end
 
-	humanoid:TakeDamage(amount + npc["DamageBuff"] or 0)
+	humanoid:TakeDamage(amount)
 end
 
 local function indicateAttack(npc, color)
@@ -264,22 +264,46 @@ local function checkHitboxes(npc)
 	end
 end
 
+local function createImpulse(subject: Model, power: number, direction: Vector3, velocityTime)
+	local primaryPart = subject.PrimaryPart
+	if not primaryPart then
+		return
+	end
+
+	local newVelocity = Instance.new("LinearVelocity")
+	Debris:AddItem(newVelocity, velocityTime)
+
+	newVelocity.Parent = primaryPart
+	newVelocity.Attachment0 = primaryPart:FindFirstChildOfClass("Attachment")
+	newVelocity.MaxForce = math.huge
+	newVelocity.VectorVelocity = direction * power
+end
+
 local function checkGeyserHitboxes(npc)
-	local playersHit = {}
+	local modelsHit = {}
 
 	for _, hitbox in ipairs(CollectionService:GetTagged("GeyserHitbox")) do
 		for _, partHit in ipairs(workspace:GetPartsInPart(hitbox)) do
 			local humanoid, model = util.checkForHumanoid(partHit)
 
-			local playerHit = Players:GetPlayerFromCharacter(model)
+			-- local playerHit = Players:GetPlayerFromCharacter(model)
 
-			if not playerHit or table.find(playersHit, playerHit) then
-				continue
+			-- if not playerHit or table.find(playersHit, playerHit) then
+			-- 	continue
+			-- end
+
+			if hitbox:HasTag("Launching") then
+				local modPos = model:GetPivot().Position
+				local subPos = npc.Instance:GetPivot().Position
+				local posNy = Vector3.new(subPos.X, modPos.Y, subPos.Z)
+
+				local impulseDirection = (CFrame.lookAt(posNy, modPos + Vector3.new(0, 20, 0))).LookVector -- (subject.PrimaryPart.CFrame * CFrame.Angles(math.rad(25), 0, 0)).LookVector
+				createImpulse(model, 100, impulseDirection, 0.1)
 			end
 
 			dealDamage(npc, humanoid, 1)
 
-			table.insert(playersHit, playerHit)
+			table.insert(modelsHit, model)
 		end
 	end
 end
@@ -354,7 +378,7 @@ local function aimYAxisAtPlayer(npc)
 	end)
 end
 
-local function createGeyserAt(npc, indicateTime, Position)
+local function createGeyserAt(npc, indicateTime, Position, launchTarget)
 	--local target = npc:GetTarget()
 	local model = npc.Instance
 
@@ -380,6 +404,11 @@ local function createGeyserAt(npc, indicateTime, Position)
 	newGeyser.Area.Transparency = 1
 
 	newGeyser.Hitbox:AddTag("GeyserHitbox")
+
+	if launchTarget then
+		newGeyser.Hitbox:AddTag("Launching")
+	end
+
 	vfx:FireAllClients("ShowParticleFor", "Server", true, newGeyser.GeyserPart, 5)
 	timer.wait(5)
 
@@ -593,7 +622,7 @@ local moves = {
 		npc.Instance.PrimaryPart.Shield_2.Enabled = true
 
 		for _, enemy in ipairs(enemies) do
-			if enemy.Name == "Visage Of False Hope" then
+			if enemy.Name == "Visage Of False Hope" or enemy.Humanoid.Health >= 60 then
 				continue
 			end
 
@@ -817,7 +846,7 @@ local function closeAttack(npc)
 	for _, offset in ipairs(closePattern) do
 		local cframe = npcCframe * CFrame.new(offset.X * 150, 0, offset.Y * 150)
 
-		task.spawn(createGeyserAt, npc, 0.25, cframe.Position)
+		task.spawn(createGeyserAt, npc, 0.25, cframe.Position, true)
 	end
 
 	timer.wait(5)

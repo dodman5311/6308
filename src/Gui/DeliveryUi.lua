@@ -1,6 +1,7 @@
 local module = {}
 --// Services
 local GuiService = game:GetService("GuiService")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 local UserInputService = game:GetService("UserInputService")
@@ -29,7 +30,10 @@ local net = require(Globals.Packages.Net)
 local musicService = require(Globals.Client.Services.MusicService)
 
 local deliveryAmount = 0
+local giftCount = 1
 module.onHidden = Signal.new()
+
+local giftsToChoose = {}
 
 --// Values
 
@@ -44,6 +48,22 @@ local function connectButtonHover(button, reactFrame)
 
 	leave:Connect(function()
 		reactFrame.ImageColor3 = Color3.fromRGB(255, 255, 255)
+	end)
+end
+
+local function connectGiftButtonHover(button)
+	local enter, leave = MouseOver.MouseEnterLeaveEvent(button)
+
+	local ti = TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+
+	button.Parent.Size = UDim2.fromScale(0.8, 0.8)
+
+	enter:Connect(function()
+		util.tween(button.Parent, ti, { Size = UDim2.fromScale(0.95, 0.95) })
+	end)
+
+	leave:Connect(function()
+		util.tween(button.Parent, ti, { Size = UDim2.fromScale(0.8, 0.8) })
 	end)
 end
 
@@ -75,6 +95,38 @@ local function decreaseDelivery(frame)
 	updateDeliveryText(frame)
 end
 
+local function givePerk(frame, index)
+	for _, buttonFrame in ipairs(frame.Choices:GetChildren()) do
+		if not buttonFrame:IsA("Frame") then
+			continue
+		end
+
+		buttonFrame.Button.Active = false
+	end
+
+	Signals.DoUiAction:Fire("Cursor", "Toggle", false)
+
+	local ti = TweenInfo.new(0.5, Enum.EasingStyle.Quart)
+	local title = giftsToChoose[index]
+	for i = 1, 3 do
+		if index == i then
+			continue
+		end
+
+		util.tween(frame["Spin" .. i].A1, ti, { ImageTransparency = 1 })
+	end
+
+	sfx.Unlocked_Perk:Play()
+	Signals.AddGift:Fire(title)
+	util.tween(frame.Choices, ti, { Size = UDim2.fromScale(1, 1), GroupTransparency = 1 })
+	util.tween(frame["Spin" .. index], ti, { Position = UDim2.fromScale(0.5, frame["Spin" .. index].Position.Y.Scale) })
+	util.tween(frame.Fart, ti, { ImageTransparency = 0 })
+	util.tween(frame.Box, ti, { Size = UDim2.fromScale(0.148, 0.263) }, true)
+	frame.Choices.Visible = false
+
+	module.TakeDelivery(Players.LocalPlayer, nil, frame)
+end
+
 function module.Init(player, ui, frame)
 	frame.Frame.Visible = false
 	frame.Background.Visible = false
@@ -101,6 +153,27 @@ function module.Init(player, ui, frame)
 		frame.DeliveryAmount.TextColor3 = Color3.fromRGB(255, 255, 255)
 		frame.DeliveryAmount.UIStroke.Color = Color3.fromRGB(82, 82, 82)
 	end)
+
+	local choices = frame.Choices
+
+	connectGiftButtonHover(choices.Card_1.Button)
+	connectGiftButtonHover(choices.Card_2.Button)
+	connectGiftButtonHover(choices.Card_3.Button)
+
+	choices.Card_1.Button.MouseButton1Click:Connect(function()
+		print(1)
+		givePerk(frame, 1)
+	end)
+
+	choices.Card_2.Button.MouseButton1Click:Connect(function()
+		print(2)
+		givePerk(frame, 2)
+	end)
+
+	choices.Card_3.Button.MouseButton1Click:Connect(function()
+		print(3)
+		givePerk(frame, 3)
+	end)
 end
 
 function module.Cleanup(player, ui, frame) end
@@ -109,8 +182,8 @@ function module.UpdateSouls(_, _, frame, amount)
 	frame.Souls.Count.Text = amount
 end
 
-local function getRandomGiftFromDictionary(type)
-	local dictionary = Gifts[type]
+local function getRandomGiftFromDictionary(type: string, list: {}?)
+	local dictionary = list or Gifts[type]
 	local array = {}
 
 	for key, _ in pairs(dictionary) do
@@ -171,6 +244,49 @@ local function causeHunger(player, ui, frame)
 	end
 end
 
+function module.showChoices(player, ui, frame, type)
+	for _, buttonFrame in ipairs(frame.Choices:GetChildren()) do
+		if not buttonFrame:IsA("Frame") then
+			continue
+		end
+
+		buttonFrame.Button.Active = true
+	end
+
+	local ti_0 = TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+
+	local choices = frame.Choices
+	choices.Visible = true
+	Signals.DoUiAction:Fire("Cursor", "Toggle", true)
+
+	for _, v in ipairs(choices:GetChildren()) do
+		if not v:IsA("Frame") then
+			continue
+		end
+
+		v.Visible = false
+	end
+
+	for index, perkName in ipairs(giftsToChoose) do
+		local perk = Gifts[type][perkName]
+
+		local card = choices:FindFirstChild("Card_" .. index)
+		card.Icon.Image = perk.Icon
+		card.Title.Text = perkName
+		card.Desc.Text = perk.Desc
+		card.Visible = true
+	end
+
+	choices.Size = UDim2.fromScale(0.9, 0.9)
+	choices.GroupTransparency = 1
+	choices.Visible = true
+
+	sfx.Show_Description:Play()
+	util.tween(choices, ti_0, { Size = UDim2.fromScale(1, 1), GroupTransparency = 0 }, true)
+
+	acts:removeAct("InActiveMenu")
+end
+
 function module.ShowScreen(player, ui, frame)
 	if GiftsService.CheckGift("Drav_Is_Dead") then
 		return module.fakeScreen(player, ui, frame)
@@ -200,6 +316,7 @@ function module.ShowScreen(player, ui, frame)
 	frame.Eat.Visible = false
 	frame.Demon.Visible = true
 	frame.Box.Visible = true
+	frame.Fart.Visible = true
 	frame.Gift.Visible = true
 
 	frame.LeftButton.Visible = true
@@ -212,7 +329,9 @@ function module.ShowScreen(player, ui, frame)
 
 	frame.Fade.BackgroundTransparency = 1
 
-	frame.Spin.A1.Image = ""
+	frame.Spin1.A1.Image = ""
+	frame.Spin2.A1.Image = ""
+	frame.Spin3.A1.Image = ""
 
 	util.tween(frame.Fade, ti, { BackgroundTransparency = 0 }, false, function()
 		frame.Background.Visible = true
@@ -226,6 +345,8 @@ function module.ShowScreen(player, ui, frame)
 	task.wait(0.25)
 
 	frame.DeliveryAmount.MouseButton1Click:Once(function()
+		giftsToChoose = {}
+
 		sfx.Deliver:Play()
 		local giftType = "Perks"
 
@@ -256,12 +377,73 @@ function module.ShowScreen(player, ui, frame)
 			return
 		end
 
-		SoulsService.RemoveSoul(SoulsService.Souls * deliveryAmount)
+		local soulsToGive = SoulsService.Souls * deliveryAmount
+
+		if soulsToGive >= 8 then
+			giftCount = 3
+		elseif soulsToGive >= 4 then
+			giftCount = 2
+		else
+			giftCount = 1
+		end
+
+		SoulsService.RemoveSoul(soulsToGive)
 
 		module.UpdateSouls(player, ui, frame, SoulsService.Souls)
 
-		local chosenGift = module.chooseRandomGift(player, ui, frame, giftType)
-		module.TakeDelivery(player, ui, frame, chosenGift)
+		local chosenGift
+
+		local ti = TweenInfo.new(sounds.SpinSound.TimeLength, Enum.EasingStyle.Quart)
+		local ti_1 = TweenInfo.new(0.5, Enum.EasingStyle.Linear)
+
+		if giftCount == 2 then
+			frame.Spin1.Position = UDim2.fromScale(0.375, 0)
+			frame.Spin2.Position = UDim2.fromScale(0.625, 0)
+
+			util.tween(frame.Box, ti, { Size = UDim2.fromScale(0.225, 0.263) })
+		elseif giftCount == 3 then
+			frame.Spin1.Position = UDim2.fromScale(0.25, 0)
+			frame.Spin2.Position = UDim2.fromScale(0.5, 0)
+			frame.Spin3.Position = UDim2.fromScale(0.75, 0)
+
+			util.tween(frame.Box, ti, { Size = UDim2.fromScale(0.315, 0.263) })
+		else
+			frame.Spin1.Position = UDim2.fromScale(0.5, 0)
+			frame.Box.Size = UDim2.fromScale(0.148, 0.263)
+
+			local name = getRandomGiftFromDictionary(giftType, Gifts[giftType])
+			chosenGift = module.chooseRandomGift(player, ui, frame.Spin1, giftType, name)
+			module.TakeDelivery(player, ui, frame, chosenGift)
+
+			if UserInputService.GamepadEnabled then
+				GuiService:Select(frame.Frame)
+			end
+
+			return module.onHidden
+		end
+
+		util.tween(frame.Label, ti_1, { ImageTransparency = 1 })
+		util.tween(frame.Fart, ti_1, { ImageTransparency = 1 })
+
+		local availableGifts = table.clone(Gifts[giftType])
+
+		for i = 1, giftCount do
+			local name = getRandomGiftFromDictionary(giftType, availableGifts)
+			availableGifts[name] = nil
+			table.insert(giftsToChoose, name)
+
+			if i == giftCount then
+				module.chooseRandomGift(player, ui, frame["Spin" .. i], giftType, giftsToChoose[i])
+			else
+				task.spawn(function()
+					module.chooseRandomGift(player, ui, frame["Spin" .. i], giftType, giftsToChoose[i])
+				end)
+			end
+		end
+
+		task.wait(0.5)
+
+		module.showChoices(player, ui, frame, giftType)
 	end)
 
 	if UserInputService.GamepadEnabled then
@@ -271,22 +453,22 @@ function module.ShowScreen(player, ui, frame)
 	return module.onHidden
 end
 
-local function loadToGiftsSlot(frame, type)
-	local spin = frame.Spin
+local function loadToGiftsSlot(spinFrame, type)
+	spinFrame.A1.ImageTransparency = 0
 
-	for _ = 0, spin.Size.Y.Scale do
+	for _ = 0, spinFrame.Size.Y.Scale do
 		local _, gift = getRandomGiftFromDictionary(type)
 
-		local dummy = spin.A1:Clone()
+		local dummy = spinFrame.A1:Clone()
 		dummy.Name = "Dummy"
-		dummy.Parent = spin
+		dummy.Parent = spinFrame
 		dummy.Visible = true
 		dummy.Image = gift.Icon
 	end
 end
 
 function module.emptyGiftSlot(player, ui, frame)
-	local spin = frame.Spin
+	local spin = frame.Spin1
 
 	for _, imageLabel in ipairs(spin:GetChildren()) do
 		if imageLabel.Name ~= "Dummy" then
@@ -297,28 +479,36 @@ function module.emptyGiftSlot(player, ui, frame)
 	end
 end
 
-function module.chooseRandomGift(player, ui, frame, type)
-	local name, randomGift = getRandomGiftFromDictionary(type)
+function module.chooseRandomGift(player, ui, spinFrame, type, name)
+	local randomGift = Gifts[type][name]
 
-	loadToGiftsSlot(frame, type)
+	loadToGiftsSlot(spinFrame, type)
 
-	local spin = frame.Spin
-	spin.A1.Image = randomGift.Icon
-	spin.A1.ImageTransparency = 0
+	spinFrame.A1.Image = randomGift.Icon
+	spinFrame.A1.ImageTransparency = 0
+	spinFrame.Visible = true
+
+	local frame = spinFrame.Parent.Parent
 
 	frame.DeliveryAmount.Visible = false
 
-	local spinTween = TweenInfo.new(sounds.SpinSound.TimeLength, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+	local spinTween = TweenInfo.new(sounds.SpinSound.TimeLength, Enum.EasingStyle.Quart)
 	local ti = TweenInfo.new(0.5, Enum.EasingStyle.Linear)
 
-	spin.Position = UDim2.new(0.5, 0, -spin.Size.Y.Scale, 0)
+	local logPos = spinFrame.Position.X.Scale
+	spinFrame.Position = UDim2.new(0.5, 0, -spinFrame.Size.Y.Scale, 0)
 
 	sounds.SpinSound:Play()
-	util.tween(spin, spinTween, { Position = UDim2.new(0.5, 0, 0, 0) }, true)
 
-	Signals.AddGift:Fire(name)
+	util.tween(spinFrame, spinTween, { Position = UDim2.new(logPos, 0, 0, 0) }, true)
 
 	frame.GiftName.Text = string.gsub(name, "_", " ")
+
+	if giftCount > 1 then
+		return randomGift
+	end
+
+	Signals.AddGift:Fire(name)
 
 	task.wait(0.5)
 
@@ -342,32 +532,34 @@ function module.showDescription(frame, gift)
 
 	frame.Fade.BackgroundTransparency = 0
 	frame.Frame.Visible = false
-	frame.Desc.Text = gift.Desc
 
 	util.tween(frame.Fade, ti, { BackgroundTransparency = 1 }, true)
 
-	sfx.Show_Description:Play()
+	if gift then
+		sfx.Show_Description:Play()
+		frame.Desc.Text = gift.Desc
 
-	util.tween(frame.Desc, ti, { TextTransparency = 0 }, true)
-	util.tween(frame.ClickPrompt, ti, { TextTransparency = 0 })
+		util.tween(frame.Desc, ti, { TextTransparency = 0 }, true)
+		util.tween(frame.ClickPrompt, ti, { TextTransparency = 0 })
 
-	local skipKeyPressed = false
+		local skipKeyPressed = false
 
-	local keyPressed = UserInputService.InputBegan:Connect(function(input)
-		if
-			input.UserInputType == Enum.UserInputType.MouseButton1
-			or input.UserInputType == Enum.UserInputType.Touch
-			or input.KeyCode == Enum.KeyCode.ButtonX
-			or input.KeyCode == Enum.KeyCode.ButtonA
-		then
-			skipKeyPressed = true
-		end
-	end)
+		local keyPressed = UserInputService.InputBegan:Connect(function(input)
+			if
+				input.UserInputType == Enum.UserInputType.MouseButton1
+				or input.UserInputType == Enum.UserInputType.Touch
+				or input.KeyCode == Enum.KeyCode.ButtonX
+				or input.KeyCode == Enum.KeyCode.ButtonA
+			then
+				skipKeyPressed = true
+			end
+		end)
 
-	repeat
-		task.wait()
-	until skipKeyPressed
-	keyPressed:Disconnect()
+		repeat
+			task.wait()
+		until skipKeyPressed
+		keyPressed:Disconnect()
+	end
 
 	util.tween(frame.Fade, ti, { BackgroundTransparency = 0 }, true)
 	frame.Desc.TextTransparency = 1
@@ -389,11 +581,14 @@ function module.TakeDelivery(player, ui, frame, gift)
 
 	frame.Demon.Visible = false
 	frame.Box.Visible = false
+	frame.Fart.Visible = false
 
 	frame.LeftButton.Visible = false
 	frame.RightButton.Visible = false
 
 	util.tween(frame.Label, ti_1, { ImageTransparency = 1 })
+	util.tween(frame.Fart, ti_1, { ImageTransparency = 0 })
+	util.tween(frame.Box, ti_1, { Size = UDim2.fromScale(0.148, 0.263) })
 
 	UiAnimator.StopAnimation(frame.Demon)
 
@@ -415,7 +610,9 @@ function module.TakeDelivery(player, ui, frame, gift)
 	end)
 
 	animation.OnEnded:Connect(function()
+		--if giftCount == 1 and gift then
 		module.showDescription(frame, gift)
+		--end
 
 		local maxHealth = player.Character.Humanoid.MaxHealth
 		if maxHealth < player:GetAttribute("MaxHealth") then

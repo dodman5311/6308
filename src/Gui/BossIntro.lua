@@ -74,6 +74,14 @@ local function connectButtonHover(button)
 end
 
 local function givePerk(frame, button)
+	for _, buttonFrame in ipairs(frame.Choices:GetChildren()) do
+		if not buttonFrame:IsA("Frame") then
+			continue
+		end
+
+		buttonFrame.Button.Active = false
+	end
+
 	Signals.DoUiAction:Fire("Cursor", "Toggle", false)
 
 	local ti = TweenInfo.new(1, Enum.EasingStyle.Linear)
@@ -384,6 +392,14 @@ function module.chooseGift(player, ui, frame, bossName)
 end
 
 function module.showChoices(player, ui, frame, bossName)
+	for _, buttonFrame in ipairs(frame.Choices:GetChildren()) do
+		if not buttonFrame:IsA("Frame") then
+			continue
+		end
+
+		buttonFrame.Button.Active = true
+	end
+
 	local ti_0 = TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
 
 	if typeof(rewards[bossName]) == "string" then

@@ -10,13 +10,10 @@ local stats = {
 }
 
 local CollectionService = game:GetService("CollectionService")
-local Debris = game:GetService("Debris")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
-
-local assets = ReplicatedStorage.Assets
 local util = require(Globals.Vendor.Util)
 local net = require(Globals.Packages.Net)
 local rng = Random.new()
@@ -161,7 +158,7 @@ local module = {
 				stats.ProjectileSpeed,
 				1,
 				{ Size = 1 },
-				"ElectricProjectile",
+				"EnemyElectricProjectile",
 				false,
 				0.5,
 			},
