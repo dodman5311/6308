@@ -273,7 +273,7 @@ function module.showChoices(player, ui, frame, type)
 		local card = choices:FindFirstChild("Card_" .. index)
 		card.Icon.Image = perk.Icon
 		card.Title.Text = perkName
-		card.Desc.Text = perk.Desc
+		card.Description.Text = perk.Desc
 		card.Visible = true
 	end
 
@@ -379,12 +379,22 @@ function module.ShowScreen(player, ui, frame)
 
 		local soulsToGive = SoulsService.Souls * deliveryAmount
 
-		if soulsToGive >= 8 then
-			giftCount = 3
-		elseif soulsToGive >= 4 then
-			giftCount = 2
+		if deliveryAmount > 0.5 then
+			if soulsToGive >= 8 then
+				giftCount = 3
+			elseif soulsToGive >= 4 then
+				giftCount = 2
+			else
+				giftCount = 1
+			end
 		else
-			giftCount = 1
+			if soulsToGive >= 4 then
+				giftCount = 3
+			elseif soulsToGive >= 2 then
+				giftCount = 2
+			else
+				giftCount = 1
+			end
 		end
 
 		SoulsService.RemoveSoul(soulsToGive)

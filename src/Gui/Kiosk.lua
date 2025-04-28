@@ -759,7 +759,7 @@ function module.applyGiftChange(name)
 		chanceService.luck += 2
 	elseif name == "Massive_Clover" then
 		codexService.AddEntry("Luck")
-		chanceService.luck += 2
+		chanceService.luck += 3
 	elseif name == "Kevlar" then
 		addArmor(Players.LocalPlayer, 1)
 	elseif name == "Holy_Kevlar" then
