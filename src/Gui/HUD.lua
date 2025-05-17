@@ -712,7 +712,7 @@ function module.ShowDeadBolt(player, ui, frame, crit, weaponType)
 
 	util.tween(luckValue, ti, { Value = luck })
 	util.tween(critValue, ti, { Value = crit })
-	util.tween(chanceValue, ti, { Value = crit + (luck / 2) + 35 }, false, function()
+	util.tween(chanceValue, ti, { Value = crit + (luck / 2) + 50 }, false, function()
 		luckValue:Destroy()
 		critValue:Destroy()
 		chanceValue:Destroy()

@@ -115,16 +115,6 @@ local function progressTo(level)
 end
 
 function module:OnSpawn(character, humanoid)
-	if
-		not giftService.CheckUpgrade("Anchovies")
-		or workspace:GetAttribute("Level") == math.round(workspace:GetAttribute("Level"))
-	then
-		Player:SetAttribute("Anchovies", 4)
-
-		ChanceService.luck = 0
-		ChanceService.repetitionLuck = 0
-	end
-
 	task.delay(1, function()
 		UIService.doUiAction(
 			"Notify",
@@ -136,31 +126,6 @@ function module:OnSpawn(character, humanoid)
 	end)
 
 	UIService.doUiAction("HUD", "Cleanup", humanoid.Health, humanoid.MaxHealth)
-
-	if giftService.CheckUpgrade("Order Wheel") then
-		signals.AddGift:Fire("Speed_Demon")
-		signals.AddGift:Fire("SpeedRunner")
-	end
-
-	if giftService.CheckUpgrade("Aged Cheese") then
-		signals.AddGift:Fire("Master_Scouting")
-	end
-
-	if giftService.CheckUpgrade("Insurance") then
-		signals.AddGift:Fire("Haven")
-	end
-
-	if giftService.CheckUpgrade("Quality Sauce") then
-		signals.AddGift:Fire("Sauce_Is_Fuel")
-	end
-
-	if giftService.CheckUpgrade("Sister Location") then
-		progressTo(2)
-	end
-
-	if giftService.CheckUpgrade("Pizza Chain") then
-		progressTo(4)
-	end
 
 	UIService.doUiAction("Kiosk", "resetCost")
 	UIService.doUiAction("HUD", "UpdatePlayerHealth", humanoid.Health, humanoid.MaxHealth)

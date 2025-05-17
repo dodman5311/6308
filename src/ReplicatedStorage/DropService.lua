@@ -28,6 +28,7 @@ function module.CreateDrop(position, dropType)
 	local newDrop = Effects:FindFirstChild(dropType):Clone()
 
 	newDrop.Parent = workspace
+	newDrop:SetAttribute("OriginY", position.Y - 5)
 
 	newDrop:PivotTo(CFrame.new(position))
 	newDrop.PrimaryPart.AssemblyLinearVelocity =
@@ -54,18 +55,23 @@ local function checkForDrops()
 	local characterPosition = characterCFrame.Position
 
 	for _, drop in ipairs(CollectionService:GetTagged("Drop")) do
-		local distance = (drop:GetPivot().Position - characterPosition).Magnitude
+		local dropPosition = drop:GetPivot().Position
+		local distance = (dropPosition - characterPosition).Magnitude
 
 		local beyondMaxDistance = distance > module.MaxDistance
 
 		drop.PrimaryPart.Anchored = not beyondMaxDistance
 		drop.PrimaryPart.CanCollide = beyondMaxDistance
 
+		if dropPosition.Y <= drop:GetAttribute("OriginY") then
+			drop.PrimaryPart.Anchored = true
+		end
+
 		if beyondMaxDistance then
 			continue
 		end
 
-		if distance <= 3 then
+		if distance <= 5 then
 			Signals["Add" .. drop:GetAttribute("DropType")]:Fire(1)
 			drop:Destroy()
 			return

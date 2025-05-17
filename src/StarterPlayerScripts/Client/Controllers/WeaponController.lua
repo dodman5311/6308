@@ -1338,7 +1338,7 @@ local function fireDeadBolt(extraBullet, bulletDamage, weaponName, element)
 
 	for _ = 1, extraBullet + 1 do
 		local hitHumanoid, subject, damage =
-			module.FireBullet(bulletDamage + 1, 0, 500, nil, weaponName, element, 0, 35)
+			module.FireBullet(bulletDamage + 1, 0, 500, nil, weaponName, element, 0, 50)
 
 		addToGib(hitHumanoid, subject, damage)
 		addToConsecutive(hitHumanoid)

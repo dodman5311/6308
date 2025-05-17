@@ -264,7 +264,7 @@ local module = {
 		Dead_Bolt = {
 			Icon = "rbxassetid://119974210879654",
 			Catagories = { "Arsenal" },
-			Desc = "You can now aim with non-parrying weapons and shoot a Critical Bolt. Critical Bolts have +1 damage and +35% crit chance. (3 second cooldown. Right click to aim)",
+			Desc = "You can now aim with non-parrying weapons and shoot a Critical Bolt. Critical Bolts have +1 damage and +50% crit chance. (3 second cooldown. Right click to aim)",
 		},
 
 		Daisy_Chain = {

@@ -550,6 +550,26 @@ local commands = {
 			end,
 		},
 
+		DropSoul = {
+
+			Parameters = function()
+				return {
+					{ Name = "Amount", Options = { "_Input" } },
+					{ Name = "DistanceFromCamera", Options = { "_Input" } },
+				}
+			end,
+
+			ExecuteClient = function(_, amnt, dist)
+				amnt = tonumber(amnt) or 1
+				dist = tonumber(dist) or 25
+
+				local ss = require(Globals.Client.Services.SoulsService)
+				for _ = 1, amnt do
+					ss.DropSoul((workspace.CurrentCamera.CFrame * CFrame.new(0, 0, -dist)).Position, 1000)
+				end
+			end,
+		},
+
 		SpawnEnemy = {
 			Parameters = function()
 				local enemies = game:GetService("ReplicatedStorage").Enemies:GetDescendants()
@@ -571,8 +591,6 @@ local commands = {
 			end,
 
 			ExecuteServer = function(_, player, Enemy, amount, teamName)
-				print(player, Enemy)
-
 				if not Enemy then
 					return
 				end

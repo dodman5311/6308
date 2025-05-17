@@ -75,6 +75,7 @@ function module.LoadGameData(player)
 	local upgradeIndex = LoadData(player, DataStoreService:GetDataStore("PlayerUpgradeIndex")) or 0
 	local gameSettings = LoadData(player, DataStoreService:GetDataStore("PlayerSettings")) or {}
 	local gameState = LoadData(player, DataStoreService:GetDataStore("PlayerGameState")) or {}
+	local stageState = LoadData(player, DataStoreService:GetDataStore("PlayerStageState")) or {}
 	local furthestLevel = LoadData(player, DataStoreService:GetDataStore("PlayerFurthestLevel")) or 0
 	local codex = LoadData(player, DataStoreService:GetDataStore("PlayerCodex")) or {}
 
@@ -83,6 +84,10 @@ function module.LoadGameData(player)
 
 	local permaUpgradeName = permaUpgrades.Upgrades[upgradeIndex] and permaUpgrades.Upgrades[upgradeIndex].Name or ""
 	player:SetAttribute("UpgradeName", permaUpgradeName)
+
+	if not gameState["Souls"] then
+		gameState = stageState
+	end
 
 	mapService.CurrentStage = gameState["Stage"] and math.clamp(gameState["Stage"], 1, math.huge) or 1
 	mapService.CurrentLevel = gameState["Level"] and math.clamp(gameState["Level"], 1, math.huge) or 1
@@ -130,6 +135,11 @@ function module.saveGameState(player, gameState)
 	gameState.Stage = mapService.CurrentStage
 	gameState.Level = mapService.CurrentLevel
 	SaveToStore(player, dataStore, gameState)
+
+	if gameState.Level == 1 and gameState["Souls"] then
+		SaveToStore(player, DataStoreService:GetDataStore("PlayerStageState"), gameState)
+		print("STAGE saved in", os.clock() - startTime, gameState)
+	end
 
 	print("Game saved in", os.clock() - startTime)
 	net:RemoteEvent("DoUiAction"):FireAllClients("Notify", "GameSaved")

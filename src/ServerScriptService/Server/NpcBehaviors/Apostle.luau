@@ -175,7 +175,7 @@ local module = {
 	TargetLost = {
 		{ Function = "SwitchToState", Parameters = { "Chasing" } },
 		{ Function = "MoveTowardsTarget" },
-		{ Function = "Custom", Parameters = { destroyShield } },
+		--{ Function = "Custom", Parameters = { destroyShield } },
 	},
 
 	OnSpawned = {
@@ -185,7 +185,7 @@ local module = {
 	},
 
 	OnDied = {
-		{ Function = "Custom", Parameters = { destroyShield } },
+		--{ Function = "Custom", Parameters = { destroyShield } },
 		{ Function = "SetCollision", Parameters = { "DeadBody" } },
 		{ Function = "SwitchToState", Parameters = { "Dead" } },
 		{ Function = "Ragdoll" },
