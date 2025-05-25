@@ -709,6 +709,11 @@ function module.proceedToNext(_, onlyLoadMap)
 			module.CurrentLevel = 1
 			module.CurrentStage += 1
 		end
+
+		if module.CurrentStage == 0 then
+			module.CurrentStage = workspace:GetAttribute("SaveStage") or 1
+			module.CurrentLevel = 1
+		end
 	end
 
 	if module.CurrentStage == 5 then

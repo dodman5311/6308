@@ -28,6 +28,17 @@ local function getCharacter()
 	return char, humanoid, primaryPart
 end
 
+LockedFrames = 1 / 60
+local function Locked_swait()
+	local T = tick()
+	while true do
+		game:GetService("RunService").RenderStepped:Wait()
+		if tick() - T >= LockedFrames then
+			break
+		end
+	end
+end
+
 function module.change(dash)
 	local character = player.Character
 	if not character then
@@ -43,9 +54,6 @@ function module.change(dash)
 	if not isFalling then
 		return
 	end
-	if beat then
-		beat:Disconnect()
-	end
 
 	if dash == true then
 		logVel = humanoid.MoveDirection * humanoid.WalkSpeed
@@ -53,11 +61,12 @@ function module.change(dash)
 		logVel = primaryPart.AssemblyLinearVelocity
 	end
 
-	beat = runService.Heartbeat:Connect(function()
-		if isFalling == false or t or acts:checkAct("grappling") then
-			beat:Disconnect()
-			return
+	while isFalling do
+		if t or acts:checkAct("grappling") then
+			break
 		end
+
+		Locked_swait()
 
 		local rp = RaycastParams.new()
 		rp.FilterType = Enum.RaycastFilterType.Include
@@ -95,7 +104,7 @@ function module.change(dash)
 		)
 
 		primaryPart.AssemblyLinearVelocity = clampedVector
-	end)
+	end
 end
 
 function module.cancel()

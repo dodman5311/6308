@@ -55,6 +55,11 @@ module.Exit = function(player, start_time, stage_number, level_number, bossBeate
 		title = "The Sewers"
 	end
 
+	if stage_number == 0 then
+		bossBeaten = "The Requiem"
+		workspace:SetAttribute("TotalScore", 0)
+	end
+
 	local levelData = {
 		Name = bossBeaten or title .. " : " .. level_number,
 		TimeTaken = math.round(os.clock() - start_time),
@@ -62,6 +67,9 @@ module.Exit = function(player, start_time, stage_number, level_number, bossBeate
 		ArenasCompleted = arenaCount / spawnedArenas * 100,
 		MaxCombo = bossBeaten and 10 or net:RemoteFunction("GetMaxCombo"):InvokeClient(player),
 	}
+
+	local maxScore = levelData.EnemiesKilled + levelData.ArenasCompleted + (levelData.MaxCombo * 10)
+	workspace:SetAttribute("TotalScore", workspace:GetAttribute("TotalScore") + math.floor(maxScore))
 
 	net:RemoteEvent("StartExitSequence"):FireAllClients(levelData, level_number, boss_name, miniboss_name, stage_number)
 end

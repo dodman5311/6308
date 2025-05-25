@@ -41,10 +41,11 @@ local collectedBlood = 0
 local pauseAmnt = 0
 local isPaused = false
 local lastOnGroundPosition = Vector3.zero
-local render
 local mouse = Player:GetMouse()
+local hasDied = false
 
 local mouseTarget = Instance.new("ObjectValue")
+local stageState = {}
 
 --// Fucntions
 
@@ -112,6 +113,26 @@ local function progressTo(level)
 	if level >= 3 then
 		signals["AddGift"]:Fire("Overcharge")
 	end
+end
+
+local function loadSaveData(upgradeIndex, gameState)
+	if not Player.Character then
+		Player.CharacterAdded:Wait()
+	end
+
+	soulsService.AddSoul(gameState["Souls"] or 0)
+
+	if gameState["critChances"] then
+		weaponService.critChances = gameState.critChances
+	end
+	ChanceService.luck = gameState["Luck"] or 0
+	kiosk.tickets = gameState["PerkTickets"] or 0
+
+	for _, perkName in ipairs(gameState["PerkList"] or {}) do
+		signals.AddGift:Fire(perkName)
+	end
+
+	giftService.UpgradeIndex = upgradeIndex
 end
 
 function module:OnSpawn(character, humanoid)
@@ -197,7 +218,13 @@ function module:OnSpawn(character, humanoid)
 
 	humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
 	humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
-end -- @TODO Fix dash
+	
+	local stageState = net:RemoteFunction("GetStageState"):InvokeServer()
+
+	if workspace:GetAttribute("TotalScore") > 500 and hasDied then -- req check
+		loadSaveData(0, stageState)
+	end
+end
 
 local function deathEffect()
 	local anchovies = Player:GetAttribute("Anchovies")
@@ -235,10 +262,7 @@ local function deathEffect()
 end
 
 function module:OnDied()
-	if render then
-		render:Disconnect()
-	end
-
+	hasDied = true
 	kiosk.tickets = 0
 
 	deathEffect()
@@ -475,6 +499,7 @@ local function exitS2(extraSouls, totalLevel, level, stageBoss, miniBoss, stage)
 			Stage = workspace:GetAttribute("Stage"),
 			Level = workspace:GetAttribute("Level"),
 			Souls = soulsService.Souls,
+			TotalScore = workspace:GetAttribute("TotalScore"),
 
 			critChances = weaponService.critChances,
 
@@ -504,7 +529,7 @@ local function ExitSequence(levelData, level, stageBoss, miniBoss, stage)
 	local extraSouls = UIService.doUiAction("LevelEnd", "ShowLevelEnd", levelData)
 	local onHidden
 
-	if level <= 5 and level ~= 2.5 then
+	if level <= 5 and level ~= 2.5 and stage ~= 0 then
 		onHidden = UIService.doUiAction("DeliveryUi", "ShowScreen", soulsService.Souls)
 
 		onHidden:Once(function()
@@ -519,25 +544,7 @@ local function ExitSequence(levelData, level, stageBoss, miniBoss, stage)
 	net:RemoteEvent("ProceedToNextLevel"):FireServer()
 end
 
-signals.LoadSavedDataFromClient:Connect(function(upgradeIndex, gameState)
-	if not Player.Character then
-		Player.CharacterAdded:Wait()
-	end
-
-	soulsService.AddSoul(gameState["Souls"] or 0)
-
-	if gameState["critChances"] then
-		weaponService.critChances = gameState.critChances
-	end
-	ChanceService.luck = gameState["Luck"] or 0
-	kiosk.tickets = gameState["PerkTickets"] or 0
-
-	for _, perkName in ipairs(gameState["PerkList"] or {}) do
-		signals.AddGift:Fire(perkName)
-	end
-
-	giftService.UpgradeIndex = upgradeIndex
-end)
+signals.LoadSavedDataFromClient:Connect(loadSaveData)
 
 signals.PauseGame:Connect(function()
 	local character = Player.Character

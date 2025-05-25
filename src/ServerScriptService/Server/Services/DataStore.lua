@@ -1,4 +1,9 @@
-local module = {}
+local module = {
+	stageState = {
+		Stage = 0,
+		Level = 0
+	},
+}
 
 --// Services
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -72,6 +77,7 @@ end
 
 function module.LoadGameData(player)
 	local startTime = os.clock()
+	local deathCount = LoadData(player, DataStoreService:GetDataStore("PlayerDeathCount")) or 0
 	local upgradeIndex = LoadData(player, DataStoreService:GetDataStore("PlayerUpgradeIndex")) or 0
 	local gameSettings = LoadData(player, DataStoreService:GetDataStore("PlayerSettings")) or {}
 	local gameState = LoadData(player, DataStoreService:GetDataStore("PlayerGameState")) or {}
@@ -85,9 +91,7 @@ function module.LoadGameData(player)
 	local permaUpgradeName = permaUpgrades.Upgrades[upgradeIndex] and permaUpgrades.Upgrades[upgradeIndex].Name or ""
 	player:SetAttribute("UpgradeName", permaUpgradeName)
 
-	if not gameState["Souls"] then
-		gameState = stageState
-	end
+	module.stageState = stageState
 
 	mapService.CurrentStage = gameState["Stage"] and math.clamp(gameState["Stage"], 1, math.huge) or 1
 	mapService.CurrentLevel = gameState["Level"] and math.clamp(gameState["Level"], 1, math.huge) or 1
@@ -111,8 +115,15 @@ function module.LoadGameData(player)
 
 	mapService.proceedToNext(nil, true)
 
+	workspace:SetAttribute("TotalScore", gameState.TotalScore or 0)
+	workspace:SetAttribute("DeathCount", deathCount or 0)
+
 	net:RemoteEvent("LoadData"):FireClient(player, upgradeIndex, gameState, gameSettings, codex)
 	return os.clock() - startTime
+end
+
+function module.getStageState()
+	return module.stageState
 end
 
 -- mapService.onLevelPassed:Connect(function(player, gameState)
@@ -138,6 +149,7 @@ function module.saveGameState(player, gameState)
 
 	if gameState.Level == 1 and gameState["Souls"] then
 		SaveToStore(player, DataStoreService:GetDataStore("PlayerStageState"), gameState)
+		module.stageState = gameState
 		print("STAGE saved in", os.clock() - startTime, gameState)
 	end
 
@@ -148,5 +160,6 @@ end
 net:Connect("SaveGameState", module.saveGameState)
 net:Connect("SaveFurthestLevel", module.saveFurthestLevel)
 net:Connect("SaveData", module.SaveData)
+net:Handle("GetStageState", module.getStageState)
 
 return module

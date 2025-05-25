@@ -1,5 +1,6 @@
 local module = {}
 --// Services
+local GuiService = game:GetService("GuiService")
 local Lighting = game:GetService("Lighting")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")

@@ -15,7 +15,7 @@ local Globals = require(ReplicatedStorage.Shared.Globals)
 local signals = require(Globals.Signals)
 local mapService = require(Globals.Services.MapService)
 local net = require(Globals.Packages.Net)
-local dataStore = require(Globals.Server.Services.DataStore)
+local dataStore = require(script.Parent.DataStore)
 
 local getBlockedNerd = net:RemoteEvent("GetBlockedNerd")
 net:RemoteEvent("CreateShield")
@@ -115,7 +115,8 @@ Players.PlayerAdded:Connect(function(player: Player)
 end)
 
 local function onDied(player: Player)
-	local closestDistance, closestEnemy = math.huge
+
+	local closestDistance, closestEnemy = math.huge, nil
 	for _, enemy in ipairs(collectionService:GetTagged("Enemy")) do
 		local distance = (player.Character:GetPivot().Position - enemy:GetPivot().Position).Magnitude
 
@@ -141,32 +142,24 @@ local function onDied(player: Player)
 		)
 	end
 
-	if
-		player:GetAttribute("UpgradeName") == "Anchovies"
-		and mapService.CurrentLevel ~= math.round(mapService.CurrentLevel)
-	then
-		module.Anchovies -= 1
-	end
+	--if mapService.CurrentLevel == math.round(mapService.CurrentLevel) then
+		print(mapService.CurrentStage)
 
-	if
-		player:GetAttribute("UpgradeName") ~= "Anchovies"
-		or mapService.CurrentLevel == math.round(mapService.CurrentLevel)
-		or module.Anchovies <= 0
-	then
-		mapService.CurrentStage = 1
+		workspace:SetAttribute("SaveStage", dataStore.stageState.Stage or 1)
+
+		print((workspace:GetAttribute("DeathCount") + 1) * 300)
+		if workspace:GetAttribute("TotalScore") > (workspace:GetAttribute("DeathCount") + 1) * 300 then -- req check
+			mapService.CurrentStage = 0
+			workspace:SetAttribute("DeathCount",  workspace:GetAttribute("DeathCount") + 1)
+		else
+			mapService.CurrentStage = 1
+			workspace:SetAttribute("TotalScore", 0)
+			workspace:SetAttribute("DeathCount", 0)
+		end
+
 		mapService.CurrentLevel = 1
-
-		if player:GetAttribute("UpgradeName") == "Sister Location" then
-			mapService.CurrentStage = 2
-			mapService.CurrentLevel = 1
-		end
-
-		if player:GetAttribute("UpgradeName") == "Pizza Chain" then
-			mapService.CurrentStage = 3
-			mapService.CurrentLevel = 1
-		end
-
 		dataStore.saveGameState(player, {})
+		dataStore.SaveData(player, "PlayerDeathCount", workspace:GetAttribute("DeathCount"))
 
 		local character = player.Character
 		local spawnLocation = workspace:FindFirstChild("SpawnLocation")
@@ -178,7 +171,7 @@ local function onDied(player: Player)
 		player.CharacterAdded:Once(function()
 			signals["ProceedToNextLevel"]:Fire(nil, true)
 		end)
-	end
+	--end
 
 	for _, enemy in ipairs(collectionService:GetTagged("Enemy")) do
 		enemy:Destroy()

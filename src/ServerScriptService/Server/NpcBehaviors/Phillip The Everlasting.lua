@@ -27,6 +27,7 @@ local moveChances = {
 	{ "throwAttack", 90 },
 	{ "shootAttack", 100 },
 }
+
 local moves = {}
 
 local function getTimer(npc, timerName, defaultTime)
@@ -332,7 +333,7 @@ local function grabPlayer(npc)
 
 	local beat
 	beat = RunService.Heartbeat:Connect(function()
-		if not npc:GetState() == "Dead" or not npc.Instance.Parent or not target or not target.PrimaryPart then
+		if npc:GetState() ~= "Dead" or not npc.Instance.Parent or not target or not target.PrimaryPart then
 			npc.Acts:removeAct("inAction", "inGrab")
 			beat:Disconnect()
 			return

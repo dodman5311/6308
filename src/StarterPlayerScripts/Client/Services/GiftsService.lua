@@ -81,15 +81,6 @@ function module.CheckUpgrade(upgradeName)
 end
 
 function module:OnDied()
-	if
-		module.CheckUpgrade("Anchovies")
-		and workspace:GetAttribute("Level") ~= math.round(workspace:GetAttribute("Level"))
-		and player:GetAttribute("Anchovies")
-		and player:GetAttribute("Anchovies") > 0
-	then
-		return
-	end
-
 	ClearGifts()
 end
 

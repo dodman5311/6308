@@ -9,6 +9,7 @@ local Globals = require(ReplicatedStorage.Shared.Globals)
 local sounds = ReplicatedStorage.Assets.Sounds
 
 local util = require(Globals.Vendor.Util)
+local ComboService = RunService:IsClient() and require(Globals.Client.Services.ComboService)
 
 function module.doWeakspotHit(part: BasePart): number
 	if not part or part.Name ~= "Weakspot" then
@@ -65,7 +66,13 @@ function module.doWeakspotHit(part: BasePart): number
 		end
 	end
 
-	part.Effect:Emit(part.Effect:GetAttribute("EmitCount"))
+	local effect = part:FindFirstChild("Effect")
+	effect:Emit(effect:GetAttribute("EmitCount"))
+
+	if RunService:IsClient() then
+		ComboService.RestartTimer()
+	end
+	
 
 	return Damage or 0
 end

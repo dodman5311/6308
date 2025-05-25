@@ -1,6 +1,6 @@
 local module = {
 	Souls = 0,
-	MaxDistance = 15,
+	MaxDistance = 50,
 	DropChance = 25,
 }
 
@@ -28,11 +28,12 @@ function module.CreateDrop(position, dropType)
 	local newDrop = Effects:FindFirstChild(dropType):Clone()
 
 	newDrop.Parent = workspace
-	newDrop:SetAttribute("OriginY", position.Y - 5)
 
 	newDrop:PivotTo(CFrame.new(position))
 	newDrop.PrimaryPart.AssemblyLinearVelocity =
 		Vector3.new(math.random(-30, 30), math.random(40, 50), math.random(-30, 30))
+
+	newDrop:SetAttribute("OriginY", position.Y - 5)
 
 	newDrop.PrimaryPart.CollisionGroup = "Drop"
 	newDrop:SetAttribute("DropType", dropType)
