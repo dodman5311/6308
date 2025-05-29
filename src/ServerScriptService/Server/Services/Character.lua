@@ -151,14 +151,18 @@ local function onDied(player: Player)
 		if workspace:GetAttribute("TotalScore") > (workspace:GetAttribute("DeathCount") + 1) * 300 then -- req check
 			mapService.CurrentStage = 0
 			workspace:SetAttribute("DeathCount",  workspace:GetAttribute("DeathCount") + 1)
+
+			dataStore.saveGameState(player, dataStore.stageState)
 		else
 			mapService.CurrentStage = 1
 			workspace:SetAttribute("TotalScore", 0)
 			workspace:SetAttribute("DeathCount", 0)
+
+			dataStore.saveGameState(player, {})
 		end
 
 		mapService.CurrentLevel = 1
-		dataStore.saveGameState(player, {})
+		
 		dataStore.SaveData(player, "PlayerDeathCount", workspace:GetAttribute("DeathCount"))
 
 		local character = player.Character

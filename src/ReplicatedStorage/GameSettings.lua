@@ -66,14 +66,21 @@ local settings = {
 	},
 
 	{
-		Name = "Distortion",
-		Type = "Boolean",
-		Value = true,
+		Name = "Screen Filter",
+		Type = "Slider",
+		--Value = true,
+
+		MaxValue = NumberRange.new(0, 2),
+		Value = 1,
 		OnChanged = function(self)
 			local screenEffects = playerGui:WaitForChild("ScreenEffects")
 			local distortions = screenEffects.Distortions
 
-			distortions.Visible = self.Value
+			local value = math.round(self.Value)
+
+			for _, frame in ipairs(distortions:GetChildren()) do
+				frame.Visible = tonumber(frame.Name) == value
+			end
 		end,
 	},
 

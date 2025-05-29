@@ -30,7 +30,7 @@ local function DoubleJump()
 	local humanoid = character.Humanoid
 
 	if
-		humanoid:GetState() == Enum.HumanoidStateType.Freefall
+		humanoid.FloorMaterial == Enum.Material.Air
 		and module.jumpLock == false
 		and not acts:checkAct("wallrunning")
 	then
@@ -45,9 +45,10 @@ local function DoubleJump()
 			momentum.switchFalling(true)
 
 			--util.PlaySound(script.Jump, script, 5)
+
 			repeat
 				task.wait()
-			until humanoid:GetState() == Enum.HumanoidStateType.Landed
+			until humanoid.FloorMaterial ~= Enum.Material.Air
 				or humanoid.Health <= 0
 				or acts:checkAct("wallrunning")
 				or not player.Character

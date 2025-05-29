@@ -1,7 +1,7 @@
 local module = {
 	stageState = {
 		Stage = 0,
-		Level = 0
+		Level = 0,
 	},
 }
 
@@ -78,7 +78,7 @@ end
 function module.LoadGameData(player)
 	local startTime = os.clock()
 	local deathCount = LoadData(player, DataStoreService:GetDataStore("PlayerDeathCount")) or 0
-	local upgradeIndex = LoadData(player, DataStoreService:GetDataStore("PlayerUpgradeIndex")) or 0
+	local upgrades = LoadData(player, DataStoreService:GetDataStore("ShopUpgrades")) or {}
 	local gameSettings = LoadData(player, DataStoreService:GetDataStore("PlayerSettings")) or {}
 	local gameState = LoadData(player, DataStoreService:GetDataStore("PlayerGameState")) or {}
 	local stageState = LoadData(player, DataStoreService:GetDataStore("PlayerStageState")) or {}
@@ -86,10 +86,6 @@ function module.LoadGameData(player)
 	local codex = LoadData(player, DataStoreService:GetDataStore("PlayerCodex")) or {}
 
 	player:SetAttribute("furthestLevel", furthestLevel)
-	player:SetAttribute("UpgradeIndex", upgradeIndex)
-
-	local permaUpgradeName = permaUpgrades.Upgrades[upgradeIndex] and permaUpgrades.Upgrades[upgradeIndex].Name or ""
-	player:SetAttribute("UpgradeName", permaUpgradeName)
 
 	module.stageState = stageState
 
@@ -97,28 +93,13 @@ function module.LoadGameData(player)
 	mapService.CurrentLevel = gameState["Level"] and math.clamp(gameState["Level"], 1, math.huge) or 1
 
 	player:SetAttribute("MaxHealth", 5)
-	if permaUpgradeName == "Cheaper Ingredients" then
-		player:SetAttribute("MaxHealth", 3)
-	end
-
-	signals.ActivateUpgrade:Fire(player, permaUpgradeName)
-
-	if permaUpgradeName == "Sister Location" and mapService.CurrentStage < 2 then
-		mapService.CurrentStage = 2
-		mapService.CurrentLevel = 1
-	end
-
-	if permaUpgradeName == "Pizza Chain" and mapService.CurrentStage < 3 then
-		mapService.CurrentStage = 3
-		mapService.CurrentLevel = 1
-	end
 
 	mapService.proceedToNext(nil, true)
 
 	workspace:SetAttribute("TotalScore", gameState.TotalScore or 0)
 	workspace:SetAttribute("DeathCount", deathCount or 0)
 
-	net:RemoteEvent("LoadData"):FireClient(player, upgradeIndex, gameState, gameSettings, codex)
+	net:RemoteEvent("LoadData"):FireClient(player, upgrades, gameState, gameSettings, codex)
 	return os.clock() - startTime
 end
 
@@ -143,8 +124,8 @@ function module.saveGameState(player, gameState)
 	local startTime = os.clock()
 
 	local dataStore = DataStoreService:GetDataStore("PlayerGameState")
-	gameState.Stage = mapService.CurrentStage
-	gameState.Level = mapService.CurrentLevel
+	gameState.Stage = gameState.Stage or mapService.CurrentStage
+	gameState.Level = gameState.Level or mapService.CurrentLevel
 	SaveToStore(player, dataStore, gameState)
 
 	if gameState.Level == 1 and gameState["Souls"] then
