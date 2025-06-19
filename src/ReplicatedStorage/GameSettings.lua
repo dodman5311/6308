@@ -112,7 +112,7 @@ local settings = {
 	{
 		Name = "Field of View",
 		Type = "Slider",
-		MaxValue = NumberRange.new(50, 90),
+		MaxValue = NumberRange.new(50, 120),
 		Value = 70,
 		OnChanged = function(self)
 			local ti = TweenInfo.new(0.5, Enum.EasingStyle.Quint)

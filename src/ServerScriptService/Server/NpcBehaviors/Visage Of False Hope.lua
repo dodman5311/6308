@@ -761,7 +761,7 @@ local function spawnEnemy(OriginCFrame)
 	local spawnCFrame = OriginCFrame
 		* CFrame.new(rng:NextInteger(-spawnRangeX, spawnRangeX), 2, rng:NextInteger(-spawnRangeZ, spawnRangeZ))
 
-	local enemyModel = spawners.placeNewObject(10, spawnCFrame, "Enemy", enemyToSpawn)
+	local enemyModel = spawners.placeNewObject(10, spawnCFrame, "Enemy", enemyToSpawn).Instance
 
 	if not enemyModel then
 		return

@@ -1,6 +1,6 @@
 local module = {
 	Souls = 0,
-	MaxDistance = 50,
+	MaxDistance = 15,
 	DropChance = 25,
 }
 
@@ -62,7 +62,7 @@ local function checkForDrops()
 		local beyondMaxDistance = distance > module.MaxDistance
 
 		drop.PrimaryPart.Anchored = not beyondMaxDistance
-		drop.PrimaryPart.CanCollide = beyondMaxDistance
+		drop.PrimaryPart.CanCollide = true
 
 		if dropPosition.Y <= drop:GetAttribute("OriginY") then
 			drop.PrimaryPart.Anchored = true

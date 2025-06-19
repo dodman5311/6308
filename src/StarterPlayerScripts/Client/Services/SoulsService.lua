@@ -9,6 +9,7 @@ local CollectionService = game:GetService("CollectionService")
 local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local assets = ReplicatedStorage.Assets
 
@@ -43,7 +44,7 @@ function module.CalculateDropChance(chanceMod)
 	if module.Souls <= 0 and soulCount <= 1 then
 		module.currentMult = 5
 
-		if player.Character then
+		if player.Character and player.Character:FindFirstChild("Humanoid") then
 			module.currentMult += 5 - player.Character.Humanoid.Health
 		end
 		chance *= module.currentMult
@@ -141,8 +142,6 @@ function module.AddSoul(amount)
 		return
 	end
 
-	module.CalculateDropChance()
-
 	module.Souls += math.round(amount)
 	UIService.doUiAction("HUD", "UpdateSouls", module.Souls)
 
@@ -155,8 +154,6 @@ function module.AddSoul(amount)
 end
 
 function module.RemoveSoul(amount)
-	module.CalculateDropChance()
-
 	if module.Souls <= 0 then
 		return
 	end
@@ -219,6 +216,10 @@ GiftsService.OnGiftAdded:Connect(function(gift)
 	if gift == "Iron_Will" then
 		checkIronWill()
 	end
+end)
+
+RunService.Heartbeat:Connect(function()
+	module.CalculateDropChance()
 end)
 
 return module

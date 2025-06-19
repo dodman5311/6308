@@ -76,7 +76,7 @@ local grenadeLocks = {}
 local canUseDamagePerk = true
 local DAMAGE_PERK_COOLDOWN = 20
 local SOUL_FIRE_COOLDOWN = 15
-local DEADBOLT_COOLDOWN = 3
+local DEADBOLT_COOLDOWN = 1.5
 local deadBoltActive = false
 local onDeadBoltCooldown = false
 
@@ -934,7 +934,12 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		module.HasHitMachine = true
 	end
 
-	if GiftsService.CheckGift("Open_Wounds") and ChanceService.checkChance(10, true) and not isVendingMachine then
+	if
+		GiftsService.CheckGift("Open_Wounds")
+		and ChanceService.checkChance(10, true)
+		and not isVendingMachine
+		and model.Name ~= "UpgradeUnit"
+	then
 		createFakeWeakpoint(model, subject, cframe.Position)
 	end
 
@@ -1331,6 +1336,8 @@ projectileService.projectileHit:Connect(function(result, projectile)
 end)
 
 local function fireDeadBolt(extraBullet, bulletDamage, weaponName, element)
+	module.UpdateAmmo(currentAmmo - 1)
+
 	onDeadBoltCooldown = true
 	UIService.doUiAction("HUD", "CooldownDeadBolt", DEADBOLT_COOLDOWN)
 	UIService.doUiAction("HUD", "ActivateGift", "Dead_Bolt")
@@ -2137,6 +2144,35 @@ function module.OnBlock()
 	module.currentWeapon.BlockPart.Blocked:Emit(20)
 end
 
+local function detectEnemy()
+	local enemies = CollectionService:GetTagged("Enemy")
+	local leastDiff, closestEnemy = math.huge, nil
+
+	for _, enemy in ipairs(enemies) do
+		local enemyPosition = enemy:GetPivot().Position
+
+		local lv_0 = CFrame.lookAt(camera.CFrame.Position, enemyPosition).LookVector
+
+		local difference = (camera.CFrame.LookVector - lv_0).Magnitude
+		local distance = (camera.CFrame.Position - enemyPosition).Magnitude
+
+		if distance > 200 or difference > 0.2 then
+			continue
+		end
+
+		if difference < leastDiff then
+			leastDiff = difference
+			closestEnemy = enemy
+		end
+	end
+
+	return closestEnemy
+
+	--local size = dist and dist * 3 or 0.5
+	--gui.Crosshair.Size = gui.Crosshair.Size:Lerp(UDim2.fromScale(size,size), 0.1)
+	--gui.Crosshair.ImageTransparency = gui.Crosshair.Size.X.Scale - 0.5
+end
+
 function module.OpenDeadBolt()
 	if deadBoltActive or not GiftsService.CheckGift("Dead_Bolt") then
 		return
@@ -2144,6 +2180,23 @@ function module.OpenDeadBolt()
 	deadBoltActive = true
 
 	viewmodel:SetOffset("HideDeadBolt", "FromCamera", CFrame.new(0, 0, 10))
+
+	local r = RunService.RenderStepped:Connect(function()
+		local enemyDetected = detectEnemy()
+		if enemyDetected then
+			local recoilCFrame = CFrame.Angles(
+				math.rad(recoilSpring.Position.Y),
+				math.rad(recoilSpring.Position.X),
+				math.rad(recoilSpring.Position.Z)
+			)
+
+			camera.CFrame = CFrame.lookAt(camera.CFrame.Position, enemyDetected:GetPivot().Position) * recoilCFrame
+		end
+	end)
+
+	task.delay(0.175, function()
+		r:Disconnect()
+	end)
 
 	UIService.doUiAction(
 		"HUD",

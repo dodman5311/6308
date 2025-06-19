@@ -33,6 +33,19 @@ local function Format(Int)
 	return string.format("%02i", Int)
 end
 
+local function tweenColor(frame, color: Color3, timeOv)
+	timeOv = timeOv or 1
+
+	local ti = TweenInfo.new(timeOv, Enum.EasingStyle.Quart)
+
+	util.tween(frame.Combo.Amount, ti, { TextColor3 = color })
+	util.tween(frame.Enemies.Amount, ti, { TextColor3 = color })
+	util.tween(frame.Items.Amount, ti, { TextColor3 = color })
+	util.tween(frame.Score.Amount, ti, { TextColor3 = color })
+	util.tween(frame.MapName.Completed, ti, { TextColor3 = color })
+	util.tween(frame.Skull.Image, ti, { ImageColor3 = color })
+end
+
 local function convertToHMS(Seconds)
 	local Minutes = (Seconds - Seconds % 60) / 60
 	Seconds = Seconds - Minutes * 60
@@ -56,44 +69,79 @@ local function awardSouls(frame, value, threshold)
 	if value < threshold then
 		return
 	end
+	tweenColor(frame, Color3.fromRGB(200, 255, 245))
 
 	local amount = math.floor((value - threshold) / 100) + 1
 
 	soulsAwarded += amount
-	frame.SoulAwarded.Count.Text = "+" .. amount
-	frame.SoulAwarded.Visible = true
+	frame.Score.SoulAwarded.Count.Text = "+" .. amount
+	frame.Score.SoulAwarded.Visible = true
+
+	util.PlaySound(sounds.SoulDrop, script)
+	util.PlaySound(sounds.SoulDropVoices, script)
 end
 
 function module.Init(player, ui, frame)
 	frame.Gui.Enabled = false
 
+	local SLock = false
+
 	ComboValue.Changed:Connect(function(value)
 		frame.Combo.Amount.Text = "X" .. value
+
+		if not SLock then
+			util.PlaySound(sounds.BorusFire, script)
+
+			SLock = true
+			task.wait(0.05)
+			SLock = false
+		end
 	end)
 
 	EnemiesValue.Changed:Connect(function(value)
 		frame.Enemies.Amount.Text = value .. "%"
+
+		if not SLock then
+			util.PlaySound(sounds.BorusFire, script)
+
+			SLock = true
+			task.wait(0.05)
+			SLock = false
+		end
 	end)
 
 	ItemsValue.Changed:Connect(function(value)
 		frame.Items.Amount.Text = value .. "%"
+
+		if not SLock then
+			util.PlaySound(sounds.BorusFire, script)
+
+			SLock = true
+			task.wait(0.05)
+			SLock = false
+		end
 	end)
 
 	TimeValue.Changed:Connect(function(value)
+		util.PlaySound(sounds.Click, script)
 		frame.MapTime.Text = convertToHMS(value)
 	end)
+
+	UiAnimator.PlayAnimation(frame.Score.RCoin, 0.1, true)
 end
 
 function module.Cleanup(player, ui, frame) end
 
 function module.ShowLevelEnd(player, ui, frame, levelData)
+	tweenColor(frame, Color3.fromRGB(255, 0, 0), 0)
+
 	frame.Gui.Enabled = true
 	frame.Frame.GroupTransparency = 1
 	soulsAwarded = 0
 
 	if not levelData then
 		levelData = {
-			Name = "The Suburbs : 1",
+			Name = "NO DATA",
 			TimeTaken = 120,
 			EnemiesKilled = 100,
 			ArenasCompleted = 100,
@@ -129,21 +177,25 @@ function module.ShowLevelEnd(player, ui, frame, levelData)
 	task.wait(0.5)
 
 	util.tween(EnemiesValue, ti, { Value = levelData.EnemiesKilled }, true)
+	util.PlaySound(sounds.RCoinsSmall, script, 0.05)
 	AddToMaxScore(EnemiesValue.Value, frame)
 
 	task.wait(0.5)
 
 	util.tween(ItemsValue, ti, { Value = levelData.ArenasCompleted }, true)
+	util.PlaySound(sounds.RCoinsSmall, script, 0.05)
 	AddToMaxScore(ItemsValue.Value, frame)
 
 	task.wait(0.5)
 
 	util.tween(ComboValue, ti, { Value = levelData.MaxCombo }, true)
+	util.PlaySound(sounds.RCoins, script)
+	tweenColor(frame, Color3.fromRGB(127, 63, 206))
 	AddToMaxScore(ComboValue.Value * 10, frame)
 
-	task.wait(0.5)
+	task.wait(1)
 
-	awardSouls(frame.Score, tonumber(frame.Score.Amount.Text), 300)
+	awardSouls(frame, tonumber(frame.Score.Amount.Text), 300)
 
 	task.wait(2)
 

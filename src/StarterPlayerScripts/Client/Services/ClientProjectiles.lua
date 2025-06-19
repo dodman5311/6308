@@ -297,13 +297,15 @@ local function checkRaycast(projectile, raycastDistance)
 
 	local rp = RaycastParams.new()
 
-	rp.FilterDescendantsInstances = { workspace.CurrentCamera, projectile.Sender }
-	rp.FilterType = Enum.RaycastFilterType.Exclude
-	rp.CollisionGroup = "Bullet"
+	local filter = { workspace.CurrentCamera, projectile.Sender }
 
 	for _, value in ipairs(projectile.RecentHits) do
-		table.insert(rp.FilterDescendantsInstances, value)
+		table.insert(filter, value)
 	end
+
+	rp.FilterDescendantsInstances = filter
+	rp.FilterType = Enum.RaycastFilterType.Exclude
+	rp.CollisionGroup = "Bullet"
 
 	if projectile.Sender then
 		for _, team: Team in ipairs(Teams:GetTeams()) do

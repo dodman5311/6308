@@ -18,7 +18,6 @@ local currentPlaying
 local fallBackTrack = Instance.new("Sound")
 
 local musicTimer = timer:new("PlayCalm", 5, function()
-	soulsService.CalculateDropChance()
 	local ti = TweenInfo.new(1, Enum.EasingStyle.Linear)
 
 	if not currentPlaying or not tonumber(currentPlaying.Name) then
@@ -48,7 +47,6 @@ local function switchTrack()
 		musicTimer:Run()
 	else
 		musicTimer:Cancel()
-		soulsService.CalculateDropChance()
 
 		local volume = track:GetAttribute("Volume") or 0.35
 

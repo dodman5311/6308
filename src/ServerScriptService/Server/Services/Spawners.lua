@@ -173,7 +173,7 @@ function module.placeNewObject(currentLevel, cframe, type, objectName, noChance)
 		newObject:Spawn(cframe)
 
 		task.spawn(objectTypes[type].OnSpawn, newObject)
-		return newObject.Instance
+		return newObject
 	else
 		newObject = selectedObject:Clone()
 	end
@@ -253,6 +253,7 @@ function module.spawnEnemies(currentLevel, mapOverride)
 	if not mapOverride then
 		module.EnemiesSpawned = enemiesSpawned
 	end
+
 	return enemiesSpawned
 end
 
@@ -288,10 +289,15 @@ function module.spawnHazards(currentLevel, mapOverride)
 		local cframe = getSpawnPoint(spawner)
 		local hazardToSpawn = spawner:GetAttribute("HazardType")
 
+		local npc
 		if hazardToSpawn == "VendingMachine" then
-			module.placeNewObject(currentLevel, cframe, "VendingMachine")
+			npc = module.placeNewObject(currentLevel, cframe, "VendingMachine")
 		else
-			module.placeNewObject(currentLevel, cframe, "Npc", hazardToSpawn)
+			npc = module.placeNewObject(currentLevel, cframe, "Npc", hazardToSpawn)
+		end
+
+		if hazardToSpawn == "UpgradeUnit" then
+			npc.MindData["UpgradeName"] = spawner:GetAttribute("UpgradeName")
 		end
 	end
 end

@@ -70,7 +70,7 @@ local function runArena(encounter, unit, level, isAmbush)
 			end
 
 			local spawnCFrame = unit:GetPivot() * spawnData.CFrameInUnit:Inverse()
-			local enemyModel = spawners.placeNewObject(level, spawnCFrame, "Enemy", spawnData.Enemy)
+			local enemyModel = spawners.placeNewObject(level, spawnCFrame, "Enemy", spawnData.Enemy).Instance
 
 			if not enemyModel then
 				continue

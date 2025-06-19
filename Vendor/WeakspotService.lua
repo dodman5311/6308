@@ -66,13 +66,12 @@ function module.doWeakspotHit(part: BasePart): number
 		end
 	end
 
-	local effect = part:FindFirstChild("Effect")
+	local effect = part:FindFirstChild("Effect", true)
 	effect:Emit(effect:GetAttribute("EmitCount"))
 
 	if RunService:IsClient() then
 		ComboService.RestartTimer()
 	end
-	
 
 	return Damage or 0
 end
