@@ -14,9 +14,13 @@ local vfx = net:RemoteEvent("ReplicateEffect")
 local util = require(Globals.Vendor.Util)
 local animationService = require(Globals.Vendor.AnimationService)
 local upgrades = require(Globals.Shared.Upgrades)
+local uiAnimationService = require(Globals.Vendor.UIAnimationService)
 
 local function getUpgradeInfo(npc, getPrev: boolean?)
-	local upgradeName = npc.MindData["UpgradeName"] or "ComboUpgrades"
+	if not npc.MindData["UpgradeName"] then
+		npc.MindData["UpgradeName"] = "Combo_Tier"
+	end
+	local upgradeName = npc.MindData["UpgradeName"]
 	local upgradeIndex = workspace:GetAttribute(upgradeName)
 
 	if not getPrev then
@@ -41,10 +45,12 @@ local function updateGui(npc)
 		newFrame.Title.Text = upgradeData.Name
 		newFrame.Description.Text = upgradeData.Description
 		newFrame.Cost.Text = upgradeData.Price
+		newFrame.RCoin.Visible = true
 	else
 		newFrame.Title.Text = "MAX"
 		newFrame.Description.Text = "Fully upgraded"
-		newFrame.Cost.Text = 0
+		newFrame.Cost.Text = ""
+		newFrame.RCoin.Visible = false
 	end
 
 	local ti = TweenInfo.new(0.5)
@@ -53,6 +59,7 @@ local function updateGui(npc)
 		upgradeFrame:Destroy()
 	end)
 	util.tween(newFrame, ti, { Position = UDim2.fromScale(0.5, 0) })
+	uiAnimationService.PlayAnimation(newFrame.RCoin, 0.1, true)
 end
 
 local function attemptPurchase(npc)
@@ -114,6 +121,8 @@ local function loadGui(npc)
 	gui.Adornee = instance.Screen
 	gui.Enabled = true
 
+	instance.TitleGui.Title.Text =
+		string.sub(npc.MindData.UpgradeName, 1, string.find(npc.MindData.UpgradeName, "_") - 1)
 	npc.MindData.Gui = gui
 
 	instance.Destroying:Once(function()

@@ -1,19 +1,19 @@
 local upgrades = {
-	ComboUpgrades = {
+	Combo_Tier = {
 		{
 			Name = "Tier 1",
 			Description = "-1 combo hit penalty.",
-			Price = 5,
+			Price = 600,
 		},
 		{
 			Name = "Tier 2",
 			Description = "+1 Second to combo time.",
-			Price = 10,
+			Price = 2000,
 		},
 		{
 			Name = "Tier 3",
 			Description = "Combo reduces by 5 instead of clearing",
-			Price = 15,
+			Price = 5000,
 		},
 	},
 }

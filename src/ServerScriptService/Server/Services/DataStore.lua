@@ -128,7 +128,7 @@ function module.saveGameState(player, gameState)
 	gameState.Level = gameState.Level or mapService.CurrentLevel
 	SaveToStore(player, dataStore, gameState)
 
-	if gameState.Level == 1 and gameState["Souls"] then
+	if gameState.Level == 1 then
 		SaveToStore(player, DataStoreService:GetDataStore("PlayerStageState"), gameState)
 		module.stageState = gameState
 		print("STAGE saved in", os.clock() - startTime, gameState)

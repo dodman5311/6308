@@ -202,7 +202,8 @@ function module:OnSpawn(character, humanoid)
 			end
 
 			PlayHitEffect()
-			comboService.ReduceCombo(1)
+			local comboTier = workspace:GetAttribute("Combo_Tier")
+			comboService.ReduceCombo(comboTier >= 1 and 1 or 2)
 		end
 
 		logHealth = health
@@ -218,10 +219,11 @@ function module:OnSpawn(character, humanoid)
 
 	humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
 	humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
-	
+
 	local stageState = net:RemoteFunction("GetStageState"):InvokeServer()
 
-	if workspace:GetAttribute("TotalScore") > 500 and hasDied then -- req check
+	if workspace:GetAttribute("TotalScore") > (workspace:GetAttribute("DeathCount") + 1) * 200 and hasDied then -- req check
+		UIService.doUiAction("HUD", "ShowRCoins")
 		loadSaveData(0, stageState)
 	end
 end
@@ -461,6 +463,7 @@ local function exitS2(extraSouls, totalLevel, level, stageBoss, miniBoss, stage)
 		signals.DoUiAction:Fire("HUD", "ActivateGift", "Paladin's_Faith")
 	end
 
+	-- add requiem shop entry
 	if workspace:GetAttribute("Stage") == 1 then
 		codexService.AddEntry("The Suburbs")
 	elseif workspace:GetAttribute("Stage") == 2 then
@@ -519,6 +522,7 @@ local function exitS2(extraSouls, totalLevel, level, stageBoss, miniBoss, stage)
 	local ti = TweenInfo.new(1, Enum.EasingStyle.Exponential)
 
 	util.tween(camera, ti, { FieldOfView = util.getSetting("Field of View").Value })
+	UIService.doUiAction("HUD", "HideRCoins")
 end
 local function ExitSequence(levelData, level, stageBoss, miniBoss, stage)
 	local plusStage = (stage - 1) * 5

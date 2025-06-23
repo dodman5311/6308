@@ -101,6 +101,14 @@ function module.getObjectInCenter(center, player)
 	return inCenter, objectsOnScreen, leastDistance
 end
 
+function module.ShowRCoins(player, ui, frame)
+	frame.RCoins.Visible = true
+end
+
+function module.HideRCoins(player, ui, frame)
+	frame.RCoins.Visible = false
+end
+
 function module.Init(player, ui, frame)
 	UserInputService.MouseIconEnabled = false
 
@@ -130,6 +138,11 @@ function module.Init(player, ui, frame)
 	local currentBossHealthChanged
 
 	UiAnimator.PlayAnimation(frame.Flame, 0.1, true)
+	UiAnimator.PlayAnimation(frame.RCoins.Coins, 0.1, true)
+
+	workspace:GetAttributeChangedSignal("TotalScore"):Connect(function()
+		frame.RCoins.Count.Text = workspace:GetAttribute("TotalScore")
+	end)
 
 	targetEnemy.Changed:Connect(function(value)
 		if currentHealthChanged then

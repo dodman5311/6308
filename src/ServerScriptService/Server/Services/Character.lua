@@ -115,7 +115,6 @@ Players.PlayerAdded:Connect(function(player: Player)
 end)
 
 local function onDied(player: Player)
-
 	local closestDistance, closestEnemy = math.huge, nil
 	for _, enemy in ipairs(collectionService:GetTagged("Enemy")) do
 		local distance = (player.Character:GetPivot().Position - enemy:GetPivot().Position).Magnitude
@@ -143,38 +142,38 @@ local function onDied(player: Player)
 	end
 
 	--if mapService.CurrentLevel == math.round(mapService.CurrentLevel) then
-		print(mapService.CurrentStage)
+	print(mapService.CurrentStage)
 
-		workspace:SetAttribute("SaveStage", dataStore.stageState.Stage or 1)
+	workspace:SetAttribute("SaveStage", dataStore.stageState.Stage or 1)
 
-		print((workspace:GetAttribute("DeathCount") + 1) * 300)
-		if workspace:GetAttribute("TotalScore") > (workspace:GetAttribute("DeathCount") + 1) * 300 then -- req check
-			mapService.CurrentStage = 0
-			workspace:SetAttribute("DeathCount",  workspace:GetAttribute("DeathCount") + 1)
+	print((workspace:GetAttribute("DeathCount") + 1) * 200)
+	if workspace:GetAttribute("TotalScore") > (workspace:GetAttribute("DeathCount") + 1) * 200 then -- req check
+		mapService.CurrentStage = 0
+		workspace:SetAttribute("DeathCount", workspace:GetAttribute("DeathCount") + 1)
 
-			dataStore.saveGameState(player, dataStore.stageState)
-		else
-			mapService.CurrentStage = 1
-			workspace:SetAttribute("TotalScore", 0)
-			workspace:SetAttribute("DeathCount", 0)
+		dataStore.saveGameState(player, dataStore.stageState)
+	else
+		mapService.CurrentStage = 1
+		workspace:SetAttribute("TotalScore", 0)
+		workspace:SetAttribute("DeathCount", 0)
 
-			dataStore.saveGameState(player, {})
-		end
+		dataStore.saveGameState(player, {})
+	end
 
-		mapService.CurrentLevel = 1
-		
-		dataStore.SaveData(player, "PlayerDeathCount", workspace:GetAttribute("DeathCount"))
+	mapService.CurrentLevel = 1
 
-		local character = player.Character
-		local spawnLocation = workspace:FindFirstChild("SpawnLocation")
+	dataStore.SaveData(player, "PlayerDeathCount", workspace:GetAttribute("DeathCount"))
 
-		if spawnLocation then
-			character:PivotTo(spawnLocation.CFrame * CFrame.new(0, 3, 0))
-		end
+	local character = player.Character
+	local spawnLocation = workspace:FindFirstChild("SpawnLocation")
 
-		player.CharacterAdded:Once(function()
-			signals["ProceedToNextLevel"]:Fire(nil, true)
-		end)
+	if spawnLocation then
+		character:PivotTo(spawnLocation.CFrame * CFrame.new(0, 3, 0))
+	end
+
+	player.CharacterAdded:Once(function()
+		signals["ProceedToNextLevel"]:Fire(nil, true)
+	end)
 	--end
 
 	for _, enemy in ipairs(collectionService:GetTagged("Enemy")) do

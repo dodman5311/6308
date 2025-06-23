@@ -12,24 +12,45 @@ local UIService = require(Globals.Client.Services.UIService)
 local giftService = require(Globals.Client.Services.GiftsService)
 local net = require(Globals.Packages.Net)
 
+local comboTimer
+
 local function resetCombo()
-	module.CurrentCombo = 0
-	UIService.fullUi.HUD.ComboFrame.Visible = false
+	if workspace:GetAttribute("Combo_Tier") >= 3 then
+		module.CurrentCombo = math.clamp(module.CurrentCombo - 5, 0, math.huge)
+		comboTimer:Run()
+	else
+		module.CurrentCombo = 0
+	end
+
+	if module.CurrentCombo <= 0 then
+		UIService.fullUi.HUD.ComboFrame.Visible = false
+	else
+		UIService.doUiAction("HUD", "SetCombo", module.CurrentCombo)
+	end
 end
 
-local comboTimer = Timer:new("ComboTimer", module.ComboTime, resetCombo)
+comboTimer = Timer:new("ComboTimer", module.ComboTime, resetCombo)
 
 function module.ResetCombo()
 	comboTimer:Cancel()
 	resetCombo()
 end
 
-function module.AddToCombo(amount)
-	comboTimer.WaitTime = module.ComboTime
+local function getComboTime()
+	local comboTime = module.ComboTime
 
 	if giftService.CheckGift("Kill_Chain") then
-		comboTimer.WaitTime += 0.5
+		comboTime += 0.5
 	end
+
+	if workspace:GetAttribute("Combo_Tier") >= 2 then
+		comboTime += 1
+	end
+	return comboTime
+end
+
+function module.AddToCombo(amount)
+	comboTimer.WaitTime = getComboTime()
 
 	module.CurrentCombo += amount
 	comboTimer:Reset()
@@ -61,7 +82,7 @@ function module.RestartTimer()
 end
 
 comboTimer.OnTimerStepped:Connect(function(currentTime)
-	local comboTime = giftService.CheckGift("Kill_Chain") and module.ComboTime + 0.5 or module.ComboTime
+	local comboTime = getComboTime()
 	UIService.fullUi.HUD.ComboBar.Size = UDim2.fromScale((comboTime - currentTime) / comboTime, 0.1)
 end)
 
