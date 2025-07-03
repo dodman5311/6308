@@ -16,6 +16,42 @@ local upgrades = {
 			Price = 5000,
 		},
 	},
+
+	Souls_Tier = {
+		{
+			Name = "Tier 1",
+			Description = "+ Soul Pickup distance",
+			Price = 600,
+		},
+		{
+			Name = "Tier 2",
+			Description = "You will always be given at least one soul when ending a level.",
+			Price = 2000,
+		},
+		{
+			Name = "Tier 3",
+			Description = "+ Soul Chance",
+			Price = 5000,
+		},
+	},
+
+	Movement_Tier = {
+		{
+			Name = "Tier 1",
+			Description = "+ Movement Speed",
+			Price = 600,
+		},
+		{
+			Name = "Tier 2",
+			Description = "You will always be given at least one soul when ending a level.",
+			Price = 2000,
+		},
+		{
+			Name = "Tier 3",
+			Description = "+ Soul Chance",
+			Price = 5000,
+		},
+	},
 }
 
 for upgradeName, _ in pairs(upgrades) do

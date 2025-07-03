@@ -422,7 +422,7 @@ function module.Init(player: Player, ui, frame)
 		module.Close(player, ui, frame)
 
 		SoulsService.RemoveSoul(SoulsService.Souls)
-		net:RemoteEvent("UpdatePlayerHealth"):FireServer(player:GetAttribute("MaxHealth"), 0, false)
+		net:RemoteEvent("Restart"):FireServer()
 	end)
 
 	frame.CancelRestart.MouseButton1Click:Connect(function()
@@ -1039,7 +1039,7 @@ function module.openMap(player, ui, frame)
 	loadMap(player, frame)
 	processCamera(frame)
 
-	frame.LevelDisplay.Text = "Stage: "
+	frame.LevelDisplay.Text = "Sector: "
 		.. workspace:GetAttribute("Stage")
 		.. "  "
 		.. "Level: "

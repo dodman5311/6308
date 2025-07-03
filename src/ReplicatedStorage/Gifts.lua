@@ -198,7 +198,7 @@ local module = {
 		Open_Wounds = {
 			Icon = "rbxassetid://18671290957",
 			Catagories = { "Arsenal" },
-			Desc = "Shooting an enemy now has a 10% chance to create a Weak point where you shot. (+2 damage on weak point hit)",
+			Desc = "Shooting an enemy now has a 10% chance to create a Weak point where you shot. (+4 damage on weak point hit)",
 		},
 
 		Tacticool = {
@@ -228,7 +228,7 @@ local module = {
 		Ricoshot = {
 			Icon = "rbxassetid://16050196959",
 			Catagories = { "Arsenal" },
-			Desc = "Shooting a thrown weapon mid air will now ricochet shots to the nearest enemy with increased damage. (+4 Damage)",
+			Desc = "Shooting a thrown weapon mid air will now ricochet shots to the nearest enemy with increased damage. (+2 Damage)",
 		},
 
 		Red_Eyes = {
@@ -252,7 +252,7 @@ local module = {
 		Sauce_Is_Fuel = {
 			Icon = "rbxassetid://16234651850",
 			Catagories = { "Soul" },
-			Desc = "You can now absorb blood splotches. Every 20 splotches absorbed will heal 1 HP. (Walk over blood to obsorb)",
+			Desc = "You can now absorb blood splotches. Every 20 splotches absorbed will heal 1 HP. (Walk over blood to absorb)",
 		},
 
 		Set_Em_Up = {

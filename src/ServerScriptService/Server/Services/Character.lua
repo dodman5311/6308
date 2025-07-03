@@ -174,6 +174,7 @@ local function onDied(player: Player)
 	player.CharacterAdded:Once(function()
 		signals["ProceedToNextLevel"]:Fire(nil, true)
 	end)
+
 	--end
 
 	for _, enemy in ipairs(collectionService:GetTagged("Enemy")) do
@@ -257,6 +258,14 @@ net:Connect("UpdatePlayerHealth", function(player, maxHealth, health, protected)
 
 		humanoid.Health = math.clamp(humanoid.Health, 0, humanoid.MaxHealth)
 	end
+end)
+
+net:Connect("Restart", function(player)
+	local humanoid = player.Character.Humanoid
+
+	workspace:SetAttribute("TotalScore", 0)
+	humanoid:SetAttribute("Armor", 0)
+	humanoid.Health = 0
 end)
 
 net:Connect("CreateShield", function(player)

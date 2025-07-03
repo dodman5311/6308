@@ -1296,7 +1296,7 @@ function module.FireBullet(damage, spread, distance, result, source, element, ch
 
 	if ricoObject then
 		local hit = RicoshotService.doRicoshot(ricoObject, player.Character)
-		hitHumanoid, subject, damageResult, spreadResult = module.FireBullet(damage + 4, 0, 0, hit, "Ricoshot", element)
+		hitHumanoid, subject, damageResult, spreadResult = module.FireBullet(damage + 2, 0, 0, hit, "Ricoshot", element)
 	end
 
 	if isWeapon then

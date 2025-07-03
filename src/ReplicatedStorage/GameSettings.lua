@@ -5,6 +5,7 @@ local playerGui = player.PlayerGui
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local cameraController = require(Globals.Client.Controllers.CameraController)
@@ -43,6 +44,18 @@ local settings = {
 		end,
 	},
 
+	"Controls",
+
+	{
+		Name = "Mouse Sensitivity",
+		Type = "Slider",
+		MaxValue = NumberRange.new(0, 100),
+		Value = 50,
+		OnChanged = function(self)
+			UserInputService.MouseDeltaSensitivity = (self.Value / 100) * 2
+		end,
+	},
+
 	"Graphics",
 
 	{
@@ -58,7 +71,6 @@ local settings = {
 			end
 
 			local ti_0 = TweenInfo.new(0.2, Enum.EasingStyle.Linear)
-			local ti_1 = TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 3)
 
 			TweenService:Create(frame.Background, ti_0, { BackgroundTransparency = 1 }):Play()
 			--TweenService:Create(frame.Background, ti_1, { BackgroundTransparency = 0 }):Play()
@@ -126,6 +138,17 @@ local settings = {
 		Value = true,
 		OnChanged = function(self)
 			cameraController.viewBobbingEnabled = self.Value
+		end,
+	},
+
+	{
+		Name = "Damage Feedback",
+		Type = "Slider",
+		MaxValue = NumberRange.new(0, 2),
+		Value = 2,
+		OnChanged = function(self)
+			local ti = TweenInfo.new(0.5, Enum.EasingStyle.Quint)
+			require(Globals.Vendor.Util).tween(workspace.CurrentCamera, ti, { FieldOfView = self.Value })
 		end,
 	},
 }
