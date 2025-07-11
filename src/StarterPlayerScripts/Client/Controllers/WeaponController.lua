@@ -320,6 +320,20 @@ local function createShell(shellType: string)
 	Debris:AddItem(shell, 5)
 end
 
+local function applyUpgrades(weaponName, weaponData)
+	local upgradeTier = workspace:GetAttribute(string.gsub(string.gsub(weaponName, " ", ""), "-", "") .. "_Tier")
+
+	for tierIndex, tier in ipairs(weaponData.Tiers) do
+		if tierIndex > upgradeTier then
+			continue
+		end
+
+		for i, v in pairs(tier) do
+			weaponData[i] = v
+		end
+	end
+end
+
 function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloaded)
 	UIService.doUiAction("HUD", "hideReload")
 
@@ -367,6 +381,7 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 	newWeapon.Parent = viewmodel.Model
 
 	weaponData = require(newWeapon.Data)
+	applyUpgrades(weaponName, weaponData)
 
 	UIService.doUiAction("HUD", "SetCrosshair", crosshairs[weaponData.Crosshair])
 

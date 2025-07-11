@@ -1039,7 +1039,7 @@ function module.openMap(player, ui, frame)
 	loadMap(player, frame)
 	processCamera(frame)
 
-	frame.LevelDisplay.Text = "Sector: "
+	frame.LevelDisplay.Text = "Act: "
 		.. workspace:GetAttribute("Stage")
 		.. "  "
 		.. "Level: "

@@ -146,10 +146,7 @@ local settings = {
 		Type = "Slider",
 		MaxValue = NumberRange.new(0, 2),
 		Value = 2,
-		OnChanged = function(self)
-			local ti = TweenInfo.new(0.5, Enum.EasingStyle.Quint)
-			require(Globals.Vendor.Util).tween(workspace.CurrentCamera, ti, { FieldOfView = self.Value })
-		end,
+		OnChanged = function(self) end,
 	},
 }
 

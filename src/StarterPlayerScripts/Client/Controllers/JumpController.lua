@@ -16,6 +16,7 @@ local acts = require(Globals.Vendor.Acts)
 local signals = require(Globals.Shared.Signals)
 
 local doubleJump = false
+local extraDoubleJump = false
 local wallJump = false
 
 local input
@@ -34,10 +35,15 @@ local function DoubleJump()
 		and module.jumpLock == false
 		and not acts:checkAct("wallrunning")
 	then
-		if doubleJump or wallJump then
+		if doubleJump or wallJump or extraDoubleJump then
 			if not doubleJump then
-				wallJump = false
+				if wallJump then
+					wallJump = false
+				elseif extraDoubleJump then
+					extraDoubleJump = false
+				end
 			end
+
 			doubleJump = false
 
 			local currentVel = (primaryPart.AssemblyLinearVelocity * Vector3.new(1, 0, 1)).Magnitude
@@ -55,6 +61,10 @@ local function DoubleJump()
 
 			if giftService.CheckGift("Master_Scouting") then
 				doubleJump = true
+
+				if workspace:GetAttribute("MasterScouting_Tier") > 0 then
+					extraDoubleJump = true
+				end
 			end
 		end
 	end

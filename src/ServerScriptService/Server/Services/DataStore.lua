@@ -124,9 +124,11 @@ function module.saveGameState(player, gameState)
 	local startTime = os.clock()
 
 	local dataStore = DataStoreService:GetDataStore("PlayerGameState")
-	gameState.Stage = gameState.Stage or mapService.CurrentStage
-	gameState.Level = gameState.Level or mapService.CurrentLevel
+	--gameState.Stage = gameState.Stage or mapService.CurrentStage
+	--gameState.Level = gameState.Level or mapService.CurrentLevel
 	SaveToStore(player, dataStore, gameState)
+
+	print("Game saved in", os.clock() - startTime, gameState)
 
 	if gameState.Level == 1 then
 		SaveToStore(player, DataStoreService:GetDataStore("PlayerStageState"), gameState)
@@ -134,7 +136,6 @@ function module.saveGameState(player, gameState)
 		print("STAGE saved in", os.clock() - startTime, gameState)
 	end
 
-	print("Game saved in", os.clock() - startTime)
 	net:RemoteEvent("DoUiAction"):FireAllClients("Notify", "GameSaved")
 end
 
