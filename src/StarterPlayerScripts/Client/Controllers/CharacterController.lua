@@ -222,7 +222,7 @@ function module:OnSpawn(character, humanoid)
 
 	local stageState = net:RemoteFunction("GetStageState"):InvokeServer()
 
-	if workspace:GetAttribute("TotalScore") > (workspace:GetAttribute("DeathCount") + 1) * 200 and hasDied then -- req check
+	if workspace:GetAttribute("Stage") == 0 then --workspace:GetAttribute("TotalScore") > (workspace:GetAttribute("DeathCount") + 1) * 200 and hasDied then -- req check
 		UIService.doUiAction("HUD", "ShowRCoins")
 		loadSaveData(0, stageState)
 	end
@@ -522,9 +522,10 @@ local function exitS2(extraSouls, totalLevel, level, stageBoss, miniBoss, stage)
 	local ti = TweenInfo.new(1, Enum.EasingStyle.Exponential)
 
 	util.tween(camera, ti, { FieldOfView = util.getSetting("Field of View").Value })
-	UIService.doUiAction("HUD", "HideRCoins")
 end
 local function ExitSequence(levelData, level, stageBoss, miniBoss, stage)
+	UIService.doUiAction("HUD", "HideRCoins")
+
 	local plusStage = (stage - 1) * 5
 	local totalLevel = plusStage + level
 

@@ -1,340 +1,362 @@
 local upgrades = {
-	Combo_Tier = {
-		{
-			Name = "Tier 1",
-			Description = "-1 combo hit penalty.",
-			Price = 600,
+	Shotguns = {
+		["DoubleShot_Tier"] = {
+			{
+				Name = "Tier 1",
+				Description = "+ Fire rate",
+				Price = 600,
+			},
+			{
+				Name = "Tier 2",
+				Description = "+1 Pellet",
+				Price = 600,
+			},
+			{
+				Name = "Broad Shot",
+				Description = "Pellets now pierce through enemies",
+				Price = 600,
+			},
 		},
-		{
-			Name = "Tier 2",
-			Description = "+1 Second to combo time.",
-			Price = 2000,
+
+		["DrillBite_Tier"] = {
+			{
+				Name = "Tier 1",
+				Description = "+3 Ammo",
+				Price = 600,
+			},
+			{
+				Name = "Tier 2",
+				Description = "Pellets now have a 5% chance to light enemies on fire",
+				Price = 600,
+			},
+			{
+				Name = "Wrath Guard",
+				Description = "Wrath Guard’s parry is a stunning punch",
+				Price = 600,
+			},
 		},
-		{
-			Name = "Tier 3",
-			Description = "Combo reduces by 5 instead of clearing",
-			Price = 5000,
+
+		["QuadShot_Tier"] = {
+			{
+				Name = "Tier 1",
+				Description = "+1 Pellet",
+				Price = 600,
+			},
+			{
+				Name = "Tier 2",
+				Description = "+1 Pellet",
+				Price = 600,
+			},
+			{
+				Name = "Mega Shot",
+				Description = "Every loaded shell is different. Mega shot fires 3 Explosive rounds, 3 Homing rounds, 3 Regular pellets, and 1 Slug with 3 damage",
+				Price = 600,
+			},
 		},
 	},
 
-	Souls_Tier = {
-		{
-			Name = "Tier 1",
-			Description = "+ Soul Pickup distance",
-			Price = 600,
+	Rifles = {
+		BORUS_Tier = {
+			{
+				Name = "Tier 1",
+				Description = "+5 Ammo",
+				Price = 250,
+			},
+			{
+				Name = "Tier 2",
+				Description = "- Recoil",
+				Price = 500,
+			},
+			{
+				Name = "HADES",
+				Description = "HADES has +1 Damage, -3 Speed, +10 Ammo",
+				Price = 1000,
+			},
 		},
-		{
-			Name = "Tier 2",
-			Description = "You will always be given at least one soul when ending a level.",
-			Price = 2000,
+
+		["800M_Tier"] = {
+			{
+				Name = "Tier 1",
+				Description = "+ Projectile Speed",
+				Price = 250,
+			},
+			{
+				Name = "Tier 2",
+				Description = "+ Splash Range",
+				Price = 500,
+			},
+			{
+				Name = "Concussion",
+				Description = "Explosions from the Concussion have a 15% chance to stun",
+				Price = 1000,
+			},
 		},
-		{
-			Name = "Tier 3",
-			Description = "+ Soul Chance",
-			Price = 5000,
+
+		Gratana_Tier = {
+			{
+				Name = "Tier 1",
+				Description = "+1 Ammo",
+				Price = 250,
+			},
+			{
+				Name = "Tier 2",
+				Description = "+1 Ammo",
+				Price = 500,
+			},
+			{
+				Name = "Dovus",
+				Description = "+1 Damage on an enemy that has at least 4 saw blades stuck in them",
+				Price = 1000,
+			},
 		},
 	},
 
-	["MasterScouting_Tier"] = {
-		{
-			Name = "Tier 1",
-			Description = "One extra jump is added",
-			Price = 600,
+	Pistols = {
+		["BullShot_Tier"] = {
+			{
+				Name = "Tier 1",
+				Description = "+1 Ammo",
+				Price = 250,
+			},
+			{
+				Name = "Tier 2",
+				Description = "+ Projectile speed",
+				Price = 500,
+			},
+			{
+				Name = "Dread Shot",
+				Description = "Rockets slightly seek enemies",
+				Price = 1000,
+			},
+		},
+
+		["BoomCannon_Tier"] = {
+			{
+				Name = "Tier 1",
+				Description = "+ Fire rate",
+				Price = 250,
+			},
+			{
+				Name = "Tier 2",
+				Description = "Shots now have a 5% chance to ricochet to a nearby enemy",
+				Price = 500,
+			},
+			{
+				Name = "50. Regret",
+				Description = "x2 damage to weak points",
+				Price = 1000,
+			},
+		},
+
+		RIPP_Tier = {
+			{
+				Name = "Tier 1",
+				Description = "+2 Ammo",
+				Price = 250,
+			},
+			{
+				Name = "Tier 2",
+				Description = "+ Splash Range",
+				Price = 500,
+			},
+			{
+				Name = "Experiment 05",
+				Description = "Shots have a 5% chance to electrify enemies",
+				Price = 1000,
+			},
+		},
+
+		["ISix_Tier"] = {
+			{
+				Name = "Tier 1",
+				Description = "+ lock on speed",
+				Price = 250,
+			},
+			{
+				Name = "Tier 2",
+				Description = "+1 Lock on amount",
+				Price = 500,
+			},
+			{
+				Name = "I - Seven",
+				Description = "Bullets are detonating bombs (Right click to detonate, 1 Dmg detonation)",
+				Price = 1000,
+			},
 		},
 	},
 
-	["RighteousMotion_Tier"] = {
-		{
-			Name = "Tier 1",
-			Description = "Extra dash",
-			Price = 600,
+	Melee = {
+		Katana_Tier = {
+			{
+				Name = "Tier 1",
+				Description = "A successful parry has a 5% to add ammo",
+				Price = 250,
+			},
+			{
+				Name = "Tier 2",
+				Description = "+Walk speed while holding",
+				Price = 500,
+			},
+			{
+				Name = "Shagan",
+				Description = "Attacking after parrying launches the player forward with I-Frames",
+				Price = 1000,
+			},
+		},
+
+		Harpoons_Tier = {
+			{
+				Name = "Tier 1",
+				Description = "+ Projectile Speed",
+				Price = 250,
+			},
+			{
+				Name = "Tier 2",
+				Description = "Harpoons have a 15% chance to stun enemies for 3 second.",
+				Price = 500,
+			},
+			{
+				Name = "Trident",
+				Description = "Hitting stunned enemies will deal x3 damage",
+				Price = 1000,
+			},
+		},
+
+		Cutter_Tier = {
+			{
+				Name = "Tier 1",
+				Description = "+ Range",
+				Price = 250,
+			},
+			{
+				Name = "Tier 2",
+				Description = "+ Range",
+				Price = 500,
+			},
+			{
+				Name = "Bloody Mary",
+				Description = "Every 5th enemy killed is turned into 3 seeking sawblades",
+				Price = 1000,
+			},
 		},
 	},
 
-	["BrickHook_Tier"] = {
-		{
-			Name = "Tier 1",
-			Description = "A dash can be used when on cooldown",
-			Price = 600,
+	Souls = {
+		Combo_Tier = {
+			{
+				Name = "Tier 1",
+				Description = "-1 combo hit penalty.",
+				Price = 500,
+			},
+			{
+				Name = "Tier 2",
+				Description = "+1 Second to combo time.",
+				Price = 2000,
+			},
+			{
+				Name = "Tier 3",
+				Description = "Combo reduces by 5 instead of clearing",
+				Price = 5000,
+			},
+		},
+
+		Souls_Tier = {
+			{
+				Name = "Tier 1",
+				Description = "+ Soul Pickup distance",
+				Price = 500,
+			},
+			{
+				Name = "Tier 2",
+				Description = "You will always be given at least one soul when ending a level.",
+				Price = 1000,
+			},
+			{
+				Name = "Tier 3",
+				Description = "+ Soul Chance",
+				Price = 2500,
+			},
 		},
 	},
 
-	["SpikedSabbatons_Tier"] = {
-		{
-			Name = "Tier 1",
-			Description = "One long dash",
-			Price = 600,
+	Perks = {
+		["MasterScouting_Tier"] = {
+			{
+				Name = "Tier 1",
+				Description = "One extra jump is added",
+				Price = 500,
+			},
 		},
-	},
 
-	["Overcharge_Tier"] = {
-		{
-			Name = "Tier 1",
-			Description = "Damage from your most upgraded weapon adds to overcharge",
-			Price = 600,
+		["RighteousMotion_Tier"] = {
+			{
+				Name = "Tier 1",
+				Description = "Extra dash",
+				Price = 750,
+			},
 		},
-	},
 
-	["MagLauncher_Tier"] = {
-		{
-			Name = "Tier 1",
-			Description = "Damage from your most upgraded weapon adds to overcharge",
-			Price = 600,
-		},
-	},
+		-- ["BrickHook_Tier"] = {
+		-- 	{
+		-- 		Name = "Tier 1",
+		-- 		Description = "A dash can be used when on cooldown",
+		-- 		Price = 600,
+		-- 	},
+		-- },
 
-	["BurningSouls_Tier"] = {
-		{
-			Name = "Tier 1",
-			Description = "Damage from your most upgraded weapon adds to overcharge",
-			Price = 600,
-		},
-	},
+		-- ["SpikedSabbatons_Tier"] = {
+		-- 	{
+		-- 		Name = "Tier 1",
+		-- 		Description = "One long dash",
+		-- 		Price = 600,
+		-- 	},
+		-- },
 
-	["GalvanGaze_Tier"] = {
-		{
-			Name = "Tier 1",
-			Description = "Damage from your most upgraded weapon adds to overcharge",
-			Price = 600,
+		["Overcharge_Tier"] = {
+			{
+				Name = "Tier 1",
+				Description = "Damage from your most upgraded weapon adds to overcharge",
+				Price = 500,
+			},
 		},
-	},
 
-	["DoubleShot_Tier"] = {
-		{
-			Name = "Tier 1",
-			Description = "+ Fire rate",
-			Price = 600,
+		["MagLauncher_Tier"] = {
+			{
+				Name = "Tier 1",
+				Description = "One extra projectile is shot for the Mag Launcher",
+				Price = 750,
+			},
 		},
-		{
-			Name = "Tier 2",
-			Description = "+1 Pellet",
-			Price = 600,
-		},
-		{
-			Name = "Broad Shot",
-			Description = "Pellets now pierce through enemies",
-			Price = 600,
-		},
-	},
 
-	Katana_Tier = {
-		{
-			Name = "Tier 1",
-			Description = "A successful parry has a 5% to add ammo",
-			Price = 600,
-		},
-		{
-			Name = "Tier 2",
-			Description = "+Walk speed while holding",
-			Price = 600,
-		},
-		{
-			Name = "Shagan",
-			Description = "Attacking after parrying launches the player forward with I-Frames",
-			Price = 600,
-		},
-	},
+		-- ["BurningSouls_Tier"] = {
+		-- 	{
+		-- 		Name = "Tier 1",
+		-- 		Description = "Damage from your most upgraded weapon adds to overcharge",
+		-- 		Price = 600,
+		-- 	},
+		-- },
 
-	BORUS_Tier = {
-		{
-			Name = "Tier 1",
-			Description = "+5 Ammo",
-			Price = 600,
-		},
-		{
-			Name = "Tier 2",
-			Description = "- Recoil",
-			Price = 600,
-		},
-		{
-			Name = "HADES",
-			Description = "HADES has +1 Damage, -3 Speed, +10 Ammo",
-			Price = 600,
-		},
-	},
+		-- ["GalvanGaze_Tier"] = {
+		-- 	{
+		-- 		Name = "Tier 1",
+		-- 		Description = "Damage from your most upgraded weapon adds to overcharge",
+		-- 		Price = 600,
+		-- 	},
+		-- },
 
-	["QuadShot_Tier"] = {
-		{
-			Name = "Tier 1",
-			Description = "+1 Pellet",
-			Price = 600,
-		},
-		{
-			Name = "Tier 2",
-			Description = "+1 Pellet",
-			Price = 600,
-		},
-		{
-			Name = "Mega Shot",
-			Description = "Every loaded shell is different. Mega shot fires 3 Explosive rounds, 3 Homing rounds, 3 Regular pellets, and 1 Slug with 3 damage",
-			Price = 600,
-		},
-	},
-
-	["BoomCannon_Tier"] = {
-		{
-			Name = "Tier 1",
-			Description = "+1 Pellet",
-			Price = 600,
-		},
-		{
-			Name = "Tier 2",
-			Description = "+1 Pellet",
-			Price = 600,
-		},
-		{
-			Name = "Mega Shot",
-			Description = "Every loaded shell is different. Mega shot fires 3 Explosive rounds, 3 Homing rounds, 3 Regular pellets, and 1 Slug with 3 damage",
-			Price = 600,
-		},
-	},
-
-	["ISix_Tier"] = {
-		{
-			Name = "Tier 1",
-			Description = "+ lock on speed",
-			Price = 600,
-		},
-		{
-			Name = "Tier 2",
-			Description = "+1 Lock on amount",
-			Price = 600,
-		},
-		{
-			Name = "I - Seven",
-			Description = "Bullets are now detonating bombs (Right click to detonate, 1 Dmg detonation)",
-			Price = 600,
-		},
-	},
-
-	RIPP_Tier = {
-		{
-			Name = "Tier 1",
-			Description = "+ lock on speed",
-			Price = 600,
-		},
-		{
-			Name = "Tier 2",
-			Description = "+1 Lock on amount",
-			Price = 600,
-		},
-		{
-			Name = "I - Seven",
-			Description = "Bullets are now detonating bombs (Right click to detonate, 1 Dmg detonation)",
-			Price = 600,
-		},
-	},
-
-	["800M_Tier"] = {
-		{
-			Name = "Tier 1",
-			Description = "+ lock on speed",
-			Price = 600,
-		},
-		{
-			Name = "Tier 2",
-			Description = "+1 Lock on amount",
-			Price = 600,
-		},
-		{
-			Name = "I - Seven",
-			Description = "Bullets are now detonating bombs (Right click to detonate, 1 Dmg detonation)",
-			Price = 600,
-		},
-	},
-
-	Harpoons_Tier = {
-		{
-			Name = "Tier 1",
-			Description = "+ Projectile Speed",
-			Price = 600,
-		},
-		{
-			Name = "Tier 2",
-			Description = "Harpoons now have a 15% chance to stun enemies for 3 second.",
-			Price = 600,
-		},
-		{
-			Name = "Trident",
-			Description = "Hitting stunned enemies will deal x3 damage",
-			Price = 600,
-		},
-	},
-
-	Cutter_Tier = {
-		{
-			Name = "Tier 1",
-			Description = "+ Range",
-			Price = 600,
-		},
-		{
-			Name = "Tier 2",
-			Description = "+ Range",
-			Price = 600,
-		},
-		{
-			Name = "Bloody Mary",
-			Description = "Every 5th enemy killed with the Bloody Mary is turned into seeking sawblades",
-			Price = 600,
-		},
-	},
-
-	Gratana_Tier = {
-		{
-			Name = "Tier 1",
-			Description = "+1 Ammo",
-			Price = 600,
-		},
-		{
-			Name = "Tier 2",
-			Description = "+1 Ammo",
-			Price = 600,
-		},
-		{
-			Name = "Dovus",
-			Description = "+1 Damage on an enemy that has at least 4 saw blades stuck in them",
-			Price = 600,
-		},
-	},
-
-	["BullShot_Tier"] = {
-		{
-			Name = "Tier 1",
-			Description = "+1 Ammo",
-			Price = 600,
-		},
-		{
-			Name = "Tier 2",
-			Description = "+ Projectile speed",
-			Price = 600,
-		},
-		{
-			Name = "Dread Shot",
-			Description = "Rockets now slightly seek enemies",
-			Price = 600,
-		},
-	},
-
-	["DrillBite_Tier"] = {
-		{
-			Name = "Tier 1",
-			Description = "+3 Ammo",
-			Price = 600,
-		},
-		{
-			Name = "Tier 2",
-			Description = "Pellets now have a 5% chance to light enemies on fire",
-			Price = 600,
-		},
-		{
-			Name = "Wrath Guard",
-			Description = "Wrath Guard’s parry is a stunning punch",
-			Price = 600,
+		["MaidensBlade_Tier"] = {
+			{
+				Name = "Tier 1",
+				Description = "Damage from maidens blade adds to overcharge",
+				Price = 500,
+			},
 		},
 	},
 }
-for upgradeName, _ in pairs(upgrades) do
-	workspace:SetAttribute(upgradeName, 0)
+for _, category in pairs(upgrades) do
+	for upgradeName, _ in pairs(category) do
+		workspace:SetAttribute(upgradeName, 0)
+	end
 end
 
 return upgrades

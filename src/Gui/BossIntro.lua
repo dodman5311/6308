@@ -20,6 +20,7 @@ voice.Volume = 1.5
 voice.SoundGroup = SoundService.Voice
 
 --// Modules
+local skip = require(Globals.Shared.Skip)
 local util = require(Globals.Vendor.Util)
 local acts = require(Globals.Vendor.Acts)
 local UiAnimator = require(Globals.Vendor.UIAnimationService)
@@ -171,6 +172,15 @@ function module.ShowIntro(player, ui, frame, bossName)
 
 	util.tween(frame.MessageBox, ti_0, { ImageTransparency = 0 }, true)
 
+	local skipped = false
+
+	if player:GetAttribute("furthestLevel") > workspace:GetAttribute("TotalLevel") then
+		skip.enableSkip(function()
+			skipped = true
+			voice.TimePosition = voice.TimeLength - 0.1
+		end)
+	end
+
 	for _, dialogue in ipairs(intro) do
 		voice.SoundId = dialogue.Sound
 
@@ -180,6 +190,11 @@ function module.ShowIntro(player, ui, frame, bossName)
 		end
 
 		voice:Play()
+
+		if skipped then
+			voice.TimePosition = voice.TimeLength - 0.1
+			break
+		end
 
 		local textLength = string.len(dialogue.Text)
 		local waitTime = (voice.TimeLength - 1) / textLength
@@ -221,6 +236,10 @@ function module.ShowIntro(player, ui, frame, bossName)
 		step:Disconnect()
 
 		frame.MessageBox.Message.Text = dialogue.Text
+
+		if skipped then
+			break
+		end
 
 		task.wait(dialogue.Wait)
 		-- dialogueWait.WaitTime = dialogue.Wait

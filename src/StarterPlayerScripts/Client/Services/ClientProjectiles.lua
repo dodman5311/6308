@@ -142,6 +142,15 @@ module.Presets = {
 		Model = "PlasmaProjectile",
 	},
 
+	LargePlasma = {
+		Speed = 400,
+		LifeTime = 5,
+		Info = { Size = 2, SplashRange = 15, SplashDamage = 1, ExplosiveColor = Color3.fromRGB(255, 82, 226) },
+		Damage = 1,
+		Piercing = 0,
+		Model = "PlasmaProjectile",
+	},
+
 	AssaultProjectile = {
 		Speed = 500,
 		LifeTime = 5,
@@ -152,6 +161,24 @@ module.Presets = {
 	},
 
 	Harpoon = {
+		Speed = 250,
+		LifeTime = 5,
+		Info = { Dropping = 0.25, Size = 2 },
+		Damage = 2,
+		Piercing = 2,
+		Model = "HarpoonProjectile",
+	},
+
+	FastHarpoon = {
+		Speed = 500,
+		LifeTime = 5,
+		Info = { Dropping = 0.25, Size = 2 },
+		Damage = 2,
+		Piercing = 2,
+		Model = "HarpoonProjectile",
+	},
+
+	TridentHarpoon = {
 		Speed = 250,
 		LifeTime = 5,
 		Info = { Dropping = 0.25, Size = 2 },
@@ -195,10 +222,37 @@ module.Presets = {
 		Model = "RocketProjectile",
 	},
 
+	FastExplosivePellet = {
+		Speed = 400,
+		LifeTime = 8,
+		Info = { SplashRange = 10, SplashDamage = 1 },
+		Damage = 1,
+		Piercing = 0,
+		Model = "RocketProjectile",
+	},
+
 	Rocket = {
 		Speed = 400,
 		LifeTime = 10,
 		Info = { Size = 2, SplashRange = 20, SplashDamage = 1 },
+		Damage = 1,
+		Piercing = 0,
+		Model = "RocketProjectile",
+	},
+
+	FastRocket = {
+		Speed = 600,
+		LifeTime = 10,
+		Info = { Size = 2, SplashRange = 20, SplashDamage = 1 },
+		Damage = 1,
+		Piercing = 0,
+		Model = "RocketProjectile",
+	},
+
+	LargeFastRocket = {
+		Speed = 600,
+		LifeTime = 10,
+		Info = { Size = 2, SplashRange = 50, SplashDamage = 1 },
 		Damage = 1,
 		Piercing = 0,
 		Model = "RocketProjectile",

@@ -8,7 +8,6 @@ local module = {
 --// Services
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local DataStoreService = game:GetService("DataStoreService")
-local Players = game:GetService("Players")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
@@ -16,28 +15,8 @@ local Globals = require(ReplicatedStorage.Shared.Globals)
 --// Modules
 local net = require(Globals.Packages.Net)
 local mapService = require(Globals.Server.Services.MapService)
-local signals = require(Globals.Shared.Signals)
-local permaUpgrades = require(ReplicatedStorage.Upgrades)
 
 --// Values
-local gameState = {
-	Stage = 0,
-	Level = 0,
-	Weapon = { Name = "", Ammo = 0, Element = "" },
-	Souls = 0,
-
-	critChances = {
-		AR = 0,
-		Pistol = 0,
-		Shotgun = 0,
-		Melee = 0,
-	},
-
-	Luck = 0,
-	PerkTickets = 0,
-
-	PerkList = {},
-}
 
 --// Functions
 local function LoadData(player: Player, dataStore: DataStore) -- load data

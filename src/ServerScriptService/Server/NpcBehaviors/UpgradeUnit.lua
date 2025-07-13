@@ -1,16 +1,6 @@
-local CollectionService = game:GetService("CollectionService")
-local ProximityPromptService = game:GetService("ProximityPromptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local TweenService = game:GetService("TweenService")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
-local Spawners = require(Globals.Server.Services.Spawners)
-local net = require(Globals.Packages.Net)
-local actions = require(Globals.Server.NpcActions)
-local checkChance = net:RemoteFunction("CheckChance")
-local vfx = net:RemoteEvent("ReplicateEffect")
 local util = require(Globals.Vendor.Util)
 local animationService = require(Globals.Vendor.AnimationService)
 local upgrades = require(Globals.Shared.Upgrades)
@@ -20,6 +10,19 @@ local function getUpgradeInfo(npc, getPrev: boolean?)
 	if not npc.MindData["UpgradeName"] then
 		npc.MindData["UpgradeName"] = "Combo_Tier"
 	end
+
+	local upgrade
+	for _, category in pairs(upgrades) do
+		if category[npc.MindData["UpgradeName"]] then
+			upgrade = category[npc.MindData["UpgradeName"]]
+			break
+		end
+	end
+
+	if not upgrade then
+		return
+	end
+
 	local upgradeName = npc.MindData["UpgradeName"]
 	local upgradeIndex = workspace:GetAttribute(upgradeName)
 
@@ -27,7 +30,7 @@ local function getUpgradeInfo(npc, getPrev: boolean?)
 		upgradeIndex += 1
 	end
 
-	return upgrades[upgradeName][upgradeIndex], upgradeName, upgradeIndex
+	return upgrade[upgradeIndex], upgradeName, upgradeIndex
 end
 
 local function updateGui(npc)

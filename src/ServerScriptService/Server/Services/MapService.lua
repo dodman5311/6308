@@ -713,6 +713,10 @@ function module.proceedToNext(_, onlyLoadMap)
 		if module.CurrentStage == 0 then
 			module.CurrentStage = workspace:GetAttribute("SaveStage") or 1
 			module.CurrentLevel = 1
+		elseif module.CurrentLevel == 1 then
+			workspace:SetAttribute("SaveStage", module.CurrentStage)
+			module.CurrentStage = 0
+			module.CurrentLevel = 1
 		end
 	end
 
@@ -740,6 +744,10 @@ function module.proceedToNext(_, onlyLoadMap)
 
 	if module.CurrentStage == 3 then
 		mapSize /= 2
+	end
+
+	if module.CurrentStage == 0 then
+		net:RemoteEvent("DoUiAction"):FireAllClients("HUD", "ShowRCoins")
 	end
 
 	module.loadLinearMap(mapSize)
