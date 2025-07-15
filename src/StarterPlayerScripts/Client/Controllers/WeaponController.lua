@@ -321,6 +321,10 @@ local function createShell(shellType: string)
 end
 
 local function applyUpgrades(weaponName, weaponData)
+	if not weaponData["Tiers"] then
+		return
+	end
+
 	local upgradeTier = workspace:GetAttribute(string.gsub(string.gsub(weaponName, " ", ""), "-", "") .. "_Tier")
 
 	for tierIndex, tier in ipairs(weaponData.Tiers) do
@@ -1034,6 +1038,24 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 					net:RemoteEvent("Damage"):FireServer(model, 0, "Ice")
 				end
 			end
+		end
+
+		if
+			weaponData
+			and weaponData["FireChance"]
+			and weaponData.FireChance ~= 0
+			and ChanceService.checkChance(weaponData.FireChance, true)
+		then
+			net:RemoteEvent("Damage"):FireServer(model, 0, "Fire")
+		end
+
+		if
+			weaponData
+			and weaponData["ElectricChance"]
+			and weaponData.ElectricChance ~= 0
+			and ChanceService.checkChance(weaponData.ElectricChance, true)
+		then
+			net:RemoteEvent("Damage"):FireServer(model, 0, "Electricity")
 		end
 
 		if wallrunning.onWall and ChanceService.checkChance(50, true) then
@@ -2062,6 +2084,7 @@ end
 
 function module.Block()
 	local punch = GiftsService.CheckGift("Ultra_Slayer")
+		or (module.currentWeapon and module.currentWeapon.Name == "Wrath Guard")
 	if
 		not canBlock
 		or not punch and (not module.currentWeapon or not weaponData.BlockTime)

@@ -10,6 +10,7 @@ local spawners = require(Globals.Services.Spawners)
 local debounce = false
 local inTransition = false
 local PADDING = 0.25
+local RACK_SIZE = 20
 
 local categories = {}
 
@@ -54,7 +55,7 @@ local function showUnits(npc, direction)
 		unitCount += 1
 	end
 
-	local xRange = 20 / (unitCount - 1)
+	local xRange = RACK_SIZE / (unitCount - 1)
 	local startX = -((PADDING + xRange) * unitCount) / 2
 
 	for upgradeName, _ in pairs(unitsToLoad) do

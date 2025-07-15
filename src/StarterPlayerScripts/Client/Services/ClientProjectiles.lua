@@ -257,6 +257,15 @@ module.Presets = {
 		Piercing = 0,
 		Model = "RocketProjectile",
 	},
+
+	ConcussionRocket = {
+		Speed = 600,
+		LifeTime = 10,
+		Info = { Size = 2, SplashRange = 50, SplashDamage = 1 },
+		Damage = 1,
+		Piercing = 0,
+		Model = "RocketProjectile",
+	},
 }
 
 --// Functions

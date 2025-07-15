@@ -4,17 +4,17 @@ local upgrades = {
 			{
 				Name = "Tier 1",
 				Description = "+ Fire rate",
-				Price = 600,
+				Price = 250,
 			},
 			{
 				Name = "Tier 2",
 				Description = "+1 Pellet",
-				Price = 600,
+				Price = 400,
 			},
 			{
 				Name = "Broad Shot",
 				Description = "Pellets now pierce through enemies",
-				Price = 600,
+				Price = 500,
 			},
 		},
 
@@ -22,17 +22,17 @@ local upgrades = {
 			{
 				Name = "Tier 1",
 				Description = "+3 Ammo",
-				Price = 600,
+				Price = 250,
 			},
 			{
 				Name = "Tier 2",
 				Description = "Pellets now have a 5% chance to light enemies on fire",
-				Price = 600,
+				Price = 500,
 			},
 			{
 				Name = "Wrath Guard",
 				Description = "Wrath Guard’s parry is a stunning punch",
-				Price = 600,
+				Price = 1000,
 			},
 		},
 
@@ -40,17 +40,17 @@ local upgrades = {
 			{
 				Name = "Tier 1",
 				Description = "+1 Pellet",
-				Price = 600,
+				Price = 250,
 			},
 			{
 				Name = "Tier 2",
 				Description = "+1 Pellet",
-				Price = 600,
+				Price = 500,
 			},
 			{
 				Name = "Mega Shot",
 				Description = "Every loaded shell is different. Mega shot fires 3 Explosive rounds, 3 Homing rounds, 3 Regular pellets, and 1 Slug with 3 damage",
-				Price = 600,
+				Price = 1000,
 			},
 		},
 	},
@@ -105,7 +105,7 @@ local upgrades = {
 			},
 			{
 				Name = "Dovus",
-				Description = "+1 Damage on an enemy that has at least 4 saw blades stuck in them",
+				Description = "Can lock onto up to two targets. Can fire as fast as you pull the trigger.",
 				Price = 1000,
 			},
 		},

@@ -12,6 +12,7 @@ local UiAnimationService = require(Globals.Vendor.UIAnimationService)
 local net = require(Globals.Packages.Net)
 local HandleNpcs = require(Globals.Server.HandleNpcs)
 local signals = require(Globals.Shared.Signals)
+local upgrades = require(Globals.Shared.Upgrades)
 
 local equipWeaponRemote = net:RemoteEvent("EquipWeapon")
 
@@ -102,7 +103,7 @@ local objectTypes = {
 	},
 
 	Weapon = {
-		SpawnChance = 75,
+		SpawnChance = 100,
 		Folder = assets.Models.WeaponPickups,
 		OnSpawn = onWeaponSpawned,
 	},
@@ -145,12 +146,29 @@ local function getRandomObjectOfType(currentLevel, type, noChance)
 	return getObjects[math.random(1, #getObjects)]
 end
 
+local function checkForUpgradedWeapon(selectedObject)
+	local upgradeName = string.gsub(string.gsub(selectedObject.Name, " ", ""), "-", "") .. "_Tier"
+	local upgradeTier = workspace:GetAttribute(upgradeName)
+
+	if upgradeTier and upgradeTier >= 3 then
+		for _, category in pairs(upgrades) do
+			for upgradeIndex, upgrade in pairs(category) do
+				if upgradeIndex ~= upgradeName then
+					continue
+				end
+
+				return ReplicatedStorage.Assets.Models.AltWeaponPickups[upgrade[3].Name]
+			end
+		end
+	end
+
+	return selectedObject
+end
+
 function module.placeNewObject(currentLevel, cframe, type, objectName, noChance)
 	local selectedObject
 
-	if not objectName then
-		selectedObject = getRandomObjectOfType(currentLevel, type, noChance)
-	else
+	if objectName then
 		local getType = objectTypes[type]
 		local object = getType.Folder:FindFirstChild(objectName, true)
 
@@ -159,6 +177,17 @@ function module.placeNewObject(currentLevel, cframe, type, objectName, noChance)
 			selectedObject = getRandomObjectOfType(currentLevel, type, noChance)
 		else
 			selectedObject = object
+		end
+
+		if type == "Weapon" then
+			selectedObject = checkForUpgradedWeapon(selectedObject)
+		end
+	else
+		selectedObject = getRandomObjectOfType(currentLevel, type, noChance)
+
+		if type == "Weapon" then
+			print(selectedObject.Name)
+			selectedObject = checkForUpgradedWeapon(selectedObject)
 		end
 	end
 
