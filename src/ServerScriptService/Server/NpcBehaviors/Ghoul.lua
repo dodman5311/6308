@@ -32,7 +32,7 @@ end
 local rng = Random.new()
 
 local function swing(npc, distance)
-	if npc:GetState() == "Dead" or npc.StatusEffects["Ice"] then
+	if npc:GetState() == "Dead" or npc.StatusEffects["Ice"] or npc.StatusEffects["Stun"] then
 		return
 	end
 
@@ -52,7 +52,7 @@ local function swing(npc, distance)
 
 	task.wait(0.3)
 
-	if npc:GetState() == "Dead" or npc.StatusEffects["Ice"] then
+	if npc:GetState() == "Dead" or npc.StatusEffects["Ice"] or npc.StatusEffects["Stun"] then
 		return
 	end
 

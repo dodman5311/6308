@@ -104,7 +104,7 @@ end
 
 local function attackPlayer(npc)
 	local target = npc:GetTarget()
-	if not target or npc.StatusEffects["Ice"] then
+	if not target or npc.StatusEffects["Ice"] or npc.StatusEffects["Stun"] then
 		return
 	end
 

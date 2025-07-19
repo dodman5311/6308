@@ -554,13 +554,14 @@ net:Connect("ResumeGame", function()
 			Npc.Instance.Parent
 			and Npc.Instance.PrimaryPart
 			and not Npc.StatusEffects["Ice"]
+			and not Npc.StatusEffects["Stun"]
 			and not Npc.Instance:HasTag("IsAnchored")
 		then
 			Npc.Instance.PrimaryPart.Anchored = false
 		end
 
 		local animations = AnimationService:getLoadedAnimations(Npc.Instance)
-		if not animations or Npc.StatusEffects["Ice"] then
+		if not animations or Npc.StatusEffects["Ice"] or Npc.StatusEffects["Stun"] then
 			continue
 		end
 		for _, anim in pairs(animations) do

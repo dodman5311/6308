@@ -1041,7 +1041,8 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		end
 
 		if
-			weaponData
+			sourceIsWeapon
+			and weaponData
 			and weaponData["FireChance"]
 			and weaponData.FireChance ~= 0
 			and ChanceService.checkChance(weaponData.FireChance, true)
@@ -1050,12 +1051,23 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		end
 
 		if
-			weaponData
+			sourceIsWeapon
+			and weaponData
 			and weaponData["ElectricChance"]
 			and weaponData.ElectricChance ~= 0
 			and ChanceService.checkChance(weaponData.ElectricChance, true)
 		then
 			net:RemoteEvent("Damage"):FireServer(model, 0, "Electricity")
+		end
+
+		if
+			sourceIsWeapon
+			and weaponData
+			and weaponData["StunChance"]
+			and weaponData.StunChance ~= 0
+			and ChanceService.checkChance(weaponData.StunChance, true)
+		then
+			net:RemoteEvent("Damage"):FireServer(model, 0, "Stun")
 		end
 
 		if wallrunning.onWall and ChanceService.checkChance(50, true) then
@@ -1522,6 +1534,10 @@ local function LockOn()
 		newGui.Enabled = true
 
 		UiAnimationService.PlayAnimation(newGui.Frame, 0.045, false, true)
+
+		if #weaponData.LockedOn == 0 then
+			module.Block()
+		end
 
 		table.insert(lockGuis, newGui)
 		table.insert(weaponData.LockedOn, target)
@@ -2081,7 +2097,7 @@ function module.UseSword()
 
 	return true
 end
-
+local lastBlockTime = os.clock()
 function module.Block()
 	local punch = GiftsService.CheckGift("Ultra_Slayer")
 		or (module.currentWeapon and module.currentWeapon.Name == "Wrath Guard")
@@ -2123,9 +2139,9 @@ function module.Block()
 	end
 
 	if punch then
-		module.FireBullet(2, 0, Vector3.new(5, 5, 10), nil, "Punch")
+		module.FireBullet(1, 0, Vector3.new(5, 5, 10), nil, "Punch", "Stun", 100)
 
-		Recoil(Vector3.new(0, 0, 0), Vector3.new(0.5, 0.5, 3), 1, 0.5)
+		Recoil(Vector3.new(0, 0, 0), Vector3.new(0.5, 0.5, 3), 3, 1)
 	end
 
 	net:RemoteEvent("SetBlocking"):FireServer(true)
@@ -2140,13 +2156,19 @@ function module.Block()
 	task.wait(0.25)
 
 	canBlock = true
+	lastBlockTime = os.clock()
 	return true
 end
 
 function module.OnBlock()
-	-- if module.currentWeapon and weaponData.BlockTime then
-	-- 	module.UpdateAmmo(currentAmmo + 1)
-	-- end
+	if
+		module.currentWeapon
+		and weaponData.BlockTime
+		and weaponData.ParryAmmoChance
+		and ChanceService.checkChance(weaponData.ParryAmmoChance, true)
+	then
+		module.UpdateAmmo(currentAmmo + 1)
+	end
 
 	local parryDamage = 1
 
@@ -2515,7 +2537,10 @@ UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
 	end
 
 	if input.UserInputType == Enum.UserInputType.MouseButton2 or input.KeyCode == Enum.KeyCode.ButtonL2 then
-		if not module.Block() and not (module.currentWeapon and weaponData.BlockTime) then
+		if
+			(module.currentWeapon and module.currentWeapon.Name == "I-Seven")
+			or (not module.Block() and not (module.currentWeapon and weaponData.BlockTime))
+		then
 			module.OpenDeadBolt()
 		end
 	end
@@ -2722,6 +2747,10 @@ explosionService.explosiveHit:Connect(function(subject, preHealth, postHealth, d
 
 	if preHealth > 0 and postHealth <= 0 then -- kill awarded
 		awardKill(subject.Name, subject:GetPivot().Position)
+	end
+
+	if sourceIsWeapon and source == "Concussion" and ChanceService.checkChance(15, true) then
+		net:RemoteEvent("Damage"):FireServer(subject, 0, "Stun")
 	end
 
 	addToGib(subject:FindFirstChild("Humanoid"), subject, damageDelt)

@@ -50,6 +50,15 @@ module.Presets = {
 		Model = "SmartProjectile",
 	},
 
+	DetonatingSmartProjectile = {
+		Speed = 200,
+		LifeTime = 5,
+		Info = { Seeking = 0, SeekProgression = 0.2, Size = 0, Detonating = true },
+		Damage = 1,
+		Piercing = 0,
+		Model = "SmartProjectile",
+	},
+
 	HeavyBolt = {
 		Speed = 2000,
 		LifeTime = 1,
@@ -226,6 +235,15 @@ module.Presets = {
 		Speed = 400,
 		LifeTime = 8,
 		Info = { SplashRange = 10, SplashDamage = 1 },
+		Damage = 1,
+		Piercing = 0,
+		Model = "RocketProjectile",
+	},
+
+	DreadPellet = {
+		Speed = 400,
+		LifeTime = 8,
+		Info = { SplashRange = 10, SplashDamage = 1, Seeking = 0, SeekDistance = 250, SeekProgression = 0.0075 },
 		Damage = 1,
 		Piercing = 0,
 		Model = "RocketProjectile",

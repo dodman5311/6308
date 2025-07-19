@@ -48,7 +48,12 @@ function scales.new(index: string?): Scale
 
 			return self:Check()
 		end,
-		Remove = function(self: Scale, index: string | number)
+		Remove = function(self: Scale, index: string | number?)
+			if not index then
+				table.remove(self.Contents, 1)
+				return self:Check()
+			end
+
 			if tonumber(index) then
 				table.remove(self.Contents, index)
 			else

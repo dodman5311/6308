@@ -60,6 +60,13 @@ return {
 		exit = function() end,
 	},
 
+	Stun = {
+		time = 3,
+		enter = function() end,
+
+		exit = function() end,
+	},
+
 	SoulFire = {
 		time = 3,
 		enter = function() end,

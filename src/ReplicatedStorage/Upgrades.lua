@@ -49,7 +49,7 @@ local upgrades = {
 			},
 			{
 				Name = "Mega Shot",
-				Description = "Every loaded shell is different. Mega shot fires 3 Explosive rounds, 3 Homing rounds, 3 Regular pellets, and 1 Slug with 3 damage",
+				Description = "Every loaded shell is different. Mega shot fires 3 Explosive rounds, 3 Homing rounds, 3 Regular pellets, and 1 Slug with 3 damage", -- @TODO
 				Price = 1000,
 			},
 		},
@@ -138,12 +138,12 @@ local upgrades = {
 			},
 			{
 				Name = "Tier 2",
-				Description = "Shots now have a 5% chance to ricochet to a nearby enemy",
+				Description = "Shots now have a 5% chance to ricochet to a nearby enemy", -- @TODO
 				Price = 500,
 			},
 			{
 				Name = "50. Regret",
-				Description = "x2 damage to weak points",
+				Description = "x2 damage to weak points", -- @TODO
 				Price = 1000,
 			},
 		},
@@ -179,7 +179,7 @@ local upgrades = {
 			},
 			{
 				Name = "I - Seven",
-				Description = "Bullets are detonating bombs (Right click to detonate, 1 Dmg detonation)",
+				Description = "Beginning a lock on, a parrying shield is created for 0.5 seconds",
 				Price = 1000,
 			},
 		},
@@ -194,12 +194,12 @@ local upgrades = {
 			},
 			{
 				Name = "Tier 2",
-				Description = "+Walk speed while holding",
+				Description = "+ Range",
 				Price = 500,
 			},
 			{
 				Name = "Shagan",
-				Description = "Attacking after parrying launches the player forward with I-Frames",
+				Description = "Attacking after parrying launches the player forward with I-Frames", -- @TODO
 				Price = 1000,
 			},
 		},
@@ -212,12 +212,12 @@ local upgrades = {
 			},
 			{
 				Name = "Tier 2",
-				Description = "Harpoons have a 15% chance to stun enemies for 3 second.",
+				Description = "Harpoons have a 10% chance to stun enemies for 3 second.",
 				Price = 500,
 			},
 			{
 				Name = "Trident",
-				Description = "Hitting stunned enemies will deal x3 damage",
+				Description = "Hitting stunned enemies will deal x3 damage", -- @TODO
 				Price = 1000,
 			},
 		},
@@ -235,7 +235,7 @@ local upgrades = {
 			},
 			{
 				Name = "Bloody Mary",
-				Description = "Every 5th enemy killed is turned into 3 seeking sawblades",
+				Description = "Every 5th enemy killed is turned into 3 seeking sawblades", -- @TODO
 				Price = 1000,
 			},
 		},
@@ -263,17 +263,17 @@ local upgrades = {
 		Souls_Tier = {
 			{
 				Name = "Tier 1",
-				Description = "+ Soul Pickup distance",
+				Description = "+ Soul Pickup distance", -- @TODO
 				Price = 500,
 			},
 			{
 				Name = "Tier 2",
-				Description = "You will always be given at least one soul when ending a level.",
+				Description = "You will always be given at least one soul when ending a level.", -- @TODO
 				Price = 1000,
 			},
 			{
 				Name = "Tier 3",
-				Description = "+ Soul Chance",
+				Description = "+ Soul Chance", -- @TODO
 				Price = 2500,
 			},
 		},
@@ -291,7 +291,7 @@ local upgrades = {
 		["RighteousMotion_Tier"] = {
 			{
 				Name = "Tier 1",
-				Description = "Extra dash",
+				Description = "Extra dash", -- @TODO
 				Price = 750,
 			},
 		},
@@ -315,7 +315,7 @@ local upgrades = {
 		["Overcharge_Tier"] = {
 			{
 				Name = "Tier 1",
-				Description = "Damage from your most upgraded weapon adds to overcharge",
+				Description = "Damage from your most upgraded weapon adds to overcharge", -- @TODO
 				Price = 500,
 			},
 		},
@@ -323,7 +323,7 @@ local upgrades = {
 		["MagLauncher_Tier"] = {
 			{
 				Name = "Tier 1",
-				Description = "One extra projectile is shot for the Mag Launcher",
+				Description = "One extra projectile is shot for the Mag Launcher", -- @TODO
 				Price = 750,
 			},
 		},
@@ -347,7 +347,7 @@ local upgrades = {
 		["MaidensBlade_Tier"] = {
 			{
 				Name = "Tier 1",
-				Description = "Damage from maidens blade adds to overcharge",
+				Description = "Damage from maidens blade adds to overcharge", -- @TODO
 				Price = 500,
 			},
 		},

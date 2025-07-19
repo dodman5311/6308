@@ -573,7 +573,7 @@ local function runAttackTimer(npc)
 
 	AttackTimer.WaitTime = rng:NextNumber(2, 4)
 	AttackTimer.Function = function()
-		if npc.StatusEffects["Ice"] then
+		if npc.StatusEffects["Ice"] or npc.StatusEffects["Stun"] then
 			return
 		end
 

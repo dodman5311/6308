@@ -193,7 +193,7 @@ function module.CheckFear(npc)
 		return chance
 	end
 
-	if npc.StatusEffects["Ice"] then
+	if npc.StatusEffects["Ice"] or npc.StatusEffects["Stun"]then
 		return true
 	end
 end
