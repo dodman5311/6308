@@ -138,12 +138,12 @@ local upgrades = {
 			},
 			{
 				Name = "Tier 2",
-				Description = "Shots now have a 5% chance to ricochet to a nearby enemy", -- @TODO
+				Description = "Shots now have a 5% chance to ricochet to a nearby enemy",
 				Price = 500,
 			},
 			{
-				Name = "50. Regret",
-				Description = "x2 damage to weak points", -- @TODO
+				Name = "50 Regret",
+				Description = "x2 damage to weak points",
 				Price = 1000,
 			},
 		},
@@ -189,17 +189,17 @@ local upgrades = {
 		Katana_Tier = {
 			{
 				Name = "Tier 1",
-				Description = "A successful parry has a 5% to add ammo",
+				Description = "+ Range",
 				Price = 250,
 			},
 			{
 				Name = "Tier 2",
-				Description = "+ Range",
+				Description = "A successful parry has a 5% to add ammo",
 				Price = 500,
 			},
 			{
 				Name = "Shagan",
-				Description = "Attacking after parrying launches the player forward with I-Frames", -- @TODO
+				Description = "Attacking at least 3 second after a successful parry launches the player forward, extending their range.", -- @TODO
 				Price = 1000,
 			},
 		},
@@ -217,7 +217,7 @@ local upgrades = {
 			},
 			{
 				Name = "Trident",
-				Description = "Hitting stunned enemies will deal x3 damage", -- @TODO
+				Description = "Hitting stunned enemies will deal 3 damage",
 				Price = 1000,
 			},
 		},

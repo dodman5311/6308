@@ -107,6 +107,7 @@ local Overcharge = 0
 local lastDamageSource
 
 local rng = Random.new()
+local lastBlockTime = os.clock()
 
 local slots = {
 	{
@@ -996,6 +997,10 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 
 	totalDamage *= critMult
 
+	if weakspotDamage and source == "50 Regret" then
+		totalDamage *= 2
+	end
+
 	if isVendingMachine then
 		totalDamage = 1
 	end
@@ -1070,6 +1075,20 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 			net:RemoteEvent("Damage"):FireServer(model, 0, "Stun")
 		end
 
+		if
+			sourceIsWeapon
+			and weaponData
+			and weaponData["StunChance"]
+			and weaponData.StunChance ~= 0
+			and ChanceService.checkChance(weaponData.StunChance, true)
+		then
+			net:RemoteEvent("Damage"):FireServer(model, 0, "Stun")
+		end
+
+		if sourceIsWeapon and source == "Trident" and subject:GetAttribute("Stun") then
+			totalDamage += 1
+		end
+
 		if wallrunning.onWall and ChanceService.checkChance(50, true) then
 			ComboService.RestartTimer()
 		end
@@ -1082,6 +1101,19 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		end
 
 		if preHealth > 0 and postHealth <= 0 then -- kill awarded
+			if sourceIsWeapon and source == "Bloody Mary" then
+				weaponData.KillCount += 1
+				if weaponData.KillCount >= 1 then
+					weaponData.KillCount = 0
+					print("BOOM")
+					for i = 1, 3 do
+						print("A")
+						module.FireProjectile("SmartSawBlade", 0, 1, i) --@TODO WHY NO WORKY!!!!
+					end
+					-- Make spawn blades @TODO
+				end
+			end
+
 			awardKill(model, subjectPosition)
 		end
 	end)
@@ -1346,6 +1378,17 @@ function module.FireBullet(damage, spread, distance, result, source, element, ch
 	if ricoObject then
 		local hit = RicoshotService.doRicoshot(ricoObject, player.Character)
 		hitHumanoid, subject, damageResult, spreadResult = module.FireBullet(damage + 2, 0, 0, hit, "Ricoshot", element)
+	end
+
+	if
+		result
+		and result.Instance:FindFirstAncestorOfClass("Model")
+		and weaponData["RicochetChance"]
+		and weaponData.RicochetChance ~= 0
+		and ChanceService.checkChance(weaponData.RicochetChance, true)
+	then
+		local hit = RicoshotService.doRicoshot(result.Instance:FindFirstAncestorOfClass("Model"), player.Character)
+		hitHumanoid, subject, damageResult, spreadResult = module.FireBullet(damage, 0, 0, hit, "Ricoshot", element)
 	end
 
 	if isWeapon then
@@ -1638,6 +1681,15 @@ function module.Fire()
 	end
 
 	local maxDistance = weaponData.MaxDistance or 500
+
+	if module.currentWeapon.Name == "Shagan" and os.clock() - lastBlockTime <= 3 then
+		maxDistance = 65
+		player.Character.PrimaryPart.AssemblyLinearVelocity = (camera.CFrame.LookVector * 250) + Vector3.new(0, 25, 0)
+		airController.change()
+		task.delay(0.2, function()
+			airController.change(true)
+		end)
+	end
 
 	if deadBoltActive then
 		fireDeadBolt(extraBullet, bulletDamage, module.currentWeapon.Name, weaponData["Element"])
@@ -2097,7 +2149,7 @@ function module.UseSword()
 
 	return true
 end
-local lastBlockTime = os.clock()
+
 function module.Block()
 	local punch = GiftsService.CheckGift("Ultra_Slayer")
 		or (module.currentWeapon and module.currentWeapon.Name == "Wrath Guard")
@@ -2156,7 +2208,7 @@ function module.Block()
 	task.wait(0.25)
 
 	canBlock = true
-	lastBlockTime = os.clock()
+
 	return true
 end
 
@@ -2178,6 +2230,7 @@ function module.OnBlock()
 		ComboService.RestartTimer()
 	end
 
+	lastBlockTime = os.clock()
 	module.FireBullet(parryDamage, 0, 300, nil, "Parry")
 
 	util.PlaySound(assets.Sounds.BlockedMetal, script, 0.1)

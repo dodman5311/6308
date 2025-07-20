@@ -119,6 +119,25 @@ local function getNearestEnemy(position, position2)
 	return closestEnemy
 end
 
+local function handleHitEffect(weapon)
+	local ricoHitbox = weapon:FindFirstChild("RicoHitbox")
+
+	if not ricoHitbox then
+		return
+	end
+
+	UiAnimationService.PlayAnimation(ricoHitbox.Ui.Shoot, 0.045)
+
+	local health = weapon:GetAttribute("Health")
+	local maxHealth = 5
+	if not health and weapon:FindFirstChild("Humanoid") then
+		health = weapon.Humanoid.Health
+		maxHealth = weapon.Humanoid.MaxHealth
+	end
+
+	ricoHitbox.Ui.Shoot.Image.ImageColor3 = Color3.new(1):Lerp(Color3.fromRGB(255, 235, 185), health / maxHealth)
+end
+
 function module.doRicoshot(weapon, character)
 	local weaponPosition = weapon:GetPivot().Position
 
@@ -131,18 +150,7 @@ function module.doRicoshot(weapon, character)
 
 	weapon:SetAttribute("RicoHit", true)
 
-	local ricoHitbox = weapon.RicoHitbox
-
-	UiAnimationService.PlayAnimation(ricoHitbox.Ui.Shoot, 0.045)
-
-	local health = weapon:GetAttribute("Health")
-	local maxHealth = 5
-	if not health and weapon:FindFirstChild("Humanoid") then
-		health = weapon.Humanoid.Health
-		maxHealth = weapon.Humanoid.MaxHealth
-	end
-
-	ricoHitbox.Ui.Shoot.Image.ImageColor3 = Color3.new(1):Lerp(Color3.fromRGB(255, 235, 185), health / maxHealth)
+	handleHitEffect(weapon)
 
 	local result = getNearestEnemy(characterPosition, weaponPosition)
 
