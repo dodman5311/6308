@@ -49,7 +49,7 @@ local upgrades = {
 			},
 			{
 				Name = "Mega Shot",
-				Description = "Every loaded shell is different. Mega shot fires 3 Explosive rounds, 3 Homing rounds, 3 Regular pellets, and 1 Slug with 3 damage", -- @TODO
+				Description = "Every loaded shell is different. Mega shot fires 3 Explosive rounds, 3 Homing rounds, 3 Regular pellets, and 1 Slug with 3 damage",
 				Price = 1000,
 			},
 		},
@@ -178,8 +178,8 @@ local upgrades = {
 				Price = 500,
 			},
 			{
-				Name = "I - Seven",
-				Description = "Beginning a lock on, a parrying shield is created for 0.5 seconds",
+				Name = "I-Seven",
+				Description = "When beginning a lock on, a parrying shield is created for 0.5 seconds",
 				Price = 1000,
 			},
 		},
@@ -199,7 +199,7 @@ local upgrades = {
 			},
 			{
 				Name = "Shagan",
-				Description = "Attacking at least 3 second after a successful parry launches the player forward, extending their range.", -- @TODO
+				Description = "Attacking at least 3 second after a successful parry will launch the player forward",
 				Price = 1000,
 			},
 		},
@@ -212,7 +212,7 @@ local upgrades = {
 			},
 			{
 				Name = "Tier 2",
-				Description = "Harpoons have a 10% chance to stun enemies for 3 second.",
+				Description = "Harpoons have a 10% chance to stun enemies",
 				Price = 500,
 			},
 			{
@@ -235,7 +235,7 @@ local upgrades = {
 			},
 			{
 				Name = "Bloody Mary",
-				Description = "Every 5th enemy killed is turned into 3 seeking sawblades", -- @TODO
+				Description = "Successfully parrying an attack will convert said attack into a smart sawblade",
 				Price = 1000,
 			},
 		},
@@ -263,17 +263,17 @@ local upgrades = {
 		Souls_Tier = {
 			{
 				Name = "Tier 1",
-				Description = "+ Soul Pickup distance", -- @TODO
+				Description = "You will always be given at least one soul when ending a level.",
 				Price = 500,
 			},
 			{
 				Name = "Tier 2",
-				Description = "You will always be given at least one soul when ending a level.", -- @TODO
+				Description = "+ Soul Pickup distance",
 				Price = 1000,
 			},
 			{
 				Name = "Tier 3",
-				Description = "+ Soul Chance", -- @TODO
+				Description = "+ Soul Chance",
 				Price = 2500,
 			},
 		},
@@ -291,31 +291,31 @@ local upgrades = {
 		["RighteousMotion_Tier"] = {
 			{
 				Name = "Tier 1",
-				Description = "Extra dash", -- @TODO
+				Description = "Extra dash",
 				Price = 750,
 			},
 		},
 
-		-- ["BrickHook_Tier"] = {
-		-- 	{
-		-- 		Name = "Tier 1",
-		-- 		Description = "A dash can be used when on cooldown",
-		-- 		Price = 600,
-		-- 	},
-		-- },
+		["BrickHook_Tier"] = {
+			{
+				Name = "Tier 1",
+				Description = "A dash can be used when on cooldown",
+				Price = 600,
+			},
+		},
 
-		-- ["SpikedSabbatons_Tier"] = {
-		-- 	{
-		-- 		Name = "Tier 1",
-		-- 		Description = "One long dash",
-		-- 		Price = 600,
-		-- 	},
-		-- },
+		["SpikedSabatons_Tier"] = {
+			{
+				Name = "Tier 1",
+				Description = "A long dash can be used by pressing shift",
+				Price = 600,
+			},
+		},
 
 		["Overcharge_Tier"] = {
 			{
 				Name = "Tier 1",
-				Description = "Damage from your most upgraded weapon adds to overcharge", -- @TODO
+				Description = "Damage not dealt from picked up weapons adds to overcharge",
 				Price = 500,
 			},
 		},
@@ -323,31 +323,31 @@ local upgrades = {
 		["MagLauncher_Tier"] = {
 			{
 				Name = "Tier 1",
-				Description = "One extra projectile is shot for the Mag Launcher", -- @TODO
+				Description = "-2 Second cooldown",
 				Price = 750,
 			},
 		},
 
-		-- ["BurningSouls_Tier"] = {
-		-- 	{
-		-- 		Name = "Tier 1",
-		-- 		Description = "Damage from your most upgraded weapon adds to overcharge",
-		-- 		Price = 600,
-		-- 	},
-		-- },
-
-		-- ["GalvanGaze_Tier"] = {
-		-- 	{
-		-- 		Name = "Tier 1",
-		-- 		Description = "Damage from your most upgraded weapon adds to overcharge",
-		-- 		Price = 600,
-		-- 	},
-		-- },
-
-		["MaidensBlade_Tier"] = {
+		["BurningSouls_Tier"] = {
 			{
 				Name = "Tier 1",
-				Description = "Damage from maidens blade adds to overcharge", -- @TODO
+				Description = "-1 Second cooldown",
+				Price = 500,
+			},
+		},
+
+		["GalvanGaze_Tier"] = {
+			{
+				Name = "Tier 1",
+				Description = "-1 Second cooldown",
+				Price = 500,
+			},
+		},
+
+		["Maidenless_Tier"] = {
+			{
+				Name = "Tier 1",
+				Description = "+1 armor to maidens blade attack",
 				Price = 500,
 			},
 		},

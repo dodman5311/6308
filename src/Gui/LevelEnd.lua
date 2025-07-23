@@ -18,6 +18,7 @@ local util = require(Globals.Vendor.Util)
 local acts = require(Globals.Vendor.Acts)
 local UiAnimator = require(Globals.Vendor.UIAnimationService)
 local Signals = require(Globals.Shared.Signals)
+local SoulsService = require(Globals.Client.Services.SoulsService)
 
 local ComboValue = Instance.new("IntValue")
 local EnemiesValue = Instance.new("IntValue")
@@ -133,6 +134,10 @@ end
 function module.Cleanup(player, ui, frame) end
 
 function module.ShowLevelEnd(player, ui, frame, levelData)
+	if SoulsService.Souls == 0 and workspace:GetAttribute("Souls_Tier") >= 1 then
+		Signals.AddSoul:Fire(1)
+	end
+
 	tweenColor(frame, Color3.fromRGB(255, 0, 0), 0)
 
 	frame.Gui.Enabled = true

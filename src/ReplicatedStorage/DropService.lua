@@ -59,7 +59,13 @@ local function checkForDrops()
 		local dropPosition = drop:GetPivot().Position
 		local distance = (dropPosition - characterPosition).Magnitude
 
-		local beyondMaxDistance = distance > module.MaxDistance
+		local maxDistance = module.MaxDistance
+
+		if workspace:GetAttribute("Souls_Tier") >= 2 and drop.Name == "Soul" then
+			maxDistance += 10
+		end
+
+		local beyondMaxDistance = distance > maxDistance
 
 		drop.PrimaryPart.Anchored = not beyondMaxDistance
 		drop.PrimaryPart.CanCollide = true

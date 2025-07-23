@@ -1,12 +1,11 @@
 local module = {
 	dashes = 3,
 	canDash = true,
+	extraDash = false,
 }
 
 local CollectionService = game:GetService("CollectionService")
 local Lighting = game:GetService("Lighting")
-local ProximityPromptService = game:GetService("ProximityPromptService")
-local rs = game:GetService("RunService")
 local uis = game:GetService("UserInputService")
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -36,11 +35,30 @@ function module.fillDashes()
 
 	uiService.doUiAction("HUD", "UpdateGiftProgress", "Righteous_Motion", module.dashes / 3)
 	uiService.doUiAction("HUD", "RefreshSideBar")
+
+	if workspace:GetAttribute("RighteousMotion_Tier") > 0 then
+		module.extraDash = true
+	end
 	--script.LoadedUI:Play()
 end
 
 function module.Dash(subject)
-	if not module.canDash or not giftService.CheckGift("Righteous_Motion") then
+	print(module.canDash)
+	if
+		(workspace:GetAttribute("RighteousMotion_Tier") <= 0 or not module.extraDash)
+		and (
+			not module.canDash
+			or not (
+				giftService.CheckGift("Righteous_Motion")
+				or (giftService.CheckGift("Spiked_Sabatons") and workspace:GetAttribute("SpikedSabatons_Tier") > 0)
+				or (
+					giftService.CheckGift("Brick_Hook")
+					and workspace:GetAttribute("BrickHook_Tier") > 0
+					and acts:checkAct("GrappleCooldown")
+				)
+			)
+		)
+	then
 		return
 	end
 
@@ -55,6 +73,9 @@ function module.Dash(subject)
 		module.dashes -= 1
 		if module.dashes == 0 then
 			module.canDash = false
+		elseif module.dashes == -1 then
+			module.extraDash = false
+			module.dashes = 1
 		end
 
 		util.PlaySound(ReplicatedStorage.Assets.Sounds.Dash, script, 0.1)
@@ -86,14 +107,28 @@ function module.Dash(subject)
 		linearVelocity.Attachment0 = velocityAttachment
 
 		local direction = primaryPart.CFrame:VectorToObjectSpace(humanoid.MoveDirection)
-		local goalVelocity = (camera.CFrame.Rotation * CFrame.new(direction * 100)).Position
+
+		local distance = 100
+
+		if giftService.CheckGift("Spiked_Sabatons") and workspace:GetAttribute("SpikedSabatons_Tier") > 0 then
+			module.dashes = 0
+			module.canDash = false
+			distance = 200
+		end
+
+		if giftService.CheckGift("Brick_Hook") and workspace:GetAttribute("BrickHook_Tier") > 0 then
+			module.canDash = false
+		end
+
+		local goalVelocity = (camera.CFrame.Rotation * CFrame.new(direction * distance)).Position
 
 		if direction.Z > 0 then
-			goalVelocity = humanoid.MoveDirection * 100
+			goalVelocity = humanoid.MoveDirection * distance
 		end
 
 		linearVelocity.VectorVelocity = goalVelocity
 		task.wait(0.2)
+
 		linearVelocity:Destroy()
 		velocityAttachment:Destroy()
 

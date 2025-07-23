@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
@@ -6,11 +7,14 @@ local animationService = require(Globals.Vendor.AnimationService)
 local upgrades = require(Globals.Shared.Upgrades)
 local uiAnimationService = require(Globals.Vendor.UIAnimationService)
 local spawners = require(Globals.Services.Spawners)
+local Net = require(Globals.Packages.Net)
 
 local debounce = false
 local inTransition = false
 local PADDING = 0.25
 local RACK_SIZE = 20
+
+local getPerks = Net:RemoteFunction("GetGifts")
 
 local categories = {}
 
@@ -50,6 +54,10 @@ local function showUnits(npc, direction)
 	weldPart.Weld.C1 = CFrame.new(-30, 0, 0)
 
 	local unitsToLoad = upgrades[npc.MindData.CurrentCategory]
+
+	-- if npc.MindData.CurrentCategory == "Perks" then
+	-- 	local perkList = getPerks:InvokeClient(Players[1])
+	-- end
 
 	for _, _ in pairs(unitsToLoad) do
 		unitCount += 1

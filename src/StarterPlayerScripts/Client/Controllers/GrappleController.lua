@@ -543,6 +543,7 @@ local function grappleMovement()
 		return
 	end
 
+	acts:createAct("GrappleCooldown")
 	onCooldown = true
 	uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", 0.9)
 
@@ -556,6 +557,7 @@ local function grappleMovement()
 	timer.wait(cooldown)
 
 	onCooldown = false
+	acts:removeAct("GrappleCooldown")
 	if GiftsService.CheckGift("Brick_Hook") then
 		uiService.doUiAction("HUD", "SetGrappleIndicatorTransparency", 0)
 	end

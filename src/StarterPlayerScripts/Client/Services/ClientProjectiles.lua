@@ -187,8 +187,8 @@ module.Presets = {
 		Model = "HarpoonProjectile",
 	},
 
-	TridentHarpoon = {
-		Speed = 250,
+	Trident = {
+		Speed = 500,
 		LifeTime = 5,
 		Info = { Dropping = 0.25, Size = 2 },
 		Damage = 2,

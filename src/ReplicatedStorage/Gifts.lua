@@ -391,7 +391,7 @@ Each ricochet deals +4 damage.
 		Overcharge = {
 			Icon = "rbxassetid://120254924259541",
 			Catagories = { "Arsenal" },
-			Desc = [[Damage from pistols and the <b>Maiden's Blade</b> now adds to <b>overcharge</b>.
+			Desc = [[Damage from pistols now adds to <b>overcharge</b>.
 Other weapon damage activates <b>overcharge</b>.
 When active, you gain +50% firerate, and infinite ammo for 3 seconds. (20 hits for an <b>overcharge</b>)]],
 		},

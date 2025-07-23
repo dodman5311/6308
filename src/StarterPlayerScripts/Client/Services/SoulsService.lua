@@ -34,9 +34,14 @@ local ironWillActive = false
 --// Functions
 
 function module.CalculateDropChance(chanceMod)
+	local baseDropChance = module.DropChance
+	if workspace:GetAttribute("Souls_Tier") >= 3 then
+		baseDropChance += 0.75
+	end
+
 	chanceMod = chanceMod or 0
 	local combo = math.clamp(ComboService.CurrentCombo, 1, 100)
-	local chance = (module.DropChance * combo) + chanceMod
+	local chance = (baseDropChance * combo) + chanceMod
 	--chance += ChanceService.getLuck()
 
 	local soulCount = module.Souls + #CollectionService:GetTagged("SoulDrop")

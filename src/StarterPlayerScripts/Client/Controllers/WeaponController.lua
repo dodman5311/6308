@@ -1045,6 +1045,12 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 			end
 		end
 
+		if workspace:GetAttribute("Overcharge_Tier") > 0 then
+			if not sourceIsWeapon and source ~= "ThrownWeapon" then
+				addToOvercharge(1)
+			end
+		end
+
 		if
 			sourceIsWeapon
 			and weaponData
@@ -1101,19 +1107,6 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		end
 
 		if preHealth > 0 and postHealth <= 0 then -- kill awarded
-			if sourceIsWeapon and source == "Bloody Mary" then
-				weaponData.KillCount += 1
-				if weaponData.KillCount >= 1 then
-					weaponData.KillCount = 0
-					print("BOOM")
-					for i = 1, 3 do
-						print("A")
-						module.FireProjectile("SmartSawBlade", 0, 1, i) --@TODO WHY NO WORKY!!!!
-					end
-					-- Make spawn blades @TODO
-				end
-			end
-
 			awardKill(model, subjectPosition)
 		end
 	end)
@@ -1126,10 +1119,6 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 	if GiftsService.CheckGift("Life_Steal") and soulsService.Souls <= 1 and critMult > 1 then
 		net:RemoteEvent("Damage"):FireServer(player.Character, -1)
 		UIService.doUiAction("HUD", "ActivateGift", "Life_Steal")
-	end
-
-	if source == "Maidenless" then
-		addToOvercharge(1)
 	end
 
 	if source ~= "DaisyChain" and GiftsService.CheckGift("Daisy_Chain") and not isVendingMachine then
@@ -1381,7 +1370,8 @@ function module.FireBullet(damage, spread, distance, result, source, element, ch
 	end
 
 	if
-		result
+		module.currentWeapon
+		and result
 		and result.Instance:FindFirstAncestorOfClass("Model")
 		and weaponData["RicochetChance"]
 		and weaponData.RicochetChance ~= 0
@@ -1691,11 +1681,29 @@ function module.Fire()
 		end)
 	end
 
+	if module.currentWeapon.Name == "Mega Shot" then
+		bulletDamage = 3
+		bulletCount = 10
+	end
+
 	if deadBoltActive then
 		fireDeadBolt(extraBullet, bulletDamage, module.currentWeapon.Name, weaponData["Element"])
 	else
 		for index = 1, bulletCount do
 			local spread = index == 1 and 0 or index
+
+			if module.currentWeapon.Name == "Mega Shot" and spread ~= 0 then
+				if index <= 4 then
+					module.FireProjectile("Rocket", spread, 1, index, weaponData["Element"])
+					continue
+				elseif index <= 7 then
+					module.FireProjectile("SmartPellet", spread, 1, index, weaponData["Element"])
+					continue
+				elseif index <= 10 then
+					module.FireProjectile("ShotgunProjectile", spread, 1, index, weaponData["Element"])
+					continue
+				end
+			end
 
 			if weaponData.Projectile then
 				module.FireProjectile(weaponData.Projectile, spread, bulletDamage, index, weaponData["Element"])
@@ -2053,6 +2061,11 @@ local function onSwordHit(subject)
 		end
 	end
 	local dropAmount = isAfflicted and math.random(3, 4) or math.random(1, 2)
+
+	if workspace:GetAttribute("Maidenless_Tier") > 0 then
+		dropAmount += 1
+	end
+
 	for _ = 1, dropAmount do
 		dropService.CreateDrop(subject:GetPivot().Position, "Armor")
 	end
@@ -2231,7 +2244,12 @@ function module.OnBlock()
 	end
 
 	lastBlockTime = os.clock()
-	module.FireBullet(parryDamage, 0, 300, nil, "Parry")
+
+	if module.currentWeapon and module.currentWeapon.Name == "Bloody Mary" then
+		module.FireProjectile("SmartSawBlade", 0, parryDamage, 1) --@TODO WHY NO WORKY!!!!
+	else
+		module.FireBullet(parryDamage, 0, 300, nil, "Parry")
+	end
 
 	util.PlaySound(assets.Sounds.BlockedMetal, script, 0.1)
 	util.PlaySound(assets.Sounds.Blocked, script, 0.05)
@@ -2426,6 +2444,18 @@ local function releaseTrigger(gpe)
 end
 
 local function runDamagePerkCooldown(cooldown, giftName)
+	if giftName == "Mag_Launcher" and workspace:GetAttribute("MagLauncher_Tier") then
+		cooldown -= 2
+	end
+
+	if giftName == "Burning_Souls" and workspace:GetAttribute("BurningSouls_Tier") then
+		cooldown -= 1
+	end
+
+	if giftName == "Galvan_Gaze" and workspace:GetAttribute("GalvanGaze_Tier") then
+		cooldown -= 1
+	end
+
 	damagePerkTimer.WaitTime = cooldown
 	local onStep = damagePerkTimer.OnTimerStepped:Connect(function(currentTime)
 		UIService.doUiAction("HUD", "UpdateGiftProgress", giftName, currentTime / cooldown)
@@ -2795,6 +2825,10 @@ explosionService.explosiveHit:Connect(function(subject, preHealth, postHealth, d
 					net:RemoteEvent("Damage"):FireServer(subject, 0, "Ice")
 				end
 			end
+		end
+
+		if workspace:GetAttribute("Overcharge_Tier") > 0 then
+			addToOvercharge(1)
 		end
 	end
 

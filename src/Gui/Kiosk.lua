@@ -418,7 +418,7 @@ local function resetDOTD()
 		chance += gift.Chance
 	end
 
-	dailyDealCost = math.round((280 / chance) * 4.5)
+	dailyDealCost = math.round((280 / chance) * 4)
 	dealSold = false
 end
 
