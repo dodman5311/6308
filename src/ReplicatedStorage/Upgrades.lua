@@ -355,6 +355,9 @@ local upgrades = {
 }
 for _, category in pairs(upgrades) do
 	for upgradeName, _ in pairs(category) do
+		if workspace:GetAttribute(upgradeName) then
+			continue
+		end
 		workspace:SetAttribute(upgradeName, 0)
 	end
 end

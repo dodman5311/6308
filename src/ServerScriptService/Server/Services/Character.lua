@@ -16,6 +16,7 @@ local signals = require(Globals.Signals)
 local mapService = require(Globals.Services.MapService)
 local net = require(Globals.Packages.Net)
 local dataStore = require(script.Parent.DataStore)
+local upgrades = require(Globals.Shared.Upgrades)
 
 local getBlockedNerd = net:RemoteEvent("GetBlockedNerd")
 net:RemoteEvent("CreateShield")
@@ -157,7 +158,14 @@ local function onDied(player: Player)
 		workspace:SetAttribute("TotalScore", 0)
 		workspace:SetAttribute("DeathCount", 0)
 
-		dataStore.saveGameState(player, {})
+		for _, category in pairs(upgrades) do
+			for upgradeName, _ in pairs(category) do
+				workspace:SetAttribute(upgradeName, 0)
+			end
+		end
+
+		dataStore.saveGameState(player, { Level = 1 })
+		dataStore.SaveData(player, "ShopUpgrades", {})
 	end
 
 	mapService.CurrentLevel = 1
@@ -283,18 +291,6 @@ net:Connect("CreateShield", function(player)
 	newShield.Parent = character
 
 	require(newShield.RemoveShield).OnSpawned()
-end)
-
-signals.ActivateUpgrade:Connect(function(player)
-	local character = player.Character
-	if not character then
-		return
-	end
-
-	local humanoid = character:WaitForChild("Humanoid")
-
-	humanoid.MaxHealth = player:GetAttribute("MaxHealth")
-	humanoid.Health = player:GetAttribute("MaxHealth")
 end)
 
 return module

@@ -38,6 +38,7 @@ local module = {
 	},
 
 	OnSpawned = {
+		{ Function = "AssignGender" },
 		{ Function = "PlayAnimation", Parameters = { "Idle", Enum.AnimationPriority.Core } },
 		{ Function = "AddTag", Parameters = { "Enemy" } },
 	},

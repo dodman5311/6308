@@ -406,35 +406,5 @@ net:Handle("GetEnemies", function()
 	return enemyCFrames
 end)
 
-signals.ActivateUpgrade:Connect(function(_, upgradeName)
-	if upgradeName == "Bigger Boxes" then
-		objectTypes.Weapon.SpawnChance -= 5
-	end
-
-	if upgradeName == "Gourmet Kitchen Knife" then
-		assets.Models.WeaponPickups.Katana:Destroy()
-	end
-
-	if upgradeName == "Quality Sauce" then
-		assets.Models.WeaponPickups["Double Shot"]:Destroy()
-	end
-
-	if upgradeName == "Pizza Cutter" then
-		for _, weaponPickup in ipairs(assets.Models.WeaponPickups:GetChildren()) do
-			local weaponName = weaponPickup.Name
-			local weaponModel = assets.Models.Weapons:FindFirstChild(weaponName)
-			if not weaponModel then
-				continue
-			end
-
-			local weaponData = require(weaponModel.Data)
-			if weaponData.Type == "Melee" then
-				continue
-			end
-
-			weaponPickup:Destroy()
-		end
-	end
-end)
 
 return module

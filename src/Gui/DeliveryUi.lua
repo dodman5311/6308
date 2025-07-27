@@ -287,7 +287,7 @@ function module.showChoices(player, ui, frame, type)
 	acts:removeAct("InActiveMenu")
 end
 
-function module.ShowScreen(player, ui, frame)
+function module.ShowScreen(player, ui, frame, extraSouls)
 	if GiftsService.CheckGift("Drav_Is_Dead") then
 		return module.fakeScreen(player, ui, frame)
 	end
@@ -303,6 +303,9 @@ function module.ShowScreen(player, ui, frame)
 
 	deliveryAmount = 0
 	module.UpdateSouls(player, ui, frame, SoulsService.Souls)
+
+	frame.Souls.Added.Visible = extraSouls and extraSouls > 0
+	frame.Souls.Added.Text = "+" .. extraSouls
 
 	local ti = TweenInfo.new(0.25, Enum.EasingStyle.Linear)
 	Signals.DoUiAction:Fire("Cursor", "Toggle", true)

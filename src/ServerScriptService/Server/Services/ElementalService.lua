@@ -78,14 +78,5 @@ function module.applyElement(player, npcModel, elementName)
 end
 
 net:Connect("ApplyElement", module.applyElement)
-signals.ActivateUpgrade:Connect(function(upgradeName)
-	if upgradeName ~= "Brick Oven" then
-		return
-	end
-
-	for key, element in pairs(elements) do
-		element.time -= 1
-	end
-end)
 
 return module

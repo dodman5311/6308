@@ -78,6 +78,10 @@ function module.LoadGameData(player)
 	workspace:SetAttribute("TotalScore", gameState.TotalScore or 0)
 	workspace:SetAttribute("DeathCount", deathCount or 0)
 
+	for upgradeName, upgradeValue in pairs(upgrades) do
+		workspace:SetAttribute(upgradeName, upgradeValue)
+	end
+
 	net:RemoteEvent("LoadData"):FireClient(player, upgrades, gameState, gameSettings, codex)
 	return os.clock() - startTime
 end

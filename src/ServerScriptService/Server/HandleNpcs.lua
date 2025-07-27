@@ -617,31 +617,4 @@ net:Connect("BlindEnemy", function(_, enemy)
 	enemy:SetAttribute("Blind", false)
 end)
 
-Signals.ActivateUpgrade:Connect(function(_, upgradeName)
-	if upgradeName == "Order Wheel" then
-		Enemies.Divine:SetAttribute("Level", NumberRange.new(0, 1000))
-	end
-
-	if upgradeName == "Aged Cheese" then
-		Enemies.Everlasting:SetAttribute("Level", NumberRange.new(2, 5))
-		Enemies.Specimen:SetAttribute("Level", NumberRange.new(7, 10))
-	end
-
-	if upgradeName == "Spicy Pepperoni" then
-		moreHealth = true
-
-		for _, Npc in ipairs(CollectionService:GetTagged("Enemy")) do
-			local humanoid = Npc:WaitForChild("Humanoid")
-			if not humanoid then
-				continue
-			end
-
-			if humanoid.MaxHealth ~= 50 then
-				humanoid.MaxHealth += 1
-				humanoid.Health = humanoid.MaxHealth
-			end
-		end
-	end
-end)
-
 return module

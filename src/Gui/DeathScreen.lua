@@ -76,99 +76,6 @@ end
 
 function module.Cleanup(player, ui, frame) end
 
-local function showUnlock(player, ui, frame)
-	local ti = TweenInfo.new(1, Enum.EasingStyle.Linear)
-	local unlock = frame.Unlock
-
-	task.wait(2)
-
-	local animationTime = 0.055
-
-	unlock.Visible = true
-	unlock.Image.Visible = true
-	unlock.Image.ImageTransparency = 1
-	unlock.UpgradeUnlocked.Visible = false
-	unlock.ProgressNumber.TextTransparency = 1
-
-	sfx.Boom:Play()
-
-	for i = 1, 0, -0.25 do
-		unlock.Image.ImageTransparency = i
-		task.wait(animationTime)
-	end
-
-	unlock.Image.ImageTransparency = 0
-
-	task.wait(0.1)
-
-	sfx.RingLow:Play()
-
-	local animation = UiAnimator.PlayAnimation(unlock, animationTime, false)
-
-	animation:OnFrameRached(6):Once(function()
-		for i = 1, 0, -0.25 do
-			unlock.ProgressNumber.TextTransparency = i
-			task.wait(animationTime)
-		end
-
-		unlock.ProgressNumber.TextTransparency = 0
-	end)
-
-	animation:OnFrameRached(11):Once(function()
-		animation:Pause()
-
-		util.tween(
-			levelsPassed,
-			TweenInfo.new(0.5, Enum.EasingStyle.Quart),
-			{ Value = player:GetAttribute("furthestLevel") },
-			true
-		)
-
-		task.wait(1)
-
-		for i = 0, 1, 0.25 do
-			unlock.ProgressNumber.TextTransparency = i
-			task.wait(animationTime)
-		end
-
-		sfx.ReverseGlass:Play()
-
-		task.wait(0.1)
-
-		animation:Resume()
-		animation.OnEnded:Connect(function()
-			unlock.Image.Visible = false
-			frame.WhiteFrame.Visible = true
-
-			unlock.UpgradeUnlocked.Size = UDim2.fromScale(1, 1)
-			unlock.UpgradeUnlocked.ImageTransparency = 0
-			unlock.UpgradeUnlocked.Visible = true
-			frame.WhiteFrame.BackgroundTransparency = 0
-
-			sfx.Break:Play()
-
-			util.tween(
-				unlock.UpgradeUnlocked,
-				TweenInfo.new(3.5, Enum.EasingStyle.Quart),
-				{ Size = UDim2.fromScale(1.05, 1.05) }
-			)
-
-			for i = 0, 1, 0.25 do
-				frame.WhiteFrame.BackgroundTransparency = i
-				task.wait(animationTime)
-			end
-
-			task.wait(3.5)
-
-			util.tween(unlock.UpgradeUnlocked, ti, { ImageTransparency = 1 })
-			frame.ReturnToMenu.Visible = true
-			frame.ReturnToMenu.GroupTransparency = 1
-			util.tween(frame.ReturnToMenu, ti, { GroupTransparency = 0 })
-			Signals.DoUiAction:Fire("Cursor", "Toggle", true)
-		end)
-	end)
-end
-
 local function processAnchovies(player, frame)
 	if not giftService.CheckUpgrade("Anchovies") then
 		return false
@@ -302,8 +209,6 @@ function module.ShowDeathScreen(player, ui, frame)
 
 			--MusicService.playMusic()
 			SoundService.Music.Volume = logVolume
-			module.unlocked = false
-
 			return
 		end
 
@@ -317,8 +222,8 @@ function module.ShowDeathScreen(player, ui, frame)
 			sfx.EvilVoices:Stop()
 			Requiem.Visible = false
 
-			if module.unlocked then
-				showUnlock(player, ui, frame)
+			if false then
+				-- R SHOP
 			else
 				SoundService.AmbientReverb = Enum.ReverbType.NoReverb
 				util.tween(frame.Background, ti, { BackgroundTransparency = 1 }, true)
@@ -331,12 +236,5 @@ function module.ShowDeathScreen(player, ui, frame)
 		end)
 	end)
 end
-
-Players.LocalPlayer:GetAttributeChangedSignal("furthestLevel"):Connect(function()
-	if Players.LocalPlayer:GetAttribute("furthestLevel") <= 2 then
-		return
-	end
-	module.unlocked = true
-end)
 
 return module

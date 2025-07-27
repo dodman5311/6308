@@ -8,6 +8,8 @@ local Globals = require(ReplicatedStorage.Shared.Globals)
 local spawners = require(Globals.Services.Spawners)
 local net = require(Globals.Packages.Net)
 local mapService = require(Globals.Server.Services.MapService)
+local dataStore = require(Globals.Server.Services.DataStore)
+local upgrades = require(Globals.Shared.Upgrades)
 
 local function reverse(number, max)
 	if max == 0 then
@@ -70,6 +72,16 @@ module.Exit = function(player, start_time, stage_number, level_number, bossBeate
 
 	local maxScore = levelData.EnemiesKilled + levelData.ArenasCompleted + (levelData.MaxCombo * 10)
 	workspace:SetAttribute("TotalScore", workspace:GetAttribute("TotalScore") + math.floor(maxScore))
+
+	local upgradesList = {}
+
+	for _, category in pairs(upgrades) do
+		for upgradeName, _ in pairs(category) do
+			upgradesList[upgradeName] = workspace:GetAttribute(upgradeName)
+		end
+	end
+
+	dataStore.SaveData(player, "ShopUpgrades", upgradesList)
 
 	net:RemoteEvent("StartExitSequence"):FireAllClients(levelData, level_number, boss_name, miniboss_name, stage_number)
 end

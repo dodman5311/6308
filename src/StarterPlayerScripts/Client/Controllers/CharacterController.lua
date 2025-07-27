@@ -9,7 +9,6 @@ local Players = game:GetService("Players")
 local lighting = game:GetService("Lighting")
 local SoundService = game:GetService("SoundService")
 local StarterGui = game:GetService("StarterGui")
-local UserInputService = game:GetService("UserInputService")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
@@ -38,14 +37,11 @@ local kiosk = require(ReplicatedStorage.Gui.Kiosk)
 --// Values
 local logHealth = 0
 local collectedBlood = 0
-local pauseAmnt = 0
 local isPaused = false
 local lastOnGroundPosition = Vector3.zero
 local mouse = Player:GetMouse()
-local hasDied = false
 
 local mouseTarget = Instance.new("ObjectValue")
-local stageState = {}
 
 --// Fucntions
 
@@ -264,7 +260,6 @@ local function deathEffect()
 end
 
 function module:OnDied()
-	hasDied = true
 	kiosk.tickets = 0
 
 	deathEffect()
@@ -453,7 +448,7 @@ RunService.Heartbeat:Connect(function()
 	hitBlood:Destroy()
 end)
 
-local function exitS2(extraSouls, totalLevel, level, stageBoss, miniBoss, stage)
+local function exitS2(extraSouls, totalLevel, level, stageBoss, miniBoss)
 	module.attemptResume("EndPause")
 
 	soulsService.AddSoul(extraSouls)
@@ -535,7 +530,7 @@ local function ExitSequence(levelData, level, stageBoss, miniBoss, stage)
 	local onHidden
 
 	if level <= 5 and level ~= 2.5 and stage ~= 0 then
-		onHidden = UIService.doUiAction("DeliveryUi", "ShowScreen", soulsService.Souls)
+		onHidden = UIService.doUiAction("DeliveryUi", "ShowScreen", extraSouls)
 
 		onHidden:Once(function()
 			exitS2(extraSouls, totalLevel, level, stageBoss, miniBoss, stage)
