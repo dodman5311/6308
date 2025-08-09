@@ -193,7 +193,7 @@ function module.CheckFear(npc)
 		return chance
 	end
 
-	if npc.StatusEffects["Ice"] or npc.StatusEffects["Stun"]then
+	if npc.StatusEffects["Ice"] or npc.StatusEffects["Stun"] then
 		return true
 	end
 end
@@ -827,6 +827,67 @@ function module.AimAtTarget(npc, doLerp, lerpAlpha)
 	local position = target:GetPivot().Position
 
 	npc.MindData.AimCFrame = CFrame.lookAt(npc.Instance:GetPivot().Position, position)
+end
+
+function module.PlaySound(npc, soundName: string)
+	if npc.MindData.VoicePlaying then
+		npc.MindData.VoicePlaying:Stop()
+		npc.MindData.VoicePlaying:Destroy()
+		npc.MindData.VoicePlaying = nil
+	end
+
+	local voiceFolder = npc.Instance:FindFirstChild("Voice")
+	if not voiceFolder then
+		return
+	end
+
+	local sound = voiceFolder:FindFirstChild(soundName)
+	if not sound then
+		return
+	end
+
+	if sound:IsA("Folder") then
+		sound = Util.getRandomChild(sound)
+	end
+
+	if not sound then
+		return
+	end
+
+	npc.MindData.VoicePlaying = Util.PlaySound(sound, npc.Instance.PrimaryPart, 0.05)
+
+	npc.MindData.VoicePlaying.Ended:Once(function()
+		npc.MindData.VoicePlaying = nil
+	end)
+end
+
+function module.PlayIdleSound(npc, waitTime: number?)
+	waitTime = waitTime or NumberRange.new(5, 7)
+	local soundTimer = getTimer(npc, "PlayIdleSound", waitTime, function()
+		module.PlaySound(npc, "Idle")
+	end, true)
+
+	soundTimer.OnEnded:Once(function()
+		soundTimer.WaitTime = getNumber(waitTime)
+	end)
+	soundTimer:Run()
+end
+
+function module.AssignGender(npc)
+	local model = npc.Instance
+
+	local gender = rng:NextInteger(0, 1) == 1 and "Male" or "Female"
+
+	model:SetAttribute("Gender", gender)
+
+	local genderFolder = model:FindFirstChild(gender)
+	if not genderFolder then
+		return
+	end
+
+	for _, asset in ipairs(genderFolder:GetChildren()) do
+		asset.Parent = model
+	end
 end
 
 function module.LeadTarget(npc, shotSpeed, randomness, ignoreDistance)

@@ -22,6 +22,7 @@ local module = {
 
 		{ Function = "GetToDistance", Parameters = { 20, true } },
 		{ Function = "PlayWalkingAnimation" },
+		{ Function = "PlayIdleSound" },
 	},
 
 	TargetFound = {
@@ -41,6 +42,7 @@ local module = {
 	},
 
 	OnDied = {
+		{ Function = "PlaySound", Parameters = { "Death" } },
 		{ Function = "SetCollision", Parameters = { "DeadBody" } },
 		{ Function = "SwitchToState", Parameters = { "Dead" } },
 		{ Function = "Ragdoll" },

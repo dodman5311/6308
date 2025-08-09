@@ -17,6 +17,7 @@ local module = {
 
 		{ Function = "GetToDistance", Parameters = { stats.AttackDistance - 2, true } },
 		{ Function = "PlayWalkingAnimation" },
+		{ Function = "PlayIdleSound" },
 	},
 
 	TargetFound = {
@@ -44,6 +45,7 @@ local module = {
 	},
 
 	OnDied = {
+		{ Function = "PlaySound", Parameters = { "Death" } },
 		{ Function = "SetCollision", Parameters = { "DeadBody" } },
 		{ Function = "SwitchToState", Parameters = { "Dead" } },
 		{ Function = "Ragdoll" },

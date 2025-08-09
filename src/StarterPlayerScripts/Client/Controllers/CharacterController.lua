@@ -448,7 +448,7 @@ RunService.Heartbeat:Connect(function()
 	hitBlood:Destroy()
 end)
 
-local function exitS2(extraSouls, totalLevel, level, stageBoss, miniBoss)
+local function exitS2(extraSouls, level, stageBoss, miniBoss)
 	module.attemptResume("EndPause")
 
 	soulsService.AddSoul(extraSouls)
@@ -490,7 +490,10 @@ local function exitS2(extraSouls, totalLevel, level, stageBoss, miniBoss)
 		MusicService.playTrack(miniBoss)
 	else
 		task.delay(0.5, function()
-			MusicService.playMusic(math.floor(totalLevel + 1))
+			local plusStage = (workspace:GetAttribute("Stage") - 1) * 5
+			local totalLevel = plusStage + workspace:GetAttribute("Level")
+
+			MusicService.playMusic(math.floor(totalLevel))
 		end)
 
 		local gameState = {
@@ -521,9 +524,6 @@ end
 local function ExitSequence(levelData, level, stageBoss, miniBoss, stage)
 	UIService.doUiAction("HUD", "HideRCoins")
 
-	local plusStage = (stage - 1) * 5
-	local totalLevel = plusStage + level
-
 	module.attemptPause("EndPause")
 
 	local extraSouls = UIService.doUiAction("LevelEnd", "ShowLevelEnd", levelData)
@@ -533,12 +533,12 @@ local function ExitSequence(levelData, level, stageBoss, miniBoss, stage)
 		onHidden = UIService.doUiAction("DeliveryUi", "ShowScreen", extraSouls)
 
 		onHidden:Once(function()
-			exitS2(extraSouls, totalLevel, level, stageBoss, miniBoss, stage)
+			exitS2(extraSouls, level, stageBoss, miniBoss, stage)
 			UIService.doUiAction("HUD", "HideBossBar")
 		end)
 	else
 		UIService.doUiAction("DeliveryUi", "fakeScreen")
-		task.delay(1, exitS2, extraSouls, totalLevel, level, stageBoss, miniBoss, stage)
+		task.delay(1, exitS2, extraSouls, level, stageBoss, miniBoss, stage)
 	end
 
 	net:RemoteEvent("ProceedToNextLevel"):FireServer()

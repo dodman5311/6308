@@ -553,13 +553,13 @@ Make models upgrade units/upgrade rack
 complete settings
 
 FIX STAGE 1 NOT SAVING *
-compile changelog
-FIX SPAM CLICK TO GET ALL PERKS
+Fix music cutting off after shop *
 
-Fix music cutting off after shop
-Fix daisy chain + upgrade things
+compile changelog ()
+FIX exit not showing in arenas ()
+FIX SPAM CLICK TO GET ALL PERKS ()
+
 Fix upgrade units showing mega shot on full
-Fix Soul drop hitbox (BALL)
 Display stats in menu
 Fix electric smoke not showing
 
@@ -567,6 +567,6 @@ fix armor resistance perks
 
 enable mobile button for visage perks
 
-fix rack not anchoring
+fix rack not anchoring ()
 
 GENDER AND VOICES :D

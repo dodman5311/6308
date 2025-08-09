@@ -327,18 +327,18 @@ function util.randomAngle(angle)
 	return math.rad(math.random(-angle * 1000, angle * 1000) / 1000)
 end
 
-function util.PlaySound(S, Parent, range, StopTime)
-	local SC = S:Clone()
+function util.PlaySound(sound, parent, range, stopTime): Sound
+	local SC = sound:Clone()
 	SC.Name = "SoundPlaying"
-	SC.Parent = Parent
+	SC.Parent = parent
 	if range then
 		SC.PlaybackSpeed += rng:NextNumber(-range, range)
 	end
 
 	SC:Play()
 
-	if StopTime then
-		task.delay(StopTime, function()
+	if stopTime then
+		task.delay(stopTime, function()
 			SC:Destroy()
 		end)
 	else

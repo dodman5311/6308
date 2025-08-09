@@ -906,7 +906,11 @@ local function checkChainSub(a)
 end
 
 local function assignDaisyChain(subject: Model)
-	local model = subject:IsA("Model") and subject or subject:FindFirstAncestorOfClass("Model")
+	subject = subject:IsA("Model") and subject or subject:FindFirstAncestorOfClass("Model")
+
+	if subject.Name == "UpgradeRack" or subject.Name == "UpgradeUnit" then -- Don't fuck with upgrade units
+		return
+	end
 
 	if checkChainSub(daisySubject_A) then
 		daisySubject_A = subject
@@ -918,11 +922,11 @@ local function assignDaisyChain(subject: Model)
 
 	local beam = workspace.DaisyBeam
 
-	if not model.PrimaryPart then
+	if not subject.PrimaryPart then
 		return
 	end
-	local attachment = model.PrimaryPart:FindFirstChild("RootAttachment")
-		or model.PrimaryPart:FindFirstChildOfClass("Attachment")
+	local attachment = subject.PrimaryPart:FindFirstChild("RootAttachment")
+		or subject.PrimaryPart:FindFirstChildOfClass("Attachment")
 	if not attachment then
 		return
 	end

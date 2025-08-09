@@ -83,6 +83,8 @@ function module.playMusic(level)
 
 	currentPlaying = music:FindFirstChild(level)
 
+	print(level, currentPlaying)
+
 	if not currentPlaying then
 		return
 	end
