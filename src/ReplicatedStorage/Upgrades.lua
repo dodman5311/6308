@@ -286,6 +286,18 @@ local upgrades = {
 				Description = "One extra jump is added",
 				Price = 500,
 			},
+
+			{
+				Name = "Tier A",
+				Description = "Throwing a weapon while in the air boosts you upwards.",
+				Price = 500,
+			},
+
+			{
+				Name = "Tier B",
+				Description = "When in the air, bullets fired boost you in the opposite direction.",
+				Price = 500,
+			},
 		},
 
 		["RighteousMotion_Tier"] = {
@@ -318,6 +330,18 @@ local upgrades = {
 				Description = "Damage not dealt from picked up weapons adds to overcharge",
 				Price = 500,
 			},
+
+			{
+				Name = "Tier A",
+				Description = "Upon activation: no infinite ammo, faster firate, +35% crit chance, and crits add ammo.",
+				Price = 500,
+			},
+
+			{
+				Name = "Tier B",
+				Description = "Overcharge charges faster. Even more charge when dealing crit damage.",
+				Price = 500,
+			},
 		},
 
 		["MagLauncher_Tier"] = {
@@ -348,6 +372,18 @@ local upgrades = {
 			{
 				Name = "Tier 1",
 				Description = "+1 armor to maidens blade attack",
+				Price = 500,
+			},
+
+			{
+				Name = "Tier A",
+				Description = "0.5 Second parry time, 1 second cooldown. No longer drops armor. Deals <b>soul</b> damage.",
+				Price = 500,
+			},
+
+			{
+				Name = "Tier B",
+				Description = "2 second cooldown. +2 damage. Enemies killed with the Maiden's Blade have a +20% soul chance.",
 				Price = 500,
 			},
 		},

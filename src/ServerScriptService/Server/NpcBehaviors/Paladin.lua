@@ -23,6 +23,7 @@ local module = {
 		{ Function = "MoveAwayFromDistance", Parameters = { 25, true } },
 
 		{ Function = "PlayWalkingAnimation" },
+		{ Function = "PlayIdleSound" },
 	},
 
 	AtDistance = {
@@ -46,23 +47,20 @@ local module = {
 	},
 
 	TargetFound = {
+		{ Function = "PlaySound", Parameters = { "Notice", 5 } },
 		{ Function = "SwitchToState", Parameters = { "Attacking" } },
 		{ Function = "MoveTowardsTarget" },
-
-		-- {
-		-- 	Function = "ShootProjectile",
-		-- 	Parameters = { stats.ReactionDelay, stats.AttackCooldown, stats.AttackAmount, stats.ProjectileSpeed, 5 },
-		-- 	IgnoreEventParams = true,
-		-- },
 	},
 
 	TargetLost = {
+		{ Function = "PlaySound", Parameters = { "Lost", 1 } },
 		{ Function = "SwitchToState", Parameters = { "Chasing" } },
 		{ Function = "MoveTowardsTarget" },
 	},
 
 	OnSpawned = {
 		{ Function = "AssignGender" },
+		{ Function = "AssignVoice" },
 		{ Function = "PlayAnimation", Parameters = { "Idle", Enum.AnimationPriority.Core } },
 		{ Function = "AddTag", Parameters = { "Enemy" } },
 	},

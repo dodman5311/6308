@@ -31,19 +31,24 @@ local module = {
 
 		{ Function = "GetToDistance", Parameters = { 20, true } },
 		{ Function = "PlayWalkingAnimation" },
+		{ Function = "PlayIdleSound" },
 	},
 
 	TargetFound = {
+		{ Function = "PlaySound", Parameters = { "Notice", 5 } },
 		{ Function = "SwitchToState", Parameters = { "Attacking" } },
 		{ Function = "MoveTowardsTarget" },
 	},
 
 	TargetLost = {
+		{ Function = "PlaySound", Parameters = { "Lost", 1 } },
 		{ Function = "SwitchToState", Parameters = { "Chasing" } },
 		{ Function = "MoveTowardsTarget" },
 	},
 
 	OnSpawned = {
+		{ Function = "AssignGender" },
+		{ Function = "AssignVoice" },
 		{ Function = "PlayAnimation", Parameters = { "Idle", Enum.AnimationPriority.Core } },
 		{ Function = "AddTag", Parameters = { "Enemy" } },
 	},

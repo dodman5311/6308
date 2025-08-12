@@ -829,7 +829,11 @@ function module.AimAtTarget(npc, doLerp, lerpAlpha)
 	npc.MindData.AimCFrame = CFrame.lookAt(npc.Instance:GetPivot().Position, position)
 end
 
-function module.PlaySound(npc, soundName: string)
+function module.PlaySound(npc, soundName: string, chance: number?)
+	if chance and rng:NextNumber(0, 100) > chance then
+		return
+	end
+
 	if npc.MindData.VoicePlaying then
 		npc.MindData.VoicePlaying:Stop()
 		npc.MindData.VoicePlaying:Destroy()
@@ -887,6 +891,22 @@ function module.AssignGender(npc)
 
 	for _, asset in ipairs(genderFolder:GetChildren()) do
 		asset.Parent = model
+	end
+end
+
+function module.AssignVoice(npc)
+	local voicesFolder = npc.Instance:FindFirstChild("Voice")
+	if not voicesFolder then
+		print("A")
+		return
+	end
+
+	local voiceFolder = Util.getRandomChild(voicesFolder)
+	if voiceFolder then
+		print("B")
+		for _, voice in ipairs(voiceFolder:GetChildren()) do
+			voice.Parent = voicesFolder
+		end
 	end
 end
 

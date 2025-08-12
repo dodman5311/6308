@@ -21,6 +21,7 @@ local module = {
 	},
 
 	TargetFound = {
+		{ Function = "PlaySound", Parameters = { "Notice", 3 } },
 		{ Function = "SwitchToState", Parameters = { "Attacking" } },
 	},
 
@@ -40,6 +41,7 @@ local module = {
 
 	OnSpawned = {
 		{ Function = "AssignGender" },
+		{ Function = "AssignVoice" },
 		{ Function = "PlayAnimation", Parameters = { "Idle", Enum.AnimationPriority.Core } },
 		{ Function = "AddTag", Parameters = { "Enemy" } },
 	},

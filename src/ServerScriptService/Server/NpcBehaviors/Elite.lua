@@ -149,15 +149,18 @@ local module = {
 
 		{ Function = "GetToDistance", Parameters = { 30, true }, NotState = "Shielding" },
 		{ Function = "PlayWalkingAnimation" },
+		{ Function = "PlayIdleSound" },
 	},
 
 	TargetFound = {
+		{ Function = "PlaySound", Parameters = { "Notice", 5 } },
 		{ Function = "SwitchToState", Parameters = { "Attacking" }, NotState = "Shielding" },
 		{ Function = "MoveTowardsTarget", NotState = "Shielding" },
 		{ Function = "Custom", Parameters = { searchForHarbinger } },
 	},
 
 	TargetLost = {
+		{ Function = "PlaySound", Parameters = { "Lost", 1 } },
 		{ Function = "Custom", Parameters = { loseHarbinger } },
 		{ Function = "SwitchToState", Parameters = { "Chasing" }, NotState = "Shielding" },
 		{ Function = "MoveTowardsTarget" },
@@ -165,12 +168,19 @@ local module = {
 	},
 
 	OnSpawned = {
+		{ Function = "AssignGender" },
+		{ Function = "AssignVoice" },
 		{ Function = "Custom", Parameters = { setup } },
 		{ Function = "PlayAnimation", Parameters = { "Idle", Enum.AnimationPriority.Core } },
 		{ Function = "AddTag", Parameters = { "Enemy" } },
 	},
 
+	OnDamaged = {
+		{ Function = "PlaySound", Parameters = { "Hurt" } },
+	},
+
 	OnDied = {
+		{ Function = "PlaySound", Parameters = { "Death" } },
 		{ Function = "Custom", Parameters = { loseHarbinger } },
 		{ Function = "SetCollision", Parameters = { "DeadBody" } },
 		{ Function = "SwitchToState", Parameters = { "Dead" } },
