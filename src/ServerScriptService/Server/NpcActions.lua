@@ -858,14 +858,30 @@ function module.PlaySound(npc, soundName: string, chance: number?)
 		return
 	end
 
-	npc.MindData.VoicePlaying = Util.PlaySound(sound, npc.Instance.PrimaryPart, 0.05)
+	local soundPart = Instance.new("Part")
+	
+	soundPart.CanCollide = false
+	soundPart.CanQuery = false
+	soundPart.Transparency = 1
+	soundPart.Anchored = false
+	soundPart.Parent = workspace
+
+	local newWeld = Instance.new("Weld")
+
+	newWeld.Parent = soundPart
+	newWeld.Part0 = npc.Instance.PrimaryPart
+	newWeld.Part1 = soundPart
+
+
+	npc.MindData.VoicePlaying = Util.PlaySound(sound, soundPart, 0.05)
 
 	npc.MindData.VoicePlaying.Ended:Once(function()
 		npc.MindData.VoicePlaying = nil
+		soundPart:Destroy()
 	end)
 end
 
-function module.PlayIdleSound(npc, waitTime: number?)
+function module.PlayIdleSound(npc, waitTime: number | NumberRange?)
 	waitTime = waitTime or NumberRange.new(5, 7)
 	local soundTimer = getTimer(npc, "PlayIdleSound", waitTime, function()
 		module.PlaySound(npc, "Idle")
