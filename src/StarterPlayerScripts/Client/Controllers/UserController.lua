@@ -27,7 +27,9 @@ function UserController:GetLocalUser()
 	return Users[LOCAL_PLAYER]
 end
 
-function UserController:GameInit()
+function UserController:GameInit() end
+
+function UserController:GameStart()
 	Net:Connect("UserAdded", function(user)
 		print("User Added Event")
 		Users[user.player] = user
@@ -43,7 +45,5 @@ function UserController:GameInit()
 		end
 	end)
 end
-
-function UserController:GameStart() end
 
 return UserController

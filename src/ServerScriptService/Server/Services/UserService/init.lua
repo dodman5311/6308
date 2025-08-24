@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CollectionService = game:GetService("CollectionService")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local ProfileService = require(ReplicatedStorage.Packages.ProfileService)
@@ -7,6 +8,7 @@ local Signal = require(Globals.Packages.Signal)
 local Net = require(Globals.Packages.Net)
 local User = require(script.User)
 
+local assignedIds = {}
 local ProfileTemplate = {}
 
 local UserService = {}
@@ -27,6 +29,33 @@ local function PlayerAdded(player)
 
 	UserService.UserAdded:Fire(user)
 	UserService.UserAddedRemote:FireAllClients(UserService:SerializeUser(user))
+
+	local id = math.random(0, 999)
+	while table.find(assignedIds, id) do
+		id = math.random(0, 999)
+	end
+
+	player:SetAttribute("Id", id)
+	table.insert(assignedIds, id)
+
+	local assignedRoom = Instance.new("ObjectValue")
+	assignedRoom.Name = "Room"
+	assignedRoom.Parent = player
+
+	for _, room in ipairs(CollectionService:GetTagged("EmptyRoom")) do
+		assignedRoom.Value = room
+		room:RemoveTag("EmptyRoom")
+		break
+	end
+
+	if player.Character then
+		player.Character:PivotTo(assignedRoom.Value:GetPivot())
+	end
+
+	player.CharacterAdded:Connect(function(character)
+		task.wait(0.1)
+		character:PivotTo(assignedRoom.Value:GetPivot())
+	end)
 end
 
 function UserService:InitializeProfileTemplate()

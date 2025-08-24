@@ -1,9 +1,12 @@
 local modules = {}
 
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local Promise = require(Globals.Packages.Promise)
+
+local player = Players.LocalPlayer
 
 local function InitModules()
 	local inits = {}
@@ -25,6 +28,12 @@ local function InitModules()
 
 					if mod.GameInit then
 						mod:GameInit()
+					end
+
+					if mod.OnSpawned then
+						player.CharacterAdded:Connect(function(character)
+							mod:OnSpawned(character)
+						end)
 					end
 
 					table.insert(modules, mod)

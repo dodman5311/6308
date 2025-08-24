@@ -17,11 +17,11 @@
 	// }
 	"Globals": {
 		"scope": "lua,luau",
-		"prefix": "globals",
+		"prefix": "Globals",
 		"body": [
 			"local ReplicatedStorage = game:GetService(\"ReplicatedStorage\")",
 			"",
-			"local Globals = require(ReplicatedStorage.Shared.Globals)"
+			"local globals = require(ReplicatedStorage.Shared.Globals)"
 		],
 		"description": "Create the Globals + Replicated Storage variable for easy file creation."
 	},
