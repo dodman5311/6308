@@ -4,9 +4,14 @@ local module = {}
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
+local ServerScriptService = game:GetService("ServerScriptService")
 local Teams = game:GetService("Teams")
 
 --// Instances
+
+
+local HandleArenas = require(ServerScriptService.Server.Services.HandleArenas)
+local HandleNpcs = require(script.Parent.HandleNpcs)
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local map = workspace.Map
 
@@ -857,6 +862,8 @@ function module.PlaySound(npc, soundName: string, chance: number?)
 	if not sound then
 		return
 	end
+
+
 
 	local soundPart = Instance.new("Part")
 	
