@@ -4,14 +4,10 @@ local module = {}
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
-local ServerScriptService = game:GetService("ServerScriptService")
 local Teams = game:GetService("Teams")
 
 --// Instances
 
-
-local HandleArenas = require(ServerScriptService.Server.Services.HandleArenas)
-local HandleNpcs = require(script.Parent.HandleNpcs)
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local map = workspace.Map
 
@@ -80,7 +76,7 @@ local function getNearest(npc, maxDistance)
 	local team: Team = Teams:FindFirstChild(npc.TeamName)
 
 	local getList = {}
-	local teamEnemies = team.Enemies
+	local teamEnemies = team:FindFirstChild("Enemies")
 
 	for _, enemyValue: ObjectValue in ipairs(teamEnemies:GetChildren()) do
 		local enemyTeam: Team = enemyValue.Value

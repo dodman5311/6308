@@ -71,12 +71,12 @@ function module.checkChance(chance, goodLuck, PureLuck)
 		return
 	end
 
-	local luck = module.getLuck() / 2
+	local luck = module.getLuck() / 100--/ 2
 
 	if goodLuck then
-		chance += luck
+		chance *= (1 + luck)
 	elseif goodLuck == false then
-		chance -= luck
+		chance /= (1 + luck)
 	end
 
 	if rng:NextNumber(0, 100) <= chance then

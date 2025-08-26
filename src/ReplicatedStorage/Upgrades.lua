@@ -241,7 +241,7 @@ local upgrades = {
 		},
 	},
 
-	Souls = {
+	Core = {
 		Combo_Tier = {
 			{
 				Name = "Tier 1",
@@ -279,7 +279,7 @@ local upgrades = {
 		},
 	},
 
-	Perks = {
+	Stage_1_Perks = {
 		["MasterScouting_Tier"] = {
 			{
 				Name = "Tier 1",
@@ -323,7 +323,9 @@ local upgrades = {
 				Price = 600,
 			},
 		},
+	},
 
+	Stage_2_Perks = {
 		["Overcharge_Tier"] = {
 			{
 				Name = "Tier 1",
@@ -367,7 +369,9 @@ local upgrades = {
 				Price = 500,
 			},
 		},
+	},
 
+	Stage_3_Perks = {
 		["Maidenless_Tier"] = {
 			{
 				Name = "Tier 1",

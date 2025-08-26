@@ -138,7 +138,7 @@ local module = {
 			Desc = "Upon taking damage, you now have a chance to gain +1 ammo. (10% chance)",
 		},
 
-		Guts_And_Gas = { -- ICON NEEDED
+		Guts_And_Gas = {
 			Icon = "rbxassetid://71409350218402",
 			Catagories = { "Arsenal" },
 			Desc = "Gibbing enemies now deals 1 point of splash damage.",
@@ -270,7 +270,7 @@ local module = {
 		Daisy_Chain = {
 			Icon = "rbxassetid://91240165726447",
 			Catagories = { "Arsenal" },
-			Desc = "When shooting an enemy, the next one hit will now be linked to it. Damage to either enemy is delt to the other as electric damage.",
+			Desc = "When shooting an enemy, the next one hit will now be linked to it. Damage to either enemy is dealt to the other as electric damage.",
 		},
 
 		-- Haven = {
