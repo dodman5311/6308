@@ -2609,7 +2609,7 @@ local function galvanGaze()
 		end
 	end
 
-	local cooldown = target and DAMAGE_PERK_COOLDOWN or 1
+	local cooldown = target and 6 or 1
 
 	runDamagePerkCooldown(cooldown, "Galvan_Gaze")
 end

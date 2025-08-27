@@ -113,7 +113,22 @@ function util.circleCurve(t)
 	return math.sqrt(1 - (2 * t - 1) ^ 2)
 end
 
-function util.tween(instance, tweenInfo, propertyTable, yield, endingFunction, endingState: Enum.PlaybackState?)
+--[[
+@param yield : (Default: false)
+@param endingState : (Default: Enum.PlaybackState.Completed)
+@return Tween
+]]
+function util.tween(
+	instance: Instance,
+	tweenInfo: TweenInfo,
+	propertyTable: {},
+	yield: boolean?,
+	endingFunction: (() -> any?)?,
+	endingState: Enum.PlaybackState?
+)
+	yield = yield or false
+	endingState = endingState or Enum.PlaybackState.Completed
+
 	local createdTween
 
 	if typeof(instance) == "table" then
@@ -131,13 +146,13 @@ function util.tween(instance, tweenInfo, propertyTable, yield, endingFunction, e
 		end
 
 		local state = createdTween.PlaybackState
-		if state ~= (endingState or Enum.PlaybackState.Completed) then
+		if state ~= endingState then
 			return
 		end
 		endingFunction()
 	elseif endingFunction then
 		createdTween.Completed:Connect(function(state)
-			if state ~= (endingState or Enum.PlaybackState.Completed) then
+			if state ~= endingState then
 				return
 			end
 

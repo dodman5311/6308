@@ -11,8 +11,7 @@ local net = require(Globals.Packages.Net)
 
 local player = Players.LocalPlayer
 
-local allSignals = {
-	"DoUiAction",
+local allSignals = { 
 	"DoWeaponAction",
 	"AddSoul",
 	"RemoveSoul",

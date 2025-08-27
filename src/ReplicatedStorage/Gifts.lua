@@ -374,11 +374,11 @@ When inflicted with <b>soul fire</b>, enemies will take x2 damage.
 		Galvan_Gaze = {
 			Icon = "rbxassetid://102900540660710",
 			Catagories = { "Arsenal" },
-			Desc = [[Turn an enemy, below half health, into an iron statue. 
+			Desc = [[Turn an enemy, half health or below, into an iron statue. 
 When shooting an iron statue, it will ricoshot to the nearest enemy up to 8 times. 
-Each ricochet deals +4 damage.
+Each ricochet deals +2 damage.
 
-20 second cooldown
+6 second cooldown
 (G to turn an enemy)]],
 		},
 

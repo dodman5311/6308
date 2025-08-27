@@ -756,6 +756,24 @@ local commands = {
 			end,
 		},
 
+		Show_Requiem_Shop = {
+
+			Parameters = function()
+				return {
+					{ Name = "Confirm", Options = { true, false } },
+				}
+			end,
+
+			ExecuteClient = function(_, confirm)
+				if not confirm then
+					return
+				end
+
+				local uiService = require(Globals.Client.Services.UIService)
+				uiService.doUiAction("Requiem", "ShowRequiemShop")
+			end,
+		},
+
 		Notify = {
 			Parameters = function()
 				return {
