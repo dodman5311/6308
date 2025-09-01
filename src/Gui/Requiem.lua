@@ -4,7 +4,9 @@ local module = {
 }
 --// Services
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
+local UserInputService = game:GetService("UserInputService")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
@@ -12,6 +14,7 @@ local Globals = require(ReplicatedStorage.Shared.Globals)
 local assets = ReplicatedStorage.Assets
 local sounds = assets.Sounds
 local sfx = sounds.Kiosk
+local camera = workspace.CurrentCamera
 
 --// Modules
 local util = require(ReplicatedStorage.Vendor.Util)
@@ -19,16 +22,19 @@ local Signal = require(Globals.Packages.Signal)
 local Net = require(ReplicatedStorage.Packages.Net)
 local Signals = require(ReplicatedStorage.Shared.Signals)
 local Upgrades = require(ReplicatedStorage.Shared.Upgrades)
+local MouseOverModule = require(ReplicatedStorage.Vendor.MouseOverModule)
+local UIAnimationService = require(ReplicatedStorage.Vendor.UIAnimationService)
 
 module.onHidden = Signal.new()
+local runInfoBox
 
 --// Values
 
 local upgradeIndexOrder = {
 	"Core",
+	"Pistols",
 	"Shotguns",
 	"Rifles",
-	"Pistols",
 	"Melee",
 	"Stage_1_Perks",
 	"Stage_2_Perks",
@@ -122,6 +128,12 @@ local function setTreeIndex(frame, index: number, reverse: boolean?)
 		if tree.Name == upgradeIndexOrder[index] then
 			updateTree(tree)
 
+			local filigree = frame.Filigree:FindFirstChild(tree.Name)
+			
+			if filigree then
+				util.tween(filigree, ti, { ImageTransparency = 0 })
+			end
+
 			tree.Visible = true
 			tree.Position = UDim2.fromScale(reverse and 0.4 or 0.6, 0.5)
 
@@ -129,6 +141,12 @@ local function setTreeIndex(frame, index: number, reverse: boolean?)
 			util.tween(tree, ti, { Size = UDim2.fromScale(1, 1) })
 			util.tween(tree, ti, { Position = UDim2.fromScale(0.5, 0.5) })
 		else
+			local filigree = frame.Filigree:FindFirstChild(tree.Name)
+			
+			if filigree then
+				util.tween(filigree, ti, { ImageTransparency = 1 })
+			end
+			
 			util.tween(tree, ti, { GroupTransparency = 1 }, false, function()
 				tree.Visible = false
 			end)
@@ -142,6 +160,30 @@ function module.ShowRequiemShop(_, ui, frame)
 	Signals.DoUiAction:Fire("Cursor", "Toggle", true)
 	frame.Gui.Enabled = true
 	setTreeIndex(frame, currentTreeIndex)
+
+	runInfoBox = RunService.RenderStepped:Connect(function()
+		local mousePosition = UserInputService:GetMouseLocation()
+		frame.InfoBox.Position = UDim2.fromOffset(mousePosition.X, mousePosition.Y)
+
+		local midPoint = camera.ViewportSize / 2
+
+		local x = 0
+		local y = 0
+
+		if mousePosition.Y > midPoint.Y then
+			y = 1
+		else
+			y = 0
+		end
+
+		if mousePosition.X > midPoint.X then
+			x = 1
+		else
+			x = 0
+		end
+
+		util.tween(frame.InfoBox, TweenInfo.new(0.25), {AnchorPoint = Vector2.new(x,y)})
+	end)
 end
 
 function module.Init(player, ui, frame)
@@ -180,24 +222,40 @@ function module.Init(player, ui, frame)
 			button.MouseButton1Click:Connect(function()
 				-- upgrade event
 				
-				--Net:RemoteFunction("UpdateUpgradeTier"):FireServer(buttonFrame.Parent.Name, 1)
+				
 				local category =  buttonFrame.Parent.Parent.Name
 				local tierName = buttonFrame.Parent.Name
 				local currentTier = workspace:GetAttribute(tierName)
 
 				if currentTier < #Upgrades[category][tierName] then
-					workspace:SetAttribute(tierName, workspace:GetAttribute(tierName) + 1)
+					--workspace:SetAttribute(tierName, workspace:GetAttribute(tierName) + 1)
+					Net:RemoteEvent("PurchaseUpgrade"):FireServer(tierName, 5, workspace:GetAttribute(tierName) + 1)
 				end
 				
 				updateTree(tree)
 			end)
 
-			button.MouseEnter:Connect(function()
+			local enter, leave = MouseOverModule.MouseEnterLeaveEvent(button)
+
+
+
+			enter:Connect(function()
 				-- leave event
+
+				local category =  buttonFrame.Parent.Parent.Name
+				local tierName = buttonFrame.Parent.Name
+				local tierNumber = tonumber(buttonFrame.Name)
+				local tier = Upgrades[category][tierName][tierNumber]
+
+				frame.InfoBox.Visible = true
+
+				frame.InfoBox.Title.Text = tier.Name
+				frame.InfoBox.Desc.Text = tier.Description
+				frame.Icon.Image = buttonFrame.Icon.Image
 			end)
 
-			button.MouseLeave:Connect(function()
-				-- enter event
+			leave:Connect(function()
+				frame.InfoBox.Visible = false
 			end)
 		end
 	end

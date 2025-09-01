@@ -67,14 +67,6 @@ function module.CalculateDropChance(chanceMod)
 
 	chance /= (1 + TweenService:GetValue(soulCount / 15, Enum.EasingStyle.Quart, Enum.EasingDirection.In) * 5)
 
-	if GiftsService.CheckUpgrade("Quality Sauce") then
-		chance /= 1.15
-	end
-
-	if GiftsService.CheckUpgrade("Cheaper Ingredients") then
-		chance += 20
-	end
-
 	if GiftsService.CheckGift("Drav_Is_Dead") then
 		return 0, 0
 	end

@@ -2,12 +2,12 @@ local upgrades = {
 	Shotguns = {
 		["DoubleShot_Tier"] = {
 			{
-				Name = "Tier 1",
+				Name = "Double Shot: Tier 1",
 				Description = "+ Fire rate",
 				Price = 250,
 			},
 			{
-				Name = "Tier 2",
+				Name = "Double Shot: Tier 2",
 				Description = "+1 Pellet",
 				Price = 400,
 			},
@@ -20,12 +20,12 @@ local upgrades = {
 
 		["DrillBite_Tier"] = {
 			{
-				Name = "Tier 1",
+				Name = "Drill Bite: Tier 1",
 				Description = "+3 Ammo",
 				Price = 250,
 			},
 			{
-				Name = "Tier 2",
+				Name = "Drill Bite: Tier 2",
 				Description = "Pellets now have a 5% chance to light enemies on fire",
 				Price = 500,
 			},
@@ -38,12 +38,12 @@ local upgrades = {
 
 		["QuadShot_Tier"] = {
 			{
-				Name = "Tier 1",
+				Name = "Quad Shot: Tier 1",
 				Description = "+1 Pellet",
 				Price = 250,
 			},
 			{
-				Name = "Tier 2",
+				Name = "Quad Shot: Tier 2",
 				Description = "+1 Pellet",
 				Price = 500,
 			},
@@ -58,12 +58,12 @@ local upgrades = {
 	Rifles = {
 		BORUS_Tier = {
 			{
-				Name = "Tier 1",
+				Name = "BORUS: Tier 1",
 				Description = "+5 Ammo",
 				Price = 250,
 			},
 			{
-				Name = "Tier 2",
+				Name = "BORUS: Tier 2",
 				Description = "- Recoil",
 				Price = 500,
 			},
@@ -76,12 +76,12 @@ local upgrades = {
 
 		["800M_Tier"] = {
 			{
-				Name = "Tier 1",
+				Name = "800M: Tier 1",
 				Description = "+ Projectile Speed",
 				Price = 250,
 			},
 			{
-				Name = "Tier 2",
+				Name = "800M: Tier 2",
 				Description = "+ Splash Range",
 				Price = 500,
 			},
@@ -94,12 +94,12 @@ local upgrades = {
 
 		Gratana_Tier = {
 			{
-				Name = "Tier 1",
+				Name = "Gratana: Tier 1",
 				Description = "+1 Ammo",
 				Price = 250,
 			},
 			{
-				Name = "Tier 2",
+				Name = "Gratana: Tier 2",
 				Description = "+1 Ammo",
 				Price = 500,
 			},
@@ -114,12 +114,12 @@ local upgrades = {
 	Pistols = {
 		["BullShot_Tier"] = {
 			{
-				Name = "Tier 1",
+				Name = "Bull Shot: Tier 1",
 				Description = "+1 Ammo",
 				Price = 250,
 			},
 			{
-				Name = "Tier 2",
+				Name = "Bull Shot: Tier 2",
 				Description = "+ Projectile speed",
 				Price = 500,
 			},
@@ -132,12 +132,12 @@ local upgrades = {
 
 		["BoomCannon_Tier"] = {
 			{
-				Name = "Tier 1",
+				Name = "Boom Cannon: Tier 1",
 				Description = "+ Fire rate",
 				Price = 250,
 			},
 			{
-				Name = "Tier 2",
+				Name = "Boom Cannon: Tier 2",
 				Description = "Shots now have a 5% chance to ricochet to a nearby enemy",
 				Price = 500,
 			},
@@ -150,12 +150,12 @@ local upgrades = {
 
 		RIPP_Tier = {
 			{
-				Name = "Tier 1",
+				Name = "RIPP: Tier 1",
 				Description = "+2 Ammo",
 				Price = 250,
 			},
 			{
-				Name = "Tier 2",
+				Name = "RIPP: Tier 2",
 				Description = "+ Splash Range",
 				Price = 500,
 			},
@@ -168,12 +168,12 @@ local upgrades = {
 
 		["ISix_Tier"] = {
 			{
-				Name = "Tier 1",
+				Name = "I-Six: Tier 1",
 				Description = "+ lock on speed",
 				Price = 250,
 			},
 			{
-				Name = "Tier 2",
+				Name = "I-Six: Tier 2",
 				Description = "+1 Lock on amount",
 				Price = 500,
 			},
@@ -188,12 +188,12 @@ local upgrades = {
 	Melee = {
 		Katana_Tier = {
 			{
-				Name = "Tier 1",
+				Name = "Katana: Tier 1",
 				Description = "+ Range",
 				Price = 250,
 			},
 			{
-				Name = "Tier 2",
+				Name = "Katana: Tier 2",
 				Description = "A successful parry has a 5% to add ammo",
 				Price = 500,
 			},
@@ -206,12 +206,12 @@ local upgrades = {
 
 		Harpoons_Tier = {
 			{
-				Name = "Tier 1",
+				Name = "Harpoons: Tier 1",
 				Description = "+ Projectile Speed",
 				Price = 250,
 			},
 			{
-				Name = "Tier 2",
+				Name = "Harpoons: Tier 2",
 				Description = "Harpoons have a 10% chance to stun enemies",
 				Price = 500,
 			},
@@ -224,12 +224,12 @@ local upgrades = {
 
 		Cutter_Tier = {
 			{
-				Name = "Tier 1",
+				Name = "Cutter: Tier 1",
 				Description = "+ Range",
 				Price = 250,
 			},
 			{
-				Name = "Tier 2",
+				Name = "Cutter: Tier 2",
 				Description = "+ Range",
 				Price = 500,
 			},
@@ -244,17 +244,17 @@ local upgrades = {
 	Core = {
 		Combo_Tier = {
 			{
-				Name = "Tier 1",
+				Name = "Combo: Dead Trigger",
 				Description = "-1 combo hit penalty.",
 				Price = 500,
 			},
 			{
-				Name = "Tier 2",
+				Name = "Combo: Broken Clock",
 				Description = "+1 Second to combo time.",
 				Price = 2000,
 			},
 			{
-				Name = "Tier 3",
+				Name = "Combo: Father's Mercy",
 				Description = "Combo reduces by 5 instead of clearing",
 				Price = 5000,
 			},
@@ -262,17 +262,17 @@ local upgrades = {
 
 		Souls_Tier = {
 			{
-				Name = "Tier 1",
+				Name = "Souls: Life Juice",
 				Description = "You will always be given at least one soul when ending a level.",
 				Price = 500,
 			},
 			{
-				Name = "Tier 2",
+				Name = "Souls: Spectral Greed",
 				Description = "+ Soul Pickup distance",
 				Price = 1000,
 			},
 			{
-				Name = "Tier 3",
+				Name = "Souls: Corporeal Mastery",
 				Description = "+ Soul Chance",
 				Price = 2500,
 			},
@@ -282,7 +282,7 @@ local upgrades = {
 	Stage_1_Perks = {
 		["MasterScouting_Tier"] = {
 			{
-				Name = "Tier 1",
+				Name = "Master Scouting",
 				Description = "One extra jump is added",
 				Price = 500,
 			},
@@ -302,16 +302,38 @@ local upgrades = {
 
 		["RighteousMotion_Tier"] = {
 			{
-				Name = "Tier 1",
-				Description = "Extra dash",
+				Name = "Righteous Motion : Tier 1",
+				Description = "Finishing a manual reload refills dashes.",
+				Price = 750,
+			},
+
+			{
+				Name = "Righteous Motion : Tier 2",
+				Description = "After using the third dash, Cleanse and Repent ammo will be refilled.",
+				Price = 750,
+			},
+
+			{
+				Name = "Righteous Motion : Tier 3",
+				Description = "While dashing, revivng does not require a soul.",
 				Price = 750,
 			},
 		},
 
 		["BrickHook_Tier"] = {
 			{
-				Name = "Tier 1",
-				Description = "A dash can be used when on cooldown",
+				Name = "BrickHook : Tier 1",
+				Description = "Enemies have a 10% chance to be stunned after being hit with brick hook",
+				Price = 600,
+			},
+			{
+				Name = "BrickHook : Tier 1",
+				Description = "+15% Shotgun and melee crit chance for 2 second after using brick hook",
+				Price = 600,
+			},
+			{
+				Name = "BrickHook : Tier 3",
+				Description = "Hitting an enemy with Brick Hook adds +15% soul drop chance for 1 second",
 				Price = 600,
 			},
 		},
@@ -319,53 +341,96 @@ local upgrades = {
 		["SpikedSabatons_Tier"] = {
 			{
 				Name = "Tier 1",
+				Description = "+10% pistol and rifle crit chance while on a wall",
+				Price = 600,
+			},
+			{
+				Name = "Tier 2",
+				Description = "Dealing crit damage with a pistol or rifle increases soul drop chance by +10% for 1 second",
+				Price = 600,
+			},
+			{
+				Name = "Tier 3",
 				Description = "A long dash can be used by pressing shift",
 				Price = 600,
 			},
+			
 		},
 	},
 
 	Stage_2_Perks = {
 		["Overcharge_Tier"] = {
 			{
-				Name = "Tier 1",
+				Name = "Overcharge : Tier 1",
 				Description = "Damage not dealt from picked up weapons adds to overcharge",
 				Price = 500,
 			},
 
 			{
-				Name = "Tier A",
-				Description = "Upon activation: no infinite ammo, faster firate, +35% crit chance, and crits add ammo.",
+				Name = "Overcharge : Tier A",
+				Description = "Upon activation: no infinite ammo, +35% crit chance, crits add +1 ammo",
 				Price = 500,
 			},
 
 			{
-				Name = "Tier B",
-				Description = "Overcharge charges faster. Even more charge when dealing crit damage.",
+				Name = "Overcharge : Tier B",
+				Description = "Dealing crit damage adds to overcharge, including while overcharge is active",
 				Price = 500,
 			},
 		},
 
 		["MagLauncher_Tier"] = {
 			{
-				Name = "Tier 1",
-				Description = "-2 Second cooldown",
+				Name = "Burning Souls : Tier 1",
+				Description = "-1 Second cooldown",
 				Price = 750,
 			},
+			{
+				Name = "Burning Souls : Tier 2",
+				Description = "-1 Second cooldown",
+				Price = 750, 
+			},
+{
+				Name = "Burning Souls : Tier 3",
+				Description = "Launcher grenades are now sticky bombs. Sticky bombs explode after a certain time. They will explode early when shot (+1 Dmg, Splash distance) -- Place holder",
+				Price = 750,
+			}
 		},
 
 		["BurningSouls_Tier"] = {
 			{
-				Name = "Tier 1",
+				Name = "Burning Souls : Tier 1",
 				Description = "-1 Second cooldown",
+				Price = 500,
+			},
+			{
+				Name = "Burning Souls : Tier 2",
+				Description = "+1 Fire Range",
+				Price = 500,
+			},
+			{
+				Name = "Burning Souls : Tier 3",
+				Description = "Cooldown resets when losing a soul -- Place holder",
 				Price = 500,
 			},
 		},
 
 		["GalvanGaze_Tier"] = {
 			{
-				Name = "Tier 1",
+				Name = "Galvan Gaze : Tier 1",
+				Description = "No longer requires half health",
+				Price = 500,
+			},
+
+			{
+				Name = "Galvan Gaze : Tier 2",
 				Description = "-1 Second cooldown",
+				Price = 500,
+			},
+
+			{
+				Name = "Galvan Gaze : Tier 3",
+				Description = "-5 Second cooldown when at 0 souls -- Place holder",
 				Price = 500,
 			},
 		},
@@ -380,14 +445,14 @@ local upgrades = {
 			},
 
 			{
-				Name = "Tier A",
-				Description = "0.5 Second parry time, 1 second cooldown. No longer drops armor. Deals <b>soul</b> damage.",
+				Name = "Tier A", -- Survival (soul)
+				Description = "0.5 Second parry time, 1 second cooldown, enemies killed with the Maiden's Blade have a +20% soul chance.",
 				Price = 500,
 			},
 
 			{
-				Name = "Tier B",
-				Description = "2 second cooldown. +2 damage. Enemies killed with the Maiden's Blade have a +20% soul chance.",
+				Name = "Tier B", -- damage (arsenal)
+				Description = "2 second cooldown, no longer drops armor, damage dealt from Maiden's blade will always be a crit. Deals <b>soul</b> damage.",
 				Price = 500,
 			},
 		},

@@ -268,6 +268,11 @@ net:Connect("UpdatePlayerHealth", function(player, maxHealth, health, protected)
 	end
 end)
 
+net:Connect("PurchaseUpgrade", function(name, price, index)-- requiem shop buy thingy WAH!
+	workspace:SetAttribute("TotalScore", workspace:GetAttribute("TotalScore") - price)
+	workspace:SetAttribute(name, index)
+end)
+
 net:Connect("Restart", function(player)
 	local humanoid = player.Character.Humanoid
 
