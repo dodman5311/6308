@@ -2,16 +2,20 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local signal = require(ReplicatedStorage.Packages.Signal)
 
 export type Scale = {
+	LastCheck : boolean,
 	Contents: {},
-	Threshold: number, -- 1 Default
+	--[[
+	1 Default
+]]
+	Threshold: number,
 	Check: (self: Scale) -> boolean,
 	Add: (self: Scale, index: string | number?, value: any?) -> boolean,
 	Remove: (self: Scale, index: string | number?) -> boolean,
-	Reached: signal.Signal,
-	Lost: signal.Signal,
+	Changed: signal.Signal<boolean>,
 }
 
 local scales = {
+
 	activeScales = {},
 }
 
@@ -23,19 +27,26 @@ local function getSize(list: {})
 	return count
 end
 
+local function checkForSignal(scale: Scale)
+	local isOverThreshold : boolean = scale:Check()
+
+	if scale.LastCheck ~= isOverThreshold then
+		scale.Changed:Fire(isOverThreshold)
+	end
+
+	scale.LastCheck = isOverThreshold
+
+	return isOverThreshold
+end
+
 function scales.new(index: string?): Scale
 	local scale: Scale = {
+		LastCheck = false,
 		Contents = {},
 		Threshold = 1,
 		Check = function(self: Scale)
 			local weight = getSize(self.Contents)
 			local isOverThreshold = weight >= self.Threshold
-
-			if isOverThreshold then
-				self.Reached:Fire()
-			else
-				self.Lost:Fire()
-			end
 
 			return isOverThreshold
 		end,
@@ -46,25 +57,21 @@ function scales.new(index: string?): Scale
 				table.insert(self.Contents, value or true)
 			end
 
-			return self:Check()
+			return checkForSignal(self)
 		end,
 		Remove = function(self: Scale, index: string | number?)
-			if not index then
-				table.remove(self.Contents, 1)
-				return self:Check()
-			end
+			index = index or 1
 
-			if tonumber(index) then
+			if typeof(index) == "number" then
 				table.remove(self.Contents, index)
 			else
 				self.Contents[index] = nil
 			end
 
-			return self:Check()
+			return checkForSignal(self)
 		end,
 
-		Reached = signal.new(),
-		Lost = signal.new(),
+		Changed = signal.new(),
 	}
 
 	if index then

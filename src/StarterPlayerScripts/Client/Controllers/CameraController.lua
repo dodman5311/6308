@@ -14,7 +14,7 @@ local camera = workspace.CurrentCamera
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 
-local cameraShaker = require(Globals.Packages.CameraShaker)
+local cameraShaker = require(Globals.Vendor.CameraShaker)
 local util = require(Globals.Vendor.Util)
 local spring = require(Globals.Vendor.Spring)
 local ViewmodelService = require(Globals.Vendor.ViewmodelService)

@@ -3,19 +3,20 @@ local module = {
 }
 
 --// Services
+local AnalyticsService = game:GetService("AnalyticsService")
+local FriendService = game:GetService("FriendService")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local collectionService = game:GetService("CollectionService")
-local AnalyticsService = game:GetService("AnalyticsService")
-local Players = game:GetService("Players")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
 
 --// Modules
-local signals = require(Globals.Signals)
+local dataStore = require(script.Parent.DataStore)
 local mapService = require(Globals.Services.MapService)
 local net = require(Globals.Packages.Net)
-local dataStore = require(script.Parent.DataStore)
+local signals = require(Globals.Signals)
 local upgrades = require(Globals.Shared.Upgrades)
 
 local getBlockedNerd = net:RemoteEvent("GetBlockedNerd")
@@ -268,9 +269,10 @@ net:Connect("UpdatePlayerHealth", function(player, maxHealth, health, protected)
 	end
 end)
 
-net:Connect("PurchaseUpgrade", function(name, price, index)-- requiem shop buy thingy WAH!
+net:Handle("PurchaseUpgrade", function(player, name, price, index) -- requiem shop buy thingy WAH!
 	workspace:SetAttribute("TotalScore", workspace:GetAttribute("TotalScore") - price)
 	workspace:SetAttribute(name, index)
+	return workspace:GetAttribute("TotalScore")
 end)
 
 net:Connect("Restart", function(player)

@@ -12,7 +12,7 @@ local upgrades = {
 				Price = 400,
 			},
 			{
-				Name = "Broad Shot",
+				Name = "Broad Shot: Max",
 				Description = "Pellets now pierce through enemies",
 				Price = 500,
 			},
@@ -30,7 +30,7 @@ local upgrades = {
 				Price = 500,
 			},
 			{
-				Name = "Wrath Guard",
+				Name = "Wrath Guard: Max",
 				Description = "Wrath Guard’s parry is a stunning punch",
 				Price = 1000,
 			},
@@ -48,7 +48,7 @@ local upgrades = {
 				Price = 500,
 			},
 			{
-				Name = "Mega Shot",
+				Name = "Mega Shot: Max",
 				Description = "Every loaded shell is different. Mega shot fires 3 Explosive rounds, 3 Homing rounds, 3 Regular pellets, and 1 Slug with 3 damage",
 				Price = 1000,
 			},
@@ -68,7 +68,7 @@ local upgrades = {
 				Price = 500,
 			},
 			{
-				Name = "HADES",
+				Name = "HADES: Max",
 				Description = "HADES has +1 Damage, -3 Speed, +10 Ammo",
 				Price = 1000,
 			},
@@ -86,7 +86,7 @@ local upgrades = {
 				Price = 500,
 			},
 			{
-				Name = "Concussion",
+				Name = "Concussion: Max",
 				Description = "Explosions from the Concussion have a 15% chance to stun",
 				Price = 1000,
 			},
@@ -104,7 +104,7 @@ local upgrades = {
 				Price = 500,
 			},
 			{
-				Name = "Dovus",
+				Name = "Dovus: Max",
 				Description = "Can lock onto up to two targets. Can fire as fast as you pull the trigger.",
 				Price = 1000,
 			},
@@ -124,7 +124,7 @@ local upgrades = {
 				Price = 500,
 			},
 			{
-				Name = "Dread Shot",
+				Name = "Dread Shot: Max",
 				Description = "Rockets slightly seek enemies",
 				Price = 1000,
 			},
@@ -142,7 +142,7 @@ local upgrades = {
 				Price = 500,
 			},
 			{
-				Name = "50 Regret",
+				Name = "50 Regret: Max",
 				Description = "x2 damage to weak points",
 				Price = 1000,
 			},
@@ -160,7 +160,7 @@ local upgrades = {
 				Price = 500,
 			},
 			{
-				Name = "Experiment 05",
+				Name = "Experiment 05: Max",
 				Description = "Shots have a 5% chance to electrify enemies",
 				Price = 1000,
 			},
@@ -178,7 +178,7 @@ local upgrades = {
 				Price = 500,
 			},
 			{
-				Name = "I-Seven",
+				Name = "I-Seven: Max",
 				Description = "When beginning a lock on, a parrying shield is created for 0.5 seconds",
 				Price = 1000,
 			},
@@ -198,7 +198,7 @@ local upgrades = {
 				Price = 500,
 			},
 			{
-				Name = "Shagan",
+				Name = "Shagan: Max",
 				Description = "Attacking at least 3 second after a successful parry will launch the player forward",
 				Price = 1000,
 			},
@@ -216,7 +216,7 @@ local upgrades = {
 				Price = 500,
 			},
 			{
-				Name = "Trident",
+				Name = "Trident: Max",
 				Description = "Hitting stunned enemies will deal 3 damage",
 				Price = 1000,
 			},
@@ -234,7 +234,7 @@ local upgrades = {
 				Price = 500,
 			},
 			{
-				Name = "Bloody Mary",
+				Name = "Bloody Mary: Max",
 				Description = "Successfully parrying an attack will convert said attack into a smart sawblade",
 				Price = 1000,
 			},
@@ -354,7 +354,6 @@ local upgrades = {
 				Description = "A long dash can be used by pressing shift",
 				Price = 600,
 			},
-			
 		},
 	},
 
@@ -388,13 +387,13 @@ local upgrades = {
 			{
 				Name = "Burning Souls : Tier 2",
 				Description = "-1 Second cooldown",
-				Price = 750, 
+				Price = 750,
 			},
-{
+			{
 				Name = "Burning Souls : Tier 3",
 				Description = "Launcher grenades are now sticky bombs. Sticky bombs explode after a certain time. They will explode early when shot (+1 Dmg, Splash distance) -- Place holder",
 				Price = 750,
-			}
+			},
 		},
 
 		["BurningSouls_Tier"] = {
@@ -454,6 +453,16 @@ local upgrades = {
 				Name = "Tier B", -- damage (arsenal)
 				Description = "2 second cooldown, no longer drops armor, damage dealt from Maiden's blade will always be a crit. Deals <b>soul</b> damage.",
 				Price = 500,
+			},
+		},
+	},
+
+	["None"] = {
+		["None_Tier"] = {
+			{
+				Name = "???",
+				Description = "COMING SOON!",
+				Price = 0,
 			},
 		},
 	},

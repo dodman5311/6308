@@ -20,7 +20,7 @@ local sounds = assets.Sounds
 --// Modules
 local signals = require(Globals.Signals)
 local giftService = require(Globals.Client.Services.GiftsService)
-local cameraShaker = require(Globals.Packages.CameraShaker)
+local cameraShaker = require(Globals.Vendor.CameraShaker)
 local comboService = require(Globals.Client.Services.ComboService)
 local util = require(Globals.Vendor.Util)
 local net = require(Globals.Packages.Net)

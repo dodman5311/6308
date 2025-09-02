@@ -5,15 +5,17 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local lastInput = UserInputService:GetLastInputType()
-local scales = require(Globals.Vendor.Scales)
+local scales = require(ReplicatedStorage.Vendor.Scales)
 local cursorScale = scales.new("CursorScale")
 
 local function checkForGamepad()
 	for i = 1, 8 do
 		if lastInput == Enum.UserInputType["Gamepad" .. i] then
-			return true
+			break
 		end
 	end
+
+	return true
 end
 
 function module.Init(player, ui, frame)
@@ -24,21 +26,19 @@ function module.Init(player, ui, frame)
 		frame.Cursor.Position = UDim2.new(0, mousePos.X, 0, mousePos.Y)
 	end)
 
-	UserInputService.InputBegan:Connect(function()
-		lastInput = UserInputService:GetLastInputType()
+	-- UserInputService.InputBegan:Connect(function()
+	-- 	lastInput = UserInputService:GetLastInputType()
 
-		if checkForGamepad() then
-			frame.Cursor.Visible = false
-			return
-		end
-	end)
+	-- 	if checkForGamepad() then
+	-- 		print("HAS GAMEPAD")
+	-- 		frame.Cursor.Visible = false
+	-- 		return
+	-- 	end
+	-- end)
 
-	cursorScale.Reached:Connect(function()
-		frame.Cursor.Visible = true
-	end)
-
-	cursorScale.Lost:Connect(function()
-		frame.Cursor.Visible = false
+	cursorScale.Changed:Connect(function(value)
+		print(value)
+		frame.Cursor.Visible = value
 	end)
 end
 

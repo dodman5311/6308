@@ -21,7 +21,7 @@ local Globals = require(REPLICATED_STORAGE.Shared.Globals)
 --// Modules
 local util = require(Globals.Vendor.Util)
 local net = require(Globals.Packages.Net)
-local cameraShaker = require(Globals.Packages.CameraShaker)
+local cameraShaker = require(Globals.Vendor.CameraShaker)
 local timer = require(Globals.Vendor.Timer)
 local uiAnimationService = require(Globals.Vendor.UIAnimationService)
 
