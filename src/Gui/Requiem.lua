@@ -6,9 +6,11 @@ local module = {
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
+local StarterPlayer = game:GetService("StarterPlayer")
 local UserInputService = game:GetService("UserInputService")
 
 --// Instances
+local GiftsService = require(StarterPlayer.StarterPlayerScripts.Client.Services.GiftsService)
 local Globals = require(ReplicatedStorage.Shared.Globals)
 
 local assets = ReplicatedStorage.Assets
@@ -17,6 +19,7 @@ local sfx = sounds.Kiosk
 local camera = workspace.CurrentCamera
 
 --// Modules
+local Gifts = require(ReplicatedStorage.Shared.Gifts)
 local MouseOverModule = require(ReplicatedStorage.Vendor.MouseOverModule)
 local Net = require(ReplicatedStorage.Packages.Net)
 local Scales = require(ReplicatedStorage.Vendor.Scales)
@@ -46,9 +49,36 @@ local infoBoxScale = Scales.new("ShowInfoBox")
 
 --// Functions
 
+--[[
+Locked - Not avaiable or visible
+Disabled - visible but not available
+Enabled - Available for purchase
+Acquired - Purchased and active
+]]
+local function setButtonState(buttonFrame, state: "Locked" | "Disabled" | "Enabled" | "Acquired")
+	local ti = TweenInfo.new(0.25)
+
+	if state == "Acquired" then
+		util.tween(buttonFrame.FrameImage, ti, { ImageTransparency = 0 })
+		util.tween(buttonFrame.Icon, ti, { ImageTransparency = 0, ImageColor3 = Color3.fromRGB(0, 167, 139) })
+		buttonFrame.Acquired.Visible = true
+		buttonFrame.Button.Visible = false
+	elseif state == "Enabled" then
+		util.tween(buttonFrame.FrameImage, ti, { ImageTransparency = 0 })
+		util.tween(buttonFrame.Icon, ti, { ImageTransparency = 0, ImageColor3 = Color3.new(1, 1, 1) })
+		buttonFrame.Acquired.Visible = false
+		buttonFrame.Button.Visible = true
+	elseif state == "Disabled" or state == "Locked" then
+		util.tween(buttonFrame.FrameImage, ti, { ImageTransparency = 0.75 })
+		util.tween(buttonFrame.Icon, ti, { ImageTransparency = 0.75, ImageColor3 = Color3.new(1, 1, 1) })
+		buttonFrame.Acquired.Visible = false
+		buttonFrame.Button.Visible = false
+	end
+	buttonFrame.Locked.Visible = state == "Locked"
+end
+
 local function updateTree(tree)
 	local acquiredFirstIndexTree = false
-	local ti = TweenInfo.new(0.25)
 
 	for _, buttonFrame in ipairs(tree:GetDescendants()) do
 		if not buttonFrame:IsA("Frame") then
@@ -83,10 +113,7 @@ local function updateTree(tree)
 		local tier = workspace:GetAttribute(category)
 
 		if not tier then
-			util.tween(buttonFrame.FrameImage, ti, { ImageTransparency = 0.75 })
-			util.tween(buttonFrame.Icon, ti, { ImageTransparency = 0.75 })
-			buttonFrame.Acquired.Visible = false
-			buttonFrame.Button.Visible = false
+			setButtonState(buttonFrame, "Locked")
 			continue
 		end
 
@@ -94,26 +121,35 @@ local function updateTree(tree)
 			tier -= 1
 		end
 
+		if Gifts.Specials[category] and not GiftsService.CheckGift(category) then
+			setButtonState(buttonFrame, "Locked")
+			continue
+		end
+
+		if buttonFrame:GetAttribute("Index") then
+			if buttonFrame:GetAttribute("Index") == tier then
+				setButtonState(buttonFrame, "Acquired")
+			elseif tier <= 1 then
+				setButtonState(buttonFrame, "Enabled")
+			else
+				setButtonState(buttonFrame, "Locked")
+			end
+
+			continue
+		end
+
 		if index <= tier then
-			-- acquired
-			util.tween(buttonFrame.FrameImage, ti, { ImageTransparency = 0 })
-			util.tween(buttonFrame.Icon, ti, { ImageTransparency = 0, ImageColor3 = Color3.fromRGB(0, 167, 139) })
-			buttonFrame.Acquired.Visible = true
-			buttonFrame.Button.Visible = false
+			setButtonState(buttonFrame, "Acquired")
 		elseif index <= tier + 1 then
-			-- can get
-			util.tween(buttonFrame.FrameImage, ti, { ImageTransparency = 0 })
-			util.tween(buttonFrame.Icon, ti, { ImageTransparency = 0, ImageColor3 = Color3.new(1, 1, 1) })
-			buttonFrame.Acquired.Visible = false
-			buttonFrame.Button.Visible = true
+			setButtonState(buttonFrame, "Enabled")
 		else
-			-- hide
-			util.tween(buttonFrame.FrameImage, ti, { ImageTransparency = 0.75 })
-			util.tween(buttonFrame.Icon, ti, { ImageTransparency = 0.75, ImageColor3 = Color3.new(1, 1, 1) })
-			buttonFrame.Acquired.Visible = false
-			buttonFrame.Button.Visible = false
+			setButtonState(buttonFrame, "Disabled")
 		end
 	end
+end
+
+local function updateCoinBalaceUi(frame, newBalance: number)
+	frame.RCoins.Count.Text = newBalance
 end
 
 local function setTreeIndex(frame, index: number, reverse: boolean?)
@@ -160,6 +196,10 @@ function module.ShowRequiemShop(_, ui, frame)
 	Signals.DoUiAction:Fire("Cursor", "Toggle", true)
 	frame.Gui.Enabled = true
 	setTreeIndex(frame, currentTreeIndex)
+	updateCoinBalaceUi(frame, workspace:GetAttribute("TotalScore"))
+
+	UIAnimationService.PlayAnimation(frame.RCoins.Coins, 0.1, true)
+	UIAnimationService.PlayAnimation(frame.CoinIcon, 0.1, true)
 
 	runInfoBox = RunService.RenderStepped:Connect(function()
 		local mousePosition = UserInputService:GetMouseLocation()
@@ -227,12 +267,26 @@ function module.Init(player, ui, frame)
 				-- upgrade event
 				local category = buttonFrame.Parent.Parent.Name
 				local tierName = buttonFrame.Parent.Name
+				local tierNumber = tonumber(buttonFrame.Name)
 				local currentTier = workspace:GetAttribute(tierName)
+				local tier
+
+				if not Upgrades[category][tierName] then
+					infoBoxScale:Add()
+					tier = Upgrades["None"]["None_Tier"][1]
+				else
+					tier = Upgrades[category][tierName][tierNumber]
+				end
 
 				if currentTier < #Upgrades[category][tierName] then
 					--workspace:SetAttribute(tierName, workspace:GetAttribute(tierName) + 1)
-					local postPurchaseBalance = Net:RemoteFunction("PurchaseUpgrade")
-						:InvokeServer(tierName, 0, workspace:GetAttribute(tierName) + 1)
+
+					local newIndex = buttonFrame:GetAttribute("Index") or workspace:GetAttribute(tierName) + 1
+
+					updateCoinBalaceUi(
+						frame,
+						Net:RemoteFunction("PurchaseUpgrade"):InvokeServer(tierName, tier.Price, newIndex)
+					)
 				end
 
 				updateTree(tree)
@@ -242,10 +296,11 @@ function module.Init(player, ui, frame)
 			enter:Connect(function()
 				local category = buttonFrame.Parent.Parent.Name
 				local tierName = buttonFrame.Parent.Name
-				local tierNumber = tonumber(buttonFrame.Name)
+				local tierNumber = buttonFrame:GetAttribute("Index") or tonumber(buttonFrame.Name)
 				local tier
+
+				infoBoxScale:Add()
 				if not Upgrades[category][tierName] then
-					infoBoxScale:Add()
 					tier = Upgrades["None"]["None_Tier"][1]
 				else
 					tier = Upgrades[category][tierName][tierNumber]
@@ -261,8 +316,9 @@ function module.Init(player, ui, frame)
 				end
 
 				frame.InfoBox.Desc.Text = tier.Description
-				frame.Icon.Image = buttonFrame.Icon.Image
-				infoBoxScale:Add()
+				frame.InfoBox.IconFrame.Icon.Image = buttonFrame.Icon.Image
+				frame.InfoBox.IconFrame.Icon.Size = buttonFrame.Icon.Size
+				frame.InfoBox.Price.Text = tier.Price
 			end)
 
 			leave:Connect(function()

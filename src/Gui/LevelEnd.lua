@@ -1,10 +1,10 @@
 local module = {}
 --// Services
+local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local StarterGui = game:GetService("StarterGui")
 local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
-local CollectionService = game:GetService("CollectionService")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
@@ -14,11 +14,11 @@ local assets = ReplicatedStorage.Assets
 local sounds = assets.Sounds
 
 --// Modules
-local util = require(Globals.Vendor.Util)
-local acts = require(Globals.Vendor.Acts)
-local UiAnimator = require(Globals.Vendor.UIAnimationService)
 local Signals = require(Globals.Shared.Signals)
 local SoulsService = require(Globals.Client.Services.SoulsService)
+local UiAnimator = require(Globals.Vendor.UIAnimationService)
+local acts = require(Globals.Vendor.Acts)
+local util = require(Globals.Vendor.Util)
 
 local ComboValue = Instance.new("IntValue")
 local EnemiesValue = Instance.new("IntValue")
@@ -127,8 +127,6 @@ function module.Init(player, ui, frame)
 		util.PlaySound(sounds.Click, script)
 		frame.MapTime.Text = convertToHMS(value)
 	end)
-
-	UiAnimator.PlayAnimation(frame.Score.RCoin, 0.1, true)
 end
 
 function module.Cleanup(player, ui, frame) end
@@ -173,6 +171,7 @@ function module.ShowLevelEnd(player, ui, frame, levelData)
 	local ti_0 = TweenInfo.new(0.5, Enum.EasingStyle.Linear)
 
 	UiAnimator.PlayAnimation(frame.Skull, 0.045, true)
+	UiAnimator.PlayAnimation(frame.Score.RCoin, 0.1, true)
 
 	util.tween(frame.Frame, ti_0, { GroupTransparency = 0 }, true)
 	task.wait(1)
@@ -208,6 +207,7 @@ function module.ShowLevelEnd(player, ui, frame, levelData)
 		frame.Frame.GroupTransparency = 1
 		frame.Gui.Enabled = false
 		UiAnimator.StopAnimation(frame.Skull)
+		UiAnimator.StopAnimation(frame.Score.RCoin)
 	end)
 
 	return soulsAwarded

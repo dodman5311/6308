@@ -280,7 +280,7 @@ local upgrades = {
 	},
 
 	Stage_1_Perks = {
-		["MasterScouting_Tier"] = {
+		["Master_Scouting"] = {
 			{
 				Name = "Master Scouting",
 				Description = "One extra jump is added",
@@ -288,69 +288,69 @@ local upgrades = {
 			},
 
 			{
-				Name = "Tier A",
+				Name = "Master Scouting: Opposing Force",
 				Description = "Throwing a weapon while in the air boosts you upwards.",
 				Price = 500,
 			},
 
 			{
-				Name = "Tier B",
+				Name = "Master Scouting: Joy Ride",
 				Description = "When in the air, bullets fired boost you in the opposite direction.",
 				Price = 500,
 			},
 		},
 
-		["RighteousMotion_Tier"] = {
+		["Righteous_Motion"] = {
 			{
-				Name = "Righteous Motion : Tier 1",
+				Name = "Righteous Motion: Tier 1",
 				Description = "Finishing a manual reload refills dashes.",
 				Price = 750,
 			},
 
 			{
-				Name = "Righteous Motion : Tier 2",
+				Name = "Righteous Motion: Tier 2",
 				Description = "After using the third dash, Cleanse and Repent ammo will be refilled.",
 				Price = 750,
 			},
 
 			{
-				Name = "Righteous Motion : Tier 3",
+				Name = "Righteous Motion: Tier 3",
 				Description = "While dashing, revivng does not require a soul.",
 				Price = 750,
 			},
 		},
 
-		["BrickHook_Tier"] = {
+		["Brick_Hook"] = {
 			{
-				Name = "BrickHook : Tier 1",
+				Name = "BrickHook: Tier 1",
 				Description = "Enemies have a 10% chance to be stunned after being hit with brick hook",
 				Price = 600,
 			},
 			{
-				Name = "BrickHook : Tier 1",
+				Name = "BrickHook: Tier 1",
 				Description = "+15% Shotgun and melee crit chance for 2 second after using brick hook",
 				Price = 600,
 			},
 			{
-				Name = "BrickHook : Tier 3",
+				Name = "BrickHook: Tier 3",
 				Description = "Hitting an enemy with Brick Hook adds +15% soul drop chance for 1 second",
 				Price = 600,
 			},
 		},
 
-		["SpikedSabatons_Tier"] = {
+		["Spiked_Sabatons"] = {
 			{
-				Name = "Tier 1",
+				Name = "Spiked Sabatons: Tier 1",
 				Description = "+10% pistol and rifle crit chance while on a wall",
 				Price = 600,
 			},
 			{
-				Name = "Tier 2",
+				Name = "Spiked Sabatons: Tier 2",
 				Description = "Dealing crit damage with a pistol or rifle increases soul drop chance by +10% for 1 second",
 				Price = 600,
 			},
 			{
-				Name = "Tier 3",
+				Name = "Spiked Sabatons: Tier 3",
 				Description = "A long dash can be used by pressing shift",
 				Price = 600,
 			},
@@ -358,27 +358,27 @@ local upgrades = {
 	},
 
 	Stage_2_Perks = {
-		["Overcharge_Tier"] = {
+		["Overcharge"] = {
 			{
-				Name = "Overcharge : Tier 1",
+				Name = "Overcharge: Tier 1",
 				Description = "Damage not dealt from picked up weapons adds to overcharge",
 				Price = 500,
 			},
 
 			{
-				Name = "Overcharge : Tier A",
+				Name = "Overcharge: AC/DC",
 				Description = "Upon activation: no infinite ammo, +35% crit chance, crits add +1 ammo",
 				Price = 500,
 			},
 
 			{
-				Name = "Overcharge : Tier B",
+				Name = "Overcharge: Perpetual Motion",
 				Description = "Dealing crit damage adds to overcharge, including while overcharge is active",
 				Price = 500,
 			},
 		},
 
-		["MagLauncher_Tier"] = {
+		["Mag_Launcher"] = {
 			{
 				Name = "Burning Souls : Tier 1",
 				Description = "-1 Second cooldown",
@@ -396,7 +396,7 @@ local upgrades = {
 			},
 		},
 
-		["BurningSouls_Tier"] = {
+		["Burning_Souls"] = {
 			{
 				Name = "Burning Souls : Tier 1",
 				Description = "-1 Second cooldown",
@@ -414,7 +414,7 @@ local upgrades = {
 			},
 		},
 
-		["GalvanGaze_Tier"] = {
+		["Galvan_Gaze"] = {
 			{
 				Name = "Galvan Gaze : Tier 1",
 				Description = "No longer requires half health",
@@ -436,7 +436,7 @@ local upgrades = {
 	},
 
 	Stage_3_Perks = {
-		["Maidenless_Tier"] = {
+		["Maidenless"] = {
 			{
 				Name = "Tier 1",
 				Description = "+1 armor to maidens blade attack",
