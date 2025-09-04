@@ -193,6 +193,15 @@ local function setTreeIndex(frame, index: number, reverse: boolean?)
 end
 
 function module.ShowRequiemShop(_, ui, frame)
+	local ti = TweenInfo.new(0.1)
+
+	frame.Fade.BackgroundTransparency = 0
+	frame.Fade.Visible = true
+	util.tween(frame.Fade, ti, { BackgroundTransparency = 1 })
+
+	frame.Frame.Visible = true
+	frame.Background.Visible = true
+
 	Signals.DoUiAction:Fire("Cursor", "Toggle", true)
 	frame.Gui.Enabled = true
 	setTreeIndex(frame, currentTreeIndex)
@@ -223,6 +232,29 @@ function module.ShowRequiemShop(_, ui, frame)
 		end
 
 		util.tween(frame.InfoBox, TweenInfo.new(0.25), { AnchorPoint = Vector2.new(x, y) })
+	end)
+end
+
+function module.HideRequiemShop(_, ui, frame)
+	local ti = TweenInfo.new(0.1)
+
+	Signals.DoUiAction:Fire("Cursor", "Toggle", false)
+	frame.Fade.BackgroundTransparency = 0
+	setTreeIndex(frame, 0)
+
+	UIAnimationService.StopAnimation(frame.RCoins.Coins)
+	UIAnimationService.StopAnimation(frame.CoinIcon)
+
+	if runInfoBox then
+		runInfoBox:Disconnect()
+	end
+
+	frame.Frame.Visible = false
+	frame.Background.Visible = false
+
+	util.tween(frame.Fade, ti, { BackgroundTransparency = 1 }, false, function()
+		frame.Fade.Visible = false
+		frame.Gui.Enabled = false
 	end)
 end
 
@@ -281,12 +313,18 @@ function module.Init(player, ui, frame)
 				if currentTier < #Upgrades[category][tierName] then
 					--workspace:SetAttribute(tierName, workspace:GetAttribute(tierName) + 1)
 
-					local newIndex = buttonFrame:GetAttribute("Index") or workspace:GetAttribute(tierName) + 1
+					if workspace:GetAttribute("TotalScore") >= tier.Price then
+						local newIndex = buttonFrame:GetAttribute("Index") or workspace:GetAttribute(tierName) + 1
 
-					updateCoinBalaceUi(
-						frame,
-						Net:RemoteFunction("PurchaseUpgrade"):InvokeServer(tierName, tier.Price, newIndex)
-					)
+						updateCoinBalaceUi(
+							frame,
+							Net:RemoteFunction("PurchaseUpgrade"):InvokeServer(tierName, tier.Price, newIndex)
+						)
+						util.PlaySound(sounds.RCoins, script, 0.075).PlaybackSpeed += (newIndex / 5)
+						util.PlaySound(sounds.RCoinsSmall, script, 0.075).PlaybackSpeed += (newIndex / 5)
+					else
+						util.PlaySound(sounds.Denied, script, 0.075)
+					end
 				end
 
 				updateTree(tree)
