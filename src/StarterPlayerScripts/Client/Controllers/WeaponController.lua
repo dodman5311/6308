@@ -12,12 +12,12 @@ local module = {
 --// Services
 local CollectionService = game:GetService("CollectionService")
 local Debris = game:GetService("Debris")
+local Lighting = game:GetService("Lighting")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
-local Players = game:GetService("Players")
-local Lighting = game:GetService("Lighting")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
@@ -34,33 +34,33 @@ voiceSound.SoundGroup = SoundService.Voice
 
 --// Modules
 
-local signals = require(Globals.Signals)
-local acts = require(Globals.Vendor.Acts)
-local util = require(Globals.Vendor.Util)
-local spring = require(Globals.Vendor.Spring)
-local elements = require(Globals.Shared.Elements)
-local Janitor = require(Globals.Packages.Janitor)
-local dropService = require(Globals.Shared.DropService)
 local BloodEffects = require(Globals.Shared.BloodEffects)
-local UIService = require(Globals.Client.Services.UIService)
-local viewmodelService = require(Globals.Vendor.ViewmodelService)
-local animationService = require(Globals.Vendor.AnimationService)
-local GiftsService = require(Globals.Client.Services.GiftsService)
 local ComboService = require(Globals.Client.Services.ComboService)
-local soulsService = require(Globals.Client.Services.SoulsService)
-local codexService = require(Globals.Client.Services.CodexService)
-local wallrunning = require(Globals.Client.Controllers.Wallrunning)
-local UiAnimationService = require(Globals.Vendor.UIAnimationService)
-local airController = require(Globals.Client.Controllers.AirController)
+local GiftsService = require(Globals.Client.Services.GiftsService)
+local Janitor = require(Globals.Packages.Janitor)
 local RicoshotService = require(Globals.Client.Services.RicoshotService)
+local UIService = require(Globals.Client.Services.UIService)
+local UiAnimationService = require(Globals.Vendor.UIAnimationService)
 local WeakspotService = require(Globals.Vendor.WeakspotService)
+local acts = require(Globals.Vendor.Acts)
+local airController = require(Globals.Client.Controllers.AirController)
+local animationService = require(Globals.Vendor.AnimationService)
+local codexService = require(Globals.Client.Services.CodexService)
+local dropService = require(Globals.Shared.DropService)
+local elements = require(Globals.Shared.Elements)
 local explosionService = require(Globals.Client.Services.ExplosionService)
 local projectileService = require(Globals.Client.Services.ClientProjectiles)
+local signals = require(Globals.Signals)
+local soulsService = require(Globals.Client.Services.SoulsService)
+local spring = require(Globals.Vendor.Spring)
+local util = require(Globals.Vendor.Util)
+local viewmodelService = require(Globals.Vendor.ViewmodelService)
+local wallrunning = require(Globals.Client.Controllers.Wallrunning)
 
 local Timer = require(Globals.Vendor.Timer)
 
-local net = require(Globals.Packages.Net)
 local ChanceService = require(Globals.Vendor.ChanceService)
+local net = require(Globals.Packages.Net)
 
 local weaponTimer = require(Globals.Vendor.Timer):newQueue()
 local weaponReloadTimer = weaponTimer:new("WeaponReload")
@@ -411,11 +411,6 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 
 	animationService:loadAnimations(viewmodel.Model, newWeapon.Animations)
 
-	--local fireAnimation = animationService:getAnimation(viewmodel.Model, "Fire")
-	-- if fireAnimation then
-	-- 	fireAnimation:GetMarkerReachedSignal("CreateShell"):Connect(createShell)
-	-- end
-
 	if newWeapon.Animations:FindFirstChild("Equip") then
 		animationService:playAnimation(viewmodel.Model, "Equip", Enum.AnimationPriority.Action4.Value, false, 0)
 	end
@@ -561,6 +556,10 @@ end
 
 local function ReloadDefault()
 	local reloadTime = GiftsService.CheckGift("Fast_Mags") and 1.25 or 1
+
+	if workspace:GetAttribute("CleanseAndRepent_Tier") > 2 then
+		reloadTime /= 1.25
+	end
 
 	if currentAmmo <= 0 then
 		animationService:playAnimation(
@@ -1049,7 +1048,7 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 			end
 		end
 
-		if workspace:GetAttribute("Overcharge_Tier") > 0 then
+		if workspace:GetAttribute("Overcharge") > 0 then
 			if not sourceIsWeapon and source ~= "ThrownWeapon" then
 				addToOvercharge(1)
 			end
@@ -1497,6 +1496,10 @@ local function FireDefault(extraBullet)
 
 	if GiftsService.CheckUpgrade("Spicy Pepperoni") then
 		recoilMagnitude = 1.35
+	end
+
+	if workspace:GetAttribute("CleanseAndRepent_Tier") > 1 then
+		recoilMagnitude = 0.75
 	end
 
 	if defaultIndex == 0 then
@@ -1947,10 +1950,10 @@ local function ThrowWeapon()
 		end
 
 		if
-			RicoshotService.checkRicoshot({
+			RicoshotService.checkRicoshot {
 				Instance = weaponClone.HitBox,
 				Position = weaponClone:GetPivot().Position,
-			}) and GiftsService.CheckGift("Ricoshot")
+			} and GiftsService.CheckGift("Ricoshot")
 		then
 			ricoHitbox.Ui.Enabled = true
 		else
@@ -2066,7 +2069,7 @@ local function onSwordHit(subject)
 	end
 	local dropAmount = isAfflicted and math.random(3, 4) or math.random(1, 2)
 
-	if workspace:GetAttribute("Maidenless_Tier") > 0 then
+	if workspace:GetAttribute("Maidenless") > 0 then
 		dropAmount += 1
 	end
 
@@ -2448,15 +2451,15 @@ local function releaseTrigger(gpe)
 end
 
 local function runDamagePerkCooldown(cooldown, giftName)
-	if giftName == "Mag_Launcher" and workspace:GetAttribute("MagLauncher_Tier") then
+	if giftName == "Mag_Launcher" and workspace:GetAttribute("Mag_Launcher") then
 		cooldown -= 2
 	end
 
-	if giftName == "Burning_Souls" and workspace:GetAttribute("BurningSouls_Tier") then
+	if giftName == "Burning_Souls" and workspace:GetAttribute("Burning_Souls") then
 		cooldown -= 1
 	end
 
-	if giftName == "Galvan_Gaze" and workspace:GetAttribute("GalvanGaze_Tier") then
+	if giftName == "Galvan_Gaze" and workspace:GetAttribute("Galvan_Gaze") then
 		cooldown -= 1
 	end
 

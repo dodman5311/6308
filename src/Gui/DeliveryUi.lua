@@ -1,12 +1,12 @@
 local module = {}
 --// Services
+local CollectionService = game:GetService("CollectionService")
 local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local StarterGui = game:GetService("StarterGui")
 local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
-local CollectionService = game:GetService("CollectionService")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
@@ -17,17 +17,17 @@ local sounds = assets.Sounds
 local sfx = sounds.DeliverEffects
 
 --// Modules
-local util = require(Globals.Vendor.Util)
-local acts = require(Globals.Vendor.Acts)
-local UiAnimator = require(Globals.Vendor.UIAnimationService)
-local MouseOver = require(Globals.Vendor.MouseOverModule)
-local Signals = require(Globals.Shared.Signals)
-local Signal = require(Globals.Packages.Signal)
 local Gifts = require(Globals.Shared.Gifts)
 local GiftsService = require(Globals.Client.Services.GiftsService)
+local MouseOver = require(Globals.Vendor.MouseOverModule)
+local Signal = require(Globals.Packages.Signal)
+local Signals = require(Globals.Shared.Signals)
 local SoulsService = require(Globals.Client.Services.SoulsService)
-local net = require(Globals.Packages.Net)
+local UiAnimator = require(Globals.Vendor.UIAnimationService)
+local acts = require(Globals.Vendor.Acts)
 local musicService = require(Globals.Client.Services.MusicService)
+local net = require(Globals.Packages.Net)
+local util = require(Globals.Vendor.Util)
 
 local deliveryAmount = 0
 local giftCount = 1
@@ -117,7 +117,7 @@ local function givePerk(frame, index)
 	end
 
 	sfx.Unlocked_Perk:Play()
-	Signals.AddGift:Fire(title)
+	GiftsService.AddGift(title)
 	util.tween(frame.Choices, ti, { Size = UDim2.fromScale(1, 1), GroupTransparency = 1 })
 	util.tween(frame["Spin" .. index], ti, { Position = UDim2.fromScale(0.5, frame["Spin" .. index].Position.Y.Scale) })
 	util.tween(frame.Fart, ti, { ImageTransparency = 0 })
@@ -236,7 +236,7 @@ local function causeHunger(player, ui, frame)
 		module.showDescription(frame, { Desc = "Drav is starved. (-1 Max HP)" })
 	else
 		Signals.ClearGifts:Fire()
-		Signals.AddGift:Fire("Drav_Is_Dead")
+		GiftsService.AddGift("Drav_Is_Dead")
 		ui.HUD.Frame.Souls.Image.ImageColor3 = Color3.new(0.35, 0.35, 0.35)
 		ui.HUD.Frame.Souls.Count.TextColor3 = Color3.new(0.35, 0.35, 0.35)
 		SoulsService.RemoveSoul(SoulsService.Souls)
@@ -521,7 +521,7 @@ function module.chooseRandomGift(player, ui, spinFrame, type, name)
 		return randomGift
 	end
 
-	Signals.AddGift:Fire(name)
+	GiftsService.AddGift(name)
 
 	task.wait(0.5)
 

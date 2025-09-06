@@ -3,12 +3,12 @@ local module = {}
 --// Services
 local CollectionService = game:GetService("CollectionService")
 local GuiService = game:GetService("GuiService")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local Players = game:GetService("Players")
-local lighting = game:GetService("Lighting")
 local SoundService = game:GetService("SoundService")
 local StarterGui = game:GetService("StarterGui")
+local lighting = game:GetService("Lighting")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
@@ -18,21 +18,21 @@ local assets = ReplicatedStorage.Assets
 local sounds = assets.Sounds
 
 --// Modules
-local signals = require(Globals.Signals)
-local giftService = require(Globals.Client.Services.GiftsService)
-local cameraShaker = require(Globals.Vendor.CameraShaker)
-local comboService = require(Globals.Client.Services.ComboService)
-local util = require(Globals.Vendor.Util)
-local net = require(Globals.Packages.Net)
-local UIService = require(Globals.Client.Services.UIService)
-local soulsService = require(Globals.Client.Services.SoulsService)
-local ViewmodelService = require(Globals.Vendor.ViewmodelService)
+local Acts = require(Globals.Vendor.Acts)
 local ChanceService = require(Globals.Vendor.ChanceService)
 local MusicService = require(Globals.Client.Services.MusicService)
+local UIService = require(Globals.Client.Services.UIService)
+local ViewmodelService = require(Globals.Vendor.ViewmodelService)
+local cameraShaker = require(Globals.Vendor.CameraShaker)
 local codexService = require(Globals.Client.Services.CodexService)
-local Acts = require(Globals.Vendor.Acts)
-local weaponService = require(Globals.Client.Controllers.WeaponController)
+local comboService = require(Globals.Client.Services.ComboService)
+local giftService = require(Globals.Client.Services.GiftsService)
 local kiosk = require(ReplicatedStorage.Gui.Kiosk)
+local net = require(Globals.Packages.Net)
+local signals = require(Globals.Signals)
+local soulsService = require(Globals.Client.Services.SoulsService)
+local util = require(Globals.Vendor.Util)
+local weaponService = require(Globals.Client.Controllers.WeaponController)
 
 --// Values
 local logHealth = 0
@@ -82,35 +82,6 @@ function module.attemptResume(index)
 	signals.ResumeGame:Fire()
 end
 
-local function progressTo(level)
-	if level >= 1 then
-		signals["AddGift"]:Fire("Master_Scouting")
-	end
-
-	if
-		level >= 2
-		and not (
-			giftService.CheckGift("Brick_Hook")
-			or giftService.CheckGift("Righteous_Motion")
-			or giftService.CheckGift("Spiked_Sabatons")
-		)
-	then
-		local r = math.random(1, 3)
-
-		if r == 1 then
-			signals["AddGift"]:Fire("Brick_Hook")
-		elseif r == 2 then
-			signals["AddGift"]:Fire("Righteous_Motion")
-		elseif r == 3 then
-			signals["AddGift"]:Fire("Spiked_Sabatons")
-		end
-	end
-
-	if level >= 3 then
-		signals["AddGift"]:Fire("Overcharge")
-	end
-end
-
 local function loadSaveData(upgradeIndex, gameState)
 	if not Player.Character then
 		Player.CharacterAdded:Wait()
@@ -125,7 +96,7 @@ local function loadSaveData(upgradeIndex, gameState)
 	kiosk.tickets = gameState["PerkTickets"] or 0
 
 	for _, perkName in ipairs(gameState["PerkList"] or {}) do
-		signals.AddGift:Fire(perkName)
+		giftService.AddGift(perkName)
 	end
 
 	giftService.UpgradeIndex = upgradeIndex
@@ -463,10 +434,6 @@ local function exitS2(extraSouls, level, stageBoss, miniBoss)
 		codexService.AddEntry("The Suburbs")
 	elseif workspace:GetAttribute("Stage") == 2 then
 		codexService.AddEntry("The Sewers")
-
-		if giftService.CheckUpgrade("Aged Cheese") then
-			signals.AddGift:Fire("Overcharge")
-		end
 	end
 
 	if level == (giftService.CheckUpgrade("Aged Cheese") and 5.25 or 5) then
@@ -586,7 +553,7 @@ signals.ResumeGame:Connect(function()
 	end
 end)
 
-signals.AddGift:Connect(onGiftAdded)
+giftService.OnGiftAdded:Connect(onGiftAdded)
 net:Connect("StartExitSequence", ExitSequence)
 
 net:Connect("ArenaBegun", function(isAmbush)

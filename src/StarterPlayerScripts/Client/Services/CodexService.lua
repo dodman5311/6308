@@ -7,10 +7,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Globals = require(ReplicatedStorage.Shared.Globals)
 
 --// Modules
-local signal = require(Globals.Packages.Signal)
-local signals = require(Globals.Signals)
 local codex = require(Globals.Shared.Codex)
 local net = require(Globals.Packages.Net)
+local signal = require(Globals.Packages.Signal)
+local signals = require(Globals.Signals)
 
 local UIService = require(Globals.Client.Services.UIService)
 

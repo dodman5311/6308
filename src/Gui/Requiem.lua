@@ -259,8 +259,6 @@ function module.HideRequiemShop(_, ui, frame)
 end
 
 function module.Init(player, ui, frame)
-	local ti = TweenInfo.new(0.25)
-
 	infoBoxScale.Changed:Connect(function(value)
 		frame.InfoBox.Visible = value
 	end)
@@ -320,8 +318,8 @@ function module.Init(player, ui, frame)
 							frame,
 							Net:RemoteFunction("PurchaseUpgrade"):InvokeServer(tierName, tier.Price, newIndex)
 						)
-						util.PlaySound(sounds.RCoins, script, 0.075).PlaybackSpeed += (newIndex / 5)
-						util.PlaySound(sounds.RCoinsSmall, script, 0.075).PlaybackSpeed += (newIndex / 5)
+						util.PlaySound(sounds.RCoins, script, 0.075).PlaybackSpeed += (newIndex / 5) + 0.25
+						util.PlaySound(sounds.RCoinsSmall, script, 0.075).PlaybackSpeed += (newIndex / 5) + 0.25
 					else
 						util.PlaySound(sounds.Denied, script, 0.075)
 					end

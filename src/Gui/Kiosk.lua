@@ -4,14 +4,14 @@ local module = {
 }
 --// Services
 local BadgeService = game:GetService("BadgeService")
+local CollectionService = game:GetService("CollectionService")
 local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local StarterGui = game:GetService("StarterGui")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
-local CollectionService = game:GetService("CollectionService")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
@@ -22,22 +22,22 @@ local sounds = assets.Sounds
 local sfx = sounds.Kiosk
 
 --// Modules
-local util = require(Globals.Vendor.Util)
-local UiAnimator = require(Globals.Vendor.UIAnimationService)
-local MouseOver = require(Globals.Vendor.MouseOverModule)
-local Signals = require(Globals.Shared.Signals)
-local Signal = require(Globals.Packages.Signal)
 local Gifts = require(Globals.Shared.Gifts)
 local GiftsService = require(Globals.Client.Services.GiftsService)
-local net = require(Globals.Packages.Net)
+local MouseOver = require(Globals.Vendor.MouseOverModule)
 local MusicService = require(Globals.Client.Services.MusicService)
+local Signal = require(Globals.Packages.Signal)
+local Signals = require(Globals.Shared.Signals)
 local SoulsService = require(Globals.Client.Services.SoulsService)
-local weapons = require(Globals.Client.Controllers.WeaponController)
-local skip = require(Globals.Shared.Skip)
-local timer = require(Globals.Vendor.Timer)
-local promise = require(Globals.Packages.Promise)
+local UiAnimator = require(Globals.Vendor.UIAnimationService)
 local acts = require(Globals.Vendor.Acts)
 local codexService = require(Globals.Client.Services.CodexService)
+local net = require(Globals.Packages.Net)
+local promise = require(Globals.Packages.Promise)
+local skip = require(Globals.Shared.Skip)
+local timer = require(Globals.Vendor.Timer)
+local util = require(Globals.Vendor.Util)
+local weapons = require(Globals.Client.Controllers.WeaponController)
 
 local chanceService = require(Globals.Vendor.ChanceService)
 
@@ -849,7 +849,7 @@ function module.chooseRandomGift(player, ui, frame, catagory)
 	t.Completed:Wait()
 
 	if catagory then
-		Signals.AddGift:Fire(name)
+		GiftsService.AddGift(name)
 	else
 		module.applyGiftChange(name)
 	end

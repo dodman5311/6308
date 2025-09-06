@@ -3,17 +3,23 @@ local upgrades = {
 		["DoubleShot_Tier"] = {
 			{
 				Name = "Double Shot: Tier 1",
-				Description = "+ Fire rate",
+				Description = [[+ Fire rate
+				
+<b>+5% spawn chance</b>]],
 				Price = 250,
 			},
 			{
 				Name = "Double Shot: Tier 2",
-				Description = "+1 Pellet",
+				Description = [[+1 Pellet
+				
+<b>+10% spawn chance</b>]],
 				Price = 400,
 			},
 			{
 				Name = "Broad Shot: Max",
-				Description = "Pellets now pierce through enemies",
+				Description = [[Pellets now pierce through enemies
+				
+<b>+15% spawn chance</b>]],
 				Price = 500,
 			},
 		},
@@ -21,17 +27,23 @@ local upgrades = {
 		["DrillBite_Tier"] = {
 			{
 				Name = "Drill Bite: Tier 1",
-				Description = "+3 Ammo",
+				Description = [[+3 Ammo
+				
+<b>+5% spawn chance</b>]],
 				Price = 250,
 			},
 			{
 				Name = "Drill Bite: Tier 2",
-				Description = "Pellets now have a 5% chance to light enemies on fire",
+				Description = [[Pellets now have a 5% chance to light enemies on fire
+				
+<b>+10% spawn chance</b>]],
 				Price = 500,
 			},
 			{
 				Name = "Wrath Guard: Max",
-				Description = "Wrath Guard’s parry is a stunning punch",
+				Description = [[Wrath Guard’s parry is a stunning punch
+				
+<b>+15% spawn chance</b>]],
 				Price = 1000,
 			},
 		},
@@ -39,17 +51,23 @@ local upgrades = {
 		["QuadShot_Tier"] = {
 			{
 				Name = "Quad Shot: Tier 1",
-				Description = "+1 Pellet",
+				Description = [[+1 Pellet
+				
+<b>+5% spawn chance</b>]],
 				Price = 250,
 			},
 			{
 				Name = "Quad Shot: Tier 2",
-				Description = "+1 Pellet",
+				Description = [[+1 Pellet
+				
+<b>+10% spawn chance</b>]],
 				Price = 500,
 			},
 			{
 				Name = "Mega Shot: Max",
-				Description = "Every loaded shell is different. Mega shot fires 3 Explosive rounds, 3 Homing rounds, 3 Regular pellets, and 1 Slug with 3 damage",
+				Description = [[Every loaded shell is different. Mega shot fires 3 Explosive rounds, 3 Homing rounds, 3 Regular pellets, and 1 Slug with 3 damage
+				
+<b>+15% spawn chance</b>]],
 				Price = 1000,
 			},
 		},
@@ -59,17 +77,23 @@ local upgrades = {
 		BORUS_Tier = {
 			{
 				Name = "BORUS: Tier 1",
-				Description = "+5 Ammo",
+				Description = [[+5 Ammo
+				
+<b>+5% spawn chance</b>]],
 				Price = 250,
 			},
 			{
 				Name = "BORUS: Tier 2",
-				Description = "- Recoil",
+				Description = [[- Recoil
+				
+<b>+10% spawn chance</b>]],
 				Price = 500,
 			},
 			{
 				Name = "HADES: Max",
-				Description = "HADES has +1 Damage, -3 Speed, +10 Ammo",
+				Description = [[HADES has +1 Damage, -3 Speed, +10 Ammo
+				
+<b>+15% spawn chance</b>]],
 				Price = 1000,
 			},
 		},
@@ -77,17 +101,23 @@ local upgrades = {
 		["800M_Tier"] = {
 			{
 				Name = "800M: Tier 1",
-				Description = "+ Projectile Speed",
+				Description = [[+ Projectile Speed
+				
+<b>+5% spawn chance</b>]],
 				Price = 250,
 			},
 			{
 				Name = "800M: Tier 2",
-				Description = "+ Splash Range",
+				Description = [[+ Splash Range
+				
+<b>+10% spawn chance</b>]],
 				Price = 500,
 			},
 			{
 				Name = "Concussion: Max",
-				Description = "Explosions from the Concussion have a 15% chance to stun",
+				Description = [[Explosions from the Concussion have a 15% chance to stun
+				
+<b>+15% spawn chance</b>]],
 				Price = 1000,
 			},
 		},
@@ -95,17 +125,23 @@ local upgrades = {
 		Gratana_Tier = {
 			{
 				Name = "Gratana: Tier 1",
-				Description = "+1 Ammo",
+				Description = [[+1 Ammo
+				
+<b>+5% spawn chance</b>]],
 				Price = 250,
 			},
 			{
 				Name = "Gratana: Tier 2",
-				Description = "+1 Ammo",
+				Description = [[+1 Ammo
+				
+<b>+10% spawn chance</b>]],
 				Price = 500,
 			},
 			{
 				Name = "Dovus: Max",
-				Description = "Can lock onto up to two targets. Can fire as fast as you pull the trigger.",
+				Description = [[Can lock onto up to two targets. Can fire as fast as you pull the trigger.
+				
+<b>+15% spawn chance</b>]],
 				Price = 1000,
 			},
 		},
@@ -114,18 +150,48 @@ local upgrades = {
 	Pistols = {
 		["BullShot_Tier"] = {
 			{
-				Name = "Bull Shot: Tier 1",
+				Name = [[Bull Shot: Tier 1
+				
+<b>+5% spawn chance</b>]],
 				Description = "+1 Ammo",
 				Price = 250,
 			},
 			{
 				Name = "Bull Shot: Tier 2",
-				Description = "+ Projectile speed",
+				Description = [[+ Projectile speed
+				
+<b>+10% spawn chance</b>]],
 				Price = 500,
 			},
 			{
 				Name = "Dread Shot: Max",
-				Description = "Rockets slightly seek enemies",
+				Description = [[Rockets slightly seek enemies
+				
+<b>+15% spawn chance</b>]],
+				Price = 1000,
+			},
+		},
+
+		["CleanseAndRepent_Tier"] = {
+			{
+				Name = "Cleanse & Repent: Tier 1",
+				Description = [[- Recoil
+				
+<b>+5% spawn chance</b>]],
+				Price = 250,
+			},
+			{
+				Name = "Cleanse & Repent: Tier 2",
+				Description = [[+ Reload speed
+				
+<b>+10% spawn chance</b>]],
+				Price = 500,
+			},
+			{
+				Name = "Forged Arms: Max",
+				Description = [[+50% crit chance when hitting headshots, + Fire rate
+				
+<b>+15% spawn chance</b>]],
 				Price = 1000,
 			},
 		},
@@ -133,17 +199,23 @@ local upgrades = {
 		["BoomCannon_Tier"] = {
 			{
 				Name = "Boom Cannon: Tier 1",
-				Description = "+ Fire rate",
+				Description = [[+ Fire rate
+				
+<b>+5% spawn chance</b>]],
 				Price = 250,
 			},
 			{
 				Name = "Boom Cannon: Tier 2",
-				Description = "Shots now have a 5% chance to ricochet to a nearby enemy",
+				Description = [[Shots now have a 5% chance to ricochet to a nearby enemy
+				
+<b>+10% spawn chance</b>]],
 				Price = 500,
 			},
 			{
 				Name = "50 Regret: Max",
-				Description = "x2 damage to weak points",
+				Description = [[x2 damage to weak points
+				
+<b>+15% spawn chance</b>]],
 				Price = 1000,
 			},
 		},
@@ -151,17 +223,23 @@ local upgrades = {
 		RIPP_Tier = {
 			{
 				Name = "RIPP: Tier 1",
-				Description = "+2 Ammo",
+				Description = [[+2 Ammo
+				
+<b>+5% spawn chance</b>]],
 				Price = 250,
 			},
 			{
 				Name = "RIPP: Tier 2",
-				Description = "+ Splash Range",
+				Description = [[+ Splash Range
+				
+<b>+10% spawn chance</b>]],
 				Price = 500,
 			},
 			{
 				Name = "Experiment 05: Max",
-				Description = "Shots have a 5% chance to electrify enemies",
+				Description = [[Shots have a 5% chance to electrify enemies
+				
+<b>+15% spawn chance</b>]],
 				Price = 1000,
 			},
 		},
@@ -169,17 +247,23 @@ local upgrades = {
 		["ISix_Tier"] = {
 			{
 				Name = "I-Six: Tier 1",
-				Description = "+ lock on speed",
+				Description = [[+ lock on speed
+				
+<b>+5% spawn chance</b>]],
 				Price = 250,
 			},
 			{
 				Name = "I-Six: Tier 2",
-				Description = "+1 Lock on amount",
+				Description = [[+1 Lock on amount
+				
+<b>+10% spawn chance</b>]],
 				Price = 500,
 			},
 			{
 				Name = "I-Seven: Max",
-				Description = "When beginning a lock on, a parrying shield is created for 0.5 seconds",
+				Description = [[When beginning a lock on, a parrying shield is created for 0.5 seconds
+				
+<b>+15% spawn chance</b>]],
 				Price = 1000,
 			},
 		},
@@ -189,17 +273,23 @@ local upgrades = {
 		Katana_Tier = {
 			{
 				Name = "Katana: Tier 1",
-				Description = "+ Range",
+				Description = [[+ Range
+				
+<b>+5% spawn chance</b>]],
 				Price = 250,
 			},
 			{
 				Name = "Katana: Tier 2",
-				Description = "A successful parry has a 5% to add ammo",
+				Description = [[A successful parry has a 5% to add ammo
+				
+<b>+10% spawn chance</b>]],
 				Price = 500,
 			},
 			{
 				Name = "Shagan: Max",
-				Description = "Attacking at least 3 second after a successful parry will launch the player forward",
+				Description = [[Attacking at least 3 second after a successful parry will launch the player forward
+				
+<b>+15% spawn chance</b>]],
 				Price = 1000,
 			},
 		},
@@ -207,17 +297,23 @@ local upgrades = {
 		Harpoons_Tier = {
 			{
 				Name = "Harpoons: Tier 1",
-				Description = "+ Projectile Speed",
+				Description = [[+ Projectile Speed
+				
+<b>+5% spawn chance</b>]],
 				Price = 250,
 			},
 			{
 				Name = "Harpoons: Tier 2",
-				Description = "Harpoons have a 10% chance to stun enemies",
+				Description = [[Harpoons have a 10% chance to stun enemies
+				
+<b>+10% spawn chance</b>]],
 				Price = 500,
 			},
 			{
 				Name = "Trident: Max",
-				Description = "Hitting stunned enemies will deal 3 damage",
+				Description = [[Hitting stunned enemies will deal 3 damage
+				
+<b>+15% spawn chance</b>]],
 				Price = 1000,
 			},
 		},
@@ -225,17 +321,23 @@ local upgrades = {
 		Cutter_Tier = {
 			{
 				Name = "Cutter: Tier 1",
-				Description = "+ Range",
+				Description = [[+ Range
+				
+<b>+5% spawn chance</b>]],
 				Price = 250,
 			},
 			{
 				Name = "Cutter: Tier 2",
-				Description = "+ Range",
+				Description = [[+ Range
+				
+<b>+10% spawn chance</b>]],
 				Price = 500,
 			},
 			{
 				Name = "Bloody Mary: Max",
-				Description = "Successfully parrying an attack will convert said attack into a smart sawblade",
+				Description = [[Successfully parrying an attack will convert said attack into a smart sawblade
+				
+<b>+15% spawn chance</b>]],
 				Price = 1000,
 			},
 		},

@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StarterPlayer = game:GetService("StarterPlayer")
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local gifts = require(Globals.Shared.Gifts)
 
@@ -113,6 +114,8 @@ local commands = {
 			end,
 
 			ExecuteClient = function(_, levelsPassed, combatLevel)
+				local GiftsService = require(StarterPlayer.StarterPlayerScripts.Client.Services.GiftsService)
+
 				local weapons = require(Globals.Client.Controllers.WeaponController)
 				local kiosk = require(ReplicatedStorage.Gui.Kiosk)
 				local chanceService = require(Globals.Vendor.ChanceService)
@@ -138,42 +141,42 @@ local commands = {
 						randomGift = perkIndexes[math.random(1, #perkIndexes)]
 					end
 
-					signals["AddGift"]:Fire(randomGift)
+					GiftsService.AddGift(randomGift)
 
 					if level == 3 then
-						signals["AddGift"]:Fire("Master_Scouting")
+						GiftsService.AddGift("Master_Scouting")
 					end
 
 					if level == 5 then
 						local r = math.random(1, 3)
 
 						if r == 1 then
-							signals["AddGift"]:Fire("Brick_Hook")
+							GiftsService.AddGift("Brick_Hook")
 						elseif r == 2 then
-							signals["AddGift"]:Fire("Righteous_Motion")
+							GiftsService.AddGift("Righteous_Motion")
 						elseif r == 3 then
-							signals["AddGift"]:Fire("Spiked_Sabatons")
+							GiftsService.AddGift("Spiked_Sabatons")
 						end
 					end
 
 					if level == 7 then
-						signals["AddGift"]:Fire("Overcharge")
+						GiftsService.AddGift("Overcharge")
 					end
 
 					if level == 10 then
 						local r = math.random(1, 3)
 
 						if r == 1 then
-							signals["AddGift"]:Fire("Galvan_Gaze")
+							GiftsService.AddGift("Galvan_Gaze")
 						elseif r == 2 then
-							signals["AddGift"]:Fire("Mag_Launcher")
+							GiftsService.AddGift("Mag_Launcher")
 						elseif r == 3 then
-							signals["AddGift"]:Fire("Burning_Souls")
+							GiftsService.AddGift("Burning_Souls")
 						end
 					end
 
 					if level == 13 then
-						signals["AddGift"]:Fire("Maidenless")
+						GiftsService.AddGift("Maidenless")
 					end
 
 					for _ = 1, combatLevel do
@@ -188,7 +191,7 @@ local commands = {
 								randomTicketGift = perkIndexes[math.random(1, #perkIndexes)]
 							end
 
-							signals["AddGift"]:Fire(randomTicketGift)
+							GiftsService.AddGift(randomTicketGift)
 						elseif result == "Clover" then
 							chanceService.luck += 1
 						elseif result == "Large_Clover" then
@@ -340,6 +343,7 @@ local commands = {
 			end,
 
 			ExecuteClient = function(_, amount)
+				local GiftsService = require(StarterPlayer.StarterPlayerScripts.Client.Services.GiftsService)
 				local perkIndexes = {}
 				local upgradeIndexes = {}
 
@@ -361,7 +365,7 @@ local commands = {
 						randomGift = perkIndexes[math.random(1, #perkIndexes)]
 					end
 
-					signals["AddGift"]:Fire(randomGift)
+					GiftsService.AddGift(randomGift)
 				end
 			end,
 		},
@@ -375,7 +379,8 @@ local commands = {
 			end,
 
 			ExecuteClient = function(_, Perk)
-				signals["AddGift"]:Fire(Perk)
+				local GiftsService = require(StarterPlayer.StarterPlayerScripts.Client.Services.GiftsService)
+				GiftsService.AddGift(Perk)
 			end,
 		},
 
@@ -388,7 +393,8 @@ local commands = {
 			end,
 
 			ExecuteClient = function(_, Upgrade)
-				signals["AddGift"]:Fire(Upgrade)
+				local GiftsService = require(StarterPlayer.StarterPlayerScripts.Client.Services.GiftsService)
+				GiftsService.AddGift(Upgrade)
 			end,
 		},
 
@@ -401,7 +407,8 @@ local commands = {
 			end,
 
 			ExecuteClient = function(_, Special)
-				signals["AddGift"]:Fire(Special)
+				local GiftsService = require(StarterPlayer.StarterPlayerScripts.Client.Services.GiftsService)
+				GiftsService.AddGift(Special)
 			end,
 		},
 	},
@@ -765,12 +772,13 @@ local commands = {
 			end,
 
 			ExecuteClient = function(_, confirm)
-				if not confirm then
-					return
-				end
-
 				local uiService = require(Globals.Client.Services.UIService)
-				uiService.doUiAction("Requiem", "ShowRequiemShop")
+
+				if confirm then
+					uiService.doUiAction("Requiem", "ShowRequiemShop")
+				else
+					uiService.doUiAction("Requiem", "HideRequiemShop")
+				end
 			end,
 		},
 

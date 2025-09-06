@@ -1,14 +1,16 @@
 local module = {}
 --// Services
+local CollectionService = game:GetService("CollectionService")
 local DataStoreService = game:GetService("DataStoreService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local StarterGui = game:GetService("StarterGui")
+local StarterPlayer = game:GetService("StarterPlayer")
 local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
-local CollectionService = game:GetService("CollectionService")
 
 --// Instances
+local GiftsService = require(StarterPlayer.StarterPlayerScripts.Client.Services.GiftsService)
 local Globals = require(ReplicatedStorage.Shared.Globals)
 
 local assets = ReplicatedStorage.Assets
@@ -20,15 +22,15 @@ voice.Volume = 1.5
 voice.SoundGroup = SoundService.Voice
 
 --// Modules
+local MouseOver = require(Globals.Vendor.MouseOverModule)
+local Signal = require(Globals.Packages.Signal)
+local Signals = require(Globals.Shared.Signals)
+local UiAnimator = require(Globals.Vendor.UIAnimationService)
+local acts = require(Globals.Vendor.Acts)
+local gifts = require(Globals.Shared.Gifts)
+local musicService = require(Globals.Client.Services.MusicService)
 local skip = require(Globals.Shared.Skip)
 local util = require(Globals.Vendor.Util)
-local acts = require(Globals.Vendor.Acts)
-local UiAnimator = require(Globals.Vendor.UIAnimationService)
-local Signals = require(Globals.Shared.Signals)
-local Signal = require(Globals.Packages.Signal)
-local musicService = require(Globals.Client.Services.MusicService)
-local gifts = require(Globals.Shared.Gifts)
-local MouseOver = require(Globals.Vendor.MouseOverModule)
 
 local net = require(Globals.Packages.Net)
 
@@ -88,7 +90,7 @@ local function givePerk(frame, button)
 	local ti = TweenInfo.new(1, Enum.EasingStyle.Linear)
 	local title = button.Parent.Title.Text
 
-	Signals.AddGift:Fire(title)
+	GiftsService.AddGift(title)
 
 	frame.Condemn.Visible = false
 
@@ -389,7 +391,7 @@ function module.chooseGift(player, ui, frame, bossName)
 	sounds.SpinSound.TimePosition = 0
 	sounds.DeliverEffects.Perk_Take:Play()
 
-	Signals.AddGift:Fire(name)
+	GiftsService.AddGift(name)
 
 	frame.GiftName.Text = string.gsub(name, "_", " ")
 

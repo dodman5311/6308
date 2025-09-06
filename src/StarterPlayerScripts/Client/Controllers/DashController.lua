@@ -24,10 +24,10 @@ local signals = require(Globals.Shared.Signals)
 --local net = require(rps.Net)
 
 local acts = require(Globals.Vendor.Acts)
-local util = require(Globals.Vendor.Util)
 local giftService = require(Globals.Client.Services.GiftsService)
 local momentum = require(Globals.Client.Controllers.AirController)
 local uiService = require(Globals.Client.Services.UIService)
+local util = require(Globals.Vendor.Util)
 
 function module.fillDashes()
 	module.canDash = true
@@ -36,7 +36,7 @@ function module.fillDashes()
 	uiService.doUiAction("HUD", "UpdateGiftProgress", "Righteous_Motion", module.dashes / 3)
 	uiService.doUiAction("HUD", "RefreshSideBar")
 
-	if workspace:GetAttribute("RighteousMotion_Tier") > 0 then
+	if workspace:GetAttribute("Righteous_Motion") > 0 then
 		module.extraDash = true
 	end
 	--script.LoadedUI:Play()
@@ -45,15 +45,15 @@ end
 function module.Dash(subject)
 	print(module.canDash)
 	if
-		(workspace:GetAttribute("RighteousMotion_Tier") <= 0 or not module.extraDash)
+		(workspace:GetAttribute("Righteous_Motion") <= 0 or not module.extraDash)
 		and (
 			not module.canDash
 			or not (
 				giftService.CheckGift("Righteous_Motion")
-				or (giftService.CheckGift("Spiked_Sabatons") and workspace:GetAttribute("SpikedSabatons_Tier") > 0)
+				or (giftService.CheckGift("Spiked_Sabatons") and workspace:GetAttribute("Spiked_Sabatons") > 0)
 				or (
 					giftService.CheckGift("Brick_Hook")
-					and workspace:GetAttribute("BrickHook_Tier") > 0
+					and workspace:GetAttribute("Brick_Hook") > 0
 					and acts:checkAct("GrappleCooldown")
 				)
 			)
@@ -110,13 +110,13 @@ function module.Dash(subject)
 
 		local distance = 100
 
-		if giftService.CheckGift("Spiked_Sabatons") and workspace:GetAttribute("SpikedSabatons_Tier") > 0 then
+		if giftService.CheckGift("Spiked_Sabatons") and workspace:GetAttribute("Spiked_Sabatons") > 0 then
 			module.dashes = 0
 			module.canDash = false
 			distance = 200
 		end
 
-		if giftService.CheckGift("Brick_Hook") and workspace:GetAttribute("BrickHook_Tier") > 0 then
+		if giftService.CheckGift("Brick_Hook") and workspace:GetAttribute("Brick_Hook") > 0 then
 			module.canDash = false
 		end
 

@@ -3,20 +3,20 @@ local module = {
 }
 
 --// Services
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
-local permaUpgradeList = require(ReplicatedStorage.Upgrades)
 local codexService = require(Globals.Client.Services.CodexService)
+local permaUpgradeList = require(ReplicatedStorage.Upgrades)
 local player = Players.LocalPlayer
 
 --// Modules
-local signal = require(Globals.Packages.Signal)
-local signals = require(Globals.Signals)
 local gifts = require(Globals.Shared.Gifts)
 local net = require(Globals.Packages.Net)
+local signal = require(Globals.Packages.Signal)
+local signals = require(Globals.Signals)
 
 local UIService = require(Globals.Client.Services.UIService)
 
@@ -32,7 +32,7 @@ function module.CheckGift(giftName)
 	return table.find(module.AquiredGifts, giftName)
 end
 
-local function AddGift(gift)
+function module.AddGift(gift)
 	if module.CheckGift(gift) or module.CheckGift("Drav_Is_Dead") then
 		return
 	end
@@ -84,7 +84,7 @@ function module:OnDied()
 	ClearGifts()
 end
 
-signals.AddGift:Connect(AddGift)
+--signals.AddGift:Connect(AddGift)
 signals.ClearGifts:Connect(ClearGifts)
 
 return module

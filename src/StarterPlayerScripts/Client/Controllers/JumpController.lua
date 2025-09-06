@@ -2,17 +2,17 @@ local module = {
 	jumpLock = false,
 }
 
-local uis = game:GetService("UserInputService")
 local players = game:GetService("Players")
+local uis = game:GetService("UserInputService")
 local player = players.LocalPlayer
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 
+local acts = require(Globals.Vendor.Acts)
 local giftService = require(Globals.Client.Services.GiftsService)
 local momentum = require(Globals.Client.Controllers.AirController)
-local acts = require(Globals.Vendor.Acts)
 local signals = require(Globals.Shared.Signals)
 
 local doubleJump = false
@@ -62,7 +62,9 @@ local function DoubleJump()
 			if giftService.CheckGift("Master_Scouting") then
 				doubleJump = true
 
-				if workspace:GetAttribute("MasterScouting_Tier") > 0 then
+				print(workspace:GetAttribute("Master_Scouting"))
+
+				if workspace:GetAttribute("Master_Scouting") > 0 then
 					extraDoubleJump = true
 				end
 			end

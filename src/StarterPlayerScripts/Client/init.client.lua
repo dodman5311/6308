@@ -1,21 +1,20 @@
 local modules = {}
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local Promise = require(Globals.Packages.Promise)
-local signals = require(Globals.Signals)
 local net = require(Globals.Packages.Net)
+local signals = require(Globals.Signals)
 
 local player = Players.LocalPlayer
 
-local allSignals = { 
+local allSignals = {
 	"DoWeaponAction",
 	"AddSoul",
 	"RemoveSoul",
-	"AddGift",
 	"ClearGifts",
 	"AddAmmo",
 	"PauseGame",
