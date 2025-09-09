@@ -1,11 +1,11 @@
 local module = {}
 
 --// Services
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local collectionService = game:GetService("CollectionService")
-local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local Teams = game:GetService("Teams")
+local collectionService = game:GetService("CollectionService")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
@@ -14,13 +14,13 @@ local Effects = Assets.Effects
 
 --// Modules
 local Net = require(Globals.Packages.Net)
-local util = require(Globals.Vendor.Util)
-local signals = require(Globals.Shared.Signals)
 local signal = require(Globals.Packages.Signal)
+local signals = require(Globals.Shared.Signals)
+local util = require(Globals.Vendor.Util)
 
+local chanceService = require(Globals.Vendor.ChanceService)
 local explosionService = require(Globals.Client.Services.ExplosionService)
 local giftService = require(Globals.Client.Services.GiftsService)
-local chanceService = require(Globals.Vendor.ChanceService)
 
 local damageRemote = Net:RemoteEvent("Damage")
 
@@ -154,7 +154,7 @@ module.Presets = {
 	LargePlasma = {
 		Speed = 400,
 		LifeTime = 5,
-		Info = { Size = 2, SplashRange = 15, SplashDamage = 1, ExplosiveColor = Color3.fromRGB(255, 82, 226) },
+		Info = { Size = 2, SplashRange = 16, SplashDamage = 1, ExplosiveColor = Color3.fromRGB(255, 82, 226) },
 		Damage = 1,
 		Piercing = 0,
 		Model = "PlasmaProjectile",
@@ -270,7 +270,7 @@ module.Presets = {
 	LargeFastRocket = {
 		Speed = 600,
 		LifeTime = 10,
-		Info = { Size = 2, SplashRange = 50, SplashDamage = 1 },
+		Info = { Size = 2, SplashRange = 40, SplashDamage = 1 },
 		Damage = 1,
 		Piercing = 0,
 		Model = "RocketProjectile",
@@ -279,7 +279,7 @@ module.Presets = {
 	ConcussionRocket = {
 		Speed = 600,
 		LifeTime = 10,
-		Info = { Size = 2, SplashRange = 50, SplashDamage = 1 },
+		Info = { Size = 2, SplashRange = 40, SplashDamage = 1 },
 		Damage = 1,
 		Piercing = 0,
 		Model = "RocketProjectile",

@@ -33,7 +33,6 @@ local UiAnimator = require(Globals.Vendor.UIAnimationService)
 local acts = require(Globals.Vendor.Acts)
 local codexService = require(Globals.Client.Services.CodexService)
 local net = require(Globals.Packages.Net)
-local promise = require(Globals.Packages.Promise)
 local skip = require(Globals.Shared.Skip)
 local timer = require(Globals.Vendor.Timer)
 local util = require(Globals.Vendor.Util)
@@ -232,6 +231,7 @@ local DOTDRewards = {
 
 local dailyDeal = {}
 local dailyDealCost = 0
+local DAILY_DEAL_COST_MAGNITUDE = 3.75
 local dealSold = false
 
 local isOther = false
@@ -418,7 +418,7 @@ local function resetDOTD()
 		chance += gift.Chance
 	end
 
-	dailyDealCost = math.round((280 / chance) * 4)
+	dailyDealCost = math.round((280 / chance) * DAILY_DEAL_COST_MAGNITUDE)
 	dealSold = false
 end
 
@@ -616,9 +616,9 @@ function module.ShowScreen(player, ui, frame, playerSouls)
 
 	frame.DealCost.Text = "-" .. dailyDealCost
 
-	if dailyDealCost >= 8 then
+	if dailyDealCost >= 6 then
 		frame.Tag.ImageColor3 = Color3.fromRGB(255, 225, 120)
-	elseif dailyDealCost >= 6 then
+	elseif dailyDealCost >= 4 then
 		frame.Tag.ImageColor3 = Color3.fromRGB(120, 225, 255)
 	else
 		frame.Tag.ImageColor3 = Color3.new(1, 1, 1)

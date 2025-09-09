@@ -33,7 +33,7 @@ local module = {
 		Fast_Mags = {
 			Icon = "rbxassetid://16235738334",
 			Catagories = { "Tactical", "Arsenal" },
-			Desc = "Reload speed is now increased. (+25%)",
+			Desc = "Reload speed is now increased. (+20%)",
 		},
 
 		Martial_Grace = {

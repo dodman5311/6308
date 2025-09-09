@@ -202,7 +202,7 @@ function module.ShowRequiemShop(_, ui, frame)
 	frame.Frame.Visible = true
 	frame.Background.Visible = true
 
-	Signals.DoUiAction:Fire("Cursor", "Toggle", true)
+	Signals.DoUiAction:Fire("Cursor", "Toggle", true, "Requiem")
 	frame.Gui.Enabled = true
 	setTreeIndex(frame, currentTreeIndex)
 	updateCoinBalaceUi(frame, workspace:GetAttribute("TotalScore"))
@@ -238,7 +238,7 @@ end
 function module.HideRequiemShop(_, ui, frame)
 	local ti = TweenInfo.new(0.1)
 
-	Signals.DoUiAction:Fire("Cursor", "Toggle", false)
+	Signals.DoUiAction:Fire("Cursor", "Toggle", false, "Requiem")
 	frame.Fade.BackgroundTransparency = 0
 	setTreeIndex(frame, 0)
 

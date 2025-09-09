@@ -1,12 +1,12 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local Spawners = require(Globals.Server.Services.Spawners)
-local net = require(Globals.Packages.Net)
 local actions = require(Globals.Server.NpcActions)
+local net = require(Globals.Packages.Net)
 local checkChance = net:RemoteFunction("CheckChance")
 local vfx = net:RemoteEvent("ReplicateEffect")
 

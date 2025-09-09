@@ -1,11 +1,11 @@
 local module = {}
 --// Services
+local CollectionService = game:GetService("CollectionService")
 local GuiService = game:GetService("GuiService")
 local Lighting = game:GetService("Lighting")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
-local CollectionService = game:GetService("CollectionService")
+local UserInputService = game:GetService("UserInputService")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
@@ -15,12 +15,12 @@ local assets = ReplicatedStorage.Assets
 local sounds = assets.Sounds
 
 --// Modules
-local util = require(Globals.Vendor.Util)
-local UiAnimator = require(Globals.Vendor.UIAnimationService)
-local SoulsService = require(Globals.Client.Services.SoulsService)
 local GiftsService = require(Globals.Client.Services.GiftsService)
-local spring = require(Globals.Vendor.Spring)
+local SoulsService = require(Globals.Client.Services.SoulsService)
+local UiAnimator = require(Globals.Vendor.UIAnimationService)
 local chanceService = require(Globals.Vendor.ChanceService)
+local spring = require(Globals.Vendor.Spring)
+local util = require(Globals.Vendor.Util)
 
 local grappleIncicatorSpring = spring.new(Vector2.zero)
 grappleIncicatorSpring.Damper = 0.5
@@ -513,6 +513,10 @@ function module.SetCombo(player, ui, frame, amount)
 end
 
 function module.AddGift(player, ui, frame, icon, giftName)
+	if frame.Gifts:FindFirstChild(giftName) then
+		return
+	end
+
 	local gift = frame.GiftImage:Clone()
 	gift:AddTag("GiftIcon")
 

@@ -383,7 +383,7 @@ function module.ShowScreen(player, ui, frame, extraSouls)
 		local soulsToGive = SoulsService.Souls * deliveryAmount
 
 		if deliveryAmount > 0.5 then
-			if soulsToGive >= 8 then
+			if soulsToGive >= 6 then
 				giftCount = 3
 			elseif soulsToGive >= 4 then
 				giftCount = 2
@@ -391,7 +391,7 @@ function module.ShowScreen(player, ui, frame, extraSouls)
 				giftCount = 1
 			end
 		else
-			if soulsToGive >= 4 then
+			if soulsToGive >= 3 then
 				giftCount = 3
 			elseif soulsToGive >= 2 then
 				giftCount = 2

@@ -3,7 +3,7 @@ local upgrades = {
 		["DoubleShot_Tier"] = {
 			{
 				Name = "Double Shot: Tier 1",
-				Description = [[+ Fire rate
+				Description = [[+0.3 Speed
 				
 <b>+5% spawn chance</b>]],
 				Price = 250,
@@ -16,7 +16,7 @@ local upgrades = {
 				Price = 400,
 			},
 			{
-				Name = "Broad Shot: Max",
+				Name = "Broad Shot",
 				Description = [[Pellets now pierce through enemies
 				
 <b>+15% spawn chance</b>]],
@@ -40,7 +40,7 @@ local upgrades = {
 				Price = 500,
 			},
 			{
-				Name = "Wrath Guard: Max",
+				Name = "Wrath Guard",
 				Description = [[Wrath Guard’s parry is a stunning punch
 				
 <b>+15% spawn chance</b>]],
@@ -64,7 +64,7 @@ local upgrades = {
 				Price = 500,
 			},
 			{
-				Name = "Mega Shot: Max",
+				Name = "Mega Shot",
 				Description = [[Every loaded shell is different. Mega shot fires 3 Explosive rounds, 3 Homing rounds, 3 Regular pellets, and 1 Slug with 3 damage
 				
 <b>+15% spawn chance</b>]],
@@ -84,13 +84,13 @@ local upgrades = {
 			},
 			{
 				Name = "BORUS: Tier 2",
-				Description = [[- Recoil
+				Description = [[-1 Recoil
 				
 <b>+10% spawn chance</b>]],
 				Price = 500,
 			},
 			{
-				Name = "HADES: Max",
+				Name = "HADES",
 				Description = [[HADES has +1 Damage, -3 Speed, +10 Ammo
 				
 <b>+15% spawn chance</b>]],
@@ -101,20 +101,20 @@ local upgrades = {
 		["800M_Tier"] = {
 			{
 				Name = "800M: Tier 1",
-				Description = [[+ Projectile Speed
+				Description = [[+50% Projectile Speed
 				
 <b>+5% spawn chance</b>]],
 				Price = 250,
 			},
 			{
 				Name = "800M: Tier 2",
-				Description = [[+ Splash Range
+				Description = [[+100% Splash Range
 				
 <b>+10% spawn chance</b>]],
 				Price = 500,
 			},
 			{
-				Name = "Concussion: Max",
+				Name = "Concussion",
 				Description = [[Explosions from the Concussion have a 15% chance to stun
 				
 <b>+15% spawn chance</b>]],
@@ -138,7 +138,7 @@ local upgrades = {
 				Price = 500,
 			},
 			{
-				Name = "Dovus: Max",
+				Name = "Dovus",
 				Description = [[Can lock onto up to two targets. Can fire as fast as you pull the trigger.
 				
 <b>+15% spawn chance</b>]],
@@ -158,13 +158,13 @@ local upgrades = {
 			},
 			{
 				Name = "Bull Shot: Tier 2",
-				Description = [[+ Projectile speed
+				Description = [[+100% Projectile speed
 				
 <b>+10% spawn chance</b>]],
 				Price = 500,
 			},
 			{
-				Name = "Dread Shot: Max",
+				Name = "Dread Shot",
 				Description = [[Rockets slightly seek enemies
 				
 <b>+15% spawn chance</b>]],
@@ -175,23 +175,17 @@ local upgrades = {
 		["CleanseAndRepent_Tier"] = {
 			{
 				Name = "Cleanse & Repent: Tier 1",
-				Description = [[- Recoil
-				
-<b>+5% spawn chance</b>]],
+				Description = [[-1 Recoil]],
 				Price = 250,
 			},
 			{
 				Name = "Cleanse & Repent: Tier 2",
-				Description = [[+ Reload speed
-				
-<b>+10% spawn chance</b>]],
+				Description = [[+10% Reload speed]],
 				Price = 500,
 			},
 			{
-				Name = "Forged Arms: Max",
-				Description = [[+50% crit chance when hitting headshots, + Fire rate
-				
-<b>+15% spawn chance</b>]],
+				Name = "Forged Arms",
+				Description = [[+50% crit chance when hitting headshots, +1 Speed]],
 				Price = 1000,
 			},
 		},
@@ -199,7 +193,7 @@ local upgrades = {
 		["BoomCannon_Tier"] = {
 			{
 				Name = "Boom Cannon: Tier 1",
-				Description = [[+ Fire rate
+				Description = [[+1 Speed
 				
 <b>+5% spawn chance</b>]],
 				Price = 250,
@@ -212,7 +206,7 @@ local upgrades = {
 				Price = 500,
 			},
 			{
-				Name = "50 Regret: Max",
+				Name = "50 Regret",
 				Description = [[x2 damage to weak points
 				
 <b>+15% spawn chance</b>]],
@@ -230,13 +224,13 @@ local upgrades = {
 			},
 			{
 				Name = "RIPP: Tier 2",
-				Description = [[+ Splash Range
+				Description = [[+100% Splash Range
 				
 <b>+10% spawn chance</b>]],
 				Price = 500,
 			},
 			{
-				Name = "Experiment 05: Max",
+				Name = "Experiment 05",
 				Description = [[Shots have a 5% chance to electrify enemies
 				
 <b>+15% spawn chance</b>]],
@@ -247,7 +241,7 @@ local upgrades = {
 		["ISix_Tier"] = {
 			{
 				Name = "I-Six: Tier 1",
-				Description = [[+ lock on speed
+				Description = [[+65% lock on speed
 				
 <b>+5% spawn chance</b>]],
 				Price = 250,
@@ -260,7 +254,7 @@ local upgrades = {
 				Price = 500,
 			},
 			{
-				Name = "I-Seven: Max",
+				Name = "I-Seven",
 				Description = [[When beginning a lock on, a parrying shield is created for 0.5 seconds
 				
 <b>+15% spawn chance</b>]],
@@ -273,20 +267,20 @@ local upgrades = {
 		Katana_Tier = {
 			{
 				Name = "Katana: Tier 1",
-				Description = [[+ Range
+				Description = [[+5 Range
 				
 <b>+5% spawn chance</b>]],
 				Price = 250,
 			},
 			{
 				Name = "Katana: Tier 2",
-				Description = [[A successful parry has a 5% to add ammo
+				Description = [[A successful parry has a 10% to add ammo
 				
 <b>+10% spawn chance</b>]],
 				Price = 500,
 			},
 			{
-				Name = "Shagan: Max",
+				Name = "Shagan",
 				Description = [[Attacking at least 3 second after a successful parry will launch the player forward
 				
 <b>+15% spawn chance</b>]],
@@ -297,7 +291,7 @@ local upgrades = {
 		Harpoons_Tier = {
 			{
 				Name = "Harpoons: Tier 1",
-				Description = [[+ Projectile Speed
+				Description = [[+100% Projectile Speed
 				
 <b>+5% spawn chance</b>]],
 				Price = 250,
@@ -310,7 +304,7 @@ local upgrades = {
 				Price = 500,
 			},
 			{
-				Name = "Trident: Max",
+				Name = "Trident",
 				Description = [[Hitting stunned enemies will deal 3 damage
 				
 <b>+15% spawn chance</b>]],
@@ -321,20 +315,20 @@ local upgrades = {
 		Cutter_Tier = {
 			{
 				Name = "Cutter: Tier 1",
-				Description = [[+ Range
+				Description = [[+2 Range
 				
 <b>+5% spawn chance</b>]],
 				Price = 250,
 			},
 			{
 				Name = "Cutter: Tier 2",
-				Description = [[+ Range
+				Description = [[+3 Range
 				
 <b>+10% spawn chance</b>]],
 				Price = 500,
 			},
 			{
-				Name = "Bloody Mary: Max",
+				Name = "Bloody Mary",
 				Description = [[Successfully parrying an attack will convert said attack into a smart sawblade
 				
 <b>+15% spawn chance</b>]],

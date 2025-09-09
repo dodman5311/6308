@@ -555,10 +555,10 @@ local function showMuzzleFlash(flashPart, offset)
 end
 
 local function ReloadDefault()
-	local reloadTime = GiftsService.CheckGift("Fast_Mags") and 1.25 or 1
+	local reloadTime = workspace:GetAttribute("CleanseAndRepent_Tier") >= 2 and 1.15 or 1
 
-	if workspace:GetAttribute("CleanseAndRepent_Tier") > 2 then
-		reloadTime /= 1.25
+	if GiftsService.CheckGift("Fast_Mags") then
+		reloadTime *= 1.2
 	end
 
 	if currentAmmo <= 0 then
@@ -645,7 +645,7 @@ local function reload(infiniteReloads)
 	local defWeaponData = require(defWeapon.Data)
 	local magSize = defWeaponData.Ammo
 
-	local reloadMult = GiftsService.CheckGift("Fast_Mags") and 1.25 or 1
+	local reloadMult = GiftsService.CheckGift("Fast_Mags") and 1.2 or 1
 	local reloadTime = (magSize * 0.1) / reloadMult
 
 	local reloadSound: Sound = assets.Sounds.Reload
@@ -1492,14 +1492,10 @@ local function FireDefault(extraBullet)
 	end
 
 	local recoilVector = Vector3.new(0, 0.3, 0)
-	local recoilMagnitude = 1
+	local recoilMagnitude = workspace:GetAttribute("CleanseAndRepent_Tier") >= 1 and 0.75 or 1
 
 	if GiftsService.CheckUpgrade("Spicy Pepperoni") then
 		recoilMagnitude = 1.35
-	end
-
-	if workspace:GetAttribute("CleanseAndRepent_Tier") > 1 then
-		recoilMagnitude = 0.75
 	end
 
 	if defaultIndex == 0 then
@@ -1540,7 +1536,14 @@ local function FireDefault(extraBullet)
 		defaultIndex = 0
 	end
 
-	fireTimer.WaitTime = acts:checkAct("Overcharged") and defaultFireRate / 1.5 or defaultFireRate
+	fireTimer.WaitTime = defaultFireRate
+
+	if workspace:GetAttribute("CleanseAndRepent_Tier") >= 3 then
+		fireTimer.WaitTime /= 1.25
+	end
+	if acts:checkAct("Overcharged") then
+		fireTimer.WaitTime /= 1.5
+	end
 	fireTimer:Run()
 
 	fireTimer.OnEnded:Wait()
@@ -2834,7 +2837,7 @@ explosionService.explosiveHit:Connect(function(subject, preHealth, postHealth, d
 			end
 		end
 
-		if workspace:GetAttribute("Overcharge_Tier") > 0 then
+		if workspace:GetAttribute("Overcharge") > 0 then
 			addToOvercharge(1)
 		end
 	end

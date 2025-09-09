@@ -11,7 +11,7 @@ local codex = {
 
 3. Those born of iron shall remain of iron.
 
-To uphold these laws, three keepers were chosen: Maxum, host of Galga; Elios, host of Trovet; and Deilos, host of Kan-Esmortem. Over time, more laws were added, and more keepers appointed. However, the demons of Prima Hominum grew discontent. They despised the increasing restrictions and believed the freedom of Prima Hominum was rapidly diminishing. Something had to be done.
+To uphold these laws, three keepers were chosenum, host of Galga; Elios, host of Trovet; and Deilos, host of Kan-Esmortem. Over time, more laws were added, and more keepers appointed. However, the demons of Prima Hominum grew discontent. They despised the increasing restrictions and believed the freedom of Prima Hominum was rapidly diminishing. Something had to be done.
 
 The opposing demons conspired to eliminate the keepers and abolish the laws. They united to kill the keepers, striking them down one by one, but Deilos remained. His strength and unwavering faith preserved him, allowing him to uphold the third and final law.
 

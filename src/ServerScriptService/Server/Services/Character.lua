@@ -272,6 +272,7 @@ end)
 net:Handle("PurchaseUpgrade", function(player, name, price, index) -- requiem shop buy thingy WAH!
 	workspace:SetAttribute("TotalScore", workspace:GetAttribute("TotalScore") - price)
 	workspace:SetAttribute(name, index)
+
 	return workspace:GetAttribute("TotalScore")
 end)
 

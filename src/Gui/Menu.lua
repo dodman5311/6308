@@ -3,15 +3,16 @@ local module = {}
 local CollectionService = game:GetService("CollectionService")
 local ContextActionService = game:GetService("ContextActionService")
 local GuiService = game:GetService("GuiService")
+local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Lighting = game:GetService("Lighting")
 local RunService = game:GetService("RunService")
 local TeleportService = game:GetService("TeleportService")
 local UserInputService = game:GetService("UserInputService")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
+local ViewmodelService = require(ReplicatedStorage.Vendor.ViewmodelService)
 
 local assets = ReplicatedStorage.Assets
 local sounds = assets.Sounds
@@ -20,18 +21,18 @@ local mapCamera = Instance.new("Camera")
 local weaponCamera = Instance.new("Camera")
 
 --// Modules
-local util = require(Globals.Vendor.Util)
-local acts = require(Globals.Vendor.Acts)
-local Signals = require(Globals.Shared.Signals)
 local MouseOver = require(Globals.Vendor.MouseOverModule)
-local weapons = require(Globals.Client.Controllers.WeaponController)
-local giftService = require(Globals.Client.Services.GiftsService)
-local gifts = require(Globals.Shared.Gifts)
+local Signals = require(Globals.Shared.Signals)
+local SoulsService = require(Globals.Client.Services.SoulsService)
+local acts = require(Globals.Vendor.Acts)
+local characterController = require(Globals.Client.Controllers.CharacterController)
 local codexService = require(Globals.Client.Services.CodexService)
 local gameSettings = require(Globals.Shared.GameSettings)
-local SoulsService = require(Globals.Client.Services.SoulsService)
+local giftService = require(Globals.Client.Services.GiftsService)
+local gifts = require(Globals.Shared.Gifts)
 local net = require(Globals.Packages.Net)
-local characterController = require(Globals.Client.Controllers.CharacterController)
+local util = require(Globals.Vendor.Util)
+local weapons = require(Globals.Client.Controllers.WeaponController)
 
 --// Values
 local mapInFocus = false
@@ -828,18 +829,23 @@ local function loadArsenal(frame)
 	local defaultStats = {
 		Type = "Pistol",
 		Damage = 1,
-		FireDelay = 0.2,
+		FireDelay = workspace:GetAttribute("CleanseAndRepent_Tier") >= 3 and (0.2 / 1.25) or 0.2,
 		BulletCount = 1,
 		Crosshair = "Default",
 		Effect = "Akimbo",
 		Recoil = {
 			RecoilVector = Vector3.new(-1.75, 0.3, 0),
 			RandomVector = Vector3.new(0.2, 0.1, 4),
-			Magnitude = 1,
+			Magnitude = workspace:GetAttribute("CleanseAndRepent_Tier") >= 1 and 0.75 or 1,
 			Speed = 0.75,
 		},
 	}
-	local gunStats = weaponModel:FindFirstChild("Data") and require(weaponModel.Data) or defaultStats
+
+	local gunStats = defaultStats
+
+	if weapon and ViewmodelService.viewModels[1].Model:FindFirstChild(weapon.Name, true) then
+		gunStats = require(ViewmodelService.viewModels[1].Model:FindFirstChild(weapon.Name, true).Data)
+	end
 
 	local recoil = (gunStats.Recoil.RecoilVector.Magnitude * gunStats.Recoil.Magnitude) / (gunStats.Recoil.Speed / 2)
 	local fireRate = (60 / gunStats.FireDelay) / 60

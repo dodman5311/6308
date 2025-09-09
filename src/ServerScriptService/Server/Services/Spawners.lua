@@ -1,16 +1,16 @@
 local module = {}
 
+local CollectionService = game:GetService("CollectionService")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local Players = game:GetService("Players")
-local CollectionService = game:GetService("CollectionService")
 
 local map = workspace.Map
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
+local HandleNpcs = require(Globals.Server.HandleNpcs)
 local UiAnimationService = require(Globals.Vendor.UIAnimationService)
 local net = require(Globals.Packages.Net)
-local HandleNpcs = require(Globals.Server.HandleNpcs)
 local signals = require(Globals.Shared.Signals)
 local upgrades = require(Globals.Shared.Upgrades)
 
@@ -139,7 +139,16 @@ local function getList(currentLevel, type, noChance)
 end
 
 local function getRandomObjectOfType(currentLevel, type, noChance)
-	local getObjects = getList(currentLevel, type, noChance)
+	local getObjects = {}
+	if type == "Weapon" then
+		getObjects = getList(currentLevel, type, false)
+		if #getObjects == 0 then
+			getObjects = getList(currentLevel, type, true)
+		end
+	else
+		getObjects = getList(currentLevel, type, noChance)
+	end
+
 	if #getObjects == 0 then
 		return
 	end
@@ -186,7 +195,6 @@ function module.placeNewObject(currentLevel, cframe, type, objectName, noChance)
 		selectedObject = getRandomObjectOfType(currentLevel, type, noChance)
 
 		if type == "Weapon" then
-			print(selectedObject.Name)
 			selectedObject = checkForUpgradedWeapon(selectedObject)
 		end
 	end
@@ -287,6 +295,16 @@ function module.spawnEnemies(currentLevel, mapOverride)
 end
 
 function module.spawnWeapons(currentLevel, mapOverride)
+	for _, weapon in ipairs(ReplicatedStorage.Assets.Models.WeaponPickups:GetChildren()) do
+		local upgradeTier = workspace:GetAttribute(string.gsub(string.gsub(weapon.Name, " ", ""), "-", "") .. "_Tier")
+
+		print(upgradeTier)
+		if not upgradeTier then
+			continue
+		end
+		weapon:SetAttribute("SpawnChance", upgradeTier * 5)
+	end
+
 	local weaponsSpawned = 0
 
 	local spawnIn = mapOverride or map
@@ -405,6 +423,5 @@ net:Handle("GetEnemies", function()
 
 	return enemyCFrames
 end)
-
 
 return module

@@ -42,11 +42,11 @@ function module.Init(player, ui, frame)
 	end)
 end
 
-function module.Toggle(player, ui, frame, Value)
+function module.Toggle(player, ui, frame, Value, index)
 	if Value then
-		cursorScale:Add()
+		cursorScale:Add(index)
 	else
-		cursorScale:Remove()
+		cursorScale:Remove(index)
 	end
 end
 
