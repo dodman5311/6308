@@ -15,7 +15,7 @@ local player = Players.LocalPlayer
 --// Modules
 local gifts = require(Globals.Shared.Gifts)
 local net = require(Globals.Packages.Net)
-local signal = require(Globals.Packages.Signal)
+local signal = require(ReplicatedStorage.Packages.Signal)
 local signals = require(Globals.Signals)
 
 local UIService = require(Globals.Client.Services.UIService)

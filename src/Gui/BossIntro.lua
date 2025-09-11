@@ -10,7 +10,6 @@ local StarterPlayer = game:GetService("StarterPlayer")
 local UserInputService = game:GetService("UserInputService")
 
 --// Instances
-local GiftsService = require(StarterPlayer.StarterPlayerScripts.Client.Services.GiftsService)
 local Globals = require(ReplicatedStorage.Shared.Globals)
 
 local assets = ReplicatedStorage.Assets
@@ -22,6 +21,7 @@ voice.Volume = 1.5
 voice.SoundGroup = SoundService.Voice
 
 --// Modules
+local GiftsService = require(Globals.Client.Services.GiftsService)
 local MouseOver = require(Globals.Vendor.MouseOverModule)
 local Signal = require(Globals.Packages.Signal)
 local Signals = require(Globals.Shared.Signals)

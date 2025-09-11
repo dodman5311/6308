@@ -1,9 +1,9 @@
 local module = {}
 
 --// Services
+local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CollectionService = game:GetService("CollectionService")
 local Teams = game:GetService("Teams")
 
 --// Instances
@@ -12,9 +12,9 @@ local Globals = require(ReplicatedStorage.Shared.Globals)
 local map = workspace.Map
 
 --// Modules
-local Util = require(Globals.Vendor.Util)
 local AnimationService = require(Globals.Vendor.AnimationService)
 local Net = require(Globals.Packages.Net)
+local Util = require(Globals.Vendor.Util)
 
 --// Values
 
@@ -859,10 +859,8 @@ function module.PlaySound(npc, soundName: string, chance: number?)
 		return
 	end
 
-
-
 	local soundPart = Instance.new("Part")
-	
+
 	soundPart.CanCollide = false
 	soundPart.CanQuery = false
 	soundPart.Transparency = 1
@@ -874,7 +872,6 @@ function module.PlaySound(npc, soundName: string, chance: number?)
 	newWeld.Parent = soundPart
 	newWeld.Part0 = npc.Instance.PrimaryPart
 	newWeld.Part1 = soundPart
-
 
 	npc.MindData.VoicePlaying = Util.PlaySound(sound, soundPart, 0.05)
 
@@ -916,13 +913,11 @@ end
 function module.AssignVoice(npc)
 	local voicesFolder = npc.Instance:FindFirstChild("Voice")
 	if not voicesFolder then
-		print("A")
 		return
 	end
 
 	local voiceFolder = Util.getRandomChild(voicesFolder)
 	if voiceFolder then
-		print("B")
 		for _, voice in ipairs(voiceFolder:GetChildren()) do
 			voice.Parent = voicesFolder
 		end

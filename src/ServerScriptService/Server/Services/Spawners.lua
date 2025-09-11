@@ -298,7 +298,6 @@ function module.spawnWeapons(currentLevel, mapOverride)
 	for _, weapon in ipairs(ReplicatedStorage.Assets.Models.WeaponPickups:GetChildren()) do
 		local upgradeTier = workspace:GetAttribute(string.gsub(string.gsub(weapon.Name, " ", ""), "-", "") .. "_Tier")
 
-		print(upgradeTier)
 		if not upgradeTier then
 			continue
 		end

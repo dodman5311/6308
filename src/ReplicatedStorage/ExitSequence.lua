@@ -5,10 +5,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
-local spawners = require(Globals.Services.Spawners)
-local net = require(Globals.Packages.Net)
-local mapService = require(Globals.Server.Services.MapService)
 local dataStore = require(Globals.Server.Services.DataStore)
+local mapService = require(Globals.Server.Services.MapService)
+local net = require(Globals.Packages.Net)
+local spawners = require(Globals.Services.Spawners)
 local upgrades = require(Globals.Shared.Upgrades)
 
 local function reverse(number, max)
@@ -33,8 +33,6 @@ module.Exit = function(player, start_time, stage_number, level_number, bossBeate
 		end
 
 		table.insert(arenas, arena)
-
-		print(arena:GetAttribute("Status"))
 
 		if arena:GetAttribute("Status") == "Completed" then
 			table.insert(arenasCompleted, arena)

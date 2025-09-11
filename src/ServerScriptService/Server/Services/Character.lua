@@ -143,13 +143,10 @@ local function onDied(player: Player)
 		)
 	end
 
-	--if mapService.CurrentLevel == math.round(mapService.CurrentLevel) then
-	print(mapService.CurrentStage)
-
 	workspace:SetAttribute("SaveStage", dataStore.stageState.Stage or 1)
 
 	print((workspace:GetAttribute("DeathCount") + 1) * 200, workspace:GetAttribute("TotalScore"))
-	if workspace:GetAttribute("TotalScore") > (workspace:GetAttribute("DeathCount") + 1) * 200 then -- req check
+	if workspace:GetAttribute("TotalScore") >= (workspace:GetAttribute("DeathCount") + 1) * 200 then -- req check
 		mapService.CurrentStage = 0
 		workspace:SetAttribute("DeathCount", workspace:GetAttribute("DeathCount") + 1)
 

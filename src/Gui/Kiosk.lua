@@ -793,8 +793,6 @@ function module.applyGiftChange(name)
 	elseif name == "Knights_Crit_Epic" then
 		weapons.critChances.Melee += 3
 	end
-
-	print(weapons.critChances)
 end
 
 function module.chooseRandomGift(player, ui, frame, catagory)

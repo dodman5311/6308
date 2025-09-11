@@ -9,6 +9,7 @@ local Lighting = game:GetService("Lighting")
 local uis = game:GetService("UserInputService")
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StarterPlayer = game:GetService("StarterPlayer")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 
@@ -43,7 +44,6 @@ function module.fillDashes()
 end
 
 function module.Dash(subject)
-	print(module.canDash)
 	if
 		(workspace:GetAttribute("Righteous_Motion") <= 0 or not module.extraDash)
 		and (

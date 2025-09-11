@@ -114,7 +114,7 @@ local commands = {
 			end,
 
 			ExecuteClient = function(_, levelsPassed, combatLevel)
-				local GiftsService = require(StarterPlayer.StarterPlayerScripts.Client.Services.GiftsService)
+				local GiftsService = require(Players.LocalPlayer.PlayerScripts.Client.Services.GiftsService)
 
 				local weapons = require(Globals.Client.Controllers.WeaponController)
 				local kiosk = require(ReplicatedStorage.Gui.Kiosk)
@@ -343,7 +343,7 @@ local commands = {
 			end,
 
 			ExecuteClient = function(_, amount)
-				local GiftsService = require(StarterPlayer.StarterPlayerScripts.Client.Services.GiftsService)
+				local GiftsService = require(Players.LocalPlayer.PlayerScripts.Client.Services.GiftsService)
 				local perkIndexes = {}
 				local upgradeIndexes = {}
 
@@ -379,7 +379,7 @@ local commands = {
 			end,
 
 			ExecuteClient = function(_, Perk)
-				local GiftsService = require(StarterPlayer.StarterPlayerScripts.Client.Services.GiftsService)
+				local GiftsService = require(Players.LocalPlayer.PlayerScripts.Client.Services.GiftsService)
 				GiftsService.AddGift(Perk)
 			end,
 		},
@@ -393,7 +393,7 @@ local commands = {
 			end,
 
 			ExecuteClient = function(_, Upgrade)
-				local GiftsService = require(StarterPlayer.StarterPlayerScripts.Client.Services.GiftsService)
+				local GiftsService = require(Players.LocalPlayer.PlayerScripts.Client.Services.GiftsService)
 				GiftsService.AddGift(Upgrade)
 			end,
 		},
@@ -407,7 +407,7 @@ local commands = {
 			end,
 
 			ExecuteClient = function(_, Special)
-				local GiftsService = require(StarterPlayer.StarterPlayerScripts.Client.Services.GiftsService)
+				local GiftsService = require(Players.LocalPlayer.PlayerScripts.Client.Services.GiftsService)
 				GiftsService.AddGift(Special)
 			end,
 		},

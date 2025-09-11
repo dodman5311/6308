@@ -29,7 +29,7 @@ stylua = { name = "pesde/stylua", version = "^2.1.0", target = "lune" }
 
 [dependencies]
 ProfileService = { wally = "surnautica/profileservice", version = "^1.0.0" }
-Signal = { wally = "sleitnick/signal", version = "^1.5.0" }
+Signal = { wally = "sleitnick/signal", version = "^2.0.3" }
 Promise = { wally = "evaera/promise", version = "^4.0.0" }
 Net = { wally = "sleitnick/net", version = "^0.1.0" }
 Janitor = { wally = "howmanysmall/janitor", version = "^1.15.6" }

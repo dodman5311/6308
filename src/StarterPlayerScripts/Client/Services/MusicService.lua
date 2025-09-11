@@ -4,9 +4,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 
-local util = require(Globals.Vendor.Util)
-local timer = require(Globals.Vendor.Timer):newQueue()
 local soulsService = require(Globals.Client.Services.SoulsService)
+local timer = require(Globals.Vendor.Timer):newQueue()
+local util = require(Globals.Vendor.Util)
 
 local net = require(Globals.Packages.Net)
 
@@ -82,8 +82,6 @@ function module.playMusic(level)
 	module.stopMusic()
 
 	currentPlaying = music:FindFirstChild(level)
-
-	print(level, currentPlaying)
 
 	if not currentPlaying then
 		return

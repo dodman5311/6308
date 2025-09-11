@@ -62,8 +62,6 @@ local function DoubleJump()
 			if giftService.CheckGift("Master_Scouting") then
 				doubleJump = true
 
-				print(workspace:GetAttribute("Master_Scouting"))
-
 				if workspace:GetAttribute("Master_Scouting") > 0 then
 					extraDoubleJump = true
 				end

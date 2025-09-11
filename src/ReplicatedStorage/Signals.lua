@@ -1,7 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Globals = require(ReplicatedStorage.Shared.Globals)
-local signal = require(Globals.Packages.Signal)
+local signal = require(ReplicatedStorage.Packages.Signal)
 
 local signals = {
 	ToggleConsole = signal.new(),
@@ -18,7 +17,7 @@ local signals = {
 	Slide = signal.new(),
 	AddArmor = signal.new(),
 	LoadSavedDataFromClient = signal.new(),
-	DoUiAction = signal.new()
+	DoUiAction = signal.new(),
 }
 
 function signals:addSignal(index)

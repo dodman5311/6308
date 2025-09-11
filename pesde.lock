@@ -222,10 +222,10 @@ direct = ["Net", { wally = "wally#sleitnick/net", version = "^0.1.0", index = "d
 ref_ty = "wally"
 index_url = "https://github.com/UpliftGames/wally-index"
 
-[graph."wally#sleitnick/signal@1.5.0 roblox"]
-direct = ["Signal", { wally = "wally#sleitnick/signal", version = "^1.5.0", index = "default" }, "standard"]
+[graph."wally#sleitnick/signal@2.0.3 roblox"]
+direct = ["Signal", { wally = "wally#sleitnick/signal", version = "^2.0.3", index = "default" }, "standard"]
 
-[graph."wally#sleitnick/signal@1.5.0 roblox".pkg_ref]
+[graph."wally#sleitnick/signal@2.0.3 roblox".pkg_ref]
 ref_ty = "wally"
 index_url = "https://github.com/UpliftGames/wally-index"
 

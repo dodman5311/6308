@@ -161,17 +161,14 @@ function module.Init(player, ui, frame)
 	connectGiftButtonHover(choices.Card_3.Button)
 
 	choices.Card_1.Button.MouseButton1Click:Connect(function()
-		print(1)
 		givePerk(frame, 1)
 	end)
 
 	choices.Card_2.Button.MouseButton1Click:Connect(function()
-		print(2)
 		givePerk(frame, 2)
 	end)
 
 	choices.Card_3.Button.MouseButton1Click:Connect(function()
-		print(3)
 		givePerk(frame, 3)
 	end)
 end

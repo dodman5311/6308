@@ -37,7 +37,6 @@ function module.Init(player, ui, frame)
 	-- end)
 
 	cursorScale.Changed:Connect(function(value)
-		print(value)
 		frame.Cursor.Visible = value
 	end)
 end

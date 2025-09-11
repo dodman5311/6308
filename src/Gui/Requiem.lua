@@ -10,7 +10,7 @@ local StarterPlayer = game:GetService("StarterPlayer")
 local UserInputService = game:GetService("UserInputService")
 
 --// Instances
-local GiftsService = require(StarterPlayer.StarterPlayerScripts.Client.Services.GiftsService)
+
 local Globals = require(ReplicatedStorage.Shared.Globals)
 
 local assets = ReplicatedStorage.Assets
@@ -19,7 +19,9 @@ local sfx = sounds.Kiosk
 local camera = workspace.CurrentCamera
 
 --// Modules
+
 local Gifts = require(ReplicatedStorage.Shared.Gifts)
+local GiftsService = require(Globals.Client.Services.GiftsService)
 local MouseOverModule = require(ReplicatedStorage.Vendor.MouseOverModule)
 local Net = require(ReplicatedStorage.Packages.Net)
 local Scales = require(ReplicatedStorage.Vendor.Scales)
