@@ -47,6 +47,7 @@ local upgradeIndexOrder = {
 	"Stage_3_Perks",
 }
 local currentTreeIndex = 1
+local lock = false
 local infoBoxScale = Scales.new("ShowInfoBox")
 
 --// Functions
@@ -194,7 +195,7 @@ local function setTreeIndex(frame, index: number, reverse: boolean?)
 	end
 end
 
-function module.ShowRequiemShop(_, ui, frame)
+function module.ShowRequiemShop(_, ui, frame, inMenu)
 	local ti = TweenInfo.new(0.1)
 
 	frame.Fade.BackgroundTransparency = 0
@@ -202,7 +203,18 @@ function module.ShowRequiemShop(_, ui, frame)
 	util.tween(frame.Fade, ti, { BackgroundTransparency = 1 })
 
 	frame.Frame.Visible = true
-	frame.Background.Visible = true
+
+	if inMenu then
+		frame.Gui.DisplayOrder = 10
+		frame.Background.Visible = false
+		lock = true
+		frame.Frame.Size = UDim2.fromScale(0.9, 0.9)
+	else
+		frame.Gui.DisplayOrder = 9
+		frame.Background.Visible = true
+		lock = false
+		frame.Frame.Size = UDim2.fromScale(1, 1)
+	end
 
 	Signals.DoUiAction:Fire("Cursor", "Toggle", true, "Requiem")
 	frame.Gui.Enabled = true
@@ -297,6 +309,10 @@ function module.Init(player, ui, frame)
 			local button: ImageButton = buttonFrame.Button
 			button.MouseButton1Click:Connect(function()
 				-- upgrade event
+
+				if lock then
+					return
+				end
 				local category = buttonFrame.Parent.Parent.Name
 				local tierName = buttonFrame.Parent.Name
 				local tierNumber = tonumber(buttonFrame.Name)

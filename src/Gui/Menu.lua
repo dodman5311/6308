@@ -11,8 +11,10 @@ local TeleportService = game:GetService("TeleportService")
 local UserInputService = game:GetService("UserInputService")
 
 --// Instances
+local ChanceService = require(ReplicatedStorage.Vendor.ChanceService)
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local ViewmodelService = require(ReplicatedStorage.Vendor.ViewmodelService)
+local profileservice = require(ReplicatedStorage.Packages[".pesde"]["surnautica_profileservice@1.0.0"].profileservice)
 
 local assets = ReplicatedStorage.Assets
 local sounds = assets.Sounds
@@ -291,6 +293,90 @@ local buttonFunctions = {
 			local ti = TweenInfo.new(0.25, Enum.EasingStyle.Linear)
 
 			util.tween(frame[button.Name .. "_Lbl"], ti, { ImageColor3 = Color3.fromRGB(255, 255, 255) })
+		end,
+	},
+
+	PerksPage = {
+		Action = function(button, player, ui, frame)
+			frame.Perks_Page.Visible = true
+			frame.Combat_Page.Visible = false
+			Signals.DoUiAction:Fire("Requiem", "HideRequiemShop")
+		end,
+
+		Entered = function(button, player, ui, frame)
+			local ti = TweenInfo.new(0.2, Enum.EasingStyle.Quart)
+
+			util.tween(
+				frame[button.Name .. "_Lbl"],
+				ti,
+				{ ImageColor3 = Color3.fromRGB(0, 255, 225), Size = UDim2.fromScale(1.01, 1.01) }
+			)
+		end,
+
+		Left = function(button, player, ui, frame)
+			local ti = TweenInfo.new(0.2, Enum.EasingStyle.Quart)
+
+			util.tween(
+				frame[button.Name .. "_Lbl"],
+				ti,
+				{ ImageColor3 = Color3.fromRGB(170, 255, 225), Size = UDim2.fromScale(1, 1) }
+			)
+		end,
+	},
+
+	CombatPage = {
+		Action = function(button, player, ui, frame)
+			frame.Perks_Page.Visible = false
+			frame.Combat_Page.Visible = true
+			Signals.DoUiAction:Fire("Requiem", "HideRequiemShop")
+		end,
+
+		Entered = function(button, player, ui, frame)
+			local ti = TweenInfo.new(0.2, Enum.EasingStyle.Quart)
+
+			util.tween(
+				frame[button.Name .. "_Lbl"],
+				ti,
+				{ ImageColor3 = Color3.fromRGB(255, 115, 0), Size = UDim2.fromScale(1.01, 1.01) }
+			)
+		end,
+
+		Left = function(button, player, ui, frame)
+			local ti = TweenInfo.new(0.2, Enum.EasingStyle.Quart)
+
+			util.tween(
+				frame[button.Name .. "_Lbl"],
+				ti,
+				{ ImageColor3 = Color3.fromRGB(255, 170, 145), Size = UDim2.fromScale(1, 1) }
+			)
+		end,
+	},
+
+	RequiemPage = {
+		Action = function(button, player, ui, frame)
+			frame.Perks_Page.Visible = false
+			frame.Combat_Page.Visible = false
+			Signals.DoUiAction:Fire("Requiem", "ShowRequiemShop", true)
+		end,
+
+		Entered = function(button, player, ui, frame)
+			local ti = TweenInfo.new(0.2, Enum.EasingStyle.Quart)
+
+			util.tween(
+				frame[button.Name .. "_Lbl"],
+				ti,
+				{ ImageColor3 = Color3.fromRGB(175, 0, 255), Size = UDim2.fromScale(1.01, 1.01) }
+			)
+		end,
+
+		Left = function(button, player, ui, frame)
+			local ti = TweenInfo.new(0.2, Enum.EasingStyle.Quart)
+
+			util.tween(
+				frame[button.Name .. "_Lbl"],
+				ti,
+				{ ImageColor3 = Color3.fromRGB(225, 170, 255), Size = UDim2.fromScale(1, 1) }
+			)
 		end,
 	},
 
@@ -616,6 +702,7 @@ local function hideAllMenus(frame)
 	RunService:UnbindFromRenderStep("ProcessMapCamera")
 	RunService:UnbindFromRenderStep("RotateWeapon")
 	RunService:UnbindFromRenderStep("ResizeScrollBar")
+	Signals.DoUiAction:Fire("Requiem", "HideRequiemShop")
 
 	local ti = TweenInfo.new(0.1, Enum.EasingStyle.Linear)
 
@@ -742,7 +829,7 @@ end
 
 local function loadPerksList(frame)
 	local getGifts = giftService.AquiredGifts
-	local perkList = frame.PerksList
+	local perkList = frame.PerkList
 
 	for _, button in ipairs(perkList:GetChildren()) do
 		if not button:IsA("ImageButton") then
@@ -752,8 +839,13 @@ local function loadPerksList(frame)
 		button:Destroy()
 	end
 
+	frame.PerkInfo.Text = ""
+	frame.PerkName.Text = ""
+	frame.PerkCategory.Text = ""
+	frame.PerkDisplayIcon.Image = ""
+
 	for _, gift in ipairs(getGifts) do
-		local button = frame.Empty:Clone()
+		local button = frame.PerkButton:Clone()
 		button.Name = gift
 		button.Parent = perkList
 		button.Visible = true
@@ -776,30 +868,42 @@ local function loadPerksList(frame)
 		enter:Connect(function()
 			local ti = TweenInfo.new(0.2, Enum.EasingStyle.Quart)
 
-			util.tween(button.Icon, ti, { Size = UDim2.fromScale(1.2, 1.2) })
+			util.tween(button.Icon, ti, { Size = UDim2.fromScale(0.75, 0.75) })
 
 			frame.PerkInfo.Text = giftData.Desc
-			frame.PerkInfo.Visible = true
-			frame.WeaponViewport.Visible = false
-
-			frame.PerkInfo.PerkName.Text = string.gsub(gift, "_", " ")
+			frame.PerkName.Text = string.gsub(gift, "_", " ")
+			frame.PerkCategory.Text = table.concat(giftData.Catagories, " | ")
+			frame.PerkDisplayIcon.Image = giftData.Icon
 		end)
 
 		leave:Connect(function()
 			local ti = TweenInfo.new(0.1, Enum.EasingStyle.Quad)
 
-			util.tween(button.Icon, ti, { Size = UDim2.fromScale(1, 1) })
-
-			frame.PerkInfo.Visible = false
-			frame.WeaponViewport.Visible = true
+			util.tween(button.Icon, ti, { Size = UDim2.fromScale(0.6, 0.6) })
 		end)
+	end
+end
+
+function module.UpdateStats(_, _, frame)
+	local luck = frame.Player_Stats.Luck
+
+	luck.Text = "Luck " .. ChanceService.getLuck()
+
+	for _, statLabel in ipairs(frame.Player_Stats:GetChildren()) do
+		local crit = weapons.critChances[statLabel.Name]
+
+		if not crit then
+			continue
+		end
+
+		statLabel.Visible = crit > 0
+		statLabel.Text = statLabel.Name .. " " .. crit .. "%"
 	end
 end
 
 local function loadArsenal(frame)
 	local viewport = frame.WeaponViewport
 	viewport.Visible = true
-	frame.PerkInfo.Visible = false
 
 	local Model = viewport:FindFirstChildOfClass("Model")
 	if Model then
@@ -824,6 +928,10 @@ local function loadArsenal(frame)
 
 	RunService:BindToRenderStep("RotateWeapon", Enum.RenderPriority.Camera.Value, function()
 		weaponModel:PivotTo(weaponModel:GetPivot() * CFrame.Angles(0, math.rad(0.5), 0))
+
+		local list: ScrollingFrame = frame.PerkList
+
+		list.ScrollBarThickness = list.AbsoluteSize.X / 30
 	end)
 
 	local defaultStats = {
@@ -879,6 +987,10 @@ local function loadArsenal(frame)
 	frame.WeaponIcon.Image = icon
 
 	frame.Effect_Lbl.Text = gunStats.Effect
+
+	if frame.Perks_Page.Visible == false and frame.Combat_Page.Visible == false then
+		Signals.DoUiAction:Fire("Requiem", "ShowRequiemShop", true)
+	end
 end
 
 local function loadCodex(frame)
@@ -1084,7 +1196,7 @@ function module.openArsenal(player, ui, frame)
 	hideAllMenus(frame)
 	loadArsenal(frame)
 	loadPerksList(frame)
-
+	module.UpdateStats(player, ui, frame)
 	local ti = TweenInfo.new(0.1, Enum.EasingStyle.Linear)
 	frame.Arsenal_Menu.Visible = true
 

@@ -43,7 +43,7 @@ local module = {
 	},
 
 	OnDied = {
-		{ Function = "PlaySound", Parameters = { "Death" } },
+		{ Function = "PlaySound", Parameters = { "Death", 60 } },
 		{ Function = "SetCollision", Parameters = { "DeadBody" } },
 		{ Function = "SwitchToState", Parameters = { "Dead" } },
 		{ Function = "Ragdoll" },

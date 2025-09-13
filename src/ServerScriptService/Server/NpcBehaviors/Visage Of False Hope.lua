@@ -1,6 +1,6 @@
+local AnalyticsService = game:GetService("AnalyticsService")
 local BadgeService = game:GetService("BadgeService")
 local CollectionService = game:GetService("CollectionService")
-local AnalyticsService = game:GetService("AnalyticsService")
 local rng = Random.new()
 
 local HttpService = game:GetService("HttpService")
@@ -13,10 +13,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
-local spawners = require(Globals.Server.Services.Spawners)
 local net = require(Globals.Packages.Net)
-local util = require(Globals.Vendor.Util)
+local spawners = require(Globals.Server.Services.Spawners)
 local timer = require(Globals.Vendor.Timer)
+local util = require(Globals.Vendor.Util)
 
 local vfx = net:RemoteEvent("ReplicateEffect")
 local createProjectileRemote = net:RemoteEvent("CreateProjectile")

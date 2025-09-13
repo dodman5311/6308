@@ -47,13 +47,13 @@ local module = {
 	},
 
 	TargetFound = {
-		{ Function = "PlaySound", Parameters = { "Notice", 5 } },
+		{ Function = "PlaySound", Parameters = { "Notice", 15 } },
 		{ Function = "SwitchToState", Parameters = { "Attacking" } },
 		{ Function = "MoveTowardsTarget" },
 	},
 
 	TargetLost = {
-		{ Function = "PlaySound", Parameters = { "Lost", 1 } },
+		{ Function = "PlaySound", Parameters = { "Lost", 5 } },
 		{ Function = "SwitchToState", Parameters = { "Chasing" } },
 		{ Function = "MoveTowardsTarget" },
 	},
