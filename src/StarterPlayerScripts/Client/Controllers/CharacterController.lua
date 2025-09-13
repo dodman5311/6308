@@ -89,9 +89,14 @@ local function loadSaveData(upgradeIndex, gameState)
 
 	soulsService.AddSoul(gameState["Souls"] or 0)
 
-	if gameState["critChances"] then
-		weaponService.critChances = gameState.critChances
-	end
+	weaponService.critChances = gameState["critChances"]
+		or {
+			AR = 0,
+			Pistol = 0,
+			Shotgun = 0,
+			Melee = 0,
+		}
+
 	ChanceService.luck = gameState["Luck"] or 0
 	kiosk.tickets = gameState["PerkTickets"] or 0
 
@@ -232,6 +237,7 @@ end
 
 function module:OnDied()
 	kiosk.tickets = 0
+	ChanceService.luck = 0
 
 	deathEffect()
 	UIService.doUiAction("HUD", "HideBossBar")

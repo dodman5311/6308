@@ -2415,6 +2415,12 @@ function module:OnSpawn()
 		},
 	}
 
+	EquipDefault()
+
+	animationService:playAnimation(viewmodel.Model, "DefaultIdle", Enum.AnimationPriority.Core.Value)
+end
+
+function module.OnDied()
 	module.critChances = {
 		AR = 0,
 		Pistol = 0,
@@ -2422,12 +2428,6 @@ function module:OnSpawn()
 		Melee = 0,
 	}
 
-	EquipDefault()
-
-	animationService:playAnimation(viewmodel.Model, "DefaultIdle", Enum.AnimationPriority.Core.Value)
-end
-
-function module.OnDied()
 	mouseButton1Down = false
 	Overcharge = 0
 end

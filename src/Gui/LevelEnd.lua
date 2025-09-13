@@ -152,6 +152,16 @@ function module.ShowLevelEnd(player, ui, frame, levelData)
 		}
 	end
 
+	if levelData.Name == "The Requiem" then
+		frame.Combo.Visible = false
+		frame.Enemies.Visible = false
+		frame.Items.Visible = false
+	else
+		frame.Combo.Visible = true
+		frame.Enemies.Visible = true
+		frame.Items.Visible = true
+	end
+
 	frame.MapName.Text = levelData.Name
 
 	TimeValue.Value = 0
@@ -179,6 +189,18 @@ function module.ShowLevelEnd(player, ui, frame, levelData)
 	util.tween(TimeValue, ti, { Value = levelData.TimeTaken }, true)
 
 	task.wait(0.5)
+
+	if levelData.Name == "The Requiem" then
+		task.wait(2)
+
+		task.delay(0.5, function()
+			frame.Frame.GroupTransparency = 1
+			frame.Gui.Enabled = false
+			UiAnimator.StopAnimation(frame.Skull)
+			UiAnimator.StopAnimation(frame.Score.RCoin)
+		end)
+		return 0
+	end
 
 	util.tween(EnemiesValue, ti, { Value = levelData.EnemiesKilled }, true)
 	util.PlaySound(sounds.RCoinsSmall, script, 0.05)

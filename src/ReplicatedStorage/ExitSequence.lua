@@ -22,6 +22,7 @@ end
 module.Exit = function(player, start_time, stage_number, level_number, bossBeaten)
 	local arenas = {}
 	local arenasCompleted = {}
+	local comboCount = 10
 
 	local stageFolder = ServerStorage:FindFirstChild("Stage_" .. mapService.CurrentStage)
 	local boss_name = stageFolder:GetAttribute("MainBoss")
@@ -41,6 +42,7 @@ module.Exit = function(player, start_time, stage_number, level_number, bossBeate
 
 	local enemies = CollectionService:GetTagged("Enemy") or {}
 
+	local spawnedEnemies = spawners.EnemiesSpawned
 	local spawnedArenas = math.clamp(#arenas, 1, math.huge)
 	local arenaCount = math.clamp(#arenasCompleted, 1, math.huge)
 	local enemyCount = #enemies
@@ -55,17 +57,26 @@ module.Exit = function(player, start_time, stage_number, level_number, bossBeate
 		title = "The Sewers"
 	end
 
+	if not bossBeaten then
+		comboCount = net:RemoteFunction("GetMaxCombo"):InvokeClient(player)
+	end
+
 	if stage_number == 0 then
 		bossBeaten = "The Requiem"
 		workspace:SetAttribute("TotalScore", 0)
+		comboCount = 0
+		spawnedArenas = 1
+		arenaCount = 0
+		spawnedEnemies = 1
+		enemyCount = 0
 	end
 
 	local levelData = {
 		Name = bossBeaten or title .. " : " .. level_number,
 		TimeTaken = math.round(os.clock() - start_time),
-		EnemiesKilled = reverse(enemyCount, spawners.EnemiesSpawned) * 100,
+		EnemiesKilled = reverse(enemyCount, spawnedEnemies) * 100,
 		ArenasCompleted = arenaCount / spawnedArenas * 100,
-		MaxCombo = bossBeaten and 10 or net:RemoteFunction("GetMaxCombo"):InvokeClient(player),
+		MaxCombo = comboCount,
 	}
 
 	local maxScore = levelData.EnemiesKilled + levelData.ArenasCompleted + (levelData.MaxCombo * 10)
