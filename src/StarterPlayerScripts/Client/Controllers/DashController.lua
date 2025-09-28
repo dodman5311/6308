@@ -12,6 +12,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterPlayer = game:GetService("StarterPlayer")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
+local signal = require(ReplicatedStorage.Packages[".pesde"]["sleitnick_signal@2.0.3"].signal)
 
 local player = game:GetService("Players").LocalPlayer
 local camera = workspace.CurrentCamera
@@ -30,6 +31,8 @@ local momentum = require(Globals.Client.Controllers.AirController)
 local uiService = require(Globals.Client.Services.UIService)
 local util = require(Globals.Vendor.Util)
 
+module.OnLastDashUsed = signal.new()
+
 function module.fillDashes()
 	module.canDash = true
 	module.dashes = 3
@@ -37,25 +40,23 @@ function module.fillDashes()
 	uiService.doUiAction("HUD", "UpdateGiftProgress", "Righteous_Motion", module.dashes / 3)
 	uiService.doUiAction("HUD", "RefreshSideBar")
 
-	if workspace:GetAttribute("Righteous_Motion") > 0 then
-		module.extraDash = true
-	end
+	-- if workspace:GetAttribute("Righteous_Motion") > 0 then
+	-- 	module.extraDash = true
+	-- end
 	--script.LoadedUI:Play()
 end
 
 function module.Dash(subject)
 	if
-		(workspace:GetAttribute("Righteous_Motion") <= 0 or not module.extraDash)
-		and (
-			not module.canDash
-			or not (
-				giftService.CheckGift("Righteous_Motion")
-				or (giftService.CheckGift("Spiked_Sabatons") and workspace:GetAttribute("Spiked_Sabatons") > 0)
-				or (
-					giftService.CheckGift("Brick_Hook")
-					and workspace:GetAttribute("Brick_Hook") > 0
-					and acts:checkAct("GrappleCooldown")
-				)
+
+		not module.canDash
+		or not (
+			giftService.CheckGift("Righteous_Motion")
+			or (giftService.CheckGift("Spiked_Sabatons") and workspace:GetAttribute("Spiked_Sabatons") > 0)
+			or (
+				giftService.CheckGift("Brick_Hook")
+				and workspace:GetAttribute("Brick_Hook") > 0
+				and acts:checkAct("GrappleCooldown")
 			)
 		)
 	then
@@ -73,6 +74,7 @@ function module.Dash(subject)
 		module.dashes -= 1
 		if module.dashes == 0 then
 			module.canDash = false
+			module.OnLastDashUsed:Fire()
 		elseif module.dashes == -1 then
 			module.extraDash = false
 			module.dashes = 1

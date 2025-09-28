@@ -978,7 +978,7 @@ local function loadArsenal(frame)
 		firerateDisplay = math.round(fireRate * 10) / 10
 	end
 
-	frame.Recoil_Num.Text = math.ceil(recoil)
+	frame.Recoil_Num.Text = math.round(recoil)
 	frame.Speed_Num.Text = firerateDisplay
 	frame.WeaponName.Text = weaponModel.Name
 

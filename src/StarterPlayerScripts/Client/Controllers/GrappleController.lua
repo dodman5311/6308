@@ -1,7 +1,7 @@
 --// Services
-local replicatedStorage = game:GetService("ReplicatedStorage")
-local players = game:GetService("Players")
 local CollectionService = game:GetService("CollectionService")
+local players = game:GetService("Players")
+local replicatedStorage = game:GetService("ReplicatedStorage")
 local runService = game:GetService("RunService")
 
 local uis = game:GetService("UserInputService")
@@ -11,16 +11,16 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 
-local util = require(Globals.Vendor.Util)
-local viewModelService = require(Globals.Vendor.ViewmodelService)
-local acts = require(Globals.Vendor.Acts)
-local momentum = require(Globals.Client.Controllers.AirController)
-local animationService = require(Globals.Vendor.AnimationService)
-local Net = require(Globals.Packages.Net)
 local GiftsService = require(Globals.Client.Services.GiftsService)
+local Net = require(Globals.Packages.Net)
+local acts = require(Globals.Vendor.Acts)
+local animationService = require(Globals.Vendor.AnimationService)
+local momentum = require(Globals.Client.Controllers.AirController)
 local signals = require(Globals.Signals)
 local timer = require(Globals.Vendor.Timer)
 local uiService = require(Globals.Client.Services.UIService)
+local util = require(Globals.Vendor.Util)
+local viewModelService = require(Globals.Vendor.ViewmodelService)
 local weapons = require(Globals.Client.Controllers.WeaponController)
 
 --// Instances
@@ -497,7 +497,13 @@ function module.Activate(item)
 	ViewModel = viewModelService.viewModels[1].Model
 
 	acts:createTempAct("ability_invasive", function()
-		local _, characterHit = weapons.FireBullet(0, 0, 300, nil, "Brick_Hook")
+		local chanceOverride = 0
+
+		if workspace:GetAttribute("Brick_Hook") >= 1 then
+			chanceOverride = 10
+		end
+
+		local _, characterHit = weapons.FireBullet(0, 0, 300, nil, "Brick_Hook", "Stun", chanceOverride)
 
 		task.spawn(dealDamage, characterHit)
 

@@ -297,6 +297,20 @@ function module.Init(player, ui, frame)
 		setTreeIndex(frame, currentTreeIndex, true)
 	end)
 
+	frame.ExitButton.MouseButton1Click:Connect(function()
+		module.HideRequiemShop(player, ui, frame)
+	end)
+
+	local enter, leave = MouseOverModule.MouseEnterLeaveEvent(frame.ExitButton)
+
+	enter:Connect(function()
+		frame.ExitButton.BackgroundTransparency = 0.5
+	end)
+
+	leave:Connect(function()
+		frame.ExitButton.BackgroundTransparency = 1
+	end)
+
 	for _, tree in ipairs(frame.Trees:GetChildren()) do
 		if not tree:IsA("CanvasGroup") then
 			continue

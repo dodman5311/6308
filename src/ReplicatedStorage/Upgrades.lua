@@ -399,19 +399,19 @@ local upgrades = {
 		["Righteous_Motion"] = {
 			{
 				Name = "Righteous Motion: Tier 1",
-				Description = "Finishing a manual reload refills dashes.",
+				Description = "Finishing a reload, when out of ammo, refills dashes.",
 				Price = 750,
 			},
 
 			{
 				Name = "Righteous Motion: Tier 2",
-				Description = "After using the third dash, Cleanse and Repent ammo will be refilled.",
+				Description = "After using the third dash, a manual reload will be completed.",
 				Price = 750,
 			},
 
 			{
 				Name = "Righteous Motion: Tier 3",
-				Description = "While dashing, revivng does not require a soul.",
+				Description = "", --@TODO
 				Price = 750,
 			},
 		},
@@ -419,17 +419,17 @@ local upgrades = {
 		["Brick_Hook"] = {
 			{
 				Name = "BrickHook: Tier 1",
-				Description = "Enemies have a 10% chance to be stunned after being hit with brick hook",
+				Description = "Enemies have a 10% chance to be stunned after being hit with brick hook", --@TODO
 				Price = 600,
 			},
 			{
 				Name = "BrickHook: Tier 1",
-				Description = "+15% Shotgun and melee crit chance for 2 second after using brick hook",
+				Description = "+10% crit chance for 2 seconds after using brick hook",
 				Price = 600,
 			},
 			{
 				Name = "BrickHook: Tier 3",
-				Description = "Hitting an enemy with Brick Hook adds +15% soul drop chance for 1 second",
+				Description = "Hitting an enemy with Brick Hook adds +15% soul drop chance for 1 second", --@TODO
 				Price = 600,
 			},
 		},
@@ -437,17 +437,17 @@ local upgrades = {
 		["Spiked_Sabatons"] = {
 			{
 				Name = "Spiked Sabatons: Tier 1",
-				Description = "+10% pistol and rifle crit chance while on a wall",
+				Description = "+10% pistol and rifle crit chance while on a wall", --@TODO
 				Price = 600,
 			},
 			{
 				Name = "Spiked Sabatons: Tier 2",
-				Description = "Dealing crit damage with a pistol or rifle increases soul drop chance by +10% for 1 second",
+				Description = "Dealing crit damage with a pistol or rifle increases soul drop chance by +10% for 1 second", --@TODO
 				Price = 600,
 			},
 			{
 				Name = "Spiked Sabatons: Tier 3",
-				Description = "A long dash can be used by pressing shift",
+				Description = "A long dash can be used by pressing shift", --@TODO
 				Price = 600,
 			},
 		},
@@ -457,75 +457,75 @@ local upgrades = {
 		["Overcharge"] = {
 			{
 				Name = "Overcharge: Tier 1",
-				Description = "Damage not dealt from picked up weapons adds to overcharge",
+				Description = "Damage not dealt from picked up weapons adds to overcharge", --@TODO
 				Price = 500,
 			},
 
 			{
 				Name = "Overcharge: AC/DC",
-				Description = "Upon activation: no infinite ammo, +35% crit chance, crits add +1 ammo",
+				Description = "Upon activation: no infinite ammo, +35% crit chance, crits add +1 ammo", --@TODO
 				Price = 500,
 			},
 
 			{
 				Name = "Overcharge: Perpetual Motion",
-				Description = "Dealing crit damage adds to overcharge, including while overcharge is active",
+				Description = "Dealing crit damage adds to overcharge, including while overcharge is active", --@TODO
 				Price = 500,
 			},
 		},
 
 		["Mag_Launcher"] = {
 			{
-				Name = "Burning Souls : Tier 1",
-				Description = "-1 Second cooldown",
+				Name = "Burning Souls: Tier 1",
+				Description = "-1 Second cooldown", --@TODO
 				Price = 750,
 			},
 			{
-				Name = "Burning Souls : Tier 2",
-				Description = "-1 Second cooldown",
+				Name = "Burning Souls: Tier 2",
+				Description = "-1 Second cooldown", --@TODO
 				Price = 750,
 			},
 			{
-				Name = "Burning Souls : Tier 3",
-				Description = "Launcher grenades are now sticky bombs. Sticky bombs explode after a certain time. They will explode early when shot (+1 Dmg, Splash distance) -- Place holder",
+				Name = "Burning Souls: Tier 3",
+				Description = "Launcher grenades are now sticky bombs. Sticky bombs explode after a certain time. They will explode early when shot (+1 Dmg, Splash distance) -- Place holder", --@TODO
 				Price = 750,
 			},
 		},
 
 		["Burning_Souls"] = {
 			{
-				Name = "Burning Souls : Tier 1",
-				Description = "-1 Second cooldown",
+				Name = "Burning Souls: Tier 1",
+				Description = "-1 Second cooldown", --@TODO
 				Price = 500,
 			},
 			{
-				Name = "Burning Souls : Tier 2",
-				Description = "+1 Fire Range",
+				Name = "Burning Souls: Tier 2",
+				Description = "+1 Fire Range", --@TODO
 				Price = 500,
 			},
 			{
-				Name = "Burning Souls : Tier 3",
-				Description = "Cooldown resets when losing a soul -- Place holder",
+				Name = "Burning Souls: Tier 3",
+				Description = "Cooldown resets when losing a soul -- Place holder", --@TODO
 				Price = 500,
 			},
 		},
 
 		["Galvan_Gaze"] = {
 			{
-				Name = "Galvan Gaze : Tier 1",
-				Description = "No longer requires half health",
+				Name = "Galvan Gaze: Tier 1",
+				Description = "No longer requires half health", --@TODO
 				Price = 500,
 			},
 
 			{
-				Name = "Galvan Gaze : Tier 2",
-				Description = "-1 Second cooldown",
+				Name = "Galvan Gaze: Tier 2",
+				Description = "-1 Second cooldown", --@TODO
 				Price = 500,
 			},
 
 			{
-				Name = "Galvan Gaze : Tier 3",
-				Description = "-5 Second cooldown when at 0 souls -- Place holder",
+				Name = "Galvan Gaze: Tier 3",
+				Description = "-5 Second cooldown when at 0 souls -- Place holder", --@TODO
 				Price = 500,
 			},
 		},
@@ -534,20 +534,20 @@ local upgrades = {
 	Stage_3_Perks = {
 		["Maidenless"] = {
 			{
-				Name = "Tier 1",
-				Description = "+1 armor to maidens blade attack",
+				Name = "Maidenless: Tier 1",
+				Description = "+1 armor to maidens blade attack", --@TODO
 				Price = 500,
 			},
 
 			{
 				Name = "Tier A", -- Survival (soul)
-				Description = "0.5 Second parry time, 1 second cooldown, enemies killed with the Maiden's Blade have a +20% soul chance.",
+				Description = "0.5 Second parry time, 1 second cooldown, enemies killed with the Maiden's Blade have a +20% soul chance.", --@TODO
 				Price = 500,
 			},
 
 			{
 				Name = "Tier B", -- damage (arsenal)
-				Description = "2 second cooldown, no longer drops armor, damage dealt from Maiden's blade will always be a crit. Deals <b>soul</b> damage.",
+				Description = "2 second cooldown, no longer drops armor, damage dealt from Maiden's blade will always be a crit. Deals <b>soul</b> damage.", --@TODO
 				Price = 500,
 			},
 		},

@@ -20,6 +20,7 @@ local SoundService = game:GetService("SoundService")
 local UserInputService = game:GetService("UserInputService")
 
 --// Instances
+local DashController = require(script.Parent.DashController)
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local assets = Globals.Assets
 local reloadSounds = assets.Sounds.Reloading
@@ -555,6 +556,10 @@ local function showMuzzleFlash(flashPart, offset)
 end
 
 local function ReloadDefault()
+	if currentAmmo >= module.defaultMagSize then
+		return
+	end
+
 	local reloadTime = workspace:GetAttribute("CleanseAndRepent_Tier") >= 2 and 1.15 or 1
 
 	if GiftsService.CheckGift("Fast_Mags") then
@@ -596,6 +601,15 @@ local function ReloadDefault()
 		return
 	end
 
+	if
+		GiftsService.CheckGift("Righteous_Motion")
+		and workspace:GetAttribute("Righteous_Motion") >= 1
+		and currentAmmo <= 0
+	then
+		DashController.fillDashes()
+	end
+
+	UIService.doUiAction("HUD", "reload", 0)
 	module.UpdateAmmo(module.defaultMagSize)
 
 	module.UpdateSlot()
@@ -627,6 +641,12 @@ local function completeReload(magSize)
 
 	acts:removeAct("Reloading")
 end
+
+DashController.OnLastDashUsed:Connect(function()
+	if GiftsService.CheckGift("Righteous_Motion") and workspace:GetAttribute("Righteous_Motion") >= 2 then
+		animationService:stopAnimation(viewmodel.Model, "Reload", 0)
+	end
+end)
 
 local function reload(infiniteReloads)
 	if acts:checkAct("Throwing", "Reloading") or not module.currentWeapon then
@@ -937,7 +957,7 @@ local function assignDaisyChain(subject: Model)
 	end
 end
 
-function module.dealDamage(cframe, subject, damage, source, element, chanceOverride, critChanceAddition)
+function module.dealDamage(cframe, subject, damage, source, element, chanceOverride, critChanceAddition, isHeadshot)
 	if not subject or Players:GetPlayerFromCharacter(subject) then
 		return
 	end
@@ -988,6 +1008,9 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 	if ChanceService.checkChance(getCritChance(source, critChanceAddition), true) then
 		critMult = 2
 		util.PlaySound(assets.Sounds.Crit, script, 0.05)
+		if isHeadshot then
+			util.PlaySound(assets.Sounds.Headshot, script, 0.05)
+		end
 	end
 
 	local deadshotDamage = checkDeadshot()
@@ -1259,6 +1282,19 @@ local function addToGib(humanoid, subject, damage)
 	hitHumanoids[humanoid].Damage += damage
 end
 
+local function getRecoilNumber(): number?
+	local recoil = {
+		RecoilVector = Vector3.new(-1.75, 0.3, 0),
+		RandomVector = Vector3.new(0.2, 0.1, 4),
+		Magnitude = workspace:GetAttribute("CleanseAndRepent_Tier") >= 1 and 0.75 or 1,
+		Speed = 0.75,
+	}
+	if module.currentWeapon then
+		recoil = weaponData.Recoil
+	end
+	return (recoil.RecoilVector.Magnitude * recoil.Magnitude) / (recoil.Speed / 2)
+end
+
 function module.FireRaycast(spread, distance, direction)
 	local raycastParams = RaycastParams.new()
 	raycastParams.FilterDescendantsInstances = { camera, player.Character }
@@ -1295,6 +1331,20 @@ function module.FireHitbox(size, cframe)
 
 		return raycast
 	end
+end
+
+local function createKnockback(mult)
+	local character = player.Character
+	if not character or workspace:GetAttribute("Master_Scouting") ~= 3 then
+		return
+	end
+
+	character.PrimaryPart.AssemblyLinearVelocity += (camera.CFrame.LookVector * (-2 * mult)) + Vector3.new(
+		0,
+		mult / 2,
+		0
+	)
+	airController.change()
 end
 
 function module.FireProjectile(projectileType, spread, damage, bulletIndex, element, offsetOverride)
@@ -1360,6 +1410,17 @@ function module.FireBullet(damage, spread, distance, result, source, element, ch
 		return nil, nil, nil, spreadResult
 	end
 
+	local isHeadshot = false
+	if
+		(result.Instance.Name == "Head" or result.Instance:HasTag("IsHead"))
+		and not module.currentWeapon
+		and workspace:GetAttribute("CleanseAndRepent_Tier") >= 3
+	then
+		isHeadshot = true
+		critChanceAddition = critChanceAddition or 0
+		critChanceAddition += 50
+	end
+
 	placeHitEffect(result.Position)
 
 	local ricoObject, isWeapon = RicoshotService.checkRicoshot(result)
@@ -1396,8 +1457,16 @@ function module.FireBullet(damage, spread, distance, result, source, element, ch
 		return hitHumanoid, subject, damageResult, spreadResult
 	end
 
-	local hitHumanoid, subject, damageResult =
-		module.dealDamage(hitCframe, result.Instance, damage, source, element, chanceOverride, critChanceAddition)
+	local hitHumanoid, subject, damageResult = module.dealDamage(
+		hitCframe,
+		result.Instance,
+		damage,
+		source,
+		element,
+		chanceOverride,
+		critChanceAddition,
+		isHeadshot
+	)
 
 	if not hitHumanoid then
 		HitPart(result)
@@ -1462,6 +1531,8 @@ local function FireDefault(extraBullet)
 	if GiftsService.CheckUpgrade("Spicy Pepperoni") then
 		damageAmount = 2
 	end
+
+	createKnockback(getRecoilNumber())
 
 	if deadBoltActive then
 		fireDeadBolt(extraBullet, damageAmount, "Default")
@@ -1696,6 +1767,8 @@ function module.Fire()
 		bulletCount = 10
 	end
 
+	createKnockback(getRecoilNumber())
+
 	if deadBoltActive then
 		fireDeadBolt(extraBullet, bulletDamage, module.currentWeapon.Name, weaponData["Element"])
 	else
@@ -1877,6 +1950,16 @@ local function ThrowWeapon()
 
 	if weaponClone:FindFirstChild("LM6D") then
 		weaponClone.LM6D:Destroy()
+	end
+
+	local character = player.Character
+	if
+		character
+		and character:FindFirstChild("Humanoid")
+		and character.Humanoid.FloorMaterial == Enum.Material.Air
+		and workspace:GetAttribute("Master_Scouting") == 2
+	then
+		player.Character.PrimaryPart.AssemblyLinearVelocity += Vector3.new(0, 60, 0)
 	end
 
 	weaponClone.Parent = workspace

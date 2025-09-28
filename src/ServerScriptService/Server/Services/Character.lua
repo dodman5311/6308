@@ -76,6 +76,13 @@ Players.PlayerAdded:Connect(function(player: Player)
 		humanoid.HealthChanged:Connect(function(health)
 			local LogHealth = humanoid:GetAttribute("LogHealth")
 
+			if humanoid.Health == humanoid.MaxHealth then
+				setInvincible(player, true)
+				task.delay(1, function()
+					setInvincible(player, false)
+				end)
+			end
+
 			if health < LogHealth then
 				if humanoid:GetAttribute("IsBlocking") then
 					humanoid.Health = LogHealth
@@ -84,12 +91,14 @@ Players.PlayerAdded:Connect(function(player: Player)
 
 				if humanoid:GetAttribute("Invincible") then
 					humanoid.Health = LogHealth
-				elseif character:GetAttribute("HasHaven") then
-					setInvincible(player, true)
-					task.delay(1, function()
-						setInvincible(player, false)
-					end)
 				end
+
+				-- elseif character:GetAttribute("HasHaven") then
+				-- 	setInvincible(player, true)
+				-- 	task.delay(1, function()
+				-- 		setInvincible(player, false)
+				-- 	end)
+				-- end
 			end
 
 			humanoid:SetAttribute("LogHealth", humanoid.Health)

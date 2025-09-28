@@ -112,7 +112,7 @@ function module:OnSpawn(character, humanoid)
 		UIService.doUiAction(
 			"Notify",
 			"ShowTip",
-			"Alright, PG. You ready?",
+			"Press <b>TAB</b> to open the menu!",
 			true,
 			Player:GetAttribute("furthestLevel") <= 1
 		)
@@ -595,11 +595,11 @@ end)
 local UserInputService = game:GetService("UserInputService")
 
 net:Connect("OpenKiosk", function()
-	-- if not isPaused then
-	-- 	signals.PauseGame:Fire()
-	-- end
-
 	UIService.doUiAction("Kiosk", "ShowScreen", soulsService.Souls)
+end)
+
+net:Connect("OpenRequiem", function()
+	UIService.doUiAction("Requiem", "ShowRequiemShop")
 end)
 
 UserInputService.InputBegan:Connect(function(input, gpe)

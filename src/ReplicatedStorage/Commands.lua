@@ -105,6 +105,22 @@ local commands = {
 	},
 
 	Resources = {
+
+		Set_Coins = {
+			Parameters = function()
+				return {
+					{ Name = "Amount", Options = { "_Input" } },
+				}
+			end,
+
+			ExecuteServer = function(_, _, amount)
+				if not amount or not tonumber(amount) then
+					return
+				end
+				workspace:SetAttribute("TotalScore", tonumber(amount))
+			end,
+		},
+
 		Simulate_Progression = {
 			Parameters = function()
 				return {
