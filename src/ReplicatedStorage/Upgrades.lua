@@ -424,7 +424,7 @@ local upgrades = {
 			},
 			{
 				Name = "BrickHook: Tier 1",
-				Description = "+10% crit chance for 2 seconds after using brick hook",
+				Description = "+10% crit chance for 2 seconds after using brick hook", --@TODO
 				Price = 600,
 			},
 			{
