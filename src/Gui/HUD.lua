@@ -9,6 +9,7 @@ local UserInputService = game:GetService("UserInputService")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
+local util = require(ReplicatedStorage.Vendor.Util)
 local camera = workspace.CurrentCamera
 
 local assets = ReplicatedStorage.Assets
@@ -20,7 +21,6 @@ local SoulsService = require(Globals.Client.Services.SoulsService)
 local UiAnimator = require(Globals.Vendor.UIAnimationService)
 local chanceService = require(Globals.Vendor.ChanceService)
 local spring = require(Globals.Vendor.Spring)
-local util = require(Globals.Vendor.Util)
 
 local grappleIncicatorSpring = spring.new(Vector2.zero)
 grappleIncicatorSpring.Damper = 0.5
@@ -811,10 +811,46 @@ function module.EmptyOvercharge(player, ui, frame, emptyTime, isArsenalBar)
 end
 
 function module.ShowSoulChanceMult(player, ui, frame, value, show)
+	if GiftsService.CheckGift("Drav_Is_Dead") then
+		show = false
+	end
+
 	frame.Souls.Mult.Visible = show
 	frame.Flame.Visible = show
 
 	frame.Souls.Mult.Text = "X" .. math.round(value) .. " Chance"
+end
+
+function module.ShowStaminaBar(player, ui, frame)
+	local staminaBar = frame.StaminaBar
+	local barImg = staminaBar.BarFrame.Bar.BarAnimation.Image
+	local frameImg = staminaBar.BarImageFrame
+
+	local fadeInTi = TweenInfo.new(0.25)
+
+	staminaBar.Visible = true
+	util.tween({ barImg, frameImg }, fadeInTi, { ImageTransparency = 0 })
+end
+
+function module.HideStaminaBar(player, ui, frame)
+	local staminaBar = frame.StaminaBar
+
+	local barImg = staminaBar.BarFrame.Bar.BarAnimation.Image
+	local frameImg = staminaBar.BarImageFrame
+
+	local fadeOutTi = TweenInfo.new(1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out, 0, false, 3)
+
+	util.tween({ barImg, frameImg }, fadeOutTi, { ImageTransparency = 1 }, false, function()
+		staminaBar.Visible = false
+	end)
+end
+
+function module.UpdateStaminaBar(player, ui, frame, goal)
+	module.ShowStaminaBar(player, ui, frame)
+	local bar = frame.StaminaBar.BarFrame.Bar
+
+	local ti = TweenInfo.new(0.15)
+	util.tween(bar, ti, { Size = UDim2.fromScale(1, goal) })
 end
 
 return module

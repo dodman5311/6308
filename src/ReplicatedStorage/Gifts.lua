@@ -273,12 +273,6 @@ local module = {
 			Desc = "When shooting an enemy, the next one hit will now be linked to it. Damage to either enemy is dealt to the other as electric damage.",
 		},
 
-		-- Haven = {
-		-- 	Icon = "rbxassetid://16235850238",
-		-- 	Catagories = { "Soul" },
-		-- 	Desc = "When hit, you now gain 1 second of invincibility.",
-		-- },
-
 		Sierra_6308 = {
 			Icon = "rbxassetid://16442104214",
 			Catagories = { "Tactical", "Soul" },
@@ -293,9 +287,33 @@ local module = {
 	},
 
 	Specials = {
+		Haven = {
+			Icon = "rbxassetid://16235850238",
+			Catagories = { "Soul" },
+			Desc = "When hit, you now gain 1 second of invincibility.",
+		},
+
+		Survival_Of_The_Fittest = {
+			Icon = "rbxassetid://99704540834147",
+			Catagories = { "Debuff" },
+			Desc = "-50% mag size and fire rate",
+		},
+
+		Bloody_Feet = {
+			Icon = "rbxassetid://71617892926702",
+			Catagories = { "Debuff" },
+			Desc = "-45% base walking speed.",
+		},
+
+		Stamina = {
+			Icon = "rbxassetid://15990088470",
+			Catagories = { "Tactical" },
+			Desc = "Hold left shift to sprint. Sprinting uses stamina but increases walking speed by +40%.",
+		},
+
 		Drav_Is_Dead = {
 			Icon = "rbxassetid://16875811404",
-			Catagories = {},
+			Catagories = { "Debuff" },
 			Desc = "Drav has starved to death. (You've killed your friend)",
 		},
 

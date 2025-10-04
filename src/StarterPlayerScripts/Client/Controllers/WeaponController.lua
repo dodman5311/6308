@@ -72,7 +72,7 @@ local daisySubject_B
 
 --// Values
 
-local defaultFireRate = 0.2
+local DEFAULT_FIRE_RATE = 0.2
 local grenadeLocks = {}
 local canUseDamagePerk = true
 local DAMAGE_PERK_COOLDOWN = 20
@@ -428,6 +428,10 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 		ammoToAdd += weaponData.Ammo * 0.75
 	end
 
+	if GiftsService.CheckGift("Survival_Of_The_Fittest") then
+		ammoToAdd /= 2
+	end
+
 	if GiftsService.CheckUpgrade(player, "Bigger Boxes") then
 		ammoToAdd += weaponData.Ammo * 0.15
 	end
@@ -500,7 +504,13 @@ local function EquipDefault(ignoreAmmo)
 		return
 	end
 
-	module.UpdateAmmo(module.defaultMagSize)
+	local magSize = module.defaultMagSize
+
+	if GiftsService.CheckGift("Survival_Of_The_Fittest") then
+		magSize /= 2
+	end
+
+	module.UpdateAmmo(magSize)
 	signals.WeaponEquipped:Fire("Cleanse & Repent")
 end
 
@@ -556,7 +566,10 @@ local function showMuzzleFlash(flashPart, offset)
 end
 
 local function ReloadDefault()
-	if currentAmmo >= module.defaultMagSize then
+	if
+		currentAmmo
+		>= (GiftsService.CheckGift("Survival_Of_The_Fittest") and module.defaultMagSize / 2 or module.defaultMagSize)
+	then
 		return
 	end
 
@@ -610,7 +623,14 @@ local function ReloadDefault()
 	end
 
 	UIService.doUiAction("HUD", "reload", 0)
-	module.UpdateAmmo(module.defaultMagSize)
+
+	local magSize = module.defaultMagSize
+
+	if GiftsService.CheckGift("Survival_Of_The_Fittest") then
+		magSize /= 2
+	end
+
+	module.UpdateAmmo(magSize)
 
 	module.UpdateSlot()
 end
@@ -1562,7 +1582,7 @@ local function FireDefault(extraBullet)
 		util.PlaySound(assets.Sounds.Fire, script, 0.15)
 	end
 
-	local recoilVector = Vector3.new(0, 0.3, 0)
+	local recoilVector = Vector3.new(0, 0.5, 0)
 	local recoilMagnitude = workspace:GetAttribute("CleanseAndRepent_Tier") >= 1 and 0.75 or 1
 
 	if GiftsService.CheckUpgrade("Spicy Pepperoni") then
@@ -1583,10 +1603,10 @@ local function FireDefault(extraBullet)
 		)
 
 		if not deadBoltActive then
-			Recoil(recoilVector + Vector3.new(-1.75), Vector3.new(0.2, 0.1, 4), recoilMagnitude, 0.75)
+			Recoil(recoilVector, Vector3.new(0.3, 0.1, 6), recoilMagnitude, 0.65)
 		end
 
-		defaultIndex = 1
+		defaultIndex = 0
 	else
 		UIService.doUiAction("HUD", "PumpCrosshair", true)
 		task.wait(0.03)
@@ -1604,10 +1624,14 @@ local function FireDefault(extraBullet)
 			Recoil(recoilVector + Vector3.new(1.75), Vector3.new(0.2, 0.1, 4), recoilMagnitude, 0.75)
 		end
 
-		defaultIndex = 0
+		--defaultIndex = 0
 	end
 
-	fireTimer.WaitTime = defaultFireRate
+	fireTimer.WaitTime = DEFAULT_FIRE_RATE
+
+	if GiftsService.CheckGift("Survival_Of_The_Fittest") then
+		fireTimer.WaitTime += (DEFAULT_FIRE_RATE * 0.5)
+	end
 
 	if workspace:GetAttribute("CleanseAndRepent_Tier") >= 3 then
 		fireTimer.WaitTime /= 1.25
@@ -1893,7 +1917,12 @@ function module.Fire()
 		return
 	end
 
-	fireTimer.WaitTime = acts:checkAct("Overcharged") and weaponData.FireDelay / 1.5 or weaponData.FireDelay
+	local waitTime = acts:checkAct("Overcharged") and weaponData.FireDelay / 1.5 or weaponData.FireDelay
+	fireTimer.WaitTime = waitTime
+	if GiftsService.CheckGift("Survival_Of_The_Fittest") then
+		fireTimer.WaitTime += waitTime * 0.5
+	end
+
 	fireTimer:Run()
 
 	fireTimer.OnEnded:Wait()

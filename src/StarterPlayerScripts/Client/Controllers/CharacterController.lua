@@ -35,11 +35,16 @@ local util = require(Globals.Vendor.Util)
 local weaponService = require(Globals.Client.Controllers.WeaponController)
 
 --// Values
+local DEFAULT_WALKSPEED = 30
+
 local logHealth = 0
 local collectedBlood = 0
+local stamina = 100
+local sprintKeyDown = false
 local isPaused = false
 local lastOnGroundPosition = Vector3.zero
 local mouse = Player:GetMouse()
+local baseWalkspeed = DEFAULT_WALKSPEED
 
 local mouseTarget = Instance.new("ObjectValue")
 
@@ -108,6 +113,17 @@ local function loadSaveData(upgradeIndex, gameState)
 end
 
 function module:OnSpawn(character, humanoid)
+	baseWalkspeed = DEFAULT_WALKSPEED
+
+	giftService.AddGift("Survival_Of_The_Fittest")
+	giftService.AddGift("Scavenger")
+
+	giftService.AddGift("Bloody_Feet")
+	giftService.AddGift("Stamina")
+
+	giftService.AddGift("Haven")
+	giftService.AddGift("Drav_Is_Dead")
+
 	task.delay(1, function()
 		UIService.doUiAction(
 			"Notify",
@@ -236,8 +252,10 @@ local function deathEffect()
 end
 
 function module:OnDied()
+	sprintKeyDown = false
 	kiosk.tickets = 0
 	ChanceService.luck = 0
+	stamina = 100
 
 	deathEffect()
 	UIService.doUiAction("HUD", "HideBossBar")
@@ -261,6 +279,11 @@ local function onGiftAdded(gift)
 
 	if gift == "SpeedDemon" then
 		humanoid.WalkSpeed += 6.25
+	end
+
+	if gift == "Bloody_Feet" then
+		baseWalkspeed -= baseWalkspeed * 0.45
+		humanoid.WalkSpeed = baseWalkspeed
 	end
 end
 
@@ -608,12 +631,44 @@ UserInputService.InputBegan:Connect(function(input, gpe)
 	end
 
 	if
+		giftService.CheckGift("Stamina")
+		and (input.KeyCode == Enum.KeyCode.LeftShift or input.KeyCode == Enum.KeyCode.ButtonL3)
+	then
+		sprintKeyDown = true
+		while Player.Character and sprintKeyDown and stamina > 0 do
+			if not Player.Character:FindFirstChild("Humanoid") then
+				return
+			end
+
+			Player.Character.Humanoid.WalkSpeed = baseWalkspeed + (baseWalkspeed * 0.4)
+			stamina -= 0.5
+			signals.DoUiAction:Fire("HUD", "UpdateStaminaBar", stamina / 100)
+			task.wait()
+		end
+
+		Player.Character.Humanoid.WalkSpeed = baseWalkspeed
+	end
+
+	if
 		input.KeyCode == Enum.KeyCode.Tab
 		or input.KeyCode == Enum.KeyCode.M
 		or input.KeyCode == Enum.KeyCode.ButtonSelect
 	then
 		GuiService.SelectedObject = nil
 		signals.DoUiAction:Fire("Menu", "Toggle")
+	end
+end)
+
+UserInputService.InputEnded:Connect(function(input, gpe)
+	if input.KeyCode == Enum.KeyCode.LeftShift or input.KeyCode == Enum.KeyCode.ButtonL3 then
+		sprintKeyDown = false
+
+		while not sprintKeyDown and stamina < 100 do
+			stamina += 0.25
+			signals.DoUiAction:Fire("HUD", "UpdateStaminaBar", stamina / 100)
+			task.wait()
+		end
+		signals.DoUiAction:Fire("HUD", "HideStaminaBar")
 	end
 end)
 

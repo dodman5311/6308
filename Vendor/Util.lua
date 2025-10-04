@@ -1,8 +1,8 @@
 local util = {
 	bound = {},
 }
-local deb = game:GetService("Debris")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local deb = game:GetService("Debris")
 local ts = game:GetService("TweenService")
 
 local rng = Random.new()
@@ -119,7 +119,7 @@ end
 @return Tween
 ]]
 function util.tween(
-	instance: Instance,
+	instance: Instance | { Instance },
 	tweenInfo: TweenInfo,
 	propertyTable: {},
 	yield: boolean?,
