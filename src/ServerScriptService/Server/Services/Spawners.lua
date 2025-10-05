@@ -103,7 +103,7 @@ local objectTypes = {
 	},
 
 	Weapon = {
-		SpawnChance = 100,
+		SpawnChance = 45,
 		Folder = assets.Models.WeaponPickups,
 		OnSpawn = onWeaponSpawned,
 	},

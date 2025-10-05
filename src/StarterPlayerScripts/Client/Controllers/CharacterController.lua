@@ -117,6 +117,7 @@ function module:OnSpawn(character, humanoid)
 
 	giftService.AddGift("Survival_Of_The_Fittest")
 	giftService.AddGift("Scavenger")
+	giftService.AddGift("Mule_Bags")
 
 	giftService.AddGift("Bloody_Feet")
 	giftService.AddGift("Stamina")

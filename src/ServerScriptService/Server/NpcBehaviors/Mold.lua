@@ -2,7 +2,7 @@ local stats = {
 	ViewDistance = 100,
 
 	AttackDistance = 5,
-	AttackDelay = 0.75,
+	AttackDelay = 1,
 
 	NpcType = "Enemy",
 }
@@ -21,7 +21,7 @@ local module = {
 	},
 
 	TargetFound = {
-		{ Function = "PlaySound", Parameters = { "Notice", 10 } },
+		{ Function = "PlaySound", Parameters = { "Notice", 1 } },
 		{ Function = "SwitchToState", Parameters = { "Attacking" } },
 	},
 

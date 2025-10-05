@@ -418,7 +418,7 @@ local function resetDOTD()
 		chance += gift.Chance
 	end
 
-	dailyDealCost = math.round((280 / chance) * DAILY_DEAL_COST_MAGNITUDE)
+	dailyDealCost = math.round((280 / chance) * DAILY_DEAL_COST_MAGNITUDE) * 10
 	dealSold = false
 end
 
@@ -460,7 +460,7 @@ function module.Init(player, ui, frame)
 	end)
 
 	frame.UseDOTD.MouseButton1Click:Connect(function()
-		if SoulsService.Souls < dailyDealCost or dealSold then
+		if workspace:GetAttribute("TotalScore") < dailyDealCost or dealSold then
 			return
 		end
 		local ti = TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
@@ -469,7 +469,7 @@ function module.Init(player, ui, frame)
 		dealSold = true
 		sfx.KioskBuy:Play()
 
-		SoulsService.RemoveSoul(dailyDealCost)
+		--SoulsService.RemoveSoul(dailyDealCost)
 
 		for _, giftTable in ipairs(dailyDeal) do
 			module.applyGiftChange(giftTable[1])
@@ -491,17 +491,17 @@ function module.Init(player, ui, frame)
 	end)
 
 	frame.UseSoul.MouseButton1Click:Connect(function()
-		if SoulsService.Souls < module.soulCost * costMult then
+		if workspace:GetAttribute("TotalScore") < 25 then
 			return
 		end
 
 		sfx.KioskBuy:Play()
-		SoulsService.RemoveSoul(module.soulCost * costMult)
+		--SoulsService.RemoveSoul(module.soulCost * costMult)
 
 		frame.SelectButtons.Visible = false
 		frame.ExitButton.Visible = false
 
-		module.UpdateSouls(player, ui, frame, math.round(SoulsService.Souls))
+		module.UpdateSouls(workspace:GetAttribute("TotalScore"))
 		--module.soulCost = math.clamp(module.soulCost + 1, 1, 25) -- ADD ONTO COST
 
 		costMult = (GiftsService.CheckUpgrade("A+ Dough") and chanceService.checkChance(15, false)) and 2 or 1
@@ -512,7 +512,7 @@ function module.Init(player, ui, frame)
 			isOther = not isOther
 		end
 
-		frame.SoulCost.Text = -module.soulCost * costMult
+		--frame.SoulCost.Text = -module.soulCost * costMult
 
 		local chosenGift = module.chooseRandomGift(player, ui, frame)
 		module.TakeDelivery(player, ui, frame, chosenGift, true)
@@ -567,7 +567,7 @@ end
 function module.Cleanup(player, ui, frame) end
 
 function module.UpdateSouls(_, _, frame, amount)
-	local soulsFrame = frame.Souls
+	local soulsFrame = frame.RCoins
 	local label = soulsFrame.Count
 
 	label.Text = amount
