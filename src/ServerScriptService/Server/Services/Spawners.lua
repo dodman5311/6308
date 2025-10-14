@@ -333,6 +333,10 @@ function module.spawnHazards(currentLevel, mapOverride)
 		end
 
 		local cframe = getSpawnPoint(spawner)
+		if not cframe then
+			return
+		end
+
 		local hazardToSpawn = spawner:GetAttribute("HazardType")
 
 		local npc

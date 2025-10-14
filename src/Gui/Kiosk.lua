@@ -125,14 +125,6 @@ local spinGifts = {
 		GoodLuck = true,
 	},
 
-	Perk_Ticket = {
-		Icon = "rbxassetid://16422611287",
-		Catagories = { "Luck" },
-		Desc = "You gain a perk ticket.",
-		Chance = 15,
-		GoodLuck = true,
-	},
-
 	Nothing = { -- remove
 		Icon = "rbxassetid://16422611114",
 		Catagories = { "Luck" },
@@ -225,8 +217,6 @@ local DOTDRewards = {
 
 	Large_Clover = spinGifts.Large_Clover,
 	Clover = spinGifts.Clover,
-
-	Perk_Ticket = spinGifts.Perk_Ticket,
 }
 
 local dailyDeal = {}
@@ -396,7 +386,7 @@ local function useTicket(player, frame, catagory)
 	sfx.KioskBuy:Play()
 
 	module.tickets -= 1
-	frame.Tickets.Count.Text = module.tickets
+	--frame.Tickets.Count.Text = module.tickets
 
 	local ti = TweenInfo.new(0.1, Enum.EasingStyle.Linear)
 	util.tween(frame.SpinHands.Image, ti, { ImageTransparency = 0 })
@@ -463,6 +453,9 @@ function module.Init(player, ui, frame)
 		if workspace:GetAttribute("TotalScore") < dailyDealCost or dealSold then
 			return
 		end
+
+		net:RemoteFunction("PurchaseUpgrade"):InvokeServer("EpicSussyBalls", dailyDealCost, "EPIC SUSSY BALLS!")
+
 		local ti = TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
 		local ti_2 = TweenInfo.new(1, Enum.EasingStyle.Elastic)
 
@@ -475,9 +468,9 @@ function module.Init(player, ui, frame)
 			module.applyGiftChange(giftTable[1])
 		end
 
-		module.UpdateSouls(player, ui, frame, math.round(SoulsService.Souls))
+		module.UpdateSouls(player, ui, frame, workspace:GetAttribute("TotalScore"))
 		module.UpdateStats(player, ui, frame)
-		frame.Tickets.Count.Text = module.tickets
+		--frame.Tickets.Count.Text = module.tickets
 
 		frame.DealSold.Size = UDim2.fromScale(0.25, 0.25)
 		frame.DealSold.Rotation = -5
@@ -501,7 +494,10 @@ function module.Init(player, ui, frame)
 		frame.SelectButtons.Visible = false
 		frame.ExitButton.Visible = false
 
-		module.UpdateSouls(workspace:GetAttribute("TotalScore"))
+		module.UpdateSouls(player, ui, frame, workspace:GetAttribute("TotalScore"))
+
+		net:RemoteFunction("PurchaseUpgrade"):InvokeServer("EpicSussyBalls", 15, "EPIC SUSSY BALLS!")
+
 		--module.soulCost = math.clamp(module.soulCost + 1, 1, 25) -- ADD ONTO COST
 
 		costMult = (GiftsService.CheckUpgrade("A+ Dough") and chanceService.checkChance(15, false)) and 2 or 1
@@ -537,7 +533,7 @@ function module.Init(player, ui, frame)
 
 		switchAnimation:OnFrameRached(4):Connect(function()
 			frame.SoulCost.Visible = false
-			frame.TicketCost.Visible = false
+			--frame.TicketCost.Visible = false
 		end)
 
 		anim.OnEnded:Connect(function()
@@ -631,14 +627,14 @@ function module.ShowScreen(player, ui, frame, playerSouls)
 	MusicService.playTrack("TheKiosk")
 
 	SoulsService.Souls = playerSouls
-	frame.SoulCost.Text = -module.soulCost * costMult
+	frame.SoulCost.Text = -25 * costMult
 
-	frame.Tickets.Count.Text = module.tickets
+	--frame.Tickets.Count.Text = module.tickets
 	module.UpdateStats(player, ui, frame)
 
 	module.emptyGiftSlot(player, ui, frame)
 
-	module.UpdateSouls(player, ui, frame, SoulsService.Souls)
+	module.UpdateSouls(player, ui, frame, workspace:GetAttribute("TotalScore"))
 
 	local ti = TweenInfo.new(0.25, Enum.EasingStyle.Linear)
 	Signals.DoUiAction:Fire("Cursor", "Toggle", true)
@@ -647,7 +643,7 @@ function module.ShowScreen(player, ui, frame, playerSouls)
 	frame.CatagoryButtons.Visible = false
 
 	frame.SoulCost.Visible = true
-	frame.TicketCost.Visible = true
+	--frame.TicketCost.Visible = true
 
 	frame.SpinHands.Visible = true
 
@@ -749,9 +745,7 @@ local function addArmor(player, amount)
 end
 
 function module.applyGiftChange(name)
-	if name == "Perk_Ticket" then
-		module.tickets += 1
-	elseif name == "Clover" then
+	if name == "Clover" then
 		codexService.AddEntry("Luck")
 		chanceService.luck += 1
 	elseif name == "Large_Clover" then
@@ -852,8 +846,8 @@ function module.chooseRandomGift(player, ui, frame, catagory)
 		module.applyGiftChange(name)
 	end
 
-	frame.Tickets.Count.Text = module.tickets
-	module.UpdateSouls(player, ui, frame, SoulsService.Souls)
+	--frame.Tickets.Count.Text = module.tickets
+	module.UpdateSouls(player, ui, frame, workspace:GetAttribute("TotalScore"))
 
 	skip.hideSkip()
 
@@ -937,7 +931,7 @@ function module.TakeDelivery(player, ui, frame, gift, rapido)
 	frame.ExitButton.Visible = true
 
 	frame.SoulCost.Visible = true
-	frame.TicketCost.Visible = true
+	--frame.TicketCost.Visible = true
 
 	if UserInputService.GamepadEnabled then
 		GuiService:Select(frame.SelectButtons)
