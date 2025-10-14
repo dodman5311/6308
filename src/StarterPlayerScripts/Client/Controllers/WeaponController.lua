@@ -1754,6 +1754,10 @@ function module.Fire()
 
 	UIService.doUiAction("HUD", "PumpCrosshair")
 
+	if module.currentWeapon.Name == "Medkit" then
+		net:RemoteEvent("UpdatePlayerHealth"):FireServer(nil, 5)
+	end
+
 	local bulletDamage = weaponData.Damage
 	local bulletCount = weaponData.BulletCount
 
@@ -2895,6 +2899,14 @@ signals.AddAmmo:Connect(function(bigMag)
 
 	if module.currentWeapon then
 		baseAmmo = weaponData.Ammo
+
+		if module.currentWeapon.Name == "Medkit" then
+			if currentAmmo < 2 then
+				module.AddAmmo(amount)
+			end
+
+			return
+		end
 	else
 		baseAmmo = 16
 
