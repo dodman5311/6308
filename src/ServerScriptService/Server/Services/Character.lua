@@ -91,14 +91,12 @@ Players.PlayerAdded:Connect(function(player: Player)
 
 				if humanoid:GetAttribute("Invincible") then
 					humanoid.Health = LogHealth
+				elseif character:GetAttribute("HasHaven") then
+					setInvincible(player, true)
+					task.delay(1, function()
+						setInvincible(player, false)
+					end)
 				end
-
-				-- elseif character:GetAttribute("HasHaven") then
-				-- 	setInvincible(player, true)
-				-- 	task.delay(1, function()
-				-- 		setInvincible(player, false)
-				-- 	end)
-				-- end
 			end
 
 			humanoid:SetAttribute("LogHealth", humanoid.Health)

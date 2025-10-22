@@ -21,12 +21,10 @@ local module = {
 	},
 
 	TargetFound = {
-		{ Function = "PlaySound", Parameters = { "Notice", 1 } },
 		{ Function = "SwitchToState", Parameters = { "Attacking" } },
 	},
 
 	TargetLost = {
-		{ Function = "SwitchToState", Parameters = { "Chasing" } },
 		{ Function = "MoveTowardsTarget" },
 	},
 
@@ -43,10 +41,6 @@ local module = {
 		{ Function = "AssignVoice" },
 		{ Function = "PlayAnimation", Parameters = { "Idle", Enum.AnimationPriority.Core } },
 		{ Function = "AddTag", Parameters = { "Enemy" } },
-	},
-
-	OnDamaged = {
-		{ Function = "PlaySound", Parameters = { "Hurt" } },
 	},
 
 	OnDied = {
