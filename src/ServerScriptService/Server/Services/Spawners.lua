@@ -237,7 +237,7 @@ local function getSpawnPoint(castFrom)
 	local raycast = workspace:Raycast(origin.Position, origin.UpVector * -200, rp)
 
 	if not raycast then
-		return
+		return origin
 	end
 
 	local distance = (raycast.Position - origin.Position).Magnitude
