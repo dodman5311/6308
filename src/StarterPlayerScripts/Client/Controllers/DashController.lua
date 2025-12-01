@@ -10,8 +10,10 @@ local uis = game:GetService("UserInputService")
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterPlayer = game:GetService("StarterPlayer")
+local TextChatService = game:GetService("TextChatService")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
+local Timer = require(ReplicatedStorage.Vendor.Timer)
 local signal = require(ReplicatedStorage.Packages[".pesde"]["sleitnick_signal@2.0.3"].signal)
 
 local player = game:GetService("Players").LocalPlayer
@@ -30,6 +32,7 @@ local giftService = require(Globals.Client.Services.GiftsService)
 local momentum = require(Globals.Client.Controllers.AirController)
 local uiService = require(Globals.Client.Services.UIService)
 local util = require(Globals.Vendor.Util)
+local ignoreAmmoTimer = Timer:new("IgnoreAmmo", 0.5)
 
 module.OnLastDashUsed = signal.new()
 
@@ -47,19 +50,7 @@ function module.fillDashes()
 end
 
 function module.Dash(subject)
-	if
-
-		not module.canDash
-		or not (
-			giftService.CheckGift("Righteous_Motion")
-			or (giftService.CheckGift("Spiked_Sabatons") and workspace:GetAttribute("Spiked_Sabatons") > 0)
-			or (
-				giftService.CheckGift("Brick_Hook")
-				and workspace:GetAttribute("Brick_Hook") > 0
-				and acts:checkAct("GrappleCooldown")
-			)
-		)
-	then
+	if not module.canDash then
 		return
 	end
 
@@ -112,14 +103,10 @@ function module.Dash(subject)
 
 		local distance = 100
 
-		if giftService.CheckGift("Spiked_Sabatons") and workspace:GetAttribute("Spiked_Sabatons") > 0 then
+		if giftService.CheckGift("Spiked_Sabatons") then
 			module.dashes = 0
 			module.canDash = false
 			distance = 200
-		end
-
-		if giftService.CheckGift("Brick_Hook") and workspace:GetAttribute("Brick_Hook") > 0 then
-			module.canDash = false
 		end
 
 		local goalVelocity = (camera.CFrame.Rotation * CFrame.new(direction * distance)).Position
@@ -140,6 +127,11 @@ function module.Dash(subject)
 		end)
 
 		humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
+
+		if workspace:GetAttribute("Righteous_Motion") >= 3 then
+			ignoreAmmoTimer:Reset()
+			ignoreAmmoTimer:Run()
+		end
 	end)
 
 	for i = module.dashes, 3.1, 0.1 do

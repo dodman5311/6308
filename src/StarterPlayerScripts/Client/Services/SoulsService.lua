@@ -15,17 +15,18 @@ local assets = ReplicatedStorage.Assets
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
+local Timer = require(ReplicatedStorage.Vendor.Timer)
 local player = Players.LocalPlayer
 
 --// Modules
+local ChanceService = require(Globals.Vendor.ChanceService)
+local ComboService = require(Globals.Client.Services.ComboService)
+local GiftsService = require(Globals.Client.Services.GiftsService)
 local Signals = require(Globals.Shared.Signals)
+local UIService = require(Globals.Client.Services.UIService)
 local dropService = require(Globals.Shared.DropService)
 local net = require(Globals.Packages.Net)
-local ComboService = require(Globals.Client.Services.ComboService)
-local ChanceService = require(Globals.Vendor.ChanceService)
-local GiftsService = require(Globals.Client.Services.GiftsService)
 local util = require(Globals.Vendor.Util)
-local UIService = require(Globals.Client.Services.UIService)
 
 --// Values
 
@@ -69,6 +70,16 @@ function module.CalculateDropChance(chanceMod)
 
 	if GiftsService.CheckGift("Drav_Is_Dead") then
 		return 0, 0
+	end
+
+	local grappleDropChance = Timer:getTimer("BrickHookSoulChance")
+	if grappleDropChance and grappleDropChance.IsRunning then
+		chance += chance * 0.2
+	end
+
+	local wallDropChance = Timer:getTimer("CritSoulChance")
+	if wallDropChance and wallDropChance.IsRunning then
+		chance += chance * 0.1
 	end
 
 	return chance, module.currentMult

@@ -17,7 +17,7 @@ local acts = require(Globals.Vendor.Acts)
 local animationService = require(Globals.Vendor.AnimationService)
 local momentum = require(Globals.Client.Controllers.AirController)
 local signals = require(Globals.Signals)
-local timer = require(Globals.Vendor.Timer)
+local timer = require(ReplicatedStorage.Vendor.Timer)
 local uiService = require(Globals.Client.Services.UIService)
 local util = require(Globals.Vendor.Util)
 local viewModelService = require(Globals.Vendor.ViewmodelService)
@@ -38,6 +38,9 @@ local antiGrav
 local onCooldown = false
 local onInvCooldown = false
 local keyDown = false
+
+local critTimer = timer:new("BrickHookCritChance", 2)
+local soulChanceTimer = timer:new("BrickHookSoulChance", 1)
 
 --// Connections
 local InputEnded
@@ -265,6 +268,11 @@ local function dealDamage(characterHit)
 	-- 	return
 	-- end
 	-- signals["registerHit"]:Fire(enemyHumanoid, dmgDelt)
+
+	if workspace:GetAttribute("Brick_Hook") >= 3 then
+		soulChanceTimer:Reset()
+		soulChanceTimer:Run()
+	end
 
 	if onInvCooldown then
 		return
@@ -534,6 +542,11 @@ function module.Activate(item)
 		timer.delay(animationService:getAnimation(vm, "DeactivateGrapple").Length - 0.01, function()
 			animationService:stopAnimation(vm, "DeactivateGrapple", 0)
 		end)
+
+		if workspace:GetAttribute("Brick_Hook") >= 2 then
+			critTimer:Reset()
+			critTimer:Run()
+		end
 
 		-- animations["Deactivate"].Stopped:Wait()
 		-- animations["Exit"]:Play(0, 2, 1)

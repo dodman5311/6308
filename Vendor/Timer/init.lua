@@ -8,9 +8,39 @@ local RunService = game:GetService("RunService")
 local Globals = require(ReplicatedStorage.Shared.Globals)
 
 local RUN_SERVICE = game:GetService("RunService")
-local signals = require(Globals.Shared.Signals)
-local signal = require(script.signal)
 local net = require(Globals.Packages.Net)
+local signal = require(script.signal)
+local signals = require(Globals.Shared.Signals)
+
+export type Timer = {
+	IsRunning: boolean,
+	CallTime: number,
+	WaitTime: number,
+	["Function"]: () -> any?,
+	Parameters: { any? },
+
+	OnTimerStepped: signal.Signal<number>,
+	OnEnded: signal.Signal<Enum.PlaybackState>,
+
+	Run: (self: Timer) -> nil,
+	Reset: (self: Timer) -> nil,
+	Delay: (self: Timer, amount: number) -> nil,
+	Update: (self: Timer, index: string, value: any) -> nil,
+	UpdateFunction: (self: Timer, func: () -> any, ...any) -> nil,
+	Cancel: (self: Timer) -> nil,
+	Destroy: (self: Timer) -> nil,
+	Complete: (self: Timer) -> nil,
+	GetCurrentTime: (self: Timer) -> number,
+}
+export type TimerQueue = {
+	new: (self: TimerQueue, timerName: string, waitTime: number?, Function: (() -> any?)?, ...any?) -> Timer,
+
+	DestroyAll: (self: TimerQueue) -> nil,
+
+	CancelAll: (self: TimerQueue) -> nil,
+
+	DoAll: (self: TimerQueue, functionName: string, ...any) -> nil,
+}
 
 local runningTimers = {}
 
@@ -181,7 +211,7 @@ function module:newQueue()
 	}
 end
 
-function module:getTimer(timerName)
+function module:getTimer(timerName): Timer
 	return self.timerQueue[timerName]
 end
 

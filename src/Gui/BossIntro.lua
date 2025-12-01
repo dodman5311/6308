@@ -251,6 +251,8 @@ function module.ShowIntro(player, ui, frame, bossName)
 		frame.MessageBox.Message.Visible = false
 	end
 
+	skip.hideSkip()
+
 	frame.MessageBox.Message.Text = ""
 
 	util.tween(bossFrame.Image, ti_0, { ImageTransparency = 1 })

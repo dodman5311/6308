@@ -5,23 +5,24 @@ local module = {
 	speed = 35,
 	maxUpForce = 40,
 	onWall = false,
+	wallStartTime = 0,
 }
 
 --// Services
-local replicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
+local cas = game:GetService("ContextActionService")
 local players = game:GetService("Players")
+local replicatedStorage = game:GetService("ReplicatedStorage")
 local rs = game:GetService("RunService")
 local ts = game:GetService("TweenService")
-local cas = game:GetService("ContextActionService")
-local UserInputService = game:GetService("UserInputService")
 
 local Globals = require(replicatedStorage.Shared.Globals)
 
 --// Modules
-local util = require(Globals.Vendor.Util)
 local acts = require(Globals.Vendor.Acts)
 local airMomentum = require(Globals.Client.Controllers.AirController)
 local giftService = require(Globals.Client.Services.GiftsService)
+local util = require(Globals.Vendor.Util)
 
 --// Instances
 local rp = RaycastParams.new()
@@ -42,6 +43,8 @@ local function createPhysics(yDistance)
 	if not character then
 		return
 	end
+
+	module.wallStartTime = os.clock()
 
 	local primaryPart = character.PrimaryPart
 

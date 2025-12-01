@@ -58,14 +58,15 @@ local util = require(Globals.Vendor.Util)
 local viewmodelService = require(Globals.Vendor.ViewmodelService)
 local wallrunning = require(Globals.Client.Controllers.Wallrunning)
 
-local Timer = require(Globals.Vendor.Timer)
+local Timer = require(ReplicatedStorage.Vendor.Timer)
 
 local ChanceService = require(Globals.Vendor.ChanceService)
 local net = require(Globals.Packages.Net)
 
-local weaponTimer = require(Globals.Vendor.Timer):newQueue()
+local weaponTimer = Timer:newQueue()
 local weaponReloadTimer = weaponTimer:new("WeaponReload")
 local damagePerkTimer = weaponTimer:new("DamagePerkCooldown")
+local soulChanceTimer = Timer:new("critSoulChance", 1)
 
 local daisySubject_A
 local daisySubject_B
@@ -265,7 +266,9 @@ function module.UpdateSlot()
 end
 
 function module.UpdateAmmo(amount)
-	if amount < currentAmmo and acts:checkAct("Overcharged") then
+	local ignoreAmmoTimer = Timer:getTimer("IgnoreAmmo")
+
+	if amount < currentAmmo and (acts:checkAct("Overcharged") or (ignoreAmmoTimer and ignoreAmmoTimer.IsRunning)) then
 		return
 	end
 
@@ -911,10 +914,24 @@ local function getCritChance(source, chanceToAdd)
 		chanceToAdd = 0
 	end
 
+	if acts:checkAct("wallrunning") and workspace:GetAttribute("Spiked_Sabatons") >= 3 then
+		chance += math.floor((os.clock() - wallrunning.wallStartTime) * 5)
+		print(chance)
+	end
+
 	if module.currentWeapon and source == module.currentWeapon.Name then
 		chance = module.critChances[weaponData.Type] + chanceToAdd
 	elseif source == "Default" then
 		chance = module.critChances.Pistol + chanceToAdd
+	end
+
+	if acts:checkAct("wallrunning") and workspace:GetAttribute("Spiked_Sabatons") >= 1 then
+		chance += chance * 0.1
+	end
+
+	local critTimer = Timer:getTimer("BrickHookCritChance")
+	if critTimer and critTimer.IsRunning then
+		chance += chance * 0.1
 	end
 
 	return chance
@@ -1008,6 +1025,12 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 	if ChanceService.checkChance(getCritChance(source, critChanceAddition), true) then
 		critMult = 2
 		util.PlaySound(assets.Sounds.Crit, script, 0.05)
+
+		if acts:checkAct("wallrunning") and workspace:GetAttribute("Spiked_Sabatons") >= 2 then
+			soulChanceTimer:Reset()
+			soulChanceTimer:Run()
+		end
+
 		if isHeadshot then
 			util.PlaySound(assets.Sounds.Headshot, script, 0.05)
 		end

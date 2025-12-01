@@ -400,18 +400,18 @@ local upgrades = {
 			{
 				Name = "Righteous Motion: Tier 1",
 				Description = "Finishing a reload, when out of ammo, refills dashes.",
-				Price = 750,
+				Price = 500,
 			},
 
 			{
 				Name = "Righteous Motion: Tier 2",
 				Description = "After using the third dash, a manual reload will be completed.",
-				Price = 750,
+				Price = 500,
 			},
 
 			{
 				Name = "Righteous Motion: Tier 3",
-				Description = "", --@TODO
+				Description = "Weapons will not use ammo for 0.5 seconds after dashing",
 				Price = 750,
 			},
 		},
@@ -419,36 +419,36 @@ local upgrades = {
 		["Brick_Hook"] = {
 			{
 				Name = "BrickHook: Tier 1",
-				Description = "Enemies have a 10% chance to be stunned after being hit with brick hook", --@TODO
-				Price = 600,
+				Description = "Enemies have a 10% chance to be stunned after being hit with brick hook",
+				Price = 500,
 			},
 			{
 				Name = "BrickHook: Tier 1",
-				Description = "+10% crit chance for 2 seconds after using brick hook", --@TODO
-				Price = 600,
+				Description = "+10% crit chance for 2 seconds after using brick hook",
+				Price = 500,
 			},
 			{
 				Name = "BrickHook: Tier 3",
-				Description = "Hitting an enemy with Brick Hook adds +15% soul drop chance for 1 second", --@TODO
-				Price = 600,
+				Description = "Hitting an enemy with Brick Hook adds +20% soul drop chance for 1 second",
+				Price = 750,
 			},
 		},
 
 		["Spiked_Sabatons"] = {
 			{
 				Name = "Spiked Sabatons: Tier 1",
-				Description = "+10% pistol and rifle crit chance while on a wall", --@TODO
-				Price = 600,
+				Description = "+25% jump hight for the third jump.",
+				Price = 500,
 			},
 			{
 				Name = "Spiked Sabatons: Tier 2",
-				Description = "Dealing crit damage with a pistol or rifle increases soul drop chance by +10% for 1 second", --@TODO
-				Price = 600,
+				Description = "When leaving a wall, you gain 2 seconds on immortality.",
+				Price = 500,
 			},
 			{
 				Name = "Spiked Sabatons: Tier 3",
-				Description = "A long dash can be used by pressing shift", --@TODO
-				Price = 600,
+				Description = "When leaving a wall, for 1 second, pressing shift will execute a <b>flying kick</b>.", --
+				Price = 750,
 			},
 		},
 	},
