@@ -12,7 +12,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Globals = require(ReplicatedStorage.Shared.Globals)
 
 local GiftsService = require(Globals.Client.Services.GiftsService)
-local Net = require(Globals.Packages.Net)
+local Net = require(ReplicatedStorage.Packages.Net)
 local acts = require(Globals.Vendor.Acts)
 local animationService = require(Globals.Vendor.AnimationService)
 local momentum = require(Globals.Client.Controllers.AirController)
@@ -280,8 +280,8 @@ local function dealDamage(characterHit)
 
 	onInvCooldown = true
 
-	Net:RemoteEvent("SetInvincible")
-	uiService.doUiAction("HUD", "ShowInvincible")
+	Net:RemoteEvent("SetInvincible"):FireServer("BickHook", 1)
+	uiService.doUiAction("HUD", "ShowInvincible", 1)
 
 	uiService.doUiAction("HUD", "ActivateGift", "Brick_Hook")
 	uiService.doUiAction("HUD", "CooldownGift", "Brick_Hook", 1)
@@ -289,8 +289,6 @@ local function dealDamage(characterHit)
 	uiService.doUiAction("HUD", "GrappleCooldown", 1, 0)
 
 	timer.wait(1)
-	Net:RemoteEvent("SetInvincible", false)
-	uiService.doUiAction("HUD", "HideInvincible")
 
 	uiService.doUiAction("HUD", "GrappleCooldown", 1, 1)
 

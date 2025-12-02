@@ -54,7 +54,7 @@ local projectileService = require(Globals.Client.Services.ClientProjectiles)
 local signals = require(Globals.Signals)
 local soulsService = require(Globals.Client.Services.SoulsService)
 local spring = require(Globals.Vendor.Spring)
-local util = require(Globals.Vendor.Util)
+local util = require(ReplicatedStorage.Vendor.Util)
 local viewmodelService = require(Globals.Vendor.ViewmodelService)
 local wallrunning = require(Globals.Client.Controllers.Wallrunning)
 
@@ -153,7 +153,7 @@ local recoilSpring = spring.new(Vector3.zero)
 recoilSpring.Speed = 30
 recoilSpring.Damper = 0.45
 
-local function getObjectInCenter(_, blacklist)
+local function getObjectInCenter(_, blacklist): Model
 	local inCenter
 	local objectsOnScreen = {}
 	local leastDistance = math.huge
@@ -2712,6 +2712,54 @@ local function galvanGaze()
 	runDamagePerkCooldown(cooldown, "Galvan_Gaze")
 end
 
+local function flyingKick()
+	if not player.Character then
+		return
+	end
+	local primaryPart = player.Character.PrimaryPart
+
+	animationService:playAnimation(viewmodel.Model, "Kick", 0)
+	Recoil(Vector3.new(0, 0, 0), Vector3.new(0.5, 0.5, 5), 1.15, 0.75)
+
+	if module.FireBullet(1, 0, Vector3.new(5, 5, 6), nil, "FlyingKick") then
+		primaryPart.AssemblyLinearVelocity = (camera.CFrame.LookVector * -15) + Vector3.new(0, 10, 0)
+		airController.change()
+		return
+	end
+
+	local target = getObjectInCenter(player)
+	if not target or not player.Character then
+		primaryPart.AssemblyLinearVelocity = (camera.CFrame.LookVector * 75) + Vector3.new(0, 15, 0)
+		airController.change()
+		return
+	end
+
+	local cameraCFrame = camera.CFrame
+	local targetCFrame = target:GetPivot()
+	local distanceToTarget = (cameraCFrame.Position - targetCFrame.Position).Magnitude
+
+	local stopDistance = 8
+
+	local percentage = (distanceToTarget - stopDistance) / distanceToTarget
+
+	local goal = cameraCFrame:Lerp(targetCFrame, percentage)
+	local damage = math.clamp(math.ceil(distanceToTarget / 5), 1, 10)
+
+	print(damage)
+
+	local ti = TweenInfo.new(0.1, Enum.EasingStyle.Linear)
+	util.tween(player.Character.PrimaryPart, ti, { CFrame = goal }, false, function()
+		local hitHumanoid, subject = module.FireBullet(damage, 0, Vector3.new(10, 10, 15), nil, "FlyingKick")
+		if hitHumanoid then
+			primaryPart.AssemblyLinearVelocity = (camera.CFrame.LookVector * -30) + Vector3.new(0, 10, 0)
+			airController.change()
+
+			addToGib(hitHumanoid, subject, damage)
+			checkForGibs()
+		end
+	end)
+end
+
 UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
 	if gameProcessedEvent or isPaused then
 		return
@@ -2763,6 +2811,19 @@ UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
 			for _ = 1, 3 do
 				grenadeLockOn()
 			end
+		end
+	end
+
+	if input.KeyCode == Enum.KeyCode.LeftShift or input.KeyCode == Enum.KeyCode.ButtonR1 then
+		local flyingKickTimer = Timer:getTimer("FlyingKickTimer")
+
+		if
+			GiftsService.CheckGift("Spiked_Sabatons")
+			and workspace:GetAttribute("Spiked_Sabatons") >= 3
+			and flyingKickTimer.IsRunning
+		then
+			flyingKickTimer:Cancel()
+			flyingKick()
 		end
 	end
 

@@ -159,14 +159,10 @@ function module:OnSpawn(character, humanoid)
 
 		if health < logHealth then
 			if giftService.CheckGift("Haven") then
-				UIService.doUiAction("HUD", "ShowInvincible")
+				UIService.doUiAction("HUD", "ShowInvincible", 1)
 
 				UIService.doUiAction("HUD", "ActivateGift", "Haven")
 				UIService.doUiAction("HUD", "CooldownGift", "Haven", 1)
-
-				task.delay(1, function()
-					UIService.doUiAction("HUD", "HideInvincible")
-				end)
 			end
 
 			if giftService.CheckGift("Lead_Vampire") and ChanceService.checkChance(10, true) then

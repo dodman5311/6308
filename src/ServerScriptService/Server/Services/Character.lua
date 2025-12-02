@@ -11,6 +11,8 @@ local collectionService = game:GetService("CollectionService")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
+local Scales = require(ReplicatedStorage.Vendor.Scales)
+local Timer = require(ReplicatedStorage.Vendor.Timer)
 
 --// Modules
 local dataStore = require(script.Parent.DataStore)
@@ -24,8 +26,20 @@ net:RemoteEvent("CreateShield")
 
 --// Values
 
+local invincibilityScale = Scales.new("Invincibility")
+
 local checkProtectedEvent = net:RemoteEvent("CheckProtected")
 net:RemoteEvent("OnPlayerDied")
+
+local function addInvincibility(plr, index: string, expireTime: number)
+	invincibilityScale:Add(index)
+	local iTimer = Timer:new(index, expireTime, function()
+		invincibilityScale:Remove(index)
+	end)
+
+	iTimer:Reset()
+	iTimer:Run()
+end
 
 local function checkProtected(player, souls, ironWill)
 	local character = player.Character
@@ -47,6 +61,10 @@ local function setInvincible(player, value)
 	local humanoid = character:WaitForChild("Humanoid")
 	humanoid:SetAttribute("Invincible", value)
 end
+
+invincibilityScale.Changed:Connect(function(enabled)
+	setInvincible(Players:GetPlayers()[1], enabled)
+end)
 
 Players.PlayerAdded:Connect(function(player: Player)
 	player.CharacterAdded:Connect(function(character)
@@ -213,7 +231,7 @@ end
 
 net:Connect("CheckProtected", checkProtected)
 net:Connect("SetBlocking", setBlocking)
-net:Connect("SetInvincible", setInvincible)
+net:Connect("SetInvincible", addInvincibility)
 net:Connect("OnPlayerDied", onDied)
 net:Connect("SetArmor", setArmor)
 

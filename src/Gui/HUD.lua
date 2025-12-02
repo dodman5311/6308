@@ -20,7 +20,7 @@ local SoulsService = require(Globals.Client.Services.SoulsService)
 local UiAnimator = require(Globals.Vendor.UIAnimationService)
 local chanceService = require(Globals.Vendor.ChanceService)
 local spring = require(Globals.Vendor.Spring)
-local util = require(Globals.Vendor.Util)
+local util = require(ReplicatedStorage.Vendor.Util)
 
 local grappleIncicatorSpring = spring.new(Vector2.zero)
 grappleIncicatorSpring.Damper = 0.5
@@ -475,16 +475,23 @@ function module.DamagePulse(player, ui, frame)
 	util.tween(frame.Static, ti, { ImageColor3 = Color3.new(1, 1, 1) })
 end
 
-function module.ShowInvincible(player, ui, frame)
-	local ti = TweenInfo.new(0.1, Enum.EasingStyle.Linear)
+function module.ShowInvincible(player, ui, frame, showTime)
+	local tiA = TweenInfo.new(0.1)
+	local tiB = TweenInfo.new(showTime, Enum.EasingStyle.Exponential, Enum.EasingDirection.In)
 
-	util.tween(frame.Static, ti, { ImageColor3 = Color3.new(1, 0.85, 0) })
-end
+	frame.Vignette.Visible = true
 
-function module.HideInvincible(player, ui, frame)
-	local ti = TweenInfo.new(0.2, Enum.EasingStyle.Linear)
+	local invColor = Color3.fromRGB(255, 230, 90)
 
-	util.tween(frame.Static, ti, { ImageColor3 = Color3.new(1, 1, 1) })
+	util.tween(frame.Static, tiA, { ImageColor3 = invColor })
+	util.tween(frame.Vignette, tiA, { ImageTransparency = 0, ImageColor3 = invColor })
+	util.tween(frame.CrosshairFrame.Image, tiA, { ImageColor3 = invColor })
+	util.tween(frame.LeftCrosshairFrame.Image, tiA, { ImageColor3 = invColor }, true)
+
+	util.tween(frame.Static, tiB, { ImageColor3 = Color3.fromRGB(255, 255, 255) })
+	util.tween(frame.CrosshairFrame.Image, tiB, { ImageColor3 = Color3.fromRGB(255, 255, 255) })
+	util.tween(frame.LeftCrosshairFrame.Image, tiB, { ImageColor3 = Color3.fromRGB(255, 255, 255) })
+	util.tween(frame.Vignette, tiB, { ImageTransparency = 1 })
 end
 
 function module.SetCombo(player, ui, frame, amount)

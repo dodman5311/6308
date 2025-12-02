@@ -215,6 +215,16 @@ function module:getTimer(timerName): Timer
 	return self.timerQueue[timerName]
 end
 
+--will return if a timer is running or not
+function module:checkTimerRunning(timerName): boolean
+	local timer: Timer = self:getTimer(timerName)
+	if timer then
+		return timer.IsRunning
+	else
+		return false
+	end
+end
+
 if RunService:IsClient() then
 	signals.PauseGame:Connect(function()
 		pauseSignal:Fire()

@@ -9,14 +9,19 @@ local module = {
 }
 
 --// Services
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StarterPlayer = game:GetService("StarterPlayer")
 local UserInputService = game:GetService("UserInputService")
 local cas = game:GetService("ContextActionService")
 local players = game:GetService("Players")
 local replicatedStorage = game:GetService("ReplicatedStorage")
 local rs = game:GetService("RunService")
-local ts = game:GetService("TweenService")
 
 local Globals = require(replicatedStorage.Shared.Globals)
+local Net = require(ReplicatedStorage.Packages.Net)
+local Timer = require(ReplicatedStorage.Vendor.Timer)
+local UIService = require(Globals.Client.Services.UIService)
+local Util = require(ReplicatedStorage.Vendor.Util)
 
 --// Modules
 local acts = require(Globals.Vendor.Acts)
@@ -28,6 +33,7 @@ local util = require(Globals.Vendor.Util)
 local rp = RaycastParams.new()
 local player = players.LocalPlayer
 local camera = workspace.CurrentCamera
+local flyingKickTimer = Timer:new("FlyingKickTimer", 2)
 
 --// Values
 local logOnWall
@@ -89,19 +95,16 @@ end
 
 local function jumpOffWall(_, state)
 	local character = player.Character
-	if not character then
+	if not character or state ~= Enum.UserInputState.End then
 		return
 	end
 
 	local primaryPart = character.PrimaryPart
 	local humanoid = character.Humanoid
 
-	if state ~= Enum.UserInputState.End then
-		return
-	end
-
 	startDebounce()
 	--script.End:Play()
+	Util.PlaySound(ReplicatedStorage.Assets.Sounds.WallLeave, script, 0.1)
 
 	local logVelocity = primaryPart.AssemblyLinearVelocity
 
@@ -110,6 +113,16 @@ local function jumpOffWall(_, state)
 		+ (camera.CFrame.LookVector * humanoid.WalkSpeed * 1.5)
 	--+ (humanoid.MoveDirection * humanoid.WalkSpeed * 1.5)
 	airMomentum.switchFalling(true)
+
+	if workspace:GetAttribute("Spiked_Sabatons") >= 3 then
+		flyingKickTimer:Reset()
+		flyingKickTimer:Run()
+	end
+
+	if workspace:GetAttribute("Spiked_Sabatons") >= 2 then
+		UIService.doUiAction("HUD", "ShowInvincible", 2)
+		Net:RemoteEvent("SetInvincible"):FireServer("SpikedSabatons", 2)
+	end
 end
 
 local function wallrun(distanceToCeiling)
@@ -135,7 +148,7 @@ local function wallrun(distanceToCeiling)
 
 		airMomentum.onWall = true
 		module.onWall = true
-		--script.Start:Play()
+		Util.PlaySound(ReplicatedStorage.Assets.Sounds.WallEnter, script, 0.1)
 	end
 
 	local pullVector = (wallPosition - primaryPart.Position)

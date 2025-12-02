@@ -442,12 +442,12 @@ local upgrades = {
 			},
 			{
 				Name = "Spiked Sabatons: Tier 2",
-				Description = "When leaving a wall, you gain 1 second on immortality.", --@TODO
+				Description = "When jumping off a wall, you gain 2 seconds of immortality.",
 				Price = 500,
 			},
 			{
 				Name = "Spiked Sabatons: Tier 3",
-				Description = "When leaving a wall, for 1 second, pressing shift will execute a <b>flying kick</b>.", --@TODO
+				Description = "When jumping off a wall, for 2 seconds, pressing shift will execute a <b>flying kick</b>. Flying kick damage scales with distance.",
 				Price = 750,
 			},
 		},
@@ -477,17 +477,17 @@ local upgrades = {
 		["Mag_Launcher"] = {
 			{
 				Name = "Burning Souls: Tier 1",
-				Description = "-1 Second cooldown", --@TODO
+				Description = "Coming Soon!", --"-1 Second cooldown", --@TODO
 				Price = 750,
 			},
 			{
 				Name = "Burning Souls: Tier 2",
-				Description = "-1 Second cooldown", --@TODO
+				Description = "Coming Soon!", --"-1 Second cooldown", --@TODO
 				Price = 750,
 			},
 			{
 				Name = "Burning Souls: Tier 3",
-				Description = "Launcher grenades are now sticky bombs. Sticky bombs explode after a certain time. They will explode early when shot (+1 Dmg, Splash distance) -- Place holder", --@TODO
+				Description = "Coming Soon!", --"Launcher grenades are now sticky bombs. Sticky bombs explode after a certain time. They will explode early when shot (+1 Dmg, Splash distance) -- Place holder", --@TODO
 				Price = 750,
 			},
 		},
@@ -495,17 +495,17 @@ local upgrades = {
 		["Burning_Souls"] = {
 			{
 				Name = "Burning Souls: Tier 1",
-				Description = "-1 Second cooldown", --@TODO
+				Description = "Coming Soon!", --"-1 Second cooldown", --@TODO
 				Price = 500,
 			},
 			{
 				Name = "Burning Souls: Tier 2",
-				Description = "+1 Fire Range", --@TODO
+				Description = "Coming Soon!", --"+1 Fire Range", --@TODO
 				Price = 500,
 			},
 			{
 				Name = "Burning Souls: Tier 3",
-				Description = "Cooldown resets when losing a soul -- Place holder", --@TODO
+				Description = "Coming Soon!", --"Cooldown resets when losing a soul -- Place holder", --@TODO
 				Price = 500,
 			},
 		},
@@ -513,19 +513,19 @@ local upgrades = {
 		["Galvan_Gaze"] = {
 			{
 				Name = "Galvan Gaze: Tier 1",
-				Description = "No longer requires half health", --@TODO
+				Description = "Coming Soon!", --"No longer requires half health", --@TODO
 				Price = 500,
 			},
 
 			{
 				Name = "Galvan Gaze: Tier 2",
-				Description = "-1 Second cooldown", --@TODO
+				Description = "Coming Soon!", --"-1 Second cooldown", --@TODO
 				Price = 500,
 			},
 
 			{
 				Name = "Galvan Gaze: Tier 3",
-				Description = "-5 Second cooldown when at 0 souls -- Place holder", --@TODO
+				Description = "Coming Soon!", --"-5 Second cooldown when at 0 souls -- Place holder", --@TODO
 				Price = 500,
 			},
 		},
@@ -535,19 +535,19 @@ local upgrades = {
 		["Maidenless"] = {
 			{
 				Name = "Maidenless: Tier 1",
-				Description = "+1 armor to maidens blade attack", --@TODO
+				Description = "Coming Soon!", --"+1 armor to maidens blade attack", --@TODO
 				Price = 500,
 			},
 
 			{
 				Name = "Tier A", -- Survival (soul)
-				Description = "0.5 Second parry time, 1 second cooldown, enemies killed with the Maiden's Blade have a +20% soul chance.", --@TODO
+				Description = "Coming Soon!", --"0.5 Second parry time, 1 second cooldown, enemies killed with the Maiden's Blade have a +20% soul chance.", --@TODO
 				Price = 500,
 			},
 
 			{
 				Name = "Tier B", -- damage (arsenal)
-				Description = "2 second cooldown, no longer drops armor, damage dealt from Maiden's blade will always be a crit. Deals <b>soul</b> damage.", --@TODO
+				Description = "Coming Soon!", --"2 second cooldown, no longer drops armor, damage dealt from Maiden's blade will always be a crit. Deals <b>soul</b> damage.", --@TODO
 				Price = 500,
 			},
 		},
