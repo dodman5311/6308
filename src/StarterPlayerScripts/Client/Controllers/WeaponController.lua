@@ -914,19 +914,10 @@ local function getCritChance(source, chanceToAdd)
 		chanceToAdd = 0
 	end
 
-	if acts:checkAct("wallrunning") and workspace:GetAttribute("Spiked_Sabatons") >= 3 then
-		chance += math.floor((os.clock() - wallrunning.wallStartTime) * 5)
-		print(chance)
-	end
-
 	if module.currentWeapon and source == module.currentWeapon.Name then
 		chance = module.critChances[weaponData.Type] + chanceToAdd
 	elseif source == "Default" then
 		chance = module.critChances.Pistol + chanceToAdd
-	end
-
-	if acts:checkAct("wallrunning") and workspace:GetAttribute("Spiked_Sabatons") >= 1 then
-		chance += chance * 0.1
 	end
 
 	local critTimer = Timer:getTimer("BrickHookCritChance")
@@ -1025,11 +1016,6 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 	if ChanceService.checkChance(getCritChance(source, critChanceAddition), true) then
 		critMult = 2
 		util.PlaySound(assets.Sounds.Crit, script, 0.05)
-
-		if acts:checkAct("wallrunning") and workspace:GetAttribute("Spiked_Sabatons") >= 2 then
-			soulChanceTimer:Reset()
-			soulChanceTimer:Run()
-		end
 
 		if isHeadshot then
 			util.PlaySound(assets.Sounds.Headshot, script, 0.05)

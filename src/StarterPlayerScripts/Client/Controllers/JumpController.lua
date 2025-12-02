@@ -35,10 +35,16 @@ local function DoubleJump()
 		and module.jumpLock == false
 		and not acts:checkAct("wallrunning")
 	then
+		local jumpPower = 25
+
 		if doubleJump or wallJump or extraDoubleJump then
 			if not doubleJump then
 				if wallJump then
 					wallJump = false
+
+					if workspace:GetAttribute("Spiked_Sabatons") >= 1 then
+						jumpPower += jumpPower * 0.4
+					end
 				elseif extraDoubleJump then
 					extraDoubleJump = false
 				end
@@ -47,7 +53,7 @@ local function DoubleJump()
 			doubleJump = false
 
 			local currentVel = (primaryPart.AssemblyLinearVelocity * Vector3.new(1, 0, 1)).Magnitude
-			primaryPart.AssemblyLinearVelocity = Vector3.new(0, 25, 0) + (humanoid.MoveDirection * currentVel)
+			primaryPart.AssemblyLinearVelocity = Vector3.new(0, jumpPower, 0) + (humanoid.MoveDirection * currentVel)
 			momentum.switchFalling(true)
 
 			--util.PlaySound(script.Jump, script, 5)

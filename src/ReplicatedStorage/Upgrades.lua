@@ -437,17 +437,17 @@ local upgrades = {
 		["Spiked_Sabatons"] = {
 			{
 				Name = "Spiked Sabatons: Tier 1",
-				Description = "+25% jump hight for the third jump.",
+				Description = "+40% jump hight for the third jump.",
 				Price = 500,
 			},
 			{
 				Name = "Spiked Sabatons: Tier 2",
-				Description = "When leaving a wall, you gain 2 seconds on immortality.",
+				Description = "When leaving a wall, you gain 1 second on immortality.", --@TODO
 				Price = 500,
 			},
 			{
 				Name = "Spiked Sabatons: Tier 3",
-				Description = "When leaving a wall, for 1 second, pressing shift will execute a <b>flying kick</b>.", --
+				Description = "When leaving a wall, for 1 second, pressing shift will execute a <b>flying kick</b>.", --@TODO
 				Price = 750,
 			},
 		},

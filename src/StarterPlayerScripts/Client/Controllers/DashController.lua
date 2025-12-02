@@ -50,7 +50,7 @@ function module.fillDashes()
 end
 
 function module.Dash(subject)
-	if not module.canDash then
+	if not module.canDash or (not giftService.CheckGift("Righteous_Motion")) then
 		return
 	end
 
@@ -102,12 +102,6 @@ function module.Dash(subject)
 		local direction = primaryPart.CFrame:VectorToObjectSpace(humanoid.MoveDirection)
 
 		local distance = 100
-
-		if giftService.CheckGift("Spiked_Sabatons") then
-			module.dashes = 0
-			module.canDash = false
-			distance = 200
-		end
 
 		local goalVelocity = (camera.CFrame.Rotation * CFrame.new(direction * distance)).Position
 
