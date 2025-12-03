@@ -82,6 +82,9 @@ local DEADBOLT_COOLDOWN = 1.5
 local deadBoltActive = false
 local onDeadBoltCooldown = false
 
+local MAX_OVERCHARGE = 20
+local OVERCHARGE_TIME = 3
+
 local crosshairs = {
 	Default = "rbxassetid://16453731677",
 	Automatic = "rbxassetid://16453783301",
@@ -105,7 +108,7 @@ local canBlock = true
 local overchargeDebounce = false
 
 local consecutiveHits = 0
-local Overcharge = 0
+local overchargeValue = Instance.new("NumberValue")
 local lastDamageSource
 
 local rng = Random.new()
@@ -268,7 +271,9 @@ end
 function module.UpdateAmmo(amount)
 	local ignoreAmmoTimer = Timer:getTimer("IgnoreAmmo")
 
-	if amount < currentAmmo and (acts:checkAct("Overcharged") or (ignoreAmmoTimer and ignoreAmmoTimer.IsRunning)) then
+	if
+		amount < currentAmmo and (acts:checkAct("OverchargeActive") or (ignoreAmmoTimer and ignoreAmmoTimer.IsRunning))
+	then
 		return
 	end
 
@@ -750,8 +755,7 @@ local function findHumanoid(subject)
 end
 
 local function activateOvercharge()
-	Overcharge = 0
-	acts:createAct("Overcharged")
+	acts:createAct("OverchargeActive")
 
 	local overchargeEffect: ColorCorrectionEffect = Lighting.Overcharge
 
@@ -768,9 +772,15 @@ local function activateOvercharge()
 		ti,
 		{ Brightness = 0.8, Contrast = 2, Saturation = -1, TintColor = Color3.fromRGB(255, 185, 85) }
 	)
-	UIService.doUiAction("HUD", "EmptyOvercharge", 3)
-	task.delay(3, function()
-		acts:removeAct("Overcharged")
+
+	task.spawn(function()
+		repeat
+			overchargeValue.Value -= 1
+			UIService.doUiAction("HUD", "UpdateOvercharge", overchargeValue.Value / MAX_OVERCHARGE)
+			task.wait(OVERCHARGE_TIME / MAX_OVERCHARGE)
+		until overchargeValue.Value == 0
+
+		acts:removeAct("OverchargeActive")
 
 		util.tween(
 			overchargeEffect,
@@ -781,14 +791,14 @@ local function activateOvercharge()
 end
 
 local function addToOvercharge(amount)
-	if Overcharge >= 20 or overchargeDebounce then
+	if overchargeValue.Value >= MAX_OVERCHARGE or overchargeDebounce or acts:checkAct("OverchargeActive") then
 		return
 	end
 
-	Overcharge += amount
+	overchargeValue.Value += amount
 	overchargeDebounce = true
 
-	UIService.doUiAction("HUD", "UpdateOvercharge", Overcharge / 20)
+	UIService.doUiAction("HUD", "UpdateOvercharge", overchargeValue.Value / MAX_OVERCHARGE)
 
 	task.delay(0.01, function()
 		overchargeDebounce = false
@@ -802,19 +812,24 @@ local function addToConsecutive(hit)
 		consecutiveHits += 1
 	end
 
-	if not overchargeDebounce and hit and GiftsService.CheckGift("Overcharge") and not acts:checkAct("Overcharged") then
+	if
+		not overchargeDebounce
+		and hit
+		and GiftsService.CheckGift("Overcharge")
+		and not acts:checkAct("OverchargeActive")
+	then
 		-- make pistol exlusive
 
 		if not module.currentWeapon or weaponData.Type == "Pistol" then
 			addToOvercharge(1)
 		else
-			if Overcharge >= 20 then
+			if overchargeValue.Value >= MAX_OVERCHARGE then
 				activateOvercharge()
 			end
 		end
 	end
 
-	UIService.doUiAction("HUD", "UpdateGiftProgress", "Overcharge", Overcharge / 20)
+	UIService.doUiAction("HUD", "UpdateGiftProgress", "Overcharge", overchargeValue.Value / MAX_OVERCHARGE)
 	UIService.doUiAction("HUD", "UpdateGiftProgress", "Boring_Bullets", consecutiveHits / 10)
 end
 
@@ -1016,9 +1031,13 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 	if ChanceService.checkChance(getCritChance(source, critChanceAddition), true) then
 		critMult = 2
 		util.PlaySound(assets.Sounds.Crit, script, 0.05)
-
 		if isHeadshot then
 			util.PlaySound(assets.Sounds.Headshot, script, 0.05)
+		end
+
+		if workspace:GetAttribute("Overcharge") == 3 then
+			overchargeValue.Value += 1
+			UIService.doUiAction("HUD", "UpdateOvercharge", overchargeValue.Value / MAX_OVERCHARGE)
 		end
 	end
 
@@ -1080,7 +1099,7 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 			end
 		end
 
-		if workspace:GetAttribute("Overcharge") > 0 then
+		if workspace:GetAttribute("Overcharge") >= 1 then
 			if not sourceIsWeapon and source ~= "ThrownWeapon" then
 				addToOvercharge(1)
 			end
@@ -1621,7 +1640,7 @@ local function FireDefault(extraBullet)
 	if workspace:GetAttribute("CleanseAndRepent_Tier") >= 3 then
 		fireTimer.WaitTime /= 1.25
 	end
-	if acts:checkAct("Overcharged") then
+	if acts:checkAct("OverchargeActive") then
 		fireTimer.WaitTime /= 1.5
 	end
 	fireTimer:Run()
@@ -1902,7 +1921,7 @@ function module.Fire()
 		return
 	end
 
-	fireTimer.WaitTime = acts:checkAct("Overcharged") and weaponData.FireDelay / 1.5 or weaponData.FireDelay
+	fireTimer.WaitTime = acts:checkAct("OverchargeActive") and weaponData.FireDelay / 1.5 or weaponData.FireDelay
 	fireTimer:Run()
 
 	fireTimer.OnEnded:Wait()
@@ -2521,7 +2540,7 @@ function module.OnDied()
 	}
 
 	mouseButton1Down = false
-	Overcharge = 0
+	overchargeValue.Value = 0
 end
 
 local function switchWeapon()
@@ -2815,14 +2834,16 @@ UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
 	end
 
 	if input.KeyCode == Enum.KeyCode.LeftShift or input.KeyCode == Enum.KeyCode.ButtonR1 then
-		local flyingKickTimer = Timer:getTimer("FlyingKickTimer")
+		--local flyingKickTimer = Timer:getTimer("FlyingKickTimer")
 
 		if
 			GiftsService.CheckGift("Spiked_Sabatons")
 			and workspace:GetAttribute("Spiked_Sabatons") >= 3
-			and flyingKickTimer.IsRunning
+			and wallrunning.canKick
+			--and flyingKickTimer.IsRunning
 		then
-			flyingKickTimer:Cancel()
+			--flyingKickTimer:Cancel()
+			wallrunning.canKick = false
 			flyingKick()
 		end
 	end
@@ -2990,7 +3011,7 @@ explosionService.explosiveHit:Connect(function(subject, preHealth, postHealth, d
 			end
 		end
 
-		if workspace:GetAttribute("Overcharge") > 0 then
+		if workspace:GetAttribute("Overcharge") >= 1 then
 			addToOvercharge(1)
 		end
 	end

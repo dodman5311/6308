@@ -442,12 +442,12 @@ local upgrades = {
 			},
 			{
 				Name = "Spiked Sabatons: Tier 2",
-				Description = "When jumping off a wall, you gain 2 seconds of immortality.",
+				Description = "When jumping off a wall, you gain 2 seconds of invincibility.",
 				Price = 500,
 			},
 			{
 				Name = "Spiked Sabatons: Tier 3",
-				Description = "When jumping off a wall, for 2 seconds, pressing shift will execute a <b>flying kick</b>. Flying kick damage scales with distance.",
+				Description = "After jumping off a wall, pressing shift will execute a <b>flying kick</b>. Flying kick damage scales with distance.",
 				Price = 750,
 			},
 		},
@@ -457,7 +457,7 @@ local upgrades = {
 		["Overcharge"] = {
 			{
 				Name = "Overcharge: Tier 1",
-				Description = "Damage not dealt from picked up weapons adds to overcharge", --@TODO
+				Description = "Damage not dealt from picked up weapons adds to overcharge",
 				Price = 500,
 			},
 
@@ -477,17 +477,17 @@ local upgrades = {
 		["Mag_Launcher"] = {
 			{
 				Name = "Burning Souls: Tier 1",
-				Description = "Coming Soon!", --"-1 Second cooldown", --@TODO
+				Description = "N/A", --"-1 Second cooldown", --@TODO
 				Price = 750,
 			},
 			{
 				Name = "Burning Souls: Tier 2",
-				Description = "Coming Soon!", --"-1 Second cooldown", --@TODO
+				Description = "N/A", --"-1 Second cooldown", --@TODO
 				Price = 750,
 			},
 			{
 				Name = "Burning Souls: Tier 3",
-				Description = "Coming Soon!", --"Launcher grenades are now sticky bombs. Sticky bombs explode after a certain time. They will explode early when shot (+1 Dmg, Splash distance) -- Place holder", --@TODO
+				Description = "N/A", --"Launcher grenades are now sticky bombs. Sticky bombs explode after a certain time. They will explode early when shot (+1 Dmg, Splash distance) -- Place holder", --@TODO
 				Price = 750,
 			},
 		},
@@ -495,17 +495,17 @@ local upgrades = {
 		["Burning_Souls"] = {
 			{
 				Name = "Burning Souls: Tier 1",
-				Description = "Coming Soon!", --"-1 Second cooldown", --@TODO
+				Description = "N/A", --"-1 Second cooldown", --@TODO
 				Price = 500,
 			},
 			{
 				Name = "Burning Souls: Tier 2",
-				Description = "Coming Soon!", --"+1 Fire Range", --@TODO
+				Description = "N/A", --"+1 Fire Range", --@TODO
 				Price = 500,
 			},
 			{
 				Name = "Burning Souls: Tier 3",
-				Description = "Coming Soon!", --"Cooldown resets when losing a soul -- Place holder", --@TODO
+				Description = "N/A", --"Cooldown resets when losing a soul -- Place holder", --@TODO
 				Price = 500,
 			},
 		},
@@ -513,19 +513,19 @@ local upgrades = {
 		["Galvan_Gaze"] = {
 			{
 				Name = "Galvan Gaze: Tier 1",
-				Description = "Coming Soon!", --"No longer requires half health", --@TODO
+				Description = "N/A", --"No longer requires half health", --@TODO
 				Price = 500,
 			},
 
 			{
 				Name = "Galvan Gaze: Tier 2",
-				Description = "Coming Soon!", --"-1 Second cooldown", --@TODO
+				Description = "N/A", --"-1 Second cooldown", --@TODO
 				Price = 500,
 			},
 
 			{
 				Name = "Galvan Gaze: Tier 3",
-				Description = "Coming Soon!", --"-5 Second cooldown when at 0 souls -- Place holder", --@TODO
+				Description = "N/A", --"-5 Second cooldown when at 0 souls -- Place holder", --@TODO
 				Price = 500,
 			},
 		},
@@ -535,19 +535,19 @@ local upgrades = {
 		["Maidenless"] = {
 			{
 				Name = "Maidenless: Tier 1",
-				Description = "Coming Soon!", --"+1 armor to maidens blade attack", --@TODO
+				Description = "N/A", --"+1 armor to maidens blade attack", --@TODO
 				Price = 500,
 			},
 
 			{
 				Name = "Tier A", -- Survival (soul)
-				Description = "Coming Soon!", --"0.5 Second parry time, 1 second cooldown, enemies killed with the Maiden's Blade have a +20% soul chance.", --@TODO
+				Description = "N/A", --"0.5 Second parry time, 1 second cooldown, enemies killed with the Maiden's Blade have a +20% soul chance.", --@TODO
 				Price = 500,
 			},
 
 			{
 				Name = "Tier B", -- damage (arsenal)
-				Description = "Coming Soon!", --"2 second cooldown, no longer drops armor, damage dealt from Maiden's blade will always be a crit. Deals <b>soul</b> damage.", --@TODO
+				Description = "N/A", --"2 second cooldown, no longer drops armor, damage dealt from Maiden's blade will always be a crit. Deals <b>soul</b> damage.", --@TODO
 				Price = 500,
 			},
 		},

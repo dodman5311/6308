@@ -6,6 +6,7 @@ local module = {
 	maxUpForce = 40,
 	onWall = false,
 	wallStartTime = 0,
+	canKick = false,
 }
 
 --// Services
@@ -33,7 +34,7 @@ local util = require(Globals.Vendor.Util)
 local rp = RaycastParams.new()
 local player = players.LocalPlayer
 local camera = workspace.CurrentCamera
-local flyingKickTimer = Timer:new("FlyingKickTimer", 2)
+--local flyingKickTimer = Timer:new("FlyingKickTimer", 2)
 
 --// Values
 local logOnWall
@@ -115,8 +116,9 @@ local function jumpOffWall(_, state)
 	airMomentum.switchFalling(true)
 
 	if workspace:GetAttribute("Spiked_Sabatons") >= 3 then
-		flyingKickTimer:Reset()
-		flyingKickTimer:Run()
+		--flyingKickTimer:Reset()
+		--flyingKickTimer:Run()
+		module.canKick = true
 	end
 
 	if workspace:GetAttribute("Spiked_Sabatons") >= 2 then
