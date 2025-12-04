@@ -470,6 +470,7 @@ local function exitS2(extraSouls, level, stageBoss, miniBoss)
 			Level = workspace:GetAttribute("Level"),
 			Souls = soulsService.Souls,
 			TotalScore = workspace:GetAttribute("TotalScore"),
+			StoredScore = workspace:GetAttribute("StoredScore"),
 
 			critChances = weaponService.critChances,
 

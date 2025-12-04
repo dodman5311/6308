@@ -804,7 +804,7 @@ function module.HideOvercharge(player, ui, frame, isArsenalBar)
 end
 
 function module.UpdateOvercharge(player, ui, frame, number, isArsenalBar)
-	local ti = TweenInfo.new(0.1, Enum.EasingStyle.Quad)
+	local ti = TweenInfo.new(0.15, Enum.EasingStyle.Linear)
 
 	local overChargeBar = isArsenalBar and frame.ArsenalBar or frame.OverchargeBar
 	util.tween(overChargeBar.BarFrame.Bar, ti, { Size = UDim2.fromScale(1, number) })

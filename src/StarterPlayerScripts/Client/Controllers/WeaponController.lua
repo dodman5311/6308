@@ -937,7 +937,7 @@ local function getCritChance(source, chanceToAdd)
 
 	local critTimer = Timer:getTimer("BrickHookCritChance")
 	if critTimer and critTimer.IsRunning then
-		chance += chance * 0.1
+		chance += 10
 	end
 
 	return chance
@@ -1036,7 +1036,8 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		end
 
 		if workspace:GetAttribute("Overcharge") == 3 then
-			overchargeValue.Value += 1
+			print("ADD TO CHARGE!")
+			overchargeValue.Value += 2
 			UIService.doUiAction("HUD", "UpdateOvercharge", overchargeValue.Value / MAX_OVERCHARGE)
 		end
 	end
@@ -1166,8 +1167,8 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 	end)
 
 	if GiftsService.CheckGift("Gambler's_Fallacy") then
-		ChanceService.repetitionLuck = math.clamp(ChanceService.repetitionLuck + 1, 0, 20)
-		UIService.doUiAction("HUD", "UpdateGiftProgress", "Gambler's_Fallacy", ChanceService.repetitionLuck / 20)
+		ChanceService.repetitionLuck = math.clamp(ChanceService.repetitionLuck + 1, 0, 30)
+		UIService.doUiAction("HUD", "UpdateGiftProgress", "Gambler's_Fallacy", ChanceService.repetitionLuck / 30)
 	end
 
 	if GiftsService.CheckGift("Life_Steal") and soulsService.Souls <= 1 and critMult > 1 then
@@ -2029,7 +2030,7 @@ local function ThrowWeapon()
 				local hitCframe = CFrame.new(hit.Position) * camera.CFrame.Rotation
 
 				if GiftsService.CheckGift("20_Sided_Die") then
-					ChanceService.luck += 20
+					ChanceService.luck += 35
 					UIService.doUiAction("HUD", "ActivateGift", "20_Sided_Die")
 				end
 
@@ -2037,7 +2038,7 @@ local function ThrowWeapon()
 
 				if GiftsService.CheckGift("20_Sided_Die") then
 					task.delay(0.05, function()
-						ChanceService.luck -= 20
+						ChanceService.luck -= 35
 					end)
 				end
 

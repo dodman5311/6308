@@ -5,16 +5,16 @@ local module = {
 }
 local rng = Random.new()
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local player = Players.LocalPlayer
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
-local giftService = require(Globals.Client.Services.GiftsService)
-local comboService = require(Globals.Client.Services.ComboService)
 local Net = require(Globals.Packages.Net)
 local UIService = require(Globals.Client.Services.UIService)
+local comboService = require(Globals.Client.Services.ComboService)
+local giftService = require(Globals.Client.Services.GiftsService)
 
 local assets = ReplicatedStorage.Assets
 
@@ -23,15 +23,15 @@ local signals = require(Globals.Signals)
 function module.getLuck()
 	local result = module.luck
 	if giftService.CheckGift("Rabbits_Foot") then
-		result += 5
+		result += 10
 	end
 
 	if module.airluck then
-		result += 5
+		result += 10
 	end
 
 	if giftService.CheckGift("Set_Em_Up") then
-		result += math.clamp(comboService.CurrentCombo, 0, 20)
+		result += math.clamp(comboService.CurrentCombo, 0, 30)
 	end
 
 	if giftService.CheckGift("Tough_Luck") then
@@ -45,7 +45,7 @@ function module.getLuck()
 			return
 		end
 
-		result += (humanoid.MaxHealth - humanoid.Health) * 2
+		result += (humanoid.MaxHealth - humanoid.Health) * 5
 	end
 
 	result += module.repetitionLuck
@@ -71,7 +71,7 @@ function module.checkChance(chance, goodLuck, PureLuck)
 		return
 	end
 
-	local luck = module.getLuck() / 100--/ 2
+	local luck = module.getLuck() / 100 --/ 2
 
 	if goodLuck then
 		chance *= (1 + luck)

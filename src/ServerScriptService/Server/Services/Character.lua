@@ -181,6 +181,7 @@ local function onDied(player: Player)
 	else
 		mapService.CurrentStage = 1
 		workspace:SetAttribute("TotalScore", 0)
+		workspace:SetAttribute("StoredScore", 0)
 		workspace:SetAttribute("DeathCount", 0)
 
 		for _, category in pairs(upgrades) do
@@ -304,6 +305,7 @@ net:Connect("Restart", function(player)
 	local humanoid = player.Character.Humanoid
 
 	workspace:SetAttribute("TotalScore", 0)
+	workspace:SetAttribute("StoredScore", 0)
 	humanoid:SetAttribute("Armor", 0)
 	humanoid.Health = 0
 end)

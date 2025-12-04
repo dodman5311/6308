@@ -49,7 +49,7 @@ local spinGifts = {
 		Icon = "rbxassetid://16422403509",
 		Catagories = { "Luck" },
 		Desc = "You gain luck. (+1)",
-		Chance = 75,
+		Chance = 100,
 		GoodLuck = true,
 	},
 
@@ -57,7 +57,7 @@ local spinGifts = {
 		Icon = "rbxassetid://16422448268",
 		Catagories = { "Luck" },
 		Desc = "You gain a lot of luck. (+2)",
-		Chance = 50,
+		Chance = 75,
 		GoodLuck = true,
 	},
 
@@ -65,7 +65,7 @@ local spinGifts = {
 		Icon = "rbxassetid://16422610651",
 		Catagories = { "Tactical" },
 		Desc = "You gain armor. (+1)",
-		Chance = 100,
+		Chance = 40,
 		GoodLuck = false,
 	},
 
@@ -73,7 +73,7 @@ local spinGifts = {
 		Icon = "rbxassetid://16422610885",
 		Catagories = { "Tactical" },
 		Desc = "You gain a lot of armor. (+2)",
-		Chance = 75,
+		Chance = 55,
 		GoodLuck = true,
 	},
 
@@ -81,7 +81,7 @@ local spinGifts = {
 		Icon = "rbxassetid://17631463318",
 		Catagories = { "Tactical" },
 		Desc = "You gain a few bullets. (+25% ammo)",
-		Chance = 100,
+		Chance = 75,
 		GoodLuck = false,
 	},
 
@@ -89,7 +89,7 @@ local spinGifts = {
 		Icon = "rbxassetid://17631463215",
 		Catagories = { "Tactical" },
 		Desc = "You gain a lot of bullets. (+50% ammo)",
-		Chance = 75,
+		Chance = 90,
 		GoodLuck = true,
 	},
 
@@ -97,7 +97,7 @@ local spinGifts = {
 		Icon = "rbxassetid://17631463771",
 		Catagories = { "Arsenal" },
 		Desc = "You gain a chance to deal double damage with assault rifles. (+1% chance)",
-		Chance = 65,
+		Chance = 80,
 		GoodLuck = true,
 	},
 
@@ -105,7 +105,7 @@ local spinGifts = {
 		Icon = "rbxassetid://17631463680",
 		Catagories = { "Arsenal" },
 		Desc = "You gain a chance to deal double damage with shotguns. (+1% chance)",
-		Chance = 65,
+		Chance = 80,
 		GoodLuck = true,
 	},
 
@@ -113,7 +113,7 @@ local spinGifts = {
 		Icon = "rbxassetid://17631463584",
 		Catagories = { "Arsenal" },
 		Desc = "You gain a chance to deal double damage with pistols. (+1% chance)",
-		Chance = 65,
+		Chance = 80,
 		GoodLuck = true,
 	},
 
@@ -121,7 +121,7 @@ local spinGifts = {
 		Icon = "rbxassetid://17631463457",
 		Catagories = { "Arsenal" },
 		Desc = "You gain a chance to deal double damage with melees. (+1% chance)",
-		Chance = 65,
+		Chance = 80,
 		GoodLuck = true,
 	},
 
@@ -137,7 +137,7 @@ local spinGifts = {
 		Icon = "rbxassetid://16422611114",
 		Catagories = { "Luck" },
 		Desc = "You gain jack squat.",
-		Chance = 50,
+		Chance = 25,
 		GoodLuck = false,
 	},
 }
@@ -507,7 +507,7 @@ function module.Init(player, ui, frame)
 		costMult = (GiftsService.CheckUpgrade("A+ Dough") and chanceService.checkChance(15, false)) and 2 or 1
 
 		if GiftsService.CheckGift("Buy_1_Get_1") then
-			costMult = (isOther and chanceService.checkChance(25, true)) and 0 or costMult
+			costMult = (isOther and chanceService.checkChance(30, true)) and 0 or costMult
 
 			isOther = not isOther
 		end

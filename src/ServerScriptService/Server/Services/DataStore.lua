@@ -6,15 +6,15 @@ local module = {
 }
 
 --// Services
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local DataStoreService = game:GetService("DataStoreService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
 
 --// Modules
-local net = require(Globals.Packages.Net)
 local mapService = require(Globals.Server.Services.MapService)
+local net = require(Globals.Packages.Net)
 
 --// Values
 
@@ -76,6 +76,7 @@ function module.LoadGameData(player)
 	mapService.proceedToNext(nil, true)
 
 	workspace:SetAttribute("TotalScore", gameState.TotalScore or 0)
+	workspace:SetAttribute("StoredScore", gameState.StoredScore or 0)
 	workspace:SetAttribute("DeathCount", deathCount or 0)
 
 	for upgradeName, upgradeValue in pairs(upgrades) do

@@ -63,12 +63,13 @@ module.Exit = function(player, start_time, stage_number, level_number, bossBeate
 
 	if stage_number == 0 then
 		bossBeaten = "The Requiem"
-		workspace:SetAttribute("TotalScore", 0)
-		comboCount = 0
+
+		comboCount = workspace:GetAttribute("TotalScore")
 		spawnedArenas = 1
 		arenaCount = 0
 		spawnedEnemies = 1
 		enemyCount = 0
+		workspace:SetAttribute("TotalScore", 0)
 	end
 
 	local levelData = {
@@ -79,8 +80,10 @@ module.Exit = function(player, start_time, stage_number, level_number, bossBeate
 		MaxCombo = comboCount,
 	}
 
-	local maxScore = levelData.EnemiesKilled + levelData.ArenasCompleted + (levelData.MaxCombo * 10)
-	workspace:SetAttribute("TotalScore", workspace:GetAttribute("TotalScore") + math.floor(maxScore))
+	if stage_number ~= 0 then
+		local maxScore = levelData.EnemiesKilled + levelData.ArenasCompleted + (levelData.MaxCombo * 10)
+		workspace:SetAttribute("TotalScore", workspace:GetAttribute("TotalScore") + math.floor(maxScore))
+	end
 
 	local upgradesList = {}
 

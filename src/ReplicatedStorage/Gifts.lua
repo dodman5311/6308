@@ -21,7 +21,7 @@ local module = {
 		Rabbits_Foot = {
 			Icon = "rbxassetid://16205885746",
 			Catagories = { "Luck" },
-			Desc = "You now permanently have more Luck. (+5 Luck)",
+			Desc = "You now permanently have more Luck. (+10 Luck)",
 		},
 
 		Kill_Chain = {
@@ -81,13 +81,13 @@ local module = {
 		Tough_Luck = {
 			Icon = "rbxassetid://17590259521",
 			Catagories = { "Luck" },
-			Desc = "Your health is now bound to Luck. The less health you have, the more Luck you have. (+2 Luck per lost HP)",
+			Desc = "Your health is now bound to Luck. The less health you have, the more Luck you have. (+5 Luck per lost HP)",
 		},
 
 		Heavenly_Fortune = {
 			Icon = "rbxassetid://17590259189",
 			Catagories = { "Luck" },
-			Desc = "You now have more Luck while in the air (+5 Luck)",
+			Desc = "You now have more Luck while in the air (+10 Luck)",
 		},
 
 		Unearthly_Metal = {
@@ -117,13 +117,13 @@ local module = {
 		Buy_1_Get_1 = {
 			Icon = "rbxassetid://81150499590074",
 			Catagories = { "Luck" },
-			Desc = "Every other roll at the kiosk now has a 25% chance to be free.",
+			Desc = "Every other roll at the kiosk now has a 30% chance to be free.",
 		},
 
 		["20_Sided_Die"] = {
 			Icon = "rbxassetid://98248628217405",
 			Catagories = { "Luck" },
-			Desc = "Thrown weapons now have +20 luck when hitting an enemy.",
+			Desc = "Thrown weapons now have +35 luck when hitting an enemy.",
 		},
 
 		Returned_Change = {
@@ -174,7 +174,7 @@ local module = {
 		["Gambler's_Fallacy"] = {
 			Icon = "rbxassetid://17655098782",
 			Catagories = { "Luck" },
-			Desc = "Every hit on an enemy now increases your Luck by 1. Luck added by this perk is removed on a successful Luck Roll. (Can be stacked 20 times)",
+			Desc = "Every hit on an enemy now increases your Luck by 2. Luck added by this perk is removed on a successful Luck Roll. (Can be stacked 30 times)",
 		},
 
 		Echoed_Souls = {
@@ -258,7 +258,7 @@ local module = {
 		Set_Em_Up = {
 			Icon = "rbxassetid://16235430594",
 			Catagories = { "Luck" },
-			Desc = "Your combo score is now linked to your Luck. (+1 Luck per combo score, Max 20)",
+			Desc = "Your combo score is now linked to your Luck. (+1 Luck per combo score, Max 30)",
 		},
 
 		Dead_Bolt = {

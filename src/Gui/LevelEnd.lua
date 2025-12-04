@@ -24,6 +24,7 @@ local ComboValue = Instance.new("IntValue")
 local EnemiesValue = Instance.new("IntValue")
 local ItemsValue = Instance.new("IntValue")
 local TimeValue = Instance.new("IntValue")
+local MaxScoreValue = Instance.new("IntValue")
 
 --// Values
 
@@ -127,6 +128,12 @@ function module.Init(player, ui, frame)
 		util.PlaySound(sounds.Click, script)
 		frame.MapTime.Text = convertToHMS(value)
 	end)
+
+	MaxScoreValue.Changed:Connect(function(value: number)
+		util.PlaySound(sounds.Click, script)
+		local scoreAmount = frame.Score.Amount
+		scoreAmount.Text = value
+	end)
 end
 
 function module.Cleanup(player, ui, frame) end
@@ -184,23 +191,30 @@ function module.ShowLevelEnd(player, ui, frame, levelData)
 	UiAnimator.PlayAnimation(frame.Score.RCoin, 0.1, true)
 
 	util.tween(frame.Frame, ti_0, { GroupTransparency = 0 }, true)
+
+	if levelData.Name == "The Requiem" then
+		MaxScoreValue.Value = levelData.MaxCombo
+
+		task.wait(1)
+
+		util.tween(MaxScoreValue, ti, { Value = 0 }, true)
+		AddToMaxScore(0, frame)
+
+		task.wait(2)
+
+		frame.Frame.GroupTransparency = 1
+		frame.Gui.Enabled = false
+		UiAnimator.StopAnimation(frame.Skull)
+		UiAnimator.StopAnimation(frame.Score.RCoin)
+
+		return 0
+	end
+
 	task.wait(1)
 
 	util.tween(TimeValue, ti, { Value = levelData.TimeTaken }, true)
 
 	task.wait(0.5)
-
-	if levelData.Name == "The Requiem" then
-		task.wait(2)
-
-		task.delay(0.5, function()
-			frame.Frame.GroupTransparency = 1
-			frame.Gui.Enabled = false
-			UiAnimator.StopAnimation(frame.Skull)
-			UiAnimator.StopAnimation(frame.Score.RCoin)
-		end)
-		return 0
-	end
 
 	util.tween(EnemiesValue, ti, { Value = levelData.EnemiesKilled }, true)
 	util.PlaySound(sounds.RCoinsSmall, script, 0.05)

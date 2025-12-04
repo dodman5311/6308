@@ -228,6 +228,23 @@ local commands = {
 			end,
 		},
 
+		Set_Crit = {
+			Parameters = function()
+				return {
+					{ Name = "Category", Options = { "AR", "Shotgun", "Pistol", "Melee" } },
+					{ Name = "Amount", Options = { "_Input" } },
+				}
+			end,
+
+			ExecuteClient = function(_, category, amount)
+				if not category or not amount or not tonumber(amount) then
+					return
+				end
+				local weapons = require(Globals.Client.Controllers.WeaponController)
+				weapons.critChances[category] = tonumber(amount)
+			end,
+		},
+
 		Set_Ammo = {
 			Parameters = function()
 				return {
@@ -386,7 +403,7 @@ local commands = {
 			end,
 		},
 
-		Give_Perk = {
+		Give_Inferior = {
 
 			Parameters = function()
 				return {
@@ -400,11 +417,11 @@ local commands = {
 			end,
 		},
 
-		Give_Upgrade = {
+		Give_Superior = {
 
 			Parameters = function()
 				return {
-					{ Name = "Upgrade", Options = convertToArray(gifts.Upgrades) },
+					{ Name = "Perk", Options = convertToArray(gifts.Upgrades) },
 				}
 			end,
 
@@ -418,7 +435,7 @@ local commands = {
 
 			Parameters = function()
 				return {
-					{ Name = "Special", Options = convertToArray(gifts.Specials) },
+					{ Name = "Perk", Options = convertToArray(gifts.Specials) },
 				}
 			end,
 
