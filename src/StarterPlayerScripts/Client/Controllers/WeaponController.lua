@@ -107,6 +107,8 @@ local gKeyDown = false
 local canBlock = true
 local overchargeDebounce = false
 
+local ISevenBlock = false
+
 local consecutiveHits = 0
 local overchargeValue = Instance.new("NumberValue")
 local lastDamageSource
@@ -272,7 +274,11 @@ function module.UpdateAmmo(amount)
 	local ignoreAmmoTimer = Timer:getTimer("IgnoreAmmo")
 
 	if
-		amount < currentAmmo and (acts:checkAct("OverchargeActive") or (ignoreAmmoTimer and ignoreAmmoTimer.IsRunning))
+		amount < currentAmmo
+		and (
+			(workspace:GetAttribute("Overcharge") ~= 2 and acts:checkAct("OverchargeActive"))
+			or (ignoreAmmoTimer and ignoreAmmoTimer.IsRunning)
+		)
 	then
 		return
 	end
@@ -436,10 +442,6 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 		ammoToAdd += weaponData.Ammo * 0.75
 	end
 
-	if GiftsService.CheckUpgrade(player, "Bigger Boxes") then
-		ammoToAdd += weaponData.Ammo * 0.15
-	end
-
 	if extraAmmo then
 		ammoToAdd += weaponData.Ammo * (extraAmmo / 100)
 	end
@@ -483,16 +485,6 @@ end
 
 local function EquipDefault(ignoreAmmo)
 	UIService.doUiAction("HUD", "hideReload")
-
-	if GiftsService.CheckUpgrade("Gourmet Kitchen Knife") then
-		module.EquipWeapon("Katana", "FakeDefault", nil, math.huge, true, true)
-		return
-	end
-
-	if GiftsService.CheckUpgrade("Quality Sauce") then
-		module.EquipWeapon("Double Shot", "FakeDefault", nil, math.huge, true, true)
-		return
-	end
 
 	animationService:stopAnimation(viewmodel.Model, "Equip", 0)
 	animationService:playAnimation(viewmodel.Model, "DefaultIdle", Enum.AnimationPriority.Core.Value, false, 0)
@@ -940,6 +932,10 @@ local function getCritChance(source, chanceToAdd)
 		chance += 10
 	end
 
+	if workspace:GetAttribute("Overcharge") == 2 and acts:checkAct("OverchargeActive") then
+		chance += 35
+	end
+
 	return chance
 end
 
@@ -1036,9 +1032,10 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		end
 
 		if workspace:GetAttribute("Overcharge") == 3 then
-			print("ADD TO CHARGE!")
 			overchargeValue.Value += 2
 			UIService.doUiAction("HUD", "UpdateOvercharge", overchargeValue.Value / MAX_OVERCHARGE)
+		elseif workspace:GetAttribute("Overcharge") == 2 and acts:checkAct("OverchargeActive") then
+			module.AddAmmo(1)
 		end
 	end
 
@@ -1075,7 +1072,7 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		end
 
 		if element and not chanceOverride then
-			if ChanceService.checkChance(GiftsService.CheckUpgrade("Brick Oven") and 75 or 50, true) then
+			if ChanceService.checkChance(50, true) then
 				codexService.AddEntry("Elements")
 
 				if GiftsService.CheckGift("Freeze_Heaven") and ChanceService.checkChance(50, true) then
@@ -1289,7 +1286,7 @@ local function checkForGibs()
 			continue
 		end
 
-		if humanoid.MaxHealth - data.Damage > -3 then --(GiftsService.CheckUpgrade("Quality Sauce") and -1 or -3) then
+		if humanoid.MaxHealth - data.Damage > -3 then
 			continue
 		end
 
@@ -1557,9 +1554,6 @@ local function FireDefault(extraBullet)
 	end
 
 	local damageAmount = 1
-	if GiftsService.CheckUpgrade("Spicy Pepperoni") then
-		damageAmount = 2
-	end
 
 	createKnockback(getRecoilNumber())
 
@@ -1585,18 +1579,10 @@ local function FireDefault(extraBullet)
 
 	module.UpdateAmmo(currentAmmo - 1)
 
-	if GiftsService.CheckUpgrade("Spicy Pepperoni") then
-		util.PlaySound(assets.Sounds.FireHeavy, script, 0.15).Alt:Play()
-	else
-		util.PlaySound(assets.Sounds.Fire, script, 0.15)
-	end
+	util.PlaySound(assets.Sounds.Fire, script, 0.15)
 
 	local recoilVector = Vector3.new(0, 0.3, 0)
 	local recoilMagnitude = workspace:GetAttribute("CleanseAndRepent_Tier") >= 1 and 0.75 or 1
-
-	if GiftsService.CheckUpgrade("Spicy Pepperoni") then
-		recoilMagnitude = 1.35
-	end
 
 	if defaultIndex == 0 then
 		UIService.doUiAction("HUD", "PumpCrosshair")
@@ -1653,6 +1639,92 @@ local function FireDefault(extraBullet)
 	end
 end
 
+local currentShields = nil
+
+local function createISevenShieldEffect()
+	if currentShields then
+		return
+	end
+
+	local ti = TweenInfo.new(0.25, Enum.EasingStyle.Exponential)
+
+	local weaponModel = module.currentWeapon
+
+	local leftShield = assets.Effects.ISLeftShield:Clone()
+	local rightShield = assets.Effects.ISRightShield:Clone()
+
+	currentShields = {
+		left = leftShield,
+		right = rightShield,
+	}
+
+	leftShield.Parent = weaponModel
+	rightShield.Parent = weaponModel
+
+	leftShield.CFrame = weaponModel.Grip.LeftShieldPoint.WorldCFrame
+	rightShield.CFrame = weaponModel.Grip.RightShieldPoint.WorldCFrame
+
+	local leftWeld = Instance.new("WeldConstraint")
+	leftWeld.Parent = leftShield
+	leftWeld.Part0 = weaponModel.Grip
+	leftWeld.Part1 = leftShield
+
+	local rightWeld = Instance.new("WeldConstraint")
+	rightWeld.Parent = rightShield
+	rightWeld.Part0 = weaponModel.Grip
+	rightWeld.Part1 = rightShield
+
+	leftShield.Size = Vector3.new(0.001, 3, 0.001)
+	rightShield.Size = Vector3.new(0.001, 3, 0.001)
+
+	leftShield.ActivateParticle.Enabled = true
+	rightShield.ActivateParticle.Enabled = true
+
+	util.tween(leftShield, ti, { Size = Vector3.new(3, 3, 0.001) }, false, function()
+		leftShield.ActivateParticle.Enabled = false
+	end)
+	util.tween(rightShield, ti, { Size = Vector3.new(3, 3, 0.001) }, false, function()
+		rightShield.ActivateParticle.Enabled = false
+	end)
+
+	util.tween(
+		module.currentWeapon.Grip.LeftWing,
+		ti,
+		{ C1 = CFrame.new(0, 0, -0.4) * CFrame.Angles(0, math.rad(-75), 0) }
+	)
+	util.tween(
+		module.currentWeapon.Grip.RightWing,
+		ti,
+		{ C1 = CFrame.new(0, 0, -0.4) * CFrame.Angles(0, math.rad(75), 0) }
+	)
+
+	util.PlaySound(assets.Sounds.ISevenActivate, script, 0.1)
+end
+
+local function destroyISevenShieldEffect()
+	if not currentShields then
+		return
+	end
+	local leftShield = currentShields.left
+	local rightShield = currentShields.right
+
+	currentShields = nil
+
+	local ti = TweenInfo.new(0.1, Enum.EasingStyle.Linear)
+
+	util.tween(leftShield, ti, { Size = Vector3.new(0.001, 3, 0.001) }, false, function()
+		leftShield:Destroy()
+	end)
+	util.tween(rightShield, ti, { Size = Vector3.new(0.001, 3, 0.001) }, false, function()
+		rightShield:Destroy()
+	end)
+
+	util.tween(module.currentWeapon.Grip.LeftWing, ti, { C1 = CFrame.new(0, 0, -0.4) })
+	util.tween(module.currentWeapon.Grip.RightWing, ti, { C1 = CFrame.new(0, 0, -0.4) })
+
+	util.PlaySound(assets.Sounds.ISevenDeactivate, script, 0.1)
+end
+
 local function LockOn()
 	local lockAmnt = weaponData.LockAmount
 	local lockTime = weaponData.LockIncrement
@@ -1680,6 +1752,12 @@ local function LockOn()
 
 		if #weaponData.LockedOn == 0 then
 			module.Block()
+		end
+
+		if module.currentWeapon.Name == "I-Seven" and not ISevenBlock then
+			ISevenBlock = true
+			createISevenShieldEffect()
+			net:RemoteEvent("SetBlocking"):FireServer(true)
 		end
 
 		table.insert(lockGuis, newGui)
@@ -1741,6 +1819,12 @@ function module.Fire()
 
 	for _, v in ipairs(lockGuis) do
 		v:Destroy()
+	end
+
+	if ISevenBlock then
+		ISevenBlock = false
+		destroyISevenShieldEffect()
+		net:RemoteEvent("SetBlocking"):FireServer(false)
 	end
 
 	lockTimer:Cancel()
@@ -2123,16 +2207,6 @@ function module.SwitchToSlot(slotNumber)
 end
 
 function module.Throw(outOfAmmo, dontSwitchToDefault)
-	if GiftsService.CheckUpgrade("Gourmet Kitchen Knife") and module.currentWeapon.Name == "Katana" then
-		module.Unequip()
-		return
-	end
-
-	if GiftsService.CheckUpgrade("Quality Sauce") and module.currentWeapon.Name == "Double Shot" then
-		module.Unequip()
-		return
-	end
-
 	if not outOfAmmo and acts:checkAct("Throwing") then
 		return
 	end
@@ -2359,12 +2433,6 @@ function module.OnBlock()
 
 	local parryDamage = 1
 
-	if GiftsService.CheckUpgrade("Pizza Cutter") then
-		parryDamage = 2
-		module.UpdateAmmo(currentAmmo + 1)
-		ComboService.RestartTimer()
-	end
-
 	lastBlockTime = os.clock()
 
 	if module.currentWeapon and module.currentWeapon.Name == "Bloody Mary" then
@@ -2498,11 +2566,6 @@ function module:GameInit()
 	for _, animation in pairs(animationService.animations[viewmodel.Model]) do
 		animation:GetMarkerReachedSignal("Event"):Connect(actOnAnimation)
 	end
-
-	-- if GiftsService.CheckUpgrade("Spicy Pepperoni") then
-	-- 	module.defaultMagSize = 12
-	-- 	currentAmmo = module.defaultMagSize
-	-- end
 end
 
 function module:OnSpawn()
@@ -2790,10 +2853,7 @@ UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
 	end
 
 	if input.UserInputType == Enum.UserInputType.MouseButton2 or input.KeyCode == Enum.KeyCode.ButtonL2 then
-		if
-			(module.currentWeapon and module.currentWeapon.Name == "I-Seven")
-			or (not module.Block() and not (module.currentWeapon and weaponData.BlockTime))
-		then
+		if not module.Block() and not module.currentWeapon then
 			module.OpenDeadBolt()
 		end
 	end
@@ -2849,12 +2909,7 @@ UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
 		end
 	end
 
-	if
-		(input.KeyCode == Enum.KeyCode.X or input.KeyCode == Enum.KeyCode.ButtonB)
-		and module.currentWeapon
-		and not (GiftsService.CheckUpgrade("Gourmet Kitchen Knife") and module.currentWeapon.Name == "Katana")
-		and not (GiftsService.CheckUpgrade("Quality Sauce") and module.currentWeapon.Name == "Double Shot")
-	then
+	if (input.KeyCode == Enum.KeyCode.X or input.KeyCode == Enum.KeyCode.ButtonB) and module.currentWeapon then
 		module.Throw()
 	end
 
@@ -2960,10 +3015,6 @@ signals.AddAmmo:Connect(function(bigMag)
 		baseAmmo = weaponData.Ammo
 	else
 		baseAmmo = 16
-
-		-- if GiftsService.CheckUpgrade("Spicy Pepperoni") then
-		-- 	baseAmmo = 12
-		-- end
 	end
 
 	if bigMag then
@@ -3083,13 +3134,6 @@ signals.LoadSavedDataFromClient:Connect(function()
 	if player:GetAttribute("furthestLevel") > 1 then
 		module.HasHitMachine = true
 	end
-end)
-
-net:Connect("LoadData", function()
-	-- if GiftsService.CheckUpgrade("Spicy Pepperoni") then
-	-- 	module.defaultMagSize = 12
-	-- 	currentAmmo = module.defaultMagSize
-	-- end
 end)
 
 return module

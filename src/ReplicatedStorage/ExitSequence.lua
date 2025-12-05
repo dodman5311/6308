@@ -2,11 +2,12 @@ local module = {}
 
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
+local MapService = require(ServerScriptService.Server.Services.MapService)
 local dataStore = require(Globals.Server.Services.DataStore)
-local mapService = require(Globals.Server.Services.MapService)
 local net = require(Globals.Packages.Net)
 local spawners = require(Globals.Services.Spawners)
 local upgrades = require(Globals.Shared.Upgrades)
@@ -24,7 +25,7 @@ module.Exit = function(player, start_time, stage_number, level_number, bossBeate
 	local arenasCompleted = {}
 	local comboCount = 10
 
-	local stageFolder = ServerStorage:FindFirstChild("Stage_" .. mapService.CurrentStage)
+	local stageFolder = ServerStorage:FindFirstChild("Stage_" .. MapService.CurrentStage)
 	local boss_name = stageFolder:GetAttribute("MainBoss")
 	local miniboss_name = stageFolder:GetAttribute("MiniBoss")
 
@@ -57,7 +58,7 @@ module.Exit = function(player, start_time, stage_number, level_number, bossBeate
 		title = "The Sewers"
 	end
 
-	if not bossBeaten then
+	if not bossBeaten or bossBeaten == "A prayer is spoken" then
 		comboCount = net:RemoteFunction("GetMaxCombo"):InvokeClient(player)
 	end
 
@@ -95,7 +96,15 @@ module.Exit = function(player, start_time, stage_number, level_number, bossBeate
 
 	dataStore.SaveData(player, "ShopUpgrades", upgradesList)
 
-	net:RemoteEvent("StartExitSequence"):FireAllClients(levelData, level_number, boss_name, miniboss_name, stage_number)
+	net:RemoteEvent("StartExitSequence")
+		:FireAllClients(
+			levelData,
+			level_number,
+			boss_name,
+			miniboss_name,
+			stage_number,
+			bossBeaten == "A prayer is spoken"
+		)
 end
 
 return module

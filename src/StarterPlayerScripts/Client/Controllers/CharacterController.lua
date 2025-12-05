@@ -197,16 +197,6 @@ function module:OnSpawn(character, humanoid)
 end
 
 local function deathEffect()
-	local anchovies = Player:GetAttribute("Anchovies")
-	if
-		giftService.CheckUpgrade("Anchovies")
-		and workspace:GetAttribute("Level") ~= math.round(workspace:GetAttribute("Level"))
-		and anchovies
-		and anchovies > 0
-	then
-		Player:SetAttribute("Anchovies", anchovies - 1)
-	end
-
 	sounds.Death:Play()
 	module.attemptPause("DeathPause")
 
@@ -438,7 +428,7 @@ local function exitS2(extraSouls, level, stageBoss, miniBoss)
 		codexService.AddEntry("The Sewers")
 	end
 
-	if level == (giftService.CheckUpgrade("Aged Cheese") and 5.25 or 5) then
+	if level == 5 then
 		MusicService.stopMusic()
 		local onBiHidden = UIService.doUiAction("BossIntro", "ShowIntro", stageBoss)
 		onBiHidden:Once(function()
@@ -449,7 +439,7 @@ local function exitS2(extraSouls, level, stageBoss, miniBoss)
 				UIService.doUiAction("HUD", "UpdateSouls", 3)
 			end
 		end)
-	elseif level == (giftService.CheckUpgrade("Aged Cheese") and 5 or 2) then
+	elseif level == 2 then
 		net:RemoteEvent("SpawnBoss"):FireServer("MiniBoss")
 		if soulsService.Souls < 1 then
 			soulsService.AddSoul(1)
@@ -491,7 +481,7 @@ local function exitS2(extraSouls, level, stageBoss, miniBoss)
 
 	util.tween(camera, ti, { FieldOfView = util.getSetting("Field of View").Value })
 end
-local function ExitSequence(levelData, level, stageBoss, miniBoss, stage)
+local function ExitSequence(levelData, level, stageBoss, miniBoss, stage, toReq: boolean?)
 	UIService.doUiAction("HUD", "HideRCoins")
 
 	module.attemptPause("EndPause")
@@ -511,7 +501,11 @@ local function ExitSequence(levelData, level, stageBoss, miniBoss, stage)
 		task.delay(1, exitS2, extraSouls, level, stageBoss, miniBoss, stage)
 	end
 
-	net:RemoteEvent("ProceedToNextLevel"):FireServer()
+	if toReq then
+		net:RemoteEvent("ProceedToNextLevel"):FireServer(nil, true)
+	else
+		net:RemoteEvent("ProceedToNextLevel"):FireServer()
+	end
 end
 
 signals.LoadSavedDataFromClient:Connect(loadSaveData)

@@ -504,7 +504,7 @@ function module.Init(player, ui, frame)
 		module.UpdateSouls(player, ui, frame, math.round(SoulsService.Souls))
 		--module.soulCost = math.clamp(module.soulCost + 1, 1, 25) -- ADD ONTO COST
 
-		costMult = (GiftsService.CheckUpgrade("A+ Dough") and chanceService.checkChance(15, false)) and 2 or 1
+		costMult = 1
 
 		if GiftsService.CheckGift("Buy_1_Get_1") then
 			costMult = (isOther and chanceService.checkChance(30, true)) and 0 or costMult
@@ -593,12 +593,6 @@ end
 function module.ShowScreen(player, ui, frame, playerSouls)
 	if frame.Gui.Enabled then
 		return
-	end
-
-	if GiftsService.CheckUpgrade("A+ Dough") then
-		spinGifts.Nothing = nil
-		spinGifts.Small_Magazine = nil
-		spinGifts.Kevlar = nil
 	end
 
 	if #dailyDeal == 0 then

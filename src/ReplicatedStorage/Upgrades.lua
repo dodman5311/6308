@@ -257,7 +257,7 @@ local upgrades = {
 				Name = "I-Seven",
 				Description = [[When beginning a lock on, a parrying shield is created until the weapon is discharged.
 				
-<b>+15% spawn chance</b>]], -- todo
+<b>+15% spawn chance</b>]],
 				Price = 750,
 			},
 		},
@@ -463,7 +463,7 @@ local upgrades = {
 
 			{
 				Name = "Overcharge: AC/DC",
-				Description = "Upon activation: no infinite ammo, +35% crit chance, crits add +1 ammo", --@TODO
+				Description = "Upon activation: no infinite ammo, +35 crit chance, crits add +1 ammo",
 				Price = 200,
 			},
 

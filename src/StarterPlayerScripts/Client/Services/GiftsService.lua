@@ -69,17 +69,6 @@ local function ClearGifts()
 	UIService.doUiAction("HUD", "ClearGifts")
 end
 
-function module.CheckUpgrade(upgradeName)
-	local upgradeIndex = Players.LocalPlayer:GetAttribute("UpgradeIndex")
-	local upgrades = permaUpgradeList.Upgrades
-
-	if not upgradeIndex or upgradeIndex == 0 then
-		return
-	end
-
-	return upgrades[upgradeIndex].Name == upgradeName
-end
-
 function module:OnDied()
 	ClearGifts()
 end

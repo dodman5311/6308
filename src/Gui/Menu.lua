@@ -14,7 +14,6 @@ local UserInputService = game:GetService("UserInputService")
 local ChanceService = require(ReplicatedStorage.Vendor.ChanceService)
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local ViewmodelService = require(ReplicatedStorage.Vendor.ViewmodelService)
-local profileservice = require(ReplicatedStorage.Packages[".pesde"]["surnautica_profileservice@1.0.0"].profileservice)
 
 local assets = ReplicatedStorage.Assets
 local sounds = assets.Sounds
@@ -66,7 +65,7 @@ local function Lerp(num, goal, i)
 	return num + (goal - num) * i
 end
 
-local function map(n, start, stop, newStart, newStop, withinBounds)
+local function mapf(n, start, stop, newStart, newStop, withinBounds)
 	local value = ((n - start) / (stop - start)) * (newStop - newStart) + newStart
 
 	-- Returning basic value.
@@ -748,12 +747,18 @@ local function loadMap(player, frame)
 			v.TextureID = ""
 		end
 
+		if v:IsA("SurfaceAppearance") then
+			v:Destroy()
+		end
+
 		if string.match(v.Name, "Arena_") then
 			v.Name = "Arena"
 		end
 
 		if v:IsA("BasePart") then
 			local arena = v:FindFirstAncestor("Arena")
+
+			v.Material = Enum.Material.ForceField
 
 			if arena then
 				local getArenaStatus = arena:GetAttribute("Status")
@@ -766,10 +771,12 @@ local function loadMap(player, frame)
 					v.Color = Color3.fromRGB(255, 0, 255)
 				end
 			else
-				if v:FindFirstAncestor("Exit") then
-					v.Color = Color3.fromRGB(255, 0, 0)
-				elseif v:FindFirstAncestor("Start_" .. workspace:GetAttribute("Stage")) then
+				if v:FindFirstAncestor("Start_" .. workspace:GetAttribute("Stage")) then
 					v.Color = Color3.fromRGB(50, 255, 0)
+				elseif v:FindFirstAncestor("Altar") then
+					v.Color = Color3.fromRGB(255, 255, 255)
+					v.Size *= 3
+					v.Material = Enum.Material.Neon
 				elseif v:FindFirstAncestor("Kiosk") then
 					v.Color = Color3.fromRGB(0, 255, 175)
 				else
@@ -777,7 +784,9 @@ local function loadMap(player, frame)
 				end
 			end
 
-			v.Material = Enum.Material.ForceField
+			if v:FindFirstAncestor("Exit") then
+				v.Color = Color3.fromRGB(255, 0, 0)
+			end
 		end
 
 		if v:IsA("ParticleEmitter") then
@@ -1053,7 +1062,7 @@ local function loadSettings(frame)
 
 			local barFrame: Frame = newSettingsButton.BarFrame
 			barFrame.Bar.Size = UDim2.fromScale(
-				map(settingTable.Value, settingTable.MaxValue.Min, settingTable.MaxValue.Max, 0, 1, false),
+				mapf(settingTable.Value, settingTable.MaxValue.Min, settingTable.MaxValue.Max, 0, 1, false),
 				1
 			)
 

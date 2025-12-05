@@ -4,21 +4,24 @@ local module = {
 	GeneratedAt = 0,
 }
 --// services
-local RunService = game:GetService("RunService")
-local serverStorage = game:GetService("ServerStorage")
-local replicatedStorage = game:GetService("ReplicatedStorage")
-local collectionService = game:GetService("CollectionService")
-local Players = game:GetService("Players")
 local Lighting = game:GetService("Lighting")
+local Players = game:GetService("Players")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local ServerStorage = game:GetService("ServerStorage")
+local collectionService = game:GetService("CollectionService")
+local replicatedStorage = game:GetService("ReplicatedStorage")
+local serverStorage = game:GetService("ServerStorage")
 
 local Globals = require(replicatedStorage.Shared.Globals)
 
 --// requirements
-local spawners = require(Globals.Services.Spawners)
-local signals = require(Globals.Signals)
-local signal = require(Globals.Packages.Signal)
-local net = require(Globals.Packages.Net)
 local arenas = require(Globals.Services.HandleArenas)
+local net = require(Globals.Packages.Net)
+local signal = require(Globals.Packages.Signal)
+local signals = require(Globals.Signals)
+local spawners = require(Globals.Services.Spawners)
 
 module.onLevelPassed = signal.new()
 --// instances
@@ -44,6 +47,8 @@ local links = {}
 local leeway = 6
 --local unitModules = {}
 local blacklistedUnits = {}
+
+local ALTAR_SPAWN_CHANCE = 100
 
 local clearBloodEvent = net:RemoteEvent("ClearBlood")
 net:RemoteEvent("StartExitSequence")
@@ -542,6 +547,23 @@ function module.loadLinearMap(size)
 
 	--repeat
 	module.placeExit()
+
+	local check = Random.new():NextNumber(0, 100) <= ALTAR_SPAWN_CHANCE
+	print(check)
+	if check then
+		local cap = getFurthestCap()
+		print("CAP")
+		if cap then
+			local newAltar = ServerStorage.Altar:Clone()
+			newAltar.Parent = cap.Parent
+			newAltar:PivotTo(cap:GetPivot())
+
+			print(newAltar)
+
+			local r = require(newAltar.Modules.Use)
+			r.OnPlaced(newAltar, module)
+		end
+	end
 	--task.wait()
 	--until map:FindFirstChild("Exit", true)
 
@@ -676,13 +698,8 @@ local function createStoredMap()
 	return newStoredMap
 end
 
-function module.proceedToNext(_, onlyLoadMap)
-	local hasCheese = false
+function module.proceedToNext(_, onlyLoadMap, toReq: boolean?)
 	for _, player in ipairs(Players:GetPlayers()) do -- Teleport players to spawn
-		if player:GetAttribute("UpgradeName") == "Aged Cheese" then
-			hasCheese = true
-		end
-
 		local character = player.Character
 		if not character then
 			continue
@@ -699,8 +716,8 @@ function module.proceedToNext(_, onlyLoadMap)
 	end
 
 	if not onlyLoadMap then
-		if module.CurrentLevel == 5 or module.CurrentLevel == (hasCheese and 5.25 or 2) then
-			module.CurrentLevel += (hasCheese and 0.25 or 0.5)
+		if module.CurrentLevel == 5 or module.CurrentLevel == 2 then
+			module.CurrentLevel += 0.5
 		else
 			module.CurrentLevel = math.floor(module.CurrentLevel + 1)
 		end
@@ -712,11 +729,14 @@ function module.proceedToNext(_, onlyLoadMap)
 
 		if module.CurrentStage == 0 then
 			module.CurrentStage = workspace:GetAttribute("SaveStage") or 1
-			module.CurrentLevel = 1
 		elseif module.CurrentLevel == 1 then
 			workspace:SetAttribute("SaveStage", module.CurrentStage)
 			module.CurrentStage = 0
-			module.CurrentLevel = 1
+		end
+
+		if toReq then
+			workspace:SetAttribute("SaveStage", module.CurrentStage)
+			module.CurrentStage = 0
 		end
 	end
 
@@ -734,7 +754,7 @@ function module.proceedToNext(_, onlyLoadMap)
 		Lighting.Atmosphere.Density = 0.55
 	end
 
-	if math.floor(module.CurrentLevel) ~= module.CurrentLevel then
+	if math.floor(module.CurrentLevel) ~= module.CurrentLevel and not toReq then
 		module.loadBossRoom()
 		storedMap = createStoredMap()
 		return
@@ -742,7 +762,7 @@ function module.proceedToNext(_, onlyLoadMap)
 
 	local mapSize = math.clamp(module.CurrentLevel * 4, 5, 25)
 
-	if module.CurrentStage == 3 then
+	if module.CurrentStage == 3 then -- FIX BOSS LEVEL (current level -= 1)
 		mapSize /= 2
 	end
 

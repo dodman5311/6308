@@ -2,14 +2,14 @@ local module = {
 	unlocked = false,
 }
 --// Services
+local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local StarterGui = game:GetService("StarterGui")
 local TeleportService = game:GetService("TeleportService")
 local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
-local CollectionService = game:GetService("CollectionService")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
@@ -20,14 +20,14 @@ local sounds = assets.Sounds
 local sfx = sounds.DeathScreen
 
 --// Modules
-local util = require(Globals.Vendor.Util)
-local acts = require(Globals.Vendor.Acts)
-local UiAnimator = require(Globals.Vendor.UIAnimationService)
-local Signals = require(Globals.Shared.Signals)
 local MusicService = require(Globals.Client.Services.MusicService)
+local Signals = require(Globals.Shared.Signals)
+local UiAnimator = require(Globals.Vendor.UIAnimationService)
+local acts = require(Globals.Vendor.Acts)
+local giftService = require(Globals.Client.Services.GiftsService)
 local net = require(Globals.Packages.Net)
 local soulsService = require(Globals.Client.Services.SoulsService)
-local giftService = require(Globals.Client.Services.GiftsService)
+local util = require(Globals.Vendor.Util)
 local deliveryAmount = 0
 
 local levelsPassed = Instance.new("IntValue")
@@ -76,88 +76,6 @@ end
 
 function module.Cleanup(player, ui, frame) end
 
-local function processAnchovies(player, frame)
-	if not giftService.CheckUpgrade("Anchovies") then
-		return false
-	end
-
-	local anchovies = player:GetAttribute("Anchovies")
-	if not anchovies or anchovies <= 0 then
-		return false
-	end
-
-	task.wait(1)
-
-	sfx.Boom:Play()
-
-	frame.Anchovies.Visible = true
-
-	local ti = TweenInfo.new(2)
-
-	local amount = anchovies
-
-	for anchovyIndex = 1, 3 do
-		local anchovy = frame.Anchovies[anchovyIndex]
-
-		if anchovyIndex > amount then
-			anchovy.Image = "rbxassetid://73202563080543"
-		else
-			anchovy.Image = "rbxassetid://72059147239084"
-		end
-
-		anchovy.ImageTransparency = 1
-		util.tween(anchovy, ti, { ImageTransparency = 0 })
-
-		task.delay(3, function()
-			util.tween(anchovy, TweenInfo.new(1), { ImageTransparency = 1 })
-		end)
-
-		if anchovyIndex ~= amount then
-			continue
-		end
-
-		task.delay(2, function()
-			anchovy.Image = "rbxassetid://73202563080543"
-			local originalPosition = anchovy.Position
-
-			util.PlaySound(sfx.AnchovyUse, script, 0.05)
-
-			for i = 10, 0, -1 do
-				task.wait(0.05)
-
-				local randomY = Random.new():NextNumber(-i, i) / 800
-
-				if i % 2 == 0 then
-					i = -i
-				end
-
-				anchovy.Position = originalPosition + UDim2.fromScale(i / 400, randomY)
-			end
-		end)
-	end
-
-	task.wait(4)
-
-	local level = workspace:GetAttribute("Level")
-	if level == 5.5 then
-		net:RemoteEvent("SpawnBoss"):FireServer("MainBoss")
-		if soulsService.Souls < 3 then
-			soulsService.AddSoul(3 - soulsService.Souls)
-		end
-
-		MusicService.playTrack(workspace:GetAttribute("LastBoss"))
-	elseif level == 2.5 or 5.25 then
-		net:RemoteEvent("SpawnBoss"):FireServer("MiniBoss")
-		if soulsService.Souls < 1 then
-			soulsService.AddSoul(1)
-		end
-
-		MusicService.playTrack(workspace:GetAttribute("LastBoss"))
-	end
-
-	return true
-end
-
 function module.ShowDeathScreen(player, ui, frame)
 	local logVolume = SoundService.Music.Volume
 	SoundService.Music.Volume = 0
@@ -198,19 +116,6 @@ function module.ShowDeathScreen(player, ui, frame)
 	breakAnimation.OnEnded:Once(function()
 		HealthBroken.Visible = false
 		task.wait(0.8)
-
-		if processAnchovies(player, frame) then
-			SoundService.AmbientReverb = Enum.ReverbType.NoReverb
-			Requiem.Visible = false
-
-			util.tween(frame.Background, ti, { BackgroundTransparency = 1 }, true)
-
-			frame.Gui.Enabled = false
-
-			--MusicService.playMusic()
-			SoundService.Music.Volume = logVolume
-			return
-		end
 
 		SoundService.AmbientReverb = Enum.ReverbType.Arena
 		sfx.EvilVoices:Play()
