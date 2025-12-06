@@ -1,8 +1,5 @@
 local module = {
-	stageState = {
-		Stage = 0,
-		Level = 0,
-	},
+	gameState = {},
 }
 
 --// Services
@@ -56,7 +53,11 @@ end
 
 function module.LoadGameData(player)
 	local startTime = os.clock()
+
 	local deathCount = LoadData(player, DataStoreService:GetDataStore("PlayerDeathCount")) or 0
+	local storedScore = LoadData(player, DataStoreService:GetDataStore("PlayerStoredScore")) or 0
+	local totalScore = LoadData(player, DataStoreService:GetDataStore("PlayerTotalScore")) or 0
+
 	local upgrades = LoadData(player, DataStoreService:GetDataStore("ShopUpgrades")) or {}
 	local gameSettings = LoadData(player, DataStoreService:GetDataStore("PlayerSettings")) or {}
 	local gameState = LoadData(player, DataStoreService:GetDataStore("PlayerGameState")) or {}
@@ -75,9 +76,9 @@ function module.LoadGameData(player)
 
 	mapService.proceedToNext(nil, true)
 
-	workspace:SetAttribute("TotalScore", gameState.TotalScore or 0)
-	workspace:SetAttribute("StoredScore", gameState.StoredScore or 0)
-	workspace:SetAttribute("DeathCount", deathCount or 0)
+	workspace:SetAttribute("TotalScore", storedScore)
+	workspace:SetAttribute("StoredScore", totalScore)
+	workspace:SetAttribute("DeathCount", deathCount)
 
 	for upgradeName, upgradeValue in pairs(upgrades) do
 		workspace:SetAttribute(upgradeName, upgradeValue)
@@ -88,7 +89,7 @@ function module.LoadGameData(player)
 end
 
 function module.getStageState()
-	return module.stageState
+	return module.gameState
 end
 
 -- mapService.onLevelPassed:Connect(function(player, gameState)
@@ -107,18 +108,24 @@ end
 function module.saveGameState(player, gameState)
 	local startTime = os.clock()
 
+	module.gameState = gameState
+
 	local dataStore = DataStoreService:GetDataStore("PlayerGameState")
+	local storedScore = DataStoreService:GetDataStore("PlayerStoredScore")
+	local totalScore = DataStoreService:GetDataStore("PlayerTotalScore")
 	--gameState.Stage = gameState.Stage or mapService.CurrentStage
 	--gameState.Level = gameState.Level or mapService.CurrentLevel
 	SaveToStore(player, dataStore, gameState)
+	SaveToStore(player, totalScore, workspace:GetAttribute("TotalScore"))
+	SaveToStore(player, storedScore, workspace:GetAttribute("StoredScore"))
 
 	print("Game saved in", os.clock() - startTime, gameState)
 
-	if gameState.Level == 1 then
-		SaveToStore(player, DataStoreService:GetDataStore("PlayerStageState"), gameState)
-		module.stageState = gameState
-		print("STAGE saved in", os.clock() - startTime, gameState)
-	end
+	--if gameState.Level == 1 then
+	--SaveToStore(player, DataStoreService:GetDataStore("PlayerStageState"), gameState)
+	--module.stageState = gameState
+	--print("STAGE saved in", os.clock() - startTime, gameState)
+	--end
 
 	net:RemoteEvent("DoUiAction"):FireAllClients("Notify", "GameSaved")
 end

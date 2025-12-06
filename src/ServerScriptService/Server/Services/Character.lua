@@ -177,11 +177,12 @@ local function onDied(player: Player)
 		mapService.CurrentStage = 0
 		workspace:SetAttribute("DeathCount", workspace:GetAttribute("DeathCount") + 1)
 
-		dataStore.saveGameState(player, dataStore.stageState)
+		--dataStore.saveGameState(player, dataStore.stageState)
 	else
 		mapService.CurrentStage = 1
+		mapService.CurrentLevel = 1
 		workspace:SetAttribute("TotalScore", 0)
-		workspace:SetAttribute("StoredScore", 0)
+		workspace:SetAttribute("StoredScore", math.ceil(workspace:GetAttribute("StoredScore") / 2))
 		workspace:SetAttribute("DeathCount", 0)
 
 		for _, category in pairs(upgrades) do
@@ -193,8 +194,6 @@ local function onDied(player: Player)
 		dataStore.saveGameState(player, { Level = 1 })
 		dataStore.SaveData(player, "ShopUpgrades", {})
 	end
-
-	mapService.CurrentLevel = 1
 
 	dataStore.SaveData(player, "PlayerDeathCount", workspace:GetAttribute("DeathCount"))
 

@@ -756,12 +756,20 @@ local function loadMap(player, frame)
 		end
 
 		if v:IsA("BasePart") then
-			local arena = v:FindFirstAncestor("Arena")
-
 			v.Material = Enum.Material.ForceField
 
-			if arena then
-				local getArenaStatus = arena:GetAttribute("Status")
+			if v:FindFirstAncestor("Start_" .. workspace:GetAttribute("Stage")) then
+				v.Color = Color3.fromRGB(50, 255, 0)
+			elseif v:FindFirstAncestor("Altar") then
+				v.Color = Color3.fromRGB(255, 255, 255)
+				v.Size *= 3
+				v.Material = Enum.Material.Neon
+			elseif v:FindFirstAncestor("Exit") then
+				v.Color = Color3.fromRGB(255, 0, 0)
+			elseif v:FindFirstAncestor("Kiosk") then
+				v.Color = Color3.fromRGB(0, 255, 175)
+			elseif v:FindFirstAncestor("Arena") then
+				local getArenaStatus = v:FindFirstAncestor("Arena"):GetAttribute("Status")
 
 				if getArenaStatus == "Completed" then
 					v.Color = Color3.fromRGB(150, 150, 150)
@@ -771,21 +779,7 @@ local function loadMap(player, frame)
 					v.Color = Color3.fromRGB(255, 0, 255)
 				end
 			else
-				if v:FindFirstAncestor("Start_" .. workspace:GetAttribute("Stage")) then
-					v.Color = Color3.fromRGB(50, 255, 0)
-				elseif v:FindFirstAncestor("Altar") then
-					v.Color = Color3.fromRGB(255, 255, 255)
-					v.Size *= 3
-					v.Material = Enum.Material.Neon
-				elseif v:FindFirstAncestor("Kiosk") then
-					v.Color = Color3.fromRGB(0, 255, 175)
-				else
-					v.Color = Color3.fromRGB(255, 200, 0)
-				end
-			end
-
-			if v:FindFirstAncestor("Exit") then
-				v.Color = Color3.fromRGB(255, 0, 0)
+				v.Color = Color3.fromRGB(255, 200, 0)
 			end
 		end
 

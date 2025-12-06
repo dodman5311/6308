@@ -29,7 +29,7 @@ module.Exit = function(player, start_time, stage_number, level_number, bossBeate
 	local boss_name = stageFolder:GetAttribute("MainBoss")
 	local miniboss_name = stageFolder:GetAttribute("MiniBoss")
 
-	for _, arena in ipairs(ReplicatedStorage.Map:GetChildren()) do
+	for _, arena in ipairs(workspace.Map:GetChildren()) do
 		if not string.match(arena.Name, "Arena_") then
 			continue
 		end
@@ -44,8 +44,8 @@ module.Exit = function(player, start_time, stage_number, level_number, bossBeate
 	local enemies = CollectionService:GetTagged("Enemy") or {}
 
 	local spawnedEnemies = spawners.EnemiesSpawned
-	local spawnedArenas = math.clamp(#arenas, 1, math.huge)
-	local arenaCount = math.clamp(#arenasCompleted, 1, math.huge)
+	local spawnedArenas = #arenas
+	local arenaCount = #arenasCompleted
 	local enemyCount = #enemies
 
 	for _, enemy in ipairs(enemies) do
@@ -60,6 +60,23 @@ module.Exit = function(player, start_time, stage_number, level_number, bossBeate
 
 	if not bossBeaten or bossBeaten == "A prayer is spoken" then
 		comboCount = net:RemoteFunction("GetMaxCombo"):InvokeClient(player)
+	end
+
+	if spawnedArenas == 0 then
+		spawnedArenas = 1
+		arenaCount = 1
+	end
+
+	if level_number ~= 2 and level_number ~= 5 then
+		local upgradesList = {}
+
+		for _, category in pairs(upgrades) do
+			for upgradeName, _ in pairs(category) do
+				upgradesList[upgradeName] = workspace:GetAttribute(upgradeName)
+			end
+		end
+
+		dataStore.SaveData(player, "ShopUpgrades", upgradesList)
 	end
 
 	if stage_number == 0 then
@@ -85,16 +102,6 @@ module.Exit = function(player, start_time, stage_number, level_number, bossBeate
 		local maxScore = levelData.EnemiesKilled + levelData.ArenasCompleted + (levelData.MaxCombo * 10)
 		workspace:SetAttribute("TotalScore", workspace:GetAttribute("TotalScore") + math.floor(maxScore))
 	end
-
-	local upgradesList = {}
-
-	for _, category in pairs(upgrades) do
-		for upgradeName, _ in pairs(category) do
-			upgradesList[upgradeName] = workspace:GetAttribute(upgradeName)
-		end
-	end
-
-	dataStore.SaveData(player, "ShopUpgrades", upgradesList)
 
 	net:RemoteEvent("StartExitSequence")
 		:FireAllClients(

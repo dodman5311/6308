@@ -419,17 +419,17 @@ local upgrades = {
 		["Brick_Hook"] = {
 			{
 				Name = "BrickHook: Tier 1",
-				Description = "Enemies have a 10% chance to be stunned after being hit with brick hook",
+				Description = "Enemies have a 10% chance to be stunned after being hit with brick hook", -- holding shift swings you from a point.
 				Price = 200,
 			},
 			{
-				Name = "BrickHook: Tier 1",
-				Description = "+10 crit chance for 2 seconds after using brick hook",
+				Name = "BrickHook: Tier 2",
+				Description = "+10 crit chance for 2 seconds after using brick hook", -- holding shift while on the ground, activates a damaging slide.
 				Price = 350,
 			},
 			{
 				Name = "BrickHook: Tier 3",
-				Description = "Hitting an enemy with Brick Hook adds +20% soul drop chance for 1 second",
+				Description = "Hitting an enemy with Brick Hook adds +20% soul drop chance for 1 second", -- player is invincible while whip sliding
 				Price = 500,
 			},
 		},
@@ -441,12 +441,12 @@ local upgrades = {
 				Price = 200,
 			},
 			{
-				Name = "Spiked Sabatons: Tier 2",
+				Name = "Spiked Sabatons: Immortal Folley",
 				Description = "When jumping off a wall, you gain 2 seconds of invincibility.",
 				Price = 350,
 			},
 			{
-				Name = "Spiked Sabatons: Tier 3",
+				Name = "Spiked Sabatons: Flying Kick",
 				Description = "After jumping off a wall, pressing shift will execute a <b>flying kick</b>. Flying kick damage scales with distance.",
 				Price = 500,
 			},

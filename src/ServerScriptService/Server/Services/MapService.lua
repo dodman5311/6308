@@ -6,8 +6,6 @@ local module = {
 --// services
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerStorage = game:GetService("ServerStorage")
 local collectionService = game:GetService("CollectionService")
@@ -48,7 +46,7 @@ local leeway = 6
 --local unitModules = {}
 local blacklistedUnits = {}
 
-local ALTAR_SPAWN_CHANCE = 100
+local ALTAR_SPAWN_CHANCE = 100 -- 50
 
 local clearBloodEvent = net:RemoteEvent("ClearBlood")
 net:RemoteEvent("StartExitSequence")
@@ -168,15 +166,17 @@ local function Shuffle(tabl)
 end
 
 local function getAssets()
-	stageFolder = serverStorage:FindFirstChild("Stage_" .. module.CurrentStage)
-	startUnit = stageFolder:FindFirstChild("Start_" .. module.CurrentStage)
+	local stage = module.CurrentStage
+	print(stage)
+	stageFolder = serverStorage:FindFirstChild("Stage_" .. stage)
+	startUnit = stageFolder:FindFirstChild("Start_" .. stage)
 	units = stageFolder.Units
 	caps = stageFolder.Caps
 	exit = stageFolder.Exit
 	kiosk = stageFolder.Kiosk
 	sky = stageFolder.Sky
-	bossRoom = stageFolder:FindFirstChild("BossRoom_" .. module.CurrentStage)
-	miniBossRoom = stageFolder:FindFirstChild("MiniBossRoom_" .. module.CurrentStage)
+	bossRoom = stageFolder:FindFirstChild("BossRoom_" .. stage)
+	miniBossRoom = stageFolder:FindFirstChild("MiniBossRoom_" .. stage)
 end
 
 -----------------------------------------// Important Functions //-----------------------------------------
@@ -421,6 +421,8 @@ function module.generateUnit(linkList, forInterior)
 
 		return placedUnit
 	end
+
+	return
 end
 
 local function getFurthestCap()
@@ -525,6 +527,29 @@ function module.loadMap(size)
 	module.GeneratedAt = os.clock()
 end
 
+local function placeAltar()
+	-- if module.CurrentLevel == 2 or module.CurrentLevel == 5 then
+	-- 	return
+	-- end
+
+	local check = Random.new():NextNumber(0, 100) <= ALTAR_SPAWN_CHANCE
+	if not check then
+		return
+	end
+
+	local cap = getFurthestCap()
+	if not cap then
+		return
+	end
+
+	local newAltar = ServerStorage.Altar:Clone()
+	newAltar.Parent = cap.Parent
+	newAltar:PivotTo(cap:GetPivot())
+
+	local r = require(newAltar.Modules.Use)
+	r.OnPlaced(newAltar, module)
+end
+
 function module.loadLinearMap(size)
 	module.setupMap()
 
@@ -548,22 +573,7 @@ function module.loadLinearMap(size)
 	--repeat
 	module.placeExit()
 
-	local check = Random.new():NextNumber(0, 100) <= ALTAR_SPAWN_CHANCE
-	print(check)
-	if check then
-		local cap = getFurthestCap()
-		print("CAP")
-		if cap then
-			local newAltar = ServerStorage.Altar:Clone()
-			newAltar.Parent = cap.Parent
-			newAltar:PivotTo(cap:GetPivot())
-
-			print(newAltar)
-
-			local r = require(newAltar.Modules.Use)
-			r.OnPlaced(newAltar, module)
-		end
-	end
+	placeAltar()
 	--task.wait()
 	--until map:FindFirstChild("Exit", true)
 
@@ -664,7 +674,12 @@ function module.loadBossRoom()
 end
 
 local function spawnBoss(_, type)
-	spawners.SpawnBoss(stageFolder:GetAttribute(type), map:FindFirstChildOfClass("Model"))
+	if module.CurrentStage == 0 then
+		return
+	end
+	getAssets()
+
+	spawners.SpawnBoss(stageFolder:GetAttribute(type), map:FindFirstChildOfClass("Model")) -- stage folder issue
 	workspace:SetAttribute("LastBoss", stageFolder:GetAttribute(type))
 end
 
@@ -717,24 +732,23 @@ function module.proceedToNext(_, onlyLoadMap, toReq: boolean?)
 
 	if not onlyLoadMap then
 		if module.CurrentLevel == 5 or module.CurrentLevel == 2 then
-			module.CurrentLevel += 0.5
-		else
+			if not toReq then -- dont continue if you're going to req. DON'T
+				module.CurrentLevel += 0.5
+			end
+		elseif module.CurrentStage ~= 0 and not toReq then
 			module.CurrentLevel = math.floor(module.CurrentLevel + 1)
 		end
 
 		if module.CurrentLevel > 5.5 then -- amount of levels in a stage
 			module.CurrentLevel = 1
-			module.CurrentStage += 1
+			if not toReq then
+				module.CurrentStage += 1 -- USING ALTAR DOESN'T CONTINUE TO NEXT LEVEL!
+			end
 		end
 
 		if module.CurrentStage == 0 then
 			module.CurrentStage = workspace:GetAttribute("SaveStage") or 1
-		elseif module.CurrentLevel == 1 then
-			workspace:SetAttribute("SaveStage", module.CurrentStage)
-			module.CurrentStage = 0
-		end
-
-		if toReq then
+		elseif toReq then
 			workspace:SetAttribute("SaveStage", module.CurrentStage)
 			module.CurrentStage = 0
 		end
@@ -755,6 +769,8 @@ function module.proceedToNext(_, onlyLoadMap, toReq: boolean?)
 	end
 
 	if math.floor(module.CurrentLevel) ~= module.CurrentLevel and not toReq then
+		print(module.CurrentStage)
+
 		module.loadBossRoom()
 		storedMap = createStoredMap()
 		return
@@ -762,7 +778,7 @@ function module.proceedToNext(_, onlyLoadMap, toReq: boolean?)
 
 	local mapSize = math.clamp(module.CurrentLevel * 4, 5, 25)
 
-	if module.CurrentStage == 3 then -- FIX BOSS LEVEL (current level -= 1)
+	if module.CurrentStage == 3 then
 		mapSize /= 2
 	end
 

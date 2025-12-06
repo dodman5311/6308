@@ -1702,7 +1702,7 @@ local function createISevenShieldEffect()
 end
 
 local function destroyISevenShieldEffect()
-	if not currentShields then
+	if not currentShields or not module.currentWeapon then
 		return
 	end
 	local leftShield = currentShields.left
@@ -2021,6 +2021,8 @@ local function ThrowWeapon()
 	local overlapParams = OverlapParams.new()
 
 	local canHit = {}
+
+	net:RemoteEvent("SetBlocking"):FireServer(false)
 
 	for _, v in ipairs(CollectionService:GetTagged("Enemy")) do
 		table.insert(canHit, v)
@@ -2853,7 +2855,7 @@ UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
 	end
 
 	if input.UserInputType == Enum.UserInputType.MouseButton2 or input.KeyCode == Enum.KeyCode.ButtonL2 then
-		if not module.Block() and not module.currentWeapon then
+		if not module.Block() and not (module.currentWeapon and weaponData.BlockTime) then
 			module.OpenDeadBolt()
 		end
 	end

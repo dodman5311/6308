@@ -76,7 +76,14 @@ local function connectButtonHover(button)
 	end)
 end
 
+local perkDebounce = false
+
 local function givePerk(frame, button)
+	if perkDebounce then
+		return
+	end
+	perkDebounce = true
+
 	for _, buttonFrame in ipairs(frame.Choices:GetChildren()) do
 		if not buttonFrame:IsA("Frame") then
 			continue
@@ -101,6 +108,8 @@ local function givePerk(frame, button)
 		frame.Gui.Enabled = false
 
 		net:RemoteEvent("BossExit"):FireServer()
+
+		perkDebounce = true
 	end)
 end
 
