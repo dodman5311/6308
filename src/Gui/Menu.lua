@@ -13,6 +13,7 @@ local UserInputService = game:GetService("UserInputService")
 --// Instances
 local ChanceService = require(ReplicatedStorage.Vendor.ChanceService)
 local Globals = require(ReplicatedStorage.Shared.Globals)
+local MapIcons = require(ReplicatedStorage.Vendor.MapIcons)
 local ViewmodelService = require(ReplicatedStorage.Vendor.ViewmodelService)
 
 local assets = ReplicatedStorage.Assets
@@ -721,21 +722,7 @@ local function hideAllMenus(frame)
 	showAttention(frame)
 end
 
-local function fixAspect(xCoord, viewportSize, viewport)
-	local viewportAspect = viewport.Y / viewport.X
-	local cameraAspect = viewportSize.X / viewportSize.Y
-	local aspectModification = viewportAspect / cameraAspect
-	xCoord -= 0.5
-	xCoord *= aspectModification
-	xCoord += 0.5
-	return xCoord
-end
-
--- local buttonPosition, onScreen = viewportCamera:WorldToViewportPoint(exitCFrame.Position) -- MAP REVAMP TIME!! VIEWPORT ICON MODULE
--- frame.ExitTeleportButton.Position = UDim2.fromScale(
--- 	fixAspect(buttonPosition.X, viewportSize, viewport.AbsoluteSize) / viewportSize.X,
--- 	buttonPosition.Y / viewportSize.Y
--- )
+local made = false
 
 local function loadMap(player, frame)
 	local viewport = frame.MapViewport
