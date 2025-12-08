@@ -741,6 +741,8 @@ function module.proceedToNext(_, onlyLoadMap, toReq: boolean?)
 
 		if module.CurrentLevel > 5.5 then -- amount of levels in a stage
 			module.CurrentLevel = 1
+
+			print(toReq)
 			if not toReq then
 				module.CurrentStage += 1 -- USING ALTAR DOESN'T CONTINUE TO NEXT LEVEL!
 			end
