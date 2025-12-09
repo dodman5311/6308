@@ -167,7 +167,6 @@ end
 
 local function getAssets()
 	local stage = module.CurrentStage
-	print(stage)
 	stageFolder = serverStorage:FindFirstChild("Stage_" .. stage)
 	startUnit = stageFolder:FindFirstChild("Start_" .. stage)
 	units = stageFolder.Units
@@ -453,7 +452,7 @@ function module.placeExit()
 	end
 
 	local newExit = exit:Clone()
-	newExit.Parent = cap.Parent
+	newExit.Parent = map
 
 	newExit:PivotTo(cap:GetPivot())
 
@@ -537,14 +536,15 @@ local function placeAltar()
 		return
 	end
 
-	local cap = getFurthestCap()
-	if not cap then
+	local allCaps = collectionService:GetTagged("Cap")
+	if #allCaps == 0 then
 		return
 	end
+	local randomCap = allCaps[math.random(1, #allCaps)]
 
 	local newAltar = ServerStorage.Altar:Clone()
-	newAltar.Parent = cap.Parent
-	newAltar:PivotTo(cap:GetPivot())
+	newAltar.Parent = map
+	newAltar:PivotTo(randomCap:GetPivot())
 
 	local r = require(newAltar.Modules.Use)
 	r.OnPlaced(newAltar, module)

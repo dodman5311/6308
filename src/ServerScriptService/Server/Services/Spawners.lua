@@ -417,7 +417,7 @@ net:Handle("GetEnemies", function()
 	local enemyCFrames = {}
 
 	for _, enemy in ipairs(CollectionService:GetTagged("Enemy")) do
-		table.insert(enemyCFrames, enemy:GetPivot())
+		table.insert(enemyCFrames, { CFrame = enemy:GetPivot(), Name = enemy.Name })
 	end
 
 	return enemyCFrames

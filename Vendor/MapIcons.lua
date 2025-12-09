@@ -1,46 +1,41 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local TutorialService = game:GetService("TutorialService")
+local TweenService = game:GetService("TweenService")
 
 local gui = ReplicatedStorage.Assets.Gui
 
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local mapIconsModule = {}
 
-type LabelIconInstance = ImageLabel & { Icon: ImageLabel }
-type InteractableIconInstance =
+type IconInstance =
 	ImageButton
 	& { Icon: ImageLabel }
 	& { PromptClippingFrame: Frame & { Prompt: Frame & { PromptMessage: TextLabel } } }
-type MapIcon = {
+	& { PreciseSelection: Frame }
+export type MapIcon = {
 	IconImage: string,
 	FrameImage: string,
+	PromptMessage: string,
 	Color: Color3,
 	Transparency: number,
 	Adornee: Model | BasePart?,
-}
-
-export type LabelMapIcon = MapIcon & {
-	Instance: LabelIconInstance,
-	Destroy: (self: InteractableMapIcon) -> any?,
-}
-
-export type InteractableMapIcon = MapIcon & {
 	InteractTime: number?,
-	InteractBegan: RBXScriptConnection,
-	InteractEnded: RBXScriptConnection,
+	InteractBegan: RBXScriptSignal<number, number>,
+	InteractEnded: RBXScriptSignal<number, number>,
 	InteractCompleted: Signal.Signal<>,
-	MouseEntered: RBXScriptConnection,
-	MouseLeft: RBXScriptConnection,
-	Instance: InteractableIconInstance,
-	Destroy: (self: InteractableMapIcon) -> any?,
+	MouseEntered: RBXScriptSignal<number, number>,
+	MouseLeft: RBXScriptSignal<number, number>,
+	PreciseMouseEntered: RBXScriptSignal<number, number>,
+	PreciseMouseLeft: RBXScriptSignal<number, number>,
+	Instance: IconInstance,
+	Destroy: (self: MapIcon) -> any?,
 }
 
 local function cancelThread(thread: thread?)
 	if not thread then
 		return
 	end
-	task.cancel(thread)
+	pcall(task.cancel, thread)
 end
 
 local function fixAspect(xCoordinate: number, cameraViewportSize: Vector2, absoluteViewportSize: Vector2)
@@ -53,7 +48,7 @@ local function fixAspect(xCoordinate: number, cameraViewportSize: Vector2, absol
 	return xCoordinate
 end
 
-local function processMapIcon(mapIcon: InteractableMapIcon): RBXScriptConnection
+local function processMapIcon(mapIcon: MapIcon): RBXScriptConnection
 	return RunService.RenderStepped:Connect(function()
 		if not mapIcon.Adornee then
 			return
@@ -78,25 +73,11 @@ local function processMapIcon(mapIcon: InteractableMapIcon): RBXScriptConnection
 
 		local size = 50 / iconPosition.Z
 		mapIcon.Instance.Size = UDim2.fromScale(size, size * 1.3333333333333334)
+		mapIcon.Instance.ZIndex = math.ceil(size * 100)
 	end)
 end
 
-local function createMapIcon(icon: string?, adornee: Instance?): MapIcon
-	icon = icon or ""
-	adornee = adornee or nil
-
-	local newMapIconBase: MapIcon = {
-		IconImage = icon,
-		FrameImage = "rbxassetid://110159171300777",
-		Color = Color3.new(1, 1, 1),
-		Transparency = 0,
-		Adornee = adornee,
-	}
-
-	return newMapIconBase
-end
-
-local function createMetaProxy(mapIcon: LabelMapIcon | InteractableMapIcon): LabelMapIcon | InteractableMapIcon
+local function createMetaProxy(mapIcon: MapIcon): MapIcon
 	local proxy = setmetatable({}, {
 		__index = mapIcon,
 		__newindex = function(_, key, value)
@@ -116,6 +97,8 @@ local function createMetaProxy(mapIcon: LabelMapIcon | InteractableMapIcon): Lab
 				instance.Image = value
 			elseif key == "Color" then
 				instance.ImageColor3 = value
+			elseif key == "PromptMessage" then
+				instance.PromptClippingFrame.Prompt.PromptMessage.Text = value
 			elseif key == "Transparency" then
 				instance.Transparency = value
 				instance.Icon.Transparency = value
@@ -127,38 +110,48 @@ local function createMetaProxy(mapIcon: LabelMapIcon | InteractableMapIcon): Lab
 	return proxy
 end
 
-function mapIconsModule.newLabelIcon(parent: Instance?, icon: string?, adornee: Instance?): LabelMapIcon
-	local newMapIcon = createMapIcon(icon, adornee)
-	local newInstance = gui.LabelMapIconInstance:Clone()
+function mapIconsModule.new(parent: Instance?, icon: string?, adornee: Instance?): MapIcon
+	icon = icon or ""
+	adornee = adornee or nil
+
+	local isDestroying = false
+
+	local newInstance = gui.InteractableMapIconInstance:Clone()
+	local interactThread
+	local processThread
+
+	local newMapIcon: MapIcon = {
+		IconImage = icon,
+		FrameImage = "rbxassetid://110159171300777",
+		PromptMessage = "",
+		Color = Color3.new(1, 1, 1),
+		Transparency = 0,
+		Adornee = adornee,
+		Instance = newInstance,
+		InteractTime = 1,
+		InteractBegan = newInstance.MouseButton1Down,
+		InteractEnded = newInstance.MouseButton1Up,
+		InteractCompleted = Signal.new(),
+		MouseEntered = newInstance.MouseEnter,
+		MouseLeft = newInstance.MouseLeave,
+
+		PreciseMouseEntered = newInstance.PreciseSelection.MouseEnter,
+		PreciseMouseLeft = newInstance.PreciseSelection.MouseLeave,
+		Destroy = function(self)
+			if processThread then
+				processThread:Disconnect()
+			end
+			if not isDestroying then
+				self.Instance:Destroy()
+			end
+
+			cancelThread(interactThread)
+			self.InteractCompleted:Destroy()
+		end,
+	}
+
 	newInstance.Icon.Image = newMapIcon.IconImage
 	newInstance.Parent = parent
-	newMapIcon.Instance = newInstance
-
-	local processThread = processMapIcon(newMapIcon)
-
-	newMapIcon.Destroy = function(self)
-		if processThread then
-			processThread:Disconnect()
-		end
-		self.Instance:Destroy()
-	end
-
-	return createMetaProxy(newMapIcon) :: LabelMapIcon
-end
-
-function mapIconsModule.newInteractableIcon(parent: Instance?, icon: string?, adornee: Instance?): InteractableMapIcon
-	local newMapIcon = createMapIcon(icon, adornee) :: InteractableMapIcon
-	local newInstance = gui.InteractableMapIconInstance:Clone()
-	newInstance.Icon.Image = newMapIcon.IconImage
-
-	newMapIcon.InteractTime = 1
-	newMapIcon.InteractBegan = newInstance.MouseButton1Down
-	newMapIcon.InteractEnded = newInstance.MouseButton1Up
-	newMapIcon.InteractCompleted = Signal.new()
-	newMapIcon.MouseEntered = newInstance.MouseEnter
-	newMapIcon.MouseLeft = newInstance.MouseLeave
-
-	local interactThread
 
 	newInstance.MouseButton1Down:Connect(function()
 		interactThread = task.delay(newMapIcon.InteractTime, function()
@@ -174,21 +167,29 @@ function mapIconsModule.newInteractableIcon(parent: Instance?, icon: string?, ad
 		cancelThread(interactThread)
 	end)
 
-	newMapIcon.Instance = newInstance
-	newMapIcon.Instance.Parent = parent
+	local ti = TweenInfo.new(0.25, Enum.EasingStyle.Quart)
+	local prompt = newMapIcon.Instance.PromptClippingFrame.Prompt
 
-	local processThread = processMapIcon(newMapIcon)
-
-	newMapIcon.Destroy = function(self)
-		if processThread then
-			processThread:Disconnect()
+	newMapIcon.MouseEntered:Connect(function()
+		if newMapIcon.PromptMessage == "" then
+			return
 		end
-		self.Instance:Destroy()
 
-		cancelThread(interactThread)
-	end
+		TweenService:Create(prompt, ti, { Position = UDim2.fromScale(0, 0) }):Play()
+	end)
 
-	return createMetaProxy(newMapIcon) :: InteractableIconInstance
+	newMapIcon.MouseLeft:Connect(function()
+		TweenService:Create(prompt, ti, { Position = UDim2.fromScale(-1, 0) }):Play()
+	end)
+
+	processThread = processMapIcon(newMapIcon)
+
+	newMapIcon.Instance.Destroying:Connect(function()
+		isDestroying = true
+		newMapIcon:Destroy()
+	end)
+
+	return createMetaProxy(newMapIcon) :: MapIcon
 end
 
 return mapIconsModule

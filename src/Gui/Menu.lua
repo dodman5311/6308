@@ -13,11 +13,16 @@ local UserInputService = game:GetService("UserInputService")
 --// Instances
 local ChanceService = require(ReplicatedStorage.Vendor.ChanceService)
 local Globals = require(ReplicatedStorage.Shared.Globals)
+local Kiosk = require(script.Parent.Kiosk)
 local MapIcons = require(ReplicatedStorage.Vendor.MapIcons)
+local Scales = require(ReplicatedStorage.Vendor.Scales)
+local UIAnimationService = require(ReplicatedStorage.Vendor.UIAnimationService)
+local Util = require(ReplicatedStorage.Vendor.Util)
 local ViewmodelService = require(ReplicatedStorage.Vendor.ViewmodelService)
 
 local assets = ReplicatedStorage.Assets
 local sounds = assets.Sounds
+local travelingUi = assets.Gui.Traveling:Clone()
 
 local mapCamera = Instance.new("Camera")
 local weaponCamera = Instance.new("Camera")
@@ -61,6 +66,8 @@ local weaponIcons = {
 	Melee = "rbxassetid://18298955289",
 	AR = "rbxassetid://18298954616",
 }
+
+local activeMapIcons = {}
 
 local function Lerp(num, goal, i)
 	return num + (goal - num) * i
@@ -459,6 +466,7 @@ local buttonFunctions = {
 
 function module.Init(player: Player, ui, frame)
 	frame.Gui.Enabled = false
+	travelingUi.Parent = frame.Gui.Parent
 
 	if player:GetAttribute("furthestLevel") > 1 then
 		ui.HUD.OpenMenuPrompt_T.Visible = false
@@ -697,7 +705,41 @@ local function processCamera(frame)
 	end)
 end
 
+local function showTraveling(travelSeconds: number): boolean
+	if UIAnimationService.CheckPlaying(travelingUi.WalkingAnimation) then
+		return false
+	end
+
+	UIAnimationService.PlayAnimation(travelingUi.WalkingAnimation, 0.025, true)
+
+	local ti = TweenInfo.new(1)
+
+	travelingUi.Background.BackgroundTransparency = 1
+	travelingUi.WalkingAnimation.Image.ImageTransparency = 1
+	travelingUi.Traveling.TextTransparency = 1
+	travelingUi.Enabled = true
+
+	Util.tween(travelingUi.Background, ti, { BackgroundTransparency = 0 })
+	Util.tween(travelingUi.WalkingAnimation.Image, ti, { ImageTransparency = 0 })
+	Util.tween(travelingUi.Traveling, ti, { TextTransparency = 0 })
+
+	task.delay(travelSeconds, function()
+		Util.tween(travelingUi.Background, ti, { BackgroundTransparency = 1 })
+		Util.tween(travelingUi.WalkingAnimation.Image, ti, { ImageTransparency = 1 })
+		Util.tween(travelingUi.Traveling, ti, { TextTransparency = 1 }, true)
+
+		travelingUi.Enabled = false
+		UIAnimationService.StopAnimation(travelingUi.WalkingAnimation)
+	end)
+
+	return true
+end
+
 local function hideAllMenus(frame)
+	for _, mapIcon in ipairs(activeMapIcons) do
+		mapIcon:Destroy()
+	end
+
 	mapInFocus = false
 	RunService:UnbindFromRenderStep("ProcessMapCamera")
 	RunService:UnbindFromRenderStep("RotateWeapon")
@@ -722,7 +764,113 @@ local function hideAllMenus(frame)
 	showAttention(frame)
 end
 
-local made = false
+local mapIconIds = {
+	Altar = "139969827236299",
+	Exit = "16872427753",
+	Kiosk = "16874460885",
+	Start = "77987180697847",
+	Player = "125265901862813",
+	Arena = "",
+	Elite = "120818331765177",
+	VendingMachine = "",
+	AR = "",
+	Pistol = "",
+	Shotgun = "",
+	Melee = "",
+}
+
+local function formatAssetId(idNumber)
+	return "rbxassetid://" .. idNumber
+end
+
+local function createTeleportIcon(frame, adornee: Model, icon): MapIcons.MapIcon
+	local newIcon = MapIcons.new(frame.Map_Menu, formatAssetId(icon), adornee)
+	newIcon.InteractTime = 0
+
+	newIcon.InteractCompleted:Connect(function()
+		if workspace:GetAttribute("EnemiesInCombat") > 0 then
+			util.tween(frame.DeniedFastTravel.UIStroke, TweenInfo.new(0), { Transparency = 0 })
+			util.tween(frame.DeniedFastTravel, TweenInfo.new(0), { TextTransparency = 0 }, false, function()
+				util.tween(frame.DeniedFastTravel, TweenInfo.new(2), { TextTransparency = 1 })
+				util.tween(frame.DeniedFastTravel.UIStroke, TweenInfo.new(2), { Transparency = 1 })
+			end)
+
+			return
+		end
+
+		local travelTime = 4
+
+		if not showTraveling(travelTime) then
+			return
+		end
+
+		task.wait(1)
+
+		local teleportPart = adornee:FindFirstChild("Notice")
+		if string.match(adornee.Name, "Start") then
+			teleportPart = workspace.SpawnLocation
+		end
+		Players.LocalPlayer.Character:PivotTo(teleportPart:GetPivot())
+
+		task.wait(travelTime - 1)
+
+		module.Close(Players.LocalPlayer, nil, frame)
+	end)
+
+	newIcon.PromptMessage = "FAST TRAVEL"
+
+	return newIcon
+end
+
+local function createDisplayIcon(frame, adornee: Model, icon: string, promptMessage: string?): MapIcons.MapIcon
+	local newIcon = MapIcons.new(frame.Gui, formatAssetId(icon), adornee)
+	newIcon.PromptMessage = promptMessage or ""
+	newIcon.FrameImage = ""
+
+	return newIcon
+end
+
+local function loadMapIcons(frame, map)
+	for _, model: Model in ipairs(map:GetChildren()) do
+		if not model:IsA("Model") then
+			continue
+		end
+
+		if model.Name == "Exit" and model:GetAttribute("Discovered") then
+			table.insert(activeMapIcons, createTeleportIcon(frame, model, mapIconIds.Exit))
+		elseif model.Name == "Altar" and model:GetAttribute("Discovered") then
+			table.insert(activeMapIcons, createTeleportIcon(frame, model, mapIconIds.Altar))
+		elseif model.Name == "Arena" then
+			table.insert(activeMapIcons, createDisplayIcon(frame, model, mapIconIds.Arena))
+		elseif model.Name == "Start_" .. workspace:GetAttribute("Stage") then
+			table.insert(activeMapIcons, createTeleportIcon(frame, model, mapIconIds.Start))
+		elseif model.Name == "Kiosk" and model:GetAttribute("Discovered") then
+			table.insert(activeMapIcons, createTeleportIcon(frame, model, mapIconIds.Kiosk))
+		end
+	end
+end
+
+local function displayEnemy(enemyDisplayLabel, displayIcon, enemyObject)
+	for _, v in ipairs(enemyDisplayLabel.WorldModel:GetChildren()) do
+		v:Destroy()
+	end
+
+	enemyDisplayLabel.Parent = displayIcon.Instance
+	enemyDisplayLabel.Visible = true
+
+	local newEnemyModel = enemyObject:Clone()
+	newEnemyModel.Parent = enemyDisplayLabel.WorldModel
+	newEnemyModel.PrimaryPart.Anchored = true
+
+	enemyDisplayLabel.EnemyName.Text = enemyObject.Name
+
+	enemyDisplayLabel.CurrentCamera.CFrame =
+		CFrame.lookAt((newEnemyModel:GetPivot() * CFrame.new(0, 0, -100)).Position, newEnemyModel:GetPivot().Position)
+
+	newEnemyModel.Humanoid.Animator:LoadAnimation(newEnemyModel.Animations.Idle):Play(0)
+end
+
+local enemyDisplayScale = Scales.new("EnemyMapDisplay")
 
 local function loadMap(player, frame)
 	local viewport = frame.MapViewport
@@ -730,6 +878,13 @@ local function loadMap(player, frame)
 	if viewport:FindFirstChild("Map") then
 		viewport.Map:Destroy()
 	end
+
+	local enemyDisplayLabel = assets.Gui.EnemyDisplayLabel:Clone()
+	local enemyDisplayCamera = Instance.new("Camera")
+	enemyDisplayCamera.Parent = enemyDisplayLabel
+	enemyDisplayLabel.CurrentCamera = enemyDisplayCamera
+	enemyDisplayCamera.FieldOfView = 4
+	enemyDisplayLabel.Visible = false
 
 	local map = ReplicatedStorage:FindFirstChild("Map"):Clone()
 	map:PivotTo(CFrame.new())
@@ -792,15 +947,59 @@ local function loadMap(player, frame)
 	end
 
 	local cframes = getEnemiesFunction:InvokeServer()
-	for _, enemyCFrame in ipairs(cframes) do
+	for _, enemy in pairs(cframes) do
 		local newPart = Instance.new("Part")
 		newPart.Color = Color3.new(1)
 		newPart.Anchored = true
 		newPart.Material = Enum.Material.Neon
-		newPart.CFrame = enemyCFrame
+		newPart.CFrame = enemy.CFrame
 		newPart.Size = Vector3.new(2, 4, 2)
 		newPart.Name = "Enemy"
 		newPart.Parent = map
+
+		local enemyObject = ReplicatedStorage.Enemies:FindFirstChild(enemy.Name)
+
+		if enemyObject:GetAttribute("SpawnChance") and enemyObject:GetAttribute("SpawnChance") <= 40 then
+			local displayIcon = createDisplayIcon(frame, newPart, mapIconIds.Elite, enemy.Name)
+			enemyDisplayLabel.Parent = displayIcon.Instance
+			displayIcon.PromptMessage = ""
+
+			displayIcon.MouseEntered:Connect(function()
+				enemyDisplayScale:Add()
+				enemyDisplayLabel.DangerDisplay.Visible = true
+				displayEnemy(enemyDisplayLabel, displayIcon, enemyObject)
+			end)
+
+			displayIcon.MouseLeft:Connect(function()
+				enemyDisplayScale:Remove()
+
+				if not enemyDisplayScale:Check() then
+					enemyDisplayLabel.Visible = false
+				end
+			end)
+
+			table.insert(activeMapIcons, displayIcon)
+		else
+			local displayIcon = createDisplayIcon(frame, newPart, "", enemy.Name)
+			enemyDisplayLabel.Parent = displayIcon.Instance
+			displayIcon.PromptMessage = ""
+
+			displayIcon.PreciseMouseEntered:Connect(function()
+				enemyDisplayScale:Add()
+				enemyDisplayLabel.DangerDisplay.Visible = false
+				displayEnemy(enemyDisplayLabel, displayIcon, enemyObject)
+			end)
+
+			displayIcon.PreciseMouseLeft:Connect(function()
+				enemyDisplayScale:Remove()
+
+				if not enemyDisplayScale:Check() then
+					enemyDisplayLabel.Visible = false
+				end
+			end)
+
+			table.insert(activeMapIcons, displayIcon)
+		end
 	end
 
 	for _, weapon in ipairs(CollectionService:GetTagged("Weapon")) do
@@ -826,11 +1025,15 @@ local function loadMap(player, frame)
 		local playerPart = ReplicatedStorage.MapPlayer:Clone()
 		playerPart.CFrame = player.Character:GetPivot() * CFrame.Angles(math.rad(90), 0, 0)
 		playerPart.Parent = map
+
+		table.insert(activeMapIcons, createDisplayIcon(frame, playerPart, mapIconIds.Player, "You"))
 	end
 
 	map.Parent = viewport
 
 	viewport.CurrentCamera = mapCamera
+
+	loadMapIcons(frame, map)
 end
 
 local function loadPerksList(frame)
@@ -1311,7 +1514,7 @@ function module.Open(player, ui, frame)
 	end
 end
 
-function module.Close(player, ui, frame)
+function module.Close(player, _, frame)
 	hideAllMenus(frame)
 	Signals["SetMobileControlsVisible"]:Fire(true)
 

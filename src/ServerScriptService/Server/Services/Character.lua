@@ -1,10 +1,7 @@
-local module = {
-	Anchovies = 0,
-}
+local module = {}
 
 --// Services
 local AnalyticsService = game:GetService("AnalyticsService")
-local FriendService = game:GetService("FriendService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local collectionService = game:GetService("CollectionService")
@@ -133,10 +130,6 @@ Players.PlayerAdded:Connect(function(player: Player)
 				humanoid:ChangeState(Enum.HumanoidStateType.Dead)
 			end
 		end)
-
-		if mapService.CurrentLevel == math.round(mapService.CurrentLevel) then
-			module.Anchovies = 4
-		end
 	end)
 
 	print("Save data loaded in", dataStore.LoadGameData(player))
