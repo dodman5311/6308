@@ -21,7 +21,7 @@ local assets = Globals.Assets
 local rng = Random.new()
 
 local function onWeaponSpawned(object)
-	for _, weapon in ipairs(CollectionService:GetTagged("Weapon")) do --- if spawned too close to another, then destroy
+	for _, weapon in ipairs(CollectionService:GetTagged("Weapon")) do -- if spawned too close to another, then destroy
 		if weapon == object then
 			continue
 		end

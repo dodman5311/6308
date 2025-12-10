@@ -87,8 +87,6 @@ local function createMetaProxy(mapIcon: MapIcon): MapIcon
 			end -- No change detected
 			mapIcon[key] = value
 
-			print(key, value)
-
 			local instance = mapIcon.Instance
 
 			if key == "IconImage" then

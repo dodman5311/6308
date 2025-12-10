@@ -74,8 +74,6 @@ function module.LoadGameData(player)
 
 	player:SetAttribute("MaxHealth", 5)
 
-	mapService.proceedToNext(nil, true)
-
 	workspace:SetAttribute("TotalScore", storedScore)
 	workspace:SetAttribute("StoredScore", totalScore)
 	workspace:SetAttribute("DeathCount", deathCount)
@@ -83,6 +81,8 @@ function module.LoadGameData(player)
 	for upgradeName, upgradeValue in pairs(upgrades) do
 		workspace:SetAttribute(upgradeName, upgradeValue)
 	end
+
+	mapService.proceedToNext(nil, true)
 
 	net:RemoteEvent("LoadData"):FireClient(player, upgrades, gameState, gameSettings, codex)
 	return os.clock() - startTime

@@ -46,7 +46,7 @@ local leeway = 6
 --local unitModules = {}
 local blacklistedUnits = {}
 
-local ALTAR_SPAWN_CHANCE = 100 -- 50
+local ALTAR_SPAWN_CHANCE = 50
 
 local clearBloodEvent = net:RemoteEvent("ClearBlood")
 net:RemoteEvent("StartExitSequence")
@@ -116,7 +116,11 @@ local function addLink(unit)
 end
 
 local function removeLink(unit)
-	for _, link in ipairs(unit.Links:GetChildren()) do
+	local linksFolder = unit:FindFirstChild("Links")
+	if not linksFolder then
+		return
+	end
+	for _, link in ipairs(linksFolder:GetChildren()) do
 		local index = table.find(links, link)
 
 		if not index then
@@ -731,18 +735,17 @@ function module.proceedToNext(_, onlyLoadMap, toReq: boolean?)
 	end
 
 	if not onlyLoadMap then
-		if module.CurrentLevel == 5 or module.CurrentLevel == 2 then
-			if not toReq then -- dont continue if you're going to req. DON'T
+		if not toReq then
+			if module.CurrentLevel == 5 or module.CurrentLevel == 2 then
 				module.CurrentLevel += 0.5
+			else
+				module.CurrentLevel = math.floor(module.CurrentLevel + 1)
 			end
-		elseif module.CurrentStage ~= 0 and not toReq then
-			module.CurrentLevel = math.floor(module.CurrentLevel + 1)
 		end
 
 		if module.CurrentLevel > 5.5 then -- amount of levels in a stage
 			module.CurrentLevel = 1
 
-			print(toReq)
 			if not toReq then
 				module.CurrentStage += 1 -- USING ALTAR DOESN'T CONTINUE TO NEXT LEVEL!
 			end

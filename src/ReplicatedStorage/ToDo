@@ -519,12 +519,12 @@ Add heavier damage feedback
     Despawning animation for ambushes/arenas
     Outlines for remaining enemies in arena wave
 
-    Redesigning the big acid pit sewer arena
+    Redesigning the big acid pit sewer arena *
     Enlarging the sewer doorway unit
 
     Double shot perk rename into "Loose Cannon" *
 
-    Prevent enemies from walking into hampter room on stage 3
+    Prevent enemies from walking into hampter room on stage 3 ()
 
 --Stuff for cream soda :
 
@@ -541,34 +541,40 @@ Personal preferences I didn't get to go over / get an answer for :
     Making luck a little rarer in the kiosk (to make luck perks more interesting to get and making arsenal chance perks less op)
     Deadshot / Double Shot (aka Loose Cannon) / Boring Bullets nerf ?
 
+Update stuff v----------------------------------------------------------------------------------------v
+
+FIX BOSS INTRO!! -- 11
+
+Add vending machines -- 11
+
+Add death count stat -- 11
+
+Add stat images -- 11
+
+fix fov setting resetting when stuff n things -- 11
+
+Make coin check animation -- 11
 
 
-Visual score check
-Visual Soul check
-Make game save upgrades until reset *
+Fix electric smoke not showing -- 12
 
-remove previous upgrade system
-Make models for weapon upgrades`
-Make models upgrade units/upgrade rack
-complete settings
+GENDER AND VOICES :D -- 12
 
-FIX STAGE 1 NOT SAVING *
-Fix music cutting off after shop *
+complete settings -- 12
+
+Make lil guy -- 12
+
+Update codex -- 12 (Luck)
+
+
+fix armor resistance perks -- 13
+
+enable mobile button for visage perks -- 13
+
+
+Redesign stage 2 arenas -- wait
+
 
 compile changelog ()
-FIX exit not showing in arenas ()
-FIX SPAM CLICK TO GET ALL PERKS ()
 
-Fix electric smoke not showing 
-
-fix armor resistance perks
-
-enable mobile button for visage perks
-
-fix rack not anchoring ()
-
-GENDER AND VOICES :D
-
-make drav revive when restarting run
-
-UPGRADED GUNS NOT REPLACING THE NORMAL ONES SOMETIMES!@!!
+make drav revive when restarting run ()

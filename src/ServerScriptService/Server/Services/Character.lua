@@ -165,9 +165,12 @@ local function onDied(player: Player)
 
 	workspace:SetAttribute("SaveStage", dataStore.stageState.Stage or 1)
 
+	local toReq = false
 	print((workspace:GetAttribute("DeathCount") + 1) * 400, workspace:GetAttribute("TotalScore"))
 	if workspace:GetAttribute("TotalScore") >= (workspace:GetAttribute("DeathCount") + 1) * 400 then -- req check
+		toReq = true
 		mapService.CurrentStage = 0
+		mapService.CurrentLevel -= 1
 		workspace:SetAttribute("DeathCount", workspace:GetAttribute("DeathCount") + 1)
 
 		--dataStore.saveGameState(player, dataStore.stageState)
@@ -198,7 +201,7 @@ local function onDied(player: Player)
 	end
 
 	player.CharacterAdded:Once(function()
-		signals["ProceedToNextLevel"]:Fire(nil, true)
+		signals["ProceedToNextLevel"]:Fire(nil, true, toReq)
 	end)
 
 	--end

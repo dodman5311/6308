@@ -428,7 +428,7 @@ local function exitS2(extraSouls, level, stageBoss, miniBoss)
 		codexService.AddEntry("The Sewers")
 	end
 
-	if level == 5 then
+	if level == 5 and workspace:GetAttribute("Stage") ~= 0 then
 		MusicService.stopMusic()
 		local onBiHidden = UIService.doUiAction("BossIntro", "ShowIntro", stageBoss)
 		onBiHidden:Once(function()
