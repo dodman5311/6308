@@ -706,30 +706,30 @@ local function processCamera(frame)
 end
 
 local function showTraveling(travelSeconds: number): boolean
-	if UIAnimationService.CheckPlaying(travelingUi.WalkingAnimation) then
+	local scene = travelingUi.Group.Scene
+	if UIAnimationService.CheckPlaying(scene.WalkingAnimation) then
 		return false
 	end
 
-	UIAnimationService.PlayAnimation(travelingUi.WalkingAnimation, 0.025, true)
+	UIAnimationService.PlayAnimation(scene.WalkingAnimation, 0.025, true)
 
 	local ti = TweenInfo.new(1)
+	local scrollingTi = TweenInfo.new(25, Enum.EasingStyle.Linear)
 
-	travelingUi.Background.BackgroundTransparency = 1
-	travelingUi.WalkingAnimation.Image.ImageTransparency = 1
-	travelingUi.Traveling.TextTransparency = 1
+	travelingUi.Group.GroupTransparency = 1
+	scene.ScrollingBackground.Position = UDim2.fromScale(0, 0.5)
 	travelingUi.Enabled = true
 
-	Util.tween(travelingUi.Background, ti, { BackgroundTransparency = 0 })
-	Util.tween(travelingUi.WalkingAnimation.Image, ti, { ImageTransparency = 0 })
-	Util.tween(travelingUi.Traveling, ti, { TextTransparency = 0 })
+	Util.tween(travelingUi.Group, ti, { GroupTransparency = 0 })
+	local scrollingTween = Util.tween(scene.ScrollingBackground, scrollingTi, { Position = UDim2.fromScale(-4, 0.5) })
 
 	task.delay(travelSeconds, function()
-		Util.tween(travelingUi.Background, ti, { BackgroundTransparency = 1 })
-		Util.tween(travelingUi.WalkingAnimation.Image, ti, { ImageTransparency = 1 })
-		Util.tween(travelingUi.Traveling, ti, { TextTransparency = 1 }, true)
+		Util.tween(travelingUi.Group, ti, { GroupTransparency = 1 }, true)
 
 		travelingUi.Enabled = false
-		UIAnimationService.StopAnimation(travelingUi.WalkingAnimation)
+
+		scrollingTween:Destroy()
+		UIAnimationService.StopAnimation(scene.WalkingAnimation)
 	end)
 
 	return true
