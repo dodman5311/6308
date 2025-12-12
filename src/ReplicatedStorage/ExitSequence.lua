@@ -25,7 +25,9 @@ module.Exit = function(player, start_time, stage_number, level_number, bossBeate
 	local arenasCompleted = {}
 	local comboCount = 10
 
-	local stageFolder = ServerStorage:FindFirstChild("Stage_" .. MapService.CurrentStage)
+	local stageNumber = MapService.CurrentStage == 0 and workspace:GetAttribute("SaveStage") or MapService.CurrentStage
+	local stageFolder = ServerStorage:FindFirstChild("Stage_" .. stageNumber)
+
 	local boss_name = stageFolder:GetAttribute("MainBoss")
 	local miniboss_name = stageFolder:GetAttribute("MiniBoss")
 

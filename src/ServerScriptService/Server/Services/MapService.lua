@@ -169,8 +169,8 @@ local function Shuffle(tabl)
 	return newTable
 end
 
-local function getAssets()
-	local stage = module.CurrentStage
+local function getAssets(stage)
+	stage = stage or module.CurrentStage
 	stageFolder = serverStorage:FindFirstChild("Stage_" .. stage)
 	startUnit = stageFolder:FindFirstChild("Start_" .. stage)
 	units = stageFolder.Units
@@ -678,10 +678,10 @@ function module.loadBossRoom()
 end
 
 local function spawnBoss(_, type)
-	if module.CurrentStage == 0 then
-		return
-	end
-	getAssets()
+	local stage = module.CurrentStage == 0 and workspace:GetAttribute("SaveStage") or module.CurrentStage
+	print(stage, stageFolder)
+
+	getAssets(stage)
 
 	spawners.SpawnBoss(stageFolder:GetAttribute(type), map:FindFirstChildOfClass("Model")) -- stage folder issue
 	workspace:SetAttribute("LastBoss", stageFolder:GetAttribute(type))
@@ -774,8 +774,6 @@ function module.proceedToNext(_, onlyLoadMap, toReq: boolean?)
 	end
 
 	if math.floor(module.CurrentLevel) ~= module.CurrentLevel and not toReq then
-		print(module.CurrentStage)
-
 		module.loadBossRoom()
 		storedMap = createStoredMap()
 		return

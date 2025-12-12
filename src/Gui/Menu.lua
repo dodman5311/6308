@@ -840,8 +840,6 @@ local function loadMapIcons(frame, map)
 			table.insert(activeMapIcons, createTeleportIcon(frame, model, mapIconIds.Exit))
 		elseif model.Name == "Altar" and model:GetAttribute("Discovered") then
 			table.insert(activeMapIcons, createTeleportIcon(frame, model, mapIconIds.Altar))
-		elseif model.Name == "Arena" then
-			table.insert(activeMapIcons, createDisplayIcon(frame, model, mapIconIds.Arena))
 		elseif model.Name == "Start_" .. workspace:GetAttribute("Stage") then
 			table.insert(activeMapIcons, createTeleportIcon(frame, model, mapIconIds.Start))
 		elseif model.Name == "Kiosk" and model:GetAttribute("Discovered") then
@@ -979,26 +977,6 @@ local function loadMap(player, frame)
 			end)
 
 			table.insert(activeMapIcons, displayIcon)
-		else
-			local displayIcon = createDisplayIcon(frame, newPart, "", enemy.Name)
-			enemyDisplayLabel.Parent = displayIcon.Instance
-			displayIcon.PromptMessage = ""
-
-			displayIcon.PreciseMouseEntered:Connect(function()
-				enemyDisplayScale:Add()
-				enemyDisplayLabel.DangerDisplay.Visible = false
-				displayEnemy(enemyDisplayLabel, displayIcon, enemyObject)
-			end)
-
-			displayIcon.PreciseMouseLeft:Connect(function()
-				enemyDisplayScale:Remove()
-
-				if not enemyDisplayScale:Check() then
-					enemyDisplayLabel.Visible = false
-				end
-			end)
-
-			table.insert(activeMapIcons, displayIcon)
 		end
 	end
 
@@ -1095,8 +1073,12 @@ end
 
 function module.UpdateStats(_, _, frame)
 	local luck = frame.Player_Stats.Luck
+	local deaths = frame.Player_Stats.Deaths
+	local reqCost = frame.Player_Stats.RequiemCost
 
 	luck.Text = "Luck " .. ChanceService.getLuck()
+	deaths.Text = "Deaths " .. workspace:GetAttribute("DeathCount")
+	reqCost.Text = "Requiem Cost " .. (workspace:GetAttribute("DeathCount") + 1) * 400
 
 	for _, statLabel in ipairs(frame.Player_Stats:GetChildren()) do
 		local crit = weapons.critChances[statLabel.Name]

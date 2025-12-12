@@ -1,13 +1,13 @@
 local module = {}
 --// Services
 local BadgeService = game:GetService("BadgeService")
+local CollectionService = game:GetService("CollectionService")
 local Debris = game:GetService("Debris")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local StarterGui = game:GetService("StarterGui")
 local TextService = game:GetService("TextService")
 local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
-local CollectionService = game:GetService("CollectionService")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
@@ -17,10 +17,10 @@ local assets = ReplicatedStorage.Assets
 local sounds = assets.Sounds
 
 --// Modules
-local util = require(Globals.Vendor.Util)
-local acts = require(Globals.Vendor.Acts)
-local UiAnimator = require(Globals.Vendor.UIAnimationService)
 local Signals = require(Globals.Shared.Signals)
+local UiAnimator = require(Globals.Vendor.UIAnimationService)
+local acts = require(Globals.Vendor.Acts)
+local util = require(Globals.Vendor.Util)
 
 --// Values
 
@@ -56,7 +56,7 @@ function module.ArenaComplete(player, ui, frame, awardTicket, result)
 
 	local animation = UiAnimator.PlayAnimation(complete, 0.05, false, true)
 
-	animation:OnFrameRached(4):Connect(function()
+	animation:OnFrameReached(4):Connect(function()
 		animation:Pause()
 		task.wait(0.75)
 		animation:Resume()

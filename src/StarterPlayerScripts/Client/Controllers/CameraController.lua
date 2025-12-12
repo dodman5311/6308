@@ -4,9 +4,9 @@ local module = {
 	viewBobbingEnabled = true,
 }
 
-local players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local players = game:GetService("Players")
 local uis = game:GetService("UserInputService")
 
 local player = players.LocalPlayer
@@ -14,11 +14,11 @@ local camera = workspace.CurrentCamera
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 
-local cameraShaker = require(Globals.Vendor.CameraShaker)
-local util = require(Globals.Vendor.Util)
-local spring = require(Globals.Vendor.Spring)
 local ViewmodelService = require(Globals.Vendor.ViewmodelService)
+local cameraShaker = require(Globals.Vendor.CameraShaker)
 local signals = require(Globals.Signals)
+local spring = require(Globals.Vendor.Spring)
+local util = require(Globals.Vendor.Util)
 
 local Acts = require(Globals.Vendor.Acts)
 
@@ -158,10 +158,10 @@ function module:OnSpawn(character)
 	camera.CameraType = Enum.CameraType.Custom
 	camera.CameraSubject = character:WaitForChild("Humanoid")
 
-	camera.FieldOfView = 100
+	camera.FieldOfView = 1000
 	local ti = TweenInfo.new(0.5, Enum.EasingStyle.Exponential)
 
-	util.tween(camera, ti, { FieldOfView = 70 })
+	util.tween(camera, ti, { FieldOfView = util.getSetting("Field of View").Value })
 end
 
 function module:OnDied()

@@ -166,7 +166,6 @@ local function onDied(player: Player)
 	workspace:SetAttribute("SaveStage", dataStore.stageState.Stage or 1)
 
 	local toReq = false
-	print((workspace:GetAttribute("DeathCount") + 1) * 400, workspace:GetAttribute("TotalScore"))
 	if workspace:GetAttribute("TotalScore") >= (workspace:GetAttribute("DeathCount") + 1) * 400 then -- req check
 		toReq = true
 		mapService.CurrentStage = 0

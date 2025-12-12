@@ -184,6 +184,7 @@ function module.ShowIntro(player, ui, frame, bossName)
 	util.tween(frame.MessageBox, ti_0, { ImageTransparency = 0 }, true)
 
 	local skipped = false
+	voice.TimePosition = 0
 
 	if player:GetAttribute("furthestLevel") > workspace:GetAttribute("TotalLevel") then
 		skip.enableSkip(function()

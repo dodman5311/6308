@@ -535,7 +535,7 @@ function module.Init(player, ui, frame)
 		local anim = UiAnimator.PlayAnimation(frame.SwitchHands, 0.075)
 		local switchAnimation = UiAnimator.PlayAnimation(frame.SwitchFrame, 0.075, false, true)
 
-		switchAnimation:OnFrameRached(4):Connect(function()
+		switchAnimation:OnFrameReached(4):Connect(function()
 			frame.SoulCost.Visible = false
 			frame.TicketCost.Visible = false
 		end)
@@ -806,7 +806,7 @@ function module.chooseRandomGift(player, ui, frame, catagory)
 	spin.Position = UDim2.new(0.5, 0, -(spin.Size.Y.Scale + 1), 0)
 
 	local animation = UiAnimator.PlayAnimation(frame.SpinHands, 0.075)
-	animation:OnFrameRached(10):Wait()
+	animation:OnFrameReached(10):Wait()
 	animation.OnEnded:Connect(function()
 		frame.SpinHands.Visible = true
 		frame.SwitchHands.Visible = true

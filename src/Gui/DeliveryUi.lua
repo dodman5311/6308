@@ -605,14 +605,14 @@ function module.TakeDelivery(player, ui, frame, gift)
 	local animation = UiAnimator.PlayAnimation(frame.Eat, 0.065)
 
 	sfx.Build_Growl:Play()
-	animation:OnFrameRached(6):Once(function()
+	animation:OnFrameReached(6):Once(function()
 		sfx.Perk_Take:Play()
 		sfx.Perk_Take_Metal:Play()
 		sfx.Perk_Take_Metal_2:Play()
 		sfx.Chain_Movement:Play()
 	end)
 
-	animation:OnFrameRached(14):Once(function()
+	animation:OnFrameReached(14):Once(function()
 		sfx.Bite_Effect:Play()
 		task.delay(0.25, function()
 			sfx.After_Growl:Play()
@@ -645,7 +645,7 @@ function module.TakeDelivery(player, ui, frame, gift)
 		acts:removeAct("InActiveMenu")
 	end)
 
-	animation:OnFrameRached(6):Connect(function()
+	animation:OnFrameReached(6):Connect(function()
 		frame.Gift.Visible = false
 	end)
 end
