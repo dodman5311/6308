@@ -830,8 +830,8 @@ function module.AimAtTarget(npc, doLerp, lerpAlpha)
 	npc.MindData.AimCFrame = CFrame.lookAt(npc.Instance:GetPivot().Position, position)
 end
 
-function module.PlaySound(npc, soundName: string, chance: number?)
-	if chance and rng:NextNumber(0, 100) > chance then
+function module.PlaySound(npc, soundName: string, chance: number)
+	if rng:NextNumber(0, 100) > chance then
 		return
 	end
 
@@ -884,7 +884,7 @@ end
 function module.PlayIdleSound(npc, waitTime: number | NumberRange?)
 	waitTime = waitTime or NumberRange.new(5, 7)
 	local soundTimer = getTimer(npc, "PlayIdleSound", waitTime, function()
-		module.PlaySound(npc, "Idle")
+		module.PlaySound(npc, "Idle", 100)
 	end, true)
 
 	soundTimer.OnEnded:Once(function()

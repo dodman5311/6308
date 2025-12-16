@@ -2,9 +2,9 @@ local module = {}
 
 --// Services
 local CollectionService = game:GetService("CollectionService")
+local DEBRIS = game:GetService("Debris")
 local PLAYERS = game:GetService("Players")
 local REPLICATED_STORAGE = game:GetService("ReplicatedStorage")
-local DEBRIS = game:GetService("Debris")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 
@@ -19,11 +19,11 @@ local effects = assets.Effects
 local Globals = require(REPLICATED_STORAGE.Shared.Globals)
 
 --// Modules
-local util = require(Globals.Vendor.Util)
-local net = require(Globals.Packages.Net)
 local cameraShaker = require(Globals.Vendor.CameraShaker)
+local net = require(Globals.Packages.Net)
 local timer = require(Globals.Vendor.Timer)
 local uiAnimationService = require(Globals.Vendor.UIAnimationService)
+local util = require(Globals.Vendor.Util)
 
 local replicateRemote = net:RemoteEvent("ReplicateEffect")
 
@@ -160,7 +160,13 @@ function module.GhoulTeleport(position)
 	DEBRIS:AddItem(effect, 2)
 end
 
-function module.ElectrifyPart(part)
+function module.ElectrifyPart(partName)
+	local model = workspace:WaitForChild(partName)
+	if not model then
+		return
+	end
+	local part = model.PrimaryPart
+
 	part.Smoke.Enabled = true
 	task.wait(1.1)
 	part.Electricity.Enabled = true

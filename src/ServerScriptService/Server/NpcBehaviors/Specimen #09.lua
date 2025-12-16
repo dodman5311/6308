@@ -5,18 +5,18 @@ local stats = {
 }
 
 local BadgeService = game:GetService("BadgeService")
+local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local Debris = game:GetService("Debris")
 
 local assets = ReplicatedStorage.Assets
 local effects = assets.Effects
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
-local util = require(Globals.Vendor.Util)
 local UIAnimator = require(Globals.Vendor.UIAnimationService)
 local animationService = require(Globals.Vendor.AnimationService)
+local util = require(Globals.Vendor.Util)
 
 local timer = require(Globals.Vendor.Timer)
 local catTimer = timer:new("CatWalkTimer", 6.5)
@@ -492,7 +492,7 @@ local moves = {
 		local pos = npc.Instance:GetPivot().Position + Vector3.new(0, -4, 0)
 		newGround:PivotTo(CFrame.new(pos.X, pos.Y, pos.Z))
 
-		vfx:FireAllClients("ElectrifyPart", "Server", true, newGround.PrimaryPart)
+		vfx:FireAllClients("ElectrifyPart", "Server", true, "ElectricSmoke")
 
 		timer.wait(0.25)
 

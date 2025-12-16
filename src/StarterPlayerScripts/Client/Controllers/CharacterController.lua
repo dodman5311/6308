@@ -455,8 +455,13 @@ local function exitS2(extraSouls, level, stageBoss, miniBoss)
 			MusicService.playMusic(math.floor(totalLevel))
 		end)
 
+		local stage = workspace:GetAttribute("Stage")
+		if stage == 0 then
+			stage = workspace:GetAttribute("SaveStage")
+		end
+
 		local gameState = {
-			Stage = workspace:GetAttribute("Stage"),
+			Stage = stage,
 			Level = workspace:GetAttribute("Level"),
 			Souls = soulsService.Souls,
 			TotalScore = workspace:GetAttribute("TotalScore"),

@@ -2116,7 +2116,7 @@ local function ThrowWeapon()
 				local hitCframe = CFrame.new(hit.Position) * camera.CFrame.Rotation
 
 				if GiftsService.CheckGift("20_Sided_Die") then
-					ChanceService.luck += 35
+					ChanceService.luck += 20
 					UIService.doUiAction("HUD", "ActivateGift", "20_Sided_Die")
 				end
 
@@ -2124,7 +2124,7 @@ local function ThrowWeapon()
 
 				if GiftsService.CheckGift("20_Sided_Die") then
 					task.delay(0.05, function()
-						ChanceService.luck -= 35
+						ChanceService.luck -= 20
 					end)
 				end
 

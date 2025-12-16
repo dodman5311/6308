@@ -123,7 +123,7 @@ local module = {
 		["20_Sided_Die"] = {
 			Icon = "rbxassetid://98248628217405",
 			Catagories = { "Luck" },
-			Desc = "Thrown weapons now have +35 luck when hitting an enemy.",
+			Desc = "Thrown weapons now have +20 luck when hitting an enemy.",
 		},
 
 		Returned_Change = {

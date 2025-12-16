@@ -481,6 +481,13 @@ local function processStep(distanceToMove, projectile: Projectile)
 		if projectile.Info["Locked"] then
 			nearestEnemy = projectile.Info["Locked"]
 			position = nearestEnemy:GetPivot().Position
+
+			if
+				not nearestEnemy.Parent
+				or (nearestEnemy:FindFirstChild("Humanoid") and nearestEnemy.Humanoid.Health <= 0)
+			then
+				projectile.Info["Locked"] = nil
+			end
 		else
 			nearestEnemy, distanceToMove, position =
 				util.getNearestEnemy(projectile.Instance.Position, projectile.Info["SeekDistance"] or 40, list)

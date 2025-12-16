@@ -407,15 +407,14 @@ Luck increases the chance of any positive thing in the game except for soul drop
 This includes: 
 - perk activation chances,
 - Kiosk rewards,
-- Getting a perk tickets from arenas,
+- Getting perk tickets from arenas,
 etc.
 
 In rare cases, it can also decrease the chance of bad things happening.
 
 <font color="#FF7800"><b>What do the numbers mean?:</b></font>
-The power of luck is the amount of luck divided by 2.
-
-Example: 100 luck = 50% increase to good things.
+Positive chances increase by the % of luck acquired.
+For example. 35 Luck is a 35% increase to any positive chances.
 ]],
 	},
 

@@ -54,7 +54,7 @@ local module = {
 	},
 
 	TargetLost = {
-		{ Function = "PlaySound", Parameters = { "Lost", 5 } },
+		{ Function = "PlaySound", Parameters = { "LostTarget", 5 } },
 		{ Function = "SwitchToState", Parameters = { "Chasing" } },
 		{ Function = "MoveTowardsTarget" },
 	},
@@ -67,7 +67,7 @@ local module = {
 	},
 
 	OnDamaged = {
-		{ Function = "PlaySound", Parameters = { "Hurt" } },
+		{ Function = "PlaySound", Parameters = { "Hurt", 100 } },
 	},
 
 	OnDied = {

@@ -59,6 +59,15 @@ local settings = {
 	"Graphics",
 
 	{
+		Name = "Shadows",
+		Type = "Boolean",
+		Value = true,
+		OnChanged = function(self)
+			game:GetService("Lighting").GlobalShadows = self.Value
+		end,
+	},
+
+	{
 		Name = "Gamma",
 		Type = "Slider",
 		MaxValue = NumberRange.new(0, 100),
@@ -80,7 +89,6 @@ local settings = {
 	{
 		Name = "Screen Filter",
 		Type = "Slider",
-		--Value = true,
 
 		MaxValue = NumberRange.new(0, 2),
 		Value = 1,

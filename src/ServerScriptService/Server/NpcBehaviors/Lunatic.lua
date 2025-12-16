@@ -26,6 +26,7 @@ local module = {
 	},
 
 	TargetLost = {
+		{ Function = "PlaySound", Parameters = { "LostTarget", 5 } },
 		{ Function = "SwitchToState", Parameters = { "Chasing" } },
 		{ Function = "MoveTowardsTarget" },
 	},

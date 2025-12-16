@@ -14,9 +14,9 @@ local rng = Random.new()
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local AnimationService = require(Globals.Vendor.AnimationService)
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local net = require(Globals.Packages.Net)
-local AnimationService = require(Globals.Vendor.AnimationService)
 
 local function searchForHarbinger(npc)
 	if not npc.Instance:GetAttribute("CanShield") then
@@ -160,7 +160,7 @@ local module = {
 	},
 
 	TargetLost = {
-		{ Function = "PlaySound", Parameters = { "Lost", 1 } },
+		{ Function = "PlaySound", Parameters = { "LostTarget", 1 } },
 		{ Function = "Custom", Parameters = { loseHarbinger } },
 		{ Function = "SwitchToState", Parameters = { "Chasing" }, NotState = "Shielding" },
 		{ Function = "MoveTowardsTarget" },
@@ -176,11 +176,11 @@ local module = {
 	},
 
 	OnDamaged = {
-		{ Function = "PlaySound", Parameters = { "Hurt" } },
+		{ Function = "PlaySound", Parameters = { "Hurt", 100 } },
 	},
 
 	OnDied = {
-		{ Function = "PlaySound", Parameters = { "Death" } },
+		{ Function = "PlaySound", Parameters = { "Death", 100 } },
 		{ Function = "Custom", Parameters = { loseHarbinger } },
 		{ Function = "SetCollision", Parameters = { "DeadBody" } },
 		{ Function = "SwitchToState", Parameters = { "Dead" } },

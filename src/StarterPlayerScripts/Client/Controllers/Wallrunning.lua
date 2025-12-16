@@ -96,7 +96,7 @@ end
 
 local function jumpOffWall(_, state)
 	local character = player.Character
-	if not character or state ~= Enum.UserInputState.End then
+	if not character or state ~= Enum.UserInputState.End or not acts:checkAct("wallrunning") then
 		return
 	end
 
@@ -215,6 +215,7 @@ local function onRender()
 		wallrun(upDistance)
 	else
 		removePhysics()
+		jumpOffWall(nil, Enum.UserInputState.End)
 		acts:removeAct("wallrunning")
 		acts:removeAct("wallrun-1")
 		acts:removeAct("wallrun1")
