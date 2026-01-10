@@ -66,7 +66,7 @@ local module = {
 	},
 
 	OnDamaged = {
-		{ Function = "PlaySound", Parameters = { "Hurt", 85 } },
+		{ Function = "PlaySound", Parameters = { "Hurt", 50 } },
 	},
 
 	OnDied = {

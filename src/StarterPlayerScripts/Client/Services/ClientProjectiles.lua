@@ -92,6 +92,21 @@ module.Presets = {
 		Model = "BladeProjectile",
 	},
 
+	BloodyMaryBlade = {
+		Speed = 85,
+		LifeTime = 5,
+		Info = {
+			SeekProgression = 0.01,
+			Seeking = 0.1,
+			Dropping = 0.6,
+			Bouncing = true,
+			Size = 5,
+		},
+		Damage = 1,
+		Piercing = 4,
+		Model = "BloodyBladeProjectile",
+	},
+
 	ThermaCan = {
 		Speed = 150,
 		LifeTime = 5,
@@ -197,7 +212,7 @@ module.Presets = {
 	},
 
 	ShotgunProjectile = {
-		Speed = 400,
+		Speed = 250,
 		LifeTime = 6,
 		Info = {},
 		Damage = 1,

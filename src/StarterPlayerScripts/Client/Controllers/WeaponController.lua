@@ -494,6 +494,21 @@ local function EquipDefault(ignoreAmmo)
 	UIService.doUiAction("HUD", "SetCrosshair", crosshairs.Default, true)
 
 	--fireTimer:Complete()
+
+	if not defaultWeapon then
+		print(workspace:GetAttribute("CleanseAndRepent_Tier"))
+		if workspace:GetAttribute("CleanseAndRepent_Tier") >= 3 then
+			defaultWeapon = assets.Models["Forged Arms"]:Clone()
+		else
+			defaultWeapon = assets.Models.CleanseAndRepent:Clone()
+		end
+
+		defaultWeapon.Name = "Default"
+
+		viewmodel.Model.LeftGrip.LeftGun.Part1 = defaultWeapon.Left.GripLeft
+		viewmodel.Model.RightGrip.RightGun.Part1 = defaultWeapon.Right.Grip
+	end
+
 	defaultWeapon.Parent = viewmodel.Model
 
 	if ignoreAmmo then
@@ -566,36 +581,34 @@ local function ReloadDefault()
 		reloadTime *= 1.2
 	end
 
+	local reloadAnimationName = ""
+
 	if currentAmmo <= 0 then
-		animationService:playAnimation(
-			viewmodel.Model,
-			"ReloadOut",
-			Enum.AnimationPriority.Action3.Value,
-			false,
-			0,
-			1,
-			reloadTime
-		)
-
-		local reloadAnimation: AnimationTrack = animationService:getAnimation(viewmodel.Model, "ReloadOut")
-		UIService.doUiAction("HUD", "reload", reloadAnimation.Length / reloadTime)
-
-		reloadAnimation.Stopped:Wait()
+		if workspace:GetAttribute("CleanseAndRepent_Tier") >= 3 then
+			reloadAnimationName = "ForgedArmsReloadOut"
+		else
+			reloadAnimationName = "ReloadOut"
+		end
 	else
-		animationService:playAnimation(
-			viewmodel.Model,
-			"Reload",
-			Enum.AnimationPriority.Action3.Value,
-			false,
-			0,
-			1,
-			reloadTime
-		)
-		local reloadAnimation: AnimationTrack = animationService:getAnimation(viewmodel.Model, "Reload")
-		UIService.doUiAction("HUD", "reload", reloadAnimation.Length / reloadTime)
-
-		reloadAnimation.Stopped:Wait()
+		if workspace:GetAttribute("CleanseAndRepent_Tier") >= 3 then
+			reloadAnimationName = "ForgedArmsReload"
+		else
+			reloadAnimationName = "Reload"
+		end
 	end
+
+	local reloadAnimation: AnimationTrack = animationService:playAnimation(
+		viewmodel.Model,
+		reloadAnimationName,
+		Enum.AnimationPriority.Action3.Value,
+		false,
+		0,
+		1,
+		reloadTime
+	)
+	UIService.doUiAction("HUD", "reload", reloadAnimation.Length / reloadTime)
+
+	reloadAnimation.Stopped:Wait()
 
 	if module.currentWeapon then
 		return
@@ -1579,7 +1592,11 @@ local function FireDefault(extraBullet)
 
 	module.UpdateAmmo(currentAmmo - 1)
 
-	util.PlaySound(assets.Sounds.Fire, script, 0.15)
+	if workspace:GetAttribute("CleanseAndRepent_Tier") >= 3 then
+		util.PlaySound(assets.Sounds.ForgedArmsFire, script, 0.15)
+	else
+		util.PlaySound(assets.Sounds.Fire, script, 0.15)
+	end
 
 	local recoilVector = Vector3.new(0, 0.3, 0)
 	local recoilMagnitude = workspace:GetAttribute("CleanseAndRepent_Tier") >= 1 and 0.75 or 1
@@ -1928,7 +1945,7 @@ function module.Fire()
 
 	module.UpdateAmmo(currentAmmo - 1)
 
-	util.PlaySound(module.currentWeapon.FirePart.Fire, script, 0.15)
+	local fireSound = module.currentWeapon.FirePart.Fire
 
 	showMuzzleFlash(module.currentWeapon.FirePart)
 
@@ -1943,6 +1960,10 @@ function module.Fire()
 			5,
 			1
 		)
+
+		if module.currentWeapon.FirePart:FindFirstChild("FireOut") then
+			fireSound = module.currentWeapon.FirePart.FireOut
+		end
 	else
 		playingAnimation = animationService:playAnimation(
 			viewmodel.Model,
@@ -1954,6 +1975,8 @@ function module.Fire()
 			1
 		)
 	end
+
+	util.PlaySound(fireSound, script, 0.15)
 
 	local enabled = playingAnimation:GetMarkerReachedSignal("EnableEffect"):Connect(function(effectName)
 		local effect = module.currentWeapon:FindFirstChild(effectName, true)
@@ -2438,7 +2461,7 @@ function module.OnBlock()
 	lastBlockTime = os.clock()
 
 	if module.currentWeapon and module.currentWeapon.Name == "Bloody Mary" then
-		module.FireProjectile("SmartSawBlade", 0, parryDamage, 1) --@TODO WHY NO WORKY!!!!
+		module.FireProjectile("BloodyMaryBlade", 0, parryDamage, 1) --@TODO WHY NO WORKY!!!!
 	else
 		module.FireBullet(parryDamage, 0, 300, nil, "Parry")
 	end
@@ -2560,8 +2583,6 @@ function module:GameInit()
 	viewmodel:SetOffset("BaseOffset", "FromCamera", CFrame.new(0, -1.25, 0))
 	viewmodel:SetOffset("ReloadOffset", "FromCamera", CFrame.new(0, 0, 0))
 	viewmodel:Run()
-
-	defaultWeapon = viewmodel.Model.Default
 
 	animationService:loadAnimations(viewmodel.Model, viewmodel.Model.Animations)
 

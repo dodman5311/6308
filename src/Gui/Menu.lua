@@ -1102,8 +1102,17 @@ local function loadArsenal(frame)
 	end
 
 	local weapon = weapons.currentWeapon
-	local weaponModel: Model = weapon and assets.Models.Weapons:FindFirstChild(weapon.Name):Clone()
-		or assets.Models["Cleanse & Repent"]:Clone()
+	local weaponModel
+
+	if weapon then
+		weaponModel = assets.Models.Weapons:FindFirstChild(weapon.Name):Clone()
+	else
+		if workspace:GetAttribute("CleanseAndRepent_Tier") >= 3 then
+			weaponModel = assets.Models["Forged Arms"]:Clone()
+		else
+			weaponModel = assets.Models["Cleanse & Repent"]:Clone()
+		end
+	end
 
 	weaponModel.Parent = viewport
 

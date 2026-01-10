@@ -550,11 +550,11 @@ Fix dying after killing boss
 fix boss intro not going away on kill lap 2
 
 
-GENDER AND VOICES :D -- 12
+GENDER AND VOICES :D *
 
 Make lil guy -- 12
 
-Mak map assets spawn when have wallrun
+Mak map assets spawn when have wallrun (Client Sided)
 
 fix armor resistance perks -- 13
 
@@ -571,3 +571,8 @@ Update codex (Everlastings)
 compile changelog ()
 
 make drav revive when restarting run ()
+
+I - Seven fix
+
+boss music plays when going to a boss at req shop (Worked on level 5 for some reason)
+cant choose an option after killing stage 2 boss

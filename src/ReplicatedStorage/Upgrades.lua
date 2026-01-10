@@ -3,22 +3,24 @@ local upgrades = {
 		["DoubleShot_Tier"] = {
 			{
 				Name = "Double Shot: Tier 1",
-				Description = [[+0.3 Speed
-				
-<b>+5% spawn chance</b>]],
-				Price = 100,
-			},
-			{
-				Name = "Double Shot: Tier 2",
 				Description = [[+1 Pellet
 				
-<b>+10% spawn chance</b>]],
+<b>+5% spawn chance</b>]],
 				Price = 250,
 			},
 			{
-				Name = "Broad Shot",
-				Description = [[Pellets now pierce through enemies
+				Name = "Double Shot: Tier 2",
+				Description = [[+0.3 Speed
 				
+<b>+10% spawn chance</b>]],
+				Price = 100,
+			},
+			{
+				Name = "Broad Shot",
+				Description = [[+2 Pellets
+				
+Pellets now pierce through enemies and have a 10% chance to ricochet to a nearby enemy,
+but they travel slower
 <b>+15% spawn chance</b>]],
 				Price = 500,
 			},
@@ -185,7 +187,9 @@ local upgrades = {
 			},
 			{
 				Name = "Forged Arms",
-				Description = [[+50% crit chance when hitting headshots, +1 Speed]],
+				Description = [[+50 crit chance when hitting headshots
+				
++1 Speed]],
 				Price = 750,
 			},
 		},
@@ -200,7 +204,7 @@ local upgrades = {
 			},
 			{
 				Name = "Boom Cannon: Tier 2",
-				Description = [[Shots now have a 5% chance to ricochet to a nearby enemy
+				Description = [[Shots now have a 15% chance to ricochet to a nearby enemy
 				
 <b>+10% spawn chance</b>]],
 				Price = 250,
