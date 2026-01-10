@@ -94,16 +94,16 @@ module.Presets = {
 
 	BloodyMaryBlade = {
 		Speed = 85,
-		LifeTime = 5,
+		LifeTime = 7,
 		Info = {
 			SeekProgression = 0.01,
 			Seeking = 0.1,
-			Dropping = 0.6,
+			Dropping = 0.65,
 			Bouncing = true,
 			Size = 5,
 		},
 		Damage = 1,
-		Piercing = 4,
+		Piercing = 3,
 		Model = "BloodyBladeProjectile",
 	},
 

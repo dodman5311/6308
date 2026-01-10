@@ -14,8 +14,10 @@ local rng = Random.new()
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local AnimationService = require(Globals.Vendor.AnimationService)
 local Globals = require(ReplicatedStorage.Shared.Globals)
+
+local AnimationService = require(Globals.Vendor.AnimationService)
+
 local net = require(Globals.Packages.Net)
 
 local function searchForHarbinger(npc)
@@ -143,7 +145,17 @@ local module = {
 
 		{
 			Function = "ShootProjectile",
-			Parameters = { stats.AttackDelay, stats.AttackCooldown, stats.AttackAmount, stats.ProjectileSpeed },
+			Parameters = {
+				stats.AttackDelay,
+				stats.AttackCooldown,
+				stats.AttackAmount,
+				stats.ProjectileSpeed,
+				1,
+				{},
+				"Projectile",
+				false,
+				0.5,
+			},
 			NotState = "Shielding",
 		},
 

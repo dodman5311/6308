@@ -81,6 +81,7 @@ local module = {
 				1,
 				{ SplashRange = 8, SplashDamage = 1 },
 				"RocketProjectile",
+				0.5,
 			},
 		},
 

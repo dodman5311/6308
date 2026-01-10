@@ -2461,7 +2461,9 @@ function module.OnBlock()
 	lastBlockTime = os.clock()
 
 	if module.currentWeapon and module.currentWeapon.Name == "Bloody Mary" then
-		module.FireProjectile("BloodyMaryBlade", 0, parryDamage, 1) --@TODO WHY NO WORKY!!!!
+		for _ = 1, 3 do
+			module.FireProjectile("BloodyMaryBlade", 5, parryDamage, 1)
+		end
 	else
 		module.FireBullet(parryDamage, 0, 300, nil, "Parry")
 	end

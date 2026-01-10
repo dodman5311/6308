@@ -17,7 +17,17 @@ local module = {
 		{ Function = "LeadTarget", Parameters = { 200, 1 } },
 		{
 			Function = "ShootProjectile",
-			Parameters = { stats.AttackDelay, stats.AttackCooldown, stats.AttackAmount, stats.ProjectileSpeed },
+			Parameters = {
+				stats.AttackDelay,
+				stats.AttackCooldown,
+				stats.AttackAmount,
+				stats.ProjectileSpeed,
+				1,
+				{},
+				"Projectile",
+				false,
+				0.5,
+			},
 			true,
 		},
 

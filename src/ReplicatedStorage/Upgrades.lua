@@ -319,21 +319,21 @@ but they travel slower
 		Cutter_Tier = {
 			{
 				Name = "Cutter: Tier 1",
-				Description = [[+2 Range
+				Description = [[+5 Range
 				
 <b>+5% spawn chance</b>]],
 				Price = 250,
 			},
 			{
 				Name = "Cutter: Tier 2",
-				Description = [[+3 Range
+				Description = [[+50 Ammo
 				
 <b>+10% spawn chance</b>]],
 				Price = 500,
 			},
 			{
 				Name = "Bloody Mary",
-				Description = [[Successfully parrying an attack will convert said attack into a smart sawblade
+				Description = [[Successfully parrying an attack will convert said attack into three smart sawblades
 				
 <b>+15% spawn chance</b>]],
 				Price = 750,

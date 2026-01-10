@@ -24,8 +24,9 @@ local module = {
 				stats.AltProjectileSpeed,
 				3,
 				{},
-				"Projectile",
+				false,
 				"SpecialAttack",
+				0.5,
 			},
 		},
 

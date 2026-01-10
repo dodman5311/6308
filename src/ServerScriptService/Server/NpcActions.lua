@@ -548,6 +548,9 @@ function module.ShootProjectile(
 		return
 	end
 
+	if not indicateAttack then
+	end
+
 	local AttackTimer = getTimer(
 		npc,
 		timerIndex or "ShootAttack",
