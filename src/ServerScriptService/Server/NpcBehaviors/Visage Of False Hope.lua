@@ -279,42 +279,38 @@ local function createImpulse(subject: Model, power: number, direction: Vector3, 
 	newVelocity.VectorVelocity = direction * power
 end
 
-local function checkGeyserHitboxes(npc)
-	local modelsHit = {}
+local allowedGeyserDamage = true
 
-	for _, hitbox in ipairs(CollectionService:GetTagged("GeyserHitbox")) do
-		for _, partHit in ipairs(workspace:GetPartsInPart(hitbox)) do
-			local humanoid, model = util.checkForHumanoid(partHit)
+local function checkPartsInHitbox(hitbox, npc)
+	for _, partHit in ipairs(workspace:GetPartsInPart(hitbox)) do
+		local humanoid, model = util.checkForHumanoid(partHit)
 
-			-- local playerHit = Players:GetPlayerFromCharacter(model)
+		if not humanoid or not model or model == npc.Instance then
+			continue
+		end
 
-			-- if not playerHit or table.find(playersHit, playerHit) then
-			-- 	continue
-			-- end
+		local modPos = model:GetPivot().Position
+		local subPos = npc.Instance:GetPivot().Position
+		local posNy = Vector3.new(subPos.X, modPos.Y, subPos.Z)
 
-			if hitbox:HasTag("Launching") then
-				local modPos = model:GetPivot().Position
-				local subPos = npc.Instance:GetPivot().Position
-				local posNy = Vector3.new(subPos.X, modPos.Y, subPos.Z)
+		local impulseDirection = (CFrame.lookAt(posNy, modPos + Vector3.new(0, 20, 0))).LookVector -- (subject.PrimaryPart.CFrame * CFrame.Angles(math.rad(25), 0, 0)).LookVector
+		createImpulse(model, 100, impulseDirection, 0.1)
 
-				local impulseDirection = (CFrame.lookAt(posNy, modPos + Vector3.new(0, 20, 0))).LookVector -- (subject.PrimaryPart.CFrame * CFrame.Angles(math.rad(25), 0, 0)).LookVector
-				createImpulse(model, 100, impulseDirection, 0.1)
-			end
-
+		if allowedGeyserDamage then
+			allowedGeyserDamage = false
 			dealDamage(npc, humanoid, 1)
 
-			table.insert(modelsHit, model)
+			task.delay(0.5, function()
+				allowedGeyserDamage = true
+			end)
 		end
 	end
 end
 
 local function RunGeyserCheck(npc)
-	local geyserTimer = npc:GetTimer("GeyserTimer")
-
-	geyserTimer.WaitTime = 0.25
-	geyserTimer.Function = checkGeyserHitboxes
-	geyserTimer.Parameters = { npc }
-	geyserTimer:Run()
+	for _, hitbox in ipairs(CollectionService:GetTagged("GeyserHitbox")) do
+		checkPartsInHitbox(hitbox, npc)
+	end
 end
 
 local function rotateForFire(npc)
@@ -401,7 +397,7 @@ local function createGeyserAt(npc, indicateTime, Position, launchTarget)
 	newGeyser.GeyserPart.Explosion:Play()
 	newGeyser.GeyserPart.Water:Play()
 
-	newGeyser.Area.Transparency = 1
+	newGeyser.Area.Transparency = 0.5
 
 	newGeyser.Hitbox:AddTag("GeyserHitbox")
 
@@ -917,6 +913,7 @@ local function onDied(npc)
 end
 
 local function setUp(npc)
+	allowedGeyserDamage = true
 	npc.Instance.Apature:PivotTo(CFrame.new(npc.Instance:GetPivot().Position))
 
 	for _, player in ipairs(Players:GetPlayers()) do

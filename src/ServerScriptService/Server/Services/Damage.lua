@@ -4,8 +4,8 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
-local net = require(Globals.Packages.Net)
 local elementService = require(Globals.Services.ElementalService)
+local net = require(Globals.Packages.Net)
 
 local function findHumanoid(subject)
 	local model = subject
@@ -48,7 +48,7 @@ function module.dealDamage(_, subject, amount, element)
 
 	local preHealth = humanoid.Health
 
-	if subject:GetAttribute("Soul") or subject:GetAttribute("SoulFire") then
+	if subject:GetAttribute("Soul") or subject:GetAttribute("SoulFire") or subject:GetAttribute("Bile") then
 		amount += 1
 	end
 

@@ -60,6 +60,13 @@ return {
 		exit = function() end,
 	},
 
+	Bile = {
+		time = 2,
+		enter = function() end,
+
+		exit = function() end,
+	},
+
 	Stun = {
 		time = 3,
 		enter = function() end,

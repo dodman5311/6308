@@ -563,6 +563,7 @@ enable mobile button for visage perks -- 13
 deadbolt explode when using explosive
 pellets damage for db
 
+-----------------------------------------------------------------------------
 
 Redesign stage 2 arenas -- wait
 
@@ -572,7 +573,17 @@ compile changelog ()
 
 make drav revive when restarting run ()
 
-I - Seven fix
-
 boss music plays when going to a boss at req shop (Worked on level 5 for some reason)
 cant choose an option after killing stage 2 boss
+
+FIX GEYSERS
+
+fix door
+
+fix hold prompt
+
+fix dying send u to next level
+
+fix cost resetting after save and not death
+
+nerf scavenger

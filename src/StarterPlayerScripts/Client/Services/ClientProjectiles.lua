@@ -35,9 +35,10 @@ export type Projectile = {
 	["LifeTime"]: number,
 	["Age"]: number,
 	["Sender"]: Instance,
-	["Info"]: table,
+	["Info"]: {},
 	["Damage"]: number,
 	["Piercing"]: number,
+	Source: any?,
 }
 
 module.Presets = {
@@ -103,7 +104,7 @@ module.Presets = {
 			Size = 5,
 		},
 		Damage = 1,
-		Piercing = 3,
+		Piercing = 4,
 		Model = "BloodyBladeProjectile",
 	},
 
@@ -128,6 +129,15 @@ module.Presets = {
 		Damage = 1,
 		Piercing = 1,
 		Model = "SmartProjectile",
+	},
+
+	Flare = {
+		Speed = 500,
+		LifeTime = 5,
+		Info = {},
+		Damage = 1,
+		Piercing = 0,
+		Model = "InvisibleProjectile",
 	},
 
 	SmartLockingProjectile = {
@@ -168,11 +178,31 @@ module.Presets = {
 
 	LargePlasma = {
 		Speed = 400,
-		LifeTime = 5,
-		Info = { Size = 2, SplashRange = 16, SplashDamage = 1, ExplosiveColor = Color3.fromRGB(255, 82, 226) },
+		LifeTime = 2,
+		Info = {
+			Size = 2,
+			SplashRange = 16,
+			SplashDamage = 1,
+			ExplosiveColor = Color3.fromRGB(255, 82, 226),
+		},
 		Damage = 1,
 		Piercing = 0,
 		Model = "PlasmaProjectile",
+	},
+
+	LazerusPlasma = {
+		Speed = 100,
+		LifeTime = 2,
+		Info = {
+			Size = 2,
+			Flares = true,
+			SplashRange = 32,
+			SplashDamage = 1,
+			ExplosiveColor = Color3.fromRGB(255, 82, 226),
+		},
+		Damage = 1,
+		Piercing = 0,
+		Model = "LazerusPlasmaProjectile",
 	},
 
 	AssaultProjectile = {
@@ -194,7 +224,7 @@ module.Presets = {
 	},
 
 	FastHarpoon = {
-		Speed = 500,
+		Speed = 375,
 		LifeTime = 5,
 		Info = { Dropping = 0.25, Size = 2 },
 		Damage = 2,
@@ -206,7 +236,7 @@ module.Presets = {
 		Speed = 500,
 		LifeTime = 5,
 		Info = { Dropping = 0.25, Size = 2 },
-		Damage = 2,
+		Damage = 3,
 		Piercing = 2,
 		Model = "HarpoonProjectile",
 	},
@@ -246,19 +276,19 @@ module.Presets = {
 		Model = "RocketProjectile",
 	},
 
-	FastExplosivePellet = {
-		Speed = 400,
+	BigExplosivePellet = {
+		Speed = 200,
 		LifeTime = 8,
-		Info = { SplashRange = 10, SplashDamage = 1 },
+		Info = { SplashRange = 15, SplashDamage = 1 },
 		Damage = 1,
 		Piercing = 0,
 		Model = "RocketProjectile",
 	},
 
 	DreadPellet = {
-		Speed = 400,
+		Speed = 200,
 		LifeTime = 8,
-		Info = { SplashRange = 10, SplashDamage = 1, Seeking = 0, SeekDistance = 250, SeekProgression = 0.0075 },
+		Info = { SplashRange = 15, SplashDamage = 1, Seeking = 0, SeekDistance = 250, SeekProgression = 0.0075 },
 		Damage = 1,
 		Piercing = 0,
 		Model = "RocketProjectile",
@@ -362,7 +392,7 @@ function module.createProjectile(speed, cframe, spread, dmg, LifeTime, piercing,
 	newInstance.Parent = workspace.Ignore
 	newInstance.CFrame = cframe * offset
 
-	local localScript = newInstance:FindFirstChildOfClass("LocalScript")
+	local localScript = newInstance:FindFirstChildOfClass("Script")
 	if localScript then
 		localScript.Enabled = true
 	end
@@ -462,6 +492,7 @@ Net:Connect("CreateProjectile", module.createProjectile)
 Net:Connect("CreateBeam", fireBeam)
 
 local lastRenderStep = os.clock()
+local canFireFlare = false
 
 local function processStep(distanceToMove, projectile: Projectile)
 	projectile.Instance.CFrame *= CFrame.new(0, 0, -(distanceToMove + 0.1))
@@ -530,6 +561,70 @@ local function processStep(distanceToMove, projectile: Projectile)
 			if projectile.Info["SeekSpeeding"] then
 				projectile.Speed = math.clamp(projectile.Speed + projectile.Info["SeekSpeeding"], 0, math.huge)
 			end
+		end
+	end
+
+	if projectile.Info["Flares"] then
+		local list
+
+		if projectile.Sender and projectile.Sender:IsA("Player") then
+			list = collectionService:GetTagged("Enemy")
+		else
+			list = {}
+			for _, plr in ipairs(Players:GetPlayers()) do
+				table.insert(list, plr.Character)
+			end
+		end
+
+		if not canFireFlare then
+			canFireFlare = true
+
+			for _, enemy in ipairs(list) do
+				local projectilePosition = projectile.Instance.Position
+				local position = enemy:GetPivot().Position
+
+				local distance = (position - projectilePosition).Magnitude
+				if distance > 60 then
+					continue
+				end
+
+				local rp = RaycastParams.new()
+
+				rp.FilterType = Enum.RaycastFilterType.Include
+				rp.FilterDescendantsInstances = { workspace.Map }
+
+				if workspace:Raycast(projectilePosition, position - projectilePosition, rp) then
+					continue
+				end
+
+				local tendril = enemy:FindFirstChild("Tendril")
+				if not tendril then
+					tendril = Effects.Tendril:Clone()
+					tendril.Parent = enemy
+					tendril.Attachment0 = enemy.PrimaryPart.RootAttachment
+				end
+
+				tendril.Attachment1 = projectile.Instance.RootAttachment
+				tendril.Enabled = true
+
+				task.delay(0.1, function()
+					tendril.Enabled = false
+				end)
+
+				module.createFromPreset(
+					CFrame.lookAt(projectilePosition, position),
+					0,
+					"Flare",
+					nil,
+					nil,
+					projectile.Sender,
+					projectile.Source
+				)
+			end
+
+			task.delay(0.1, function()
+				canFireFlare = false
+			end)
 		end
 	end
 

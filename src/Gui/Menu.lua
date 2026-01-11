@@ -7,10 +7,12 @@ local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local StarterPlayer = game:GetService("StarterPlayer")
 local TeleportService = game:GetService("TeleportService")
 local UserInputService = game:GetService("UserInputService")
 
 --// Instances
+local AirController = require(StarterPlayer.StarterPlayerScripts.Client.Controllers.AirController)
 local ChanceService = require(ReplicatedStorage.Vendor.ChanceService)
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local Kiosk = require(script.Parent.Kiosk)
@@ -812,6 +814,9 @@ local function createTeleportIcon(frame, adornee: Model, icon): MapIcons.MapIcon
 		end
 		Players.LocalPlayer.Character:PivotTo(teleportPart:GetPivot())
 
+		Players.LocalPlayer.Character.PrimaryPart.AssemblyLinearVelocity = Vector3.zero
+		AirController.change()
+
 		task.wait(travelTime - 1)
 
 		module.Close(Players.LocalPlayer, nil, frame)
@@ -955,7 +960,7 @@ local function loadMap(player, frame)
 		newPart.Name = "Enemy"
 		newPart.Parent = map
 
-		local enemyObject = ReplicatedStorage.Enemies:FindFirstChild(enemy.Name)
+		local enemyObject = ReplicatedStorage.Enemies:FindFirstChild(enemy.Name, true)
 
 		if enemyObject:GetAttribute("SpawnChance") and enemyObject:GetAttribute("SpawnChance") <= 40 then
 			local displayIcon = createDisplayIcon(frame, newPart, mapIconIds.Elite, enemy.Name)
@@ -1128,6 +1133,10 @@ local function loadArsenal(frame)
 
 	RunService:BindToRenderStep("RotateWeapon", Enum.RenderPriority.Camera.Value, function()
 		weaponModel:PivotTo(weaponModel:GetPivot() * CFrame.Angles(0, math.rad(0.5), 0))
+
+		if weaponModel.Name == "Lazerus" then
+			weaponModel.Model.Fan.CFrame *= CFrame.Angles(math.rad(20), 0, 0)
+		end
 
 		local list: ScrollingFrame = frame.PerkList
 

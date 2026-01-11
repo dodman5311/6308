@@ -3,8 +3,8 @@ local module = {
 }
 
 --// Services
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
@@ -76,10 +76,10 @@ local function getNearestEnemy(position, position2)
 	end
 
 	for _, model in ipairs(CollectionService:GetTagged("ThrownWeapon")) do
-		if module.checkRicoshot({
+		if module.checkRicoshot {
 			Instance = model.HitBox,
 			Position = model:GetPivot().Position,
-		}) then
+		} then
 			table.insert(list, model)
 		end
 	end
@@ -138,13 +138,8 @@ local function handleHitEffect(weapon)
 	ricoHitbox.Ui.Shoot.Image.ImageColor3 = Color3.new(1):Lerp(Color3.fromRGB(255, 235, 185), health / maxHealth)
 end
 
-function module.doRicoshot(weapon, character)
-	local weaponPosition = weapon:GetPivot().Position
-
-	local grip = weapon:FindFirstChild("Grip")
-	if grip then
-		weaponPosition = weapon.Grip.Position
-	end
+function module.doRicoshot(weapon, character, hitPoint)
+	local position = hitPoint
 
 	local characterPosition = character:GetPivot().Position
 
@@ -152,7 +147,7 @@ function module.doRicoshot(weapon, character)
 
 	handleHitEffect(weapon)
 
-	local result = getNearestEnemy(characterPosition, weaponPosition)
+	local result = getNearestEnemy(characterPosition, position)
 
 	if not result then
 		return
@@ -171,7 +166,7 @@ function module.doRicoshot(weapon, character)
 
 	local endPosition = target:GetPivot().Position
 
-	createEffect(weaponPosition, endPosition)
+	createEffect(position, endPosition)
 
 	return {
 		Instance = target,

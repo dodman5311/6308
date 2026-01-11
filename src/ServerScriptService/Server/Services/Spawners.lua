@@ -301,7 +301,7 @@ function module.spawnWeapons(currentLevel, mapOverride)
 		if not upgradeTier then
 			continue
 		end
-		weapon:SetAttribute("SpawnChance", upgradeTier * 5)
+		--weapon:SetAttribute("SpawnChance", upgradeTier * 5)
 	end
 
 	local weaponsSpawned = 0

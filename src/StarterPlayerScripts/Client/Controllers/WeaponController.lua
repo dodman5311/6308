@@ -389,8 +389,10 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 	end
 
 	signals.AddEntry:Fire(weaponName)
-
-	defaultWeapon.Parent = game
+	if defaultWeapon then
+		defaultWeapon:Destroy()
+		defaultWeapon = nil
+	end
 
 	local newWeapon = weapon:Clone()
 
@@ -1468,7 +1470,7 @@ function module.FireBullet(damage, spread, distance, result, source, element, ch
 	local hitHumanoid, subject, damageResult, spreadResult
 
 	if ricoObject then
-		local hit = RicoshotService.doRicoshot(ricoObject, player.Character)
+		local hit = RicoshotService.doRicoshot(ricoObject, player.Character, result.Position)
 		hitHumanoid, subject, damageResult, spreadResult = module.FireBullet(damage + 2, 0, 0, hit, "Ricoshot", element)
 	end
 
@@ -1480,7 +1482,11 @@ function module.FireBullet(damage, spread, distance, result, source, element, ch
 		and weaponData.RicochetChance ~= 0
 		and ChanceService.checkChance(weaponData.RicochetChance, true)
 	then
-		local hit = RicoshotService.doRicoshot(result.Instance:FindFirstAncestorOfClass("Model"), player.Character)
+		local hit = RicoshotService.doRicoshot(
+			result.Instance:FindFirstAncestorOfClass("Model"),
+			player.Character,
+			result.Position
+		)
 		hitHumanoid, subject, damageResult, spreadResult = module.FireBullet(damage, 0, 0, hit, "Ricoshot", element)
 	end
 
@@ -1558,7 +1564,10 @@ local function FireDefault(extraBullet)
 		return
 	end
 
-	local default = viewmodel.Model.Default
+	local default = viewmodel.Model:FindFirstChild("Default")
+	if not default then
+		return
+	end
 	local bulletCount = 1 + extraBullet
 
 	if currentAmmo <= 0 then
@@ -1657,11 +1666,14 @@ local function FireDefault(extraBullet)
 end
 
 local currentShields = nil
+local iSevenBlocks = 0
 
 local function createISevenShieldEffect()
 	if currentShields then
 		return
 	end
+
+	iSevenBlocks = 0
 
 	local ti = TweenInfo.new(0.25, Enum.EasingStyle.Exponential)
 
@@ -1883,7 +1895,7 @@ function module.Fire()
 
 	local maxDistance = weaponData.MaxDistance or 500
 
-	if module.currentWeapon.Name == "Shagan" and os.clock() - lastBlockTime <= 3 then
+	if module.currentWeapon.Name == "Shagan" and os.clock() - lastBlockTime <= 1 then
 		maxDistance = 65
 		player.Character.PrimaryPart.AssemblyLinearVelocity = (camera.CFrame.LookVector * 250) + Vector3.new(0, 25, 0)
 		airController.change()
@@ -1894,7 +1906,7 @@ function module.Fire()
 
 	if module.currentWeapon.Name == "Mega Shot" then
 		bulletDamage = 3
-		bulletCount = 10
+		bulletCount = 12
 	end
 
 	createKnockback(getRecoilNumber())
@@ -2402,6 +2414,8 @@ function module.Block()
 
 	local playingAnimation
 
+	lastBlockTime = os.clock()
+
 	if punch then
 		playingAnimation = animationService:playAnimation(
 			viewmodel.Model,
@@ -2458,7 +2472,15 @@ function module.OnBlock()
 
 	local parryDamage = 1
 
-	lastBlockTime = os.clock()
+	if ISevenBlock then
+		iSevenBlocks += 1
+
+		if iSevenBlocks >= 7 then
+			ISevenBlock = false
+			destroyISevenShieldEffect()
+			net:RemoteEvent("SetBlocking"):FireServer(false)
+		end
+	end
 
 	if module.currentWeapon and module.currentWeapon.Name == "Bloody Mary" then
 		for _ = 1, 3 do
@@ -2630,6 +2652,11 @@ function module.OnDied()
 
 	mouseButton1Down = false
 	overchargeValue.Value = 0
+
+	if defaultWeapon then
+		defaultWeapon:Destroy()
+		defaultWeapon = nil
+	end
 end
 
 local function switchWeapon()
@@ -3099,6 +3126,10 @@ explosionService.explosiveHit:Connect(function(subject, preHealth, postHealth, d
 
 	if sourceIsWeapon and source == "Concussion" and ChanceService.checkChance(15, true) then
 		net:RemoteEvent("Damage"):FireServer(subject, 0, "Stun")
+	end
+
+	if sourceIsWeapon and source == "Dread Shot" then
+		net:RemoteEvent("Damage"):FireServer(subject, 0, "Bile")
 	end
 
 	addToGib(subject:FindFirstChild("Humanoid"), subject, damageDelt)

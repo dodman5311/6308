@@ -3,16 +3,12 @@ local upgrades = {
 		["DoubleShot_Tier"] = {
 			{
 				Name = "Double Shot: Tier 1",
-				Description = [[+1 Pellet
-				
-<b>+5% spawn chance</b>]],
+				Description = [[+1 Pellet]],
 				Price = 250,
 			},
 			{
 				Name = "Double Shot: Tier 2",
-				Description = [[+0.3 Speed
-				
-<b>+10% spawn chance</b>]],
+				Description = [[+0.3 Speed]],
 				Price = 100,
 			},
 			{
@@ -20,8 +16,7 @@ local upgrades = {
 				Description = [[+2 Pellets
 				
 Pellets now pierce through enemies and have a 10% chance to ricochet to a nearby enemy,
-but they travel slower
-<b>+15% spawn chance</b>]],
+but they travel slower]],
 				Price = 500,
 			},
 		},
@@ -29,23 +24,17 @@ but they travel slower
 		["DrillBite_Tier"] = {
 			{
 				Name = "Drill Bite: Tier 1",
-				Description = [[+3 Ammo
-				
-<b>+5% spawn chance</b>]],
+				Description = [[+3 Ammo]],
 				Price = 250,
 			},
 			{
 				Name = "Drill Bite: Tier 2",
-				Description = [[Pellets now have a 5% chance to light enemies on fire
-				
-<b>+10% spawn chance</b>]],
+				Description = [[Pellets now have a 5% chance to light enemies on fire]],
 				Price = 500,
 			},
 			{
 				Name = "Wrath Guard",
-				Description = [[Wrath Guard’s parry is a stunning punch
-				
-<b>+15% spawn chance</b>]],
+				Description = [[Wrath Guard’s parry is a stunning punch]],
 				Price = 750,
 			},
 		},
@@ -53,23 +42,17 @@ but they travel slower
 		["QuadShot_Tier"] = {
 			{
 				Name = "Quad Shot: Tier 1",
-				Description = [[+1 Pellet
-				
-<b>+5% spawn chance</b>]],
+				Description = [[+1 Pellet]],
 				Price = 250,
 			},
 			{
 				Name = "Quad Shot: Tier 2",
-				Description = [[+1 Pellet
-				
-<b>+10% spawn chance</b>]],
+				Description = [[+1 Pellet]],
 				Price = 500,
 			},
 			{
 				Name = "Mega Shot",
-				Description = [[Every loaded shell is different. Mega shot fires 3 Explosive rounds, 3 Homing rounds, 3 Regular pellets, and 1 Slug with 3 damage
-				
-<b>+15% spawn chance</b>]],
+				Description = [[Every loaded shell is different. Mega shot fires 3 Explosive rounds, 3 Homing rounds, 3 Regular pellets, and 3 Flechettes with 3 damage]],
 				Price = 750,
 			},
 		},
@@ -79,23 +62,17 @@ but they travel slower
 		BORUS_Tier = {
 			{
 				Name = "BORUS: Tier 1",
-				Description = [[+5 Ammo
-				
-<b>+5% spawn chance</b>]],
+				Description = [[+5 Ammo]],
 				Price = 100,
 			},
 			{
 				Name = "BORUS: Tier 2",
-				Description = [[-1 Recoil
-				
-<b>+10% spawn chance</b>]],
+				Description = [[-1 Recoil]],
 				Price = 250,
 			},
 			{
 				Name = "HADES",
-				Description = [[HADES has +1 Damage, -3 Speed, +10 Ammo
-				
-<b>+15% spawn chance</b>]],
+				Description = [[HADES has +1 Damage, -3 Speed, +10 Ammo]],
 				Price = 500,
 			},
 		},
@@ -103,23 +80,17 @@ but they travel slower
 		["800M_Tier"] = {
 			{
 				Name = "800M: Tier 1",
-				Description = [[+50% Projectile Speed
-				
-<b>+5% spawn chance</b>]],
+				Description = [[+50% Projectile Speed]],
 				Price = 250,
 			},
 			{
 				Name = "800M: Tier 2",
-				Description = [[+100% Splash Range
-				
-<b>+10% spawn chance</b>]],
+				Description = [[+100% Splash Range]],
 				Price = 500,
 			},
 			{
 				Name = "Concussion",
-				Description = [[Explosions from the Concussion have a 15% chance to stun
-				
-<b>+15% spawn chance</b>]],
+				Description = [[Explosions from the Concussion have a 15% chance to stun]],
 				Price = 750,
 			},
 		},
@@ -127,23 +98,17 @@ but they travel slower
 		Gratana_Tier = {
 			{
 				Name = "Gratana: Tier 1",
-				Description = [[+1 Ammo
-				
-<b>+5% spawn chance</b>]],
+				Description = [[+1 Ammo]],
 				Price = 250,
 			},
 			{
 				Name = "Gratana: Tier 2",
-				Description = [[+1 Ammo
-				
-<b>+10% spawn chance</b>]],
+				Description = [[+1 Ammo]],
 				Price = 500,
 			},
 			{
 				Name = "Dovus",
-				Description = [[Can lock onto up to two targets. Can fire as fast as you pull the trigger.
-				
-<b>+15% spawn chance</b>]],
+				Description = [[Can lock onto up to two targets. Can fire as fast as you pull the trigger.]],
 				Price = 750,
 			},
 		},
@@ -152,24 +117,20 @@ but they travel slower
 	Pistols = {
 		["BullShot_Tier"] = {
 			{
-				Name = [[Bull Shot: Tier 1
-				
-<b>+5% spawn chance</b>]],
-				Description = "+1 Ammo",
+				Name = "Bull Shot: Tier 1",
+				Description = [[+50% Splash Range]],
 				Price = 250,
 			},
 			{
 				Name = "Bull Shot: Tier 2",
-				Description = [[+100% Projectile speed
-				
-<b>+10% spawn chance</b>]],
+				Description = [[+1 Pellets]],
 				Price = 500,
 			},
 			{
 				Name = "Dread Shot",
-				Description = [[Rockets slightly seek enemies
+				Description = [[Hitting enemies douses them with bile, increasing damage taken by 1 for 2 seconds.
 				
-<b>+15% spawn chance</b>]],
+Rockets slightly seek enemies]],
 				Price = 750,
 			},
 		},
@@ -197,23 +158,17 @@ but they travel slower
 		["BoomCannon_Tier"] = {
 			{
 				Name = "Boom Cannon: Tier 1",
-				Description = [[+1 Speed
-				
-<b>+5% spawn chance</b>]],
+				Description = [[+1 Speed]],
 				Price = 100,
 			},
 			{
 				Name = "Boom Cannon: Tier 2",
-				Description = [[Shots now have a 15% chance to ricochet to a nearby enemy
-				
-<b>+10% spawn chance</b>]],
+				Description = [[Shots now have a 15% chance to ricochet to a nearby enemy]],
 				Price = 250,
 			},
 			{
 				Name = "50 Regret",
-				Description = [[x2 damage to weak points
-				
-<b>+15% spawn chance</b>]],
+				Description = [[x2 damage to weak points]],
 				Price = 500,
 			},
 		},
@@ -221,23 +176,24 @@ but they travel slower
 		RIPP_Tier = {
 			{
 				Name = "RIPP: Tier 1",
-				Description = [[+2 Ammo
-				
-<b>+5% spawn chance</b>]],
+				Description = [[+100% Splash Range]],
 				Price = 250,
 			},
 			{
 				Name = "RIPP: Tier 2",
-				Description = [[+100% Splash Range
-				
-<b>+10% spawn chance</b>]],
+				Description = [[+1 Splash Damage]],
 				Price = 500,
 			},
 			{
-				Name = "Experiment 05",
-				Description = [[Shots have a 5% chance to electrify enemies
-				
-<b>+15% spawn chance</b>]],
+				Name = "Lazerus",
+				Description = [[-12 Ammo
+-9 Speed
+-75% projectile speed
+
++1 Damage
++100% Splash Range
+
+Plasma bolts now create damaging tendrils around then that deal 1 Damage per 0.1 second to any nearby enemy.]],
 				Price = 750,
 			},
 		},
@@ -245,23 +201,20 @@ but they travel slower
 		["ISix_Tier"] = {
 			{
 				Name = "I-Six: Tier 1",
-				Description = [[+65% lock on speed
-				
-<b>+5% spawn chance</b>]],
+				Description = [[+65% lock on speed]],
 				Price = 250,
 			},
 			{
 				Name = "I-Six: Tier 2",
-				Description = [[+1 Lock on amount
-				
-<b>+10% spawn chance</b>]],
+				Description = [[+1 Lock on amount]],
 				Price = 500,
 			},
 			{
 				Name = "I-Seven",
-				Description = [[When beginning a lock on, a parrying shield is created until the weapon is discharged.
+				Description = [[+1 Ammo
 				
-<b>+15% spawn chance</b>]],
+When beginning a lock on, a parrying shield is created until the weapon is discharged.
+The shield can parry 7 attacks before dispersing.]],
 				Price = 750,
 			},
 		},
@@ -271,23 +224,19 @@ but they travel slower
 		Katana_Tier = {
 			{
 				Name = "Katana: Tier 1",
-				Description = [[+5 Range
-				
-<b>+5% spawn chance</b>]],
+				Description = [[+5 Range]],
 				Price = 100,
 			},
 			{
 				Name = "Katana: Tier 2",
-				Description = [[A successful parry has a 10% to add ammo
-				
-<b>+10% spawn chance</b>]],
+				Description = [[A successful parry has a 15% chance to add ammo]],
 				Price = 250,
 			},
 			{
 				Name = "Shagan",
-				Description = [[Attacking at least 3 second after a successful parry will launch the player forward
+				Description = [[+5 Range
 				
-<b>+15% spawn chance</b>]],
+Attacking at least 0.5 second after parrying will launch the player forward]],
 				Price = 500,
 			},
 		},
@@ -295,23 +244,21 @@ but they travel slower
 		Harpoons_Tier = {
 			{
 				Name = "Harpoons: Tier 1",
-				Description = [[+100% Projectile Speed
-				
-<b>+5% spawn chance</b>]],
+				Description = [[+50% Projectile Speed]],
 				Price = 250,
 			},
 			{
 				Name = "Harpoons: Tier 2",
-				Description = [[Harpoons have a 10% chance to stun enemies
-				
-<b>+10% spawn chance</b>]],
+				Description = [[Harpoons have a 10% chance to stun enemies]],
 				Price = 500,
 			},
 			{
 				Name = "Trident",
-				Description = [[Hitting stunned enemies will deal 3 damage
+				Description = [[+1 Damage
 				
-<b>+15% spawn chance</b>]],
++50% Projectile Speed
+				
+Hitting stunned enemies will deal +3 damage]],
 				Price = 750,
 			},
 		},
@@ -319,23 +266,20 @@ but they travel slower
 		Cutter_Tier = {
 			{
 				Name = "Cutter: Tier 1",
-				Description = [[+5 Range
-				
-<b>+5% spawn chance</b>]],
+				Description = [[+5 Range]],
 				Price = 250,
 			},
 			{
 				Name = "Cutter: Tier 2",
-				Description = [[+50 Ammo
-				
-<b>+10% spawn chance</b>]],
+				Description = [[+50 Ammo]],
 				Price = 500,
 			},
 			{
 				Name = "Bloody Mary",
-				Description = [[Successfully parrying an attack will convert said attack into three smart sawblades
-				
-<b>+15% spawn chance</b>]],
+				Description = [[1 Damage x 3
+50% Cooler
+
+Successfully parrying an attack will convert said attack into three smart sawblades]],
 				Price = 750,
 			},
 		},
