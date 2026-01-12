@@ -36,15 +36,19 @@ local module = {
 	},
 
 	TargetFound = {
-		{ Function = "PlaySound", Parameters = { "Notice", 5 } },
+		{ Function = "PlaySound", Parameters = { "Notice", 10 } },
 		{ Function = "SwitchToState", Parameters = { "Attacking" } },
 		{ Function = "MoveTowardsTarget" },
 	},
 
 	TargetLost = {
-		{ Function = "PlaySound", Parameters = { "LostTarget", 1 } },
+		{ Function = "PlaySound", Parameters = { "LostTarget", 5 } },
 		{ Function = "SwitchToState", Parameters = { "Chasing" } },
 		{ Function = "MoveTowardsTarget" },
+	},
+
+	OnDamaged = {
+		{ Function = "PlaySound", Parameters = { "Hurt", 100 } },
 	},
 
 	OnSpawned = {
@@ -55,6 +59,7 @@ local module = {
 	},
 
 	OnDied = {
+		{ Function = "PlaySound", Parameters = { "Death", 75 } },
 		{ Function = "SetCollision", Parameters = { "DeadBody" } },
 		{ Function = "SwitchToState", Parameters = { "Dead" } },
 		{ Function = "Ragdoll" },

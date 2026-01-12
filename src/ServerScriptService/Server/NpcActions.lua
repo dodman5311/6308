@@ -882,15 +882,19 @@ function module.PlaySound(npc, soundName: string, chance: number)
 end
 
 function module.PlayIdleSound(npc, waitTime: number | NumberRange?)
-	waitTime = waitTime or NumberRange.new(5, 7)
-	local soundTimer = getTimer(npc, "PlayIdleSound", waitTime, function()
-		module.PlaySound(npc, "Idle", 100)
-	end, true)
+	-- waitTime = waitTime or NumberRange.new(5, 7)
+	-- local soundTimer = getTimer(npc, "PlayIdleSound", waitTime, function()
+	if npc.MindData.VoicePlaying then
+		return
+	end
+	-- 	module.PlaySound(npc, "Idle", 100)
+	-- end, true)
+	module.PlaySound(npc, "Idle", 0.1)
 
-	soundTimer.OnEnded:Once(function()
-		soundTimer.WaitTime = getNumber(waitTime)
-	end)
-	soundTimer:Run()
+	-- soundTimer.OnEnded:Once(function()
+	-- 	soundTimer.WaitTime = getNumber(waitTime)
+	-- end)
+	-- soundTimer:Run()
 end
 
 function module.AssignGender(npc)

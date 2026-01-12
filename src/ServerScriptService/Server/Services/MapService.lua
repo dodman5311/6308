@@ -734,7 +734,9 @@ function module.proceedToNext(_, onlyLoadMap, toReq: boolean?)
 		character.Humanoid.Health = character.Humanoid.MaxHealth
 	end
 
-	if not onlyLoadMap then
+	if onlyLoadMap then
+		workspace:SetAttribute("SaveStage", module.CurrentStage)
+	else
 		if not toReq then
 			if module.CurrentLevel == 5 or module.CurrentLevel == 2 then
 				module.CurrentLevel += 0.5
@@ -756,6 +758,8 @@ function module.proceedToNext(_, onlyLoadMap, toReq: boolean?)
 		elseif toReq then
 			workspace:SetAttribute("SaveStage", module.CurrentStage)
 			module.CurrentStage = 0
+		else
+			workspace:SetAttribute("SaveStage", module.CurrentStage)
 		end
 	end
 
