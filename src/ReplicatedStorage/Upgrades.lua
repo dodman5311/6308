@@ -186,7 +186,7 @@ Rockets slightly seek enemies]],
 			},
 			{
 				Name = "Lazerus",
-				Description = [[-12 Ammo
+				Description = [[-14 Ammo
 -9 Speed
 -75% projectile speed
 

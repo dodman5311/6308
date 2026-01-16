@@ -61,13 +61,12 @@ function module.LoadGameData(player)
 	local upgrades = LoadData(player, DataStoreService:GetDataStore("ShopUpgrades")) or {}
 	local gameSettings = LoadData(player, DataStoreService:GetDataStore("PlayerSettings")) or {}
 	local gameState = LoadData(player, DataStoreService:GetDataStore("PlayerGameState")) or {}
-	local stageState = LoadData(player, DataStoreService:GetDataStore("PlayerStageState")) or {}
 	local furthestLevel = LoadData(player, DataStoreService:GetDataStore("PlayerFurthestLevel")) or 0
 	local codex = LoadData(player, DataStoreService:GetDataStore("PlayerCodex")) or {}
 
 	player:SetAttribute("furthestLevel", furthestLevel)
 
-	module.stageState = stageState
+	module.gameState = gameState
 
 	mapService.CurrentStage = gameState["Stage"] and math.clamp(gameState["Stage"], 1, math.huge) or 1
 	mapService.CurrentLevel = gameState["Level"] and math.clamp(gameState["Level"], 1, math.huge) or 1
@@ -89,6 +88,7 @@ function module.LoadGameData(player)
 end
 
 function module.getStageState()
+	print(module.gameState)
 	return module.gameState
 end
 

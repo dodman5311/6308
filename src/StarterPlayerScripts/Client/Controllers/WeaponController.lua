@@ -3059,7 +3059,8 @@ signals.DoWeaponAction:Connect(function(actionName, ...)
 	return module[actionName](...)
 end)
 
-signals.AddAmmo:Connect(function(bigMag)
+signals.AddAmmo:Connect(function(mult)
+	mult = mult or 1
 	local amount
 	local baseAmmo
 
@@ -3069,11 +3070,7 @@ signals.AddAmmo:Connect(function(bigMag)
 		baseAmmo = 16
 	end
 
-	if bigMag then
-		amount = baseAmmo * 0.5
-	else
-		amount = baseAmmo * 0.25
-	end
+	amount = math.max((baseAmmo * 0.2) * mult, 1)
 
 	module.AddAmmo(amount)
 end)

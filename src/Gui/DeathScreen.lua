@@ -25,10 +25,6 @@ local sfx = sounds.DeathScreen
 local MusicService = require(Globals.Client.Services.MusicService)
 local Signals = require(Globals.Shared.Signals)
 local UIAnimationService = require(ReplicatedStorage.Vendor.UIAnimationService)
-local acts = require(Globals.Vendor.Acts)
-local giftService = require(Globals.Client.Services.GiftsService)
-local net = require(Globals.Packages.Net)
-local soulsService = require(Globals.Client.Services.SoulsService)
 local util = require(Globals.Vendor.Util)
 local deliveryAmount = 0
 

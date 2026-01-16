@@ -17,6 +17,7 @@ local Globals = require(replicatedStorage.Shared.Globals)
 --// requirements
 local arenas = require(Globals.Services.HandleArenas)
 local net = require(Globals.Packages.Net)
+local requiemShop = require(Globals.Services.ReqiuemShop)
 local signal = require(Globals.Packages.Signal)
 local signals = require(Globals.Signals)
 local spawners = require(Globals.Services.Spawners)
@@ -678,10 +679,7 @@ function module.loadBossRoom()
 end
 
 local function spawnBoss(_, type)
-	local stage = module.CurrentStage == 0 and workspace:GetAttribute("SaveStage") or module.CurrentStage
-	print(stage, stageFolder)
-
-	getAssets(stage)
+	getAssets()
 
 	spawners.SpawnBoss(stageFolder:GetAttribute(type), map:FindFirstChildOfClass("Model")) -- stage folder issue
 	workspace:SetAttribute("LastBoss", stageFolder:GetAttribute(type))
@@ -734,32 +732,21 @@ function module.proceedToNext(_, onlyLoadMap, toReq: boolean?)
 		character.Humanoid.Health = character.Humanoid.MaxHealth
 	end
 
-	if onlyLoadMap then
-		workspace:SetAttribute("SaveStage", module.CurrentStage)
-	else
-		if not toReq then
-			if module.CurrentLevel == 5 or module.CurrentLevel == 2 then
-				module.CurrentLevel += 0.5
-			else
-				module.CurrentLevel = math.floor(module.CurrentLevel + 1)
-			end
+	print(toReq)
+
+	if toReq then
+		requiemShop:EnterShop()
+	end
+
+	if not onlyLoadMap then
+		if module.CurrentLevel == 5 or module.CurrentLevel == 2 then
+			module.CurrentLevel += 0.5
+		else
+			module.CurrentLevel = math.floor(module.CurrentLevel + 1)
 		end
 
 		if module.CurrentLevel > 5.5 then -- amount of levels in a stage
 			module.CurrentLevel = 1
-
-			if not toReq then
-				module.CurrentStage += 1 -- USING ALTAR DOESN'T CONTINUE TO NEXT LEVEL!
-			end
-		end
-
-		if module.CurrentStage == 0 then
-			module.CurrentStage = workspace:GetAttribute("SaveStage") or 1
-		elseif toReq then
-			workspace:SetAttribute("SaveStage", module.CurrentStage)
-			module.CurrentStage = 0
-		else
-			workspace:SetAttribute("SaveStage", module.CurrentStage)
 		end
 	end
 
@@ -777,7 +764,7 @@ function module.proceedToNext(_, onlyLoadMap, toReq: boolean?)
 		Lighting.Atmosphere.Density = 0.55
 	end
 
-	if math.floor(module.CurrentLevel) ~= module.CurrentLevel and not toReq then
+	if math.floor(module.CurrentLevel) ~= module.CurrentLevel then
 		module.loadBossRoom()
 		storedMap = createStoredMap()
 		return
@@ -787,10 +774,6 @@ function module.proceedToNext(_, onlyLoadMap, toReq: boolean?)
 
 	if module.CurrentStage == 3 then
 		mapSize /= 2
-	end
-
-	if module.CurrentStage == 0 then
-		net:RemoteEvent("DoUiAction"):FireAllClients("HUD", "ShowRCoins")
 	end
 
 	module.loadLinearMap(mapSize)

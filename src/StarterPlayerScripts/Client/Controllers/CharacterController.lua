@@ -188,9 +188,9 @@ function module:OnSpawn(character, humanoid)
 	humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
 	humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
 
-	local stageState = net:RemoteFunction("GetStageState"):InvokeServer()
+	if workspace:GetAttribute("IsInReq") then --workspace:GetAttribute("TotalScore") > (workspace:GetAttribute("DeathCount") + 1) * 200 and hasDied then -- req check
+		local stageState = net:RemoteFunction("GetStageState"):InvokeServer()
 
-	if workspace:GetAttribute("Stage") == 0 then --workspace:GetAttribute("TotalScore") > (workspace:GetAttribute("DeathCount") + 1) * 200 and hasDied then -- req check
 		UIService.doUiAction("HUD", "ShowRCoins")
 		loadSaveData(0, stageState)
 	end
@@ -411,6 +411,37 @@ RunService.Heartbeat:Connect(function()
 	hitBlood:Destroy()
 end)
 
+local function playLevelTrack()
+	local plusStage = (workspace:GetAttribute("Stage") - 1) * 5
+	local totalLevel = plusStage + workspace:GetAttribute("Level")
+
+	MusicService.playMusic(math.floor(totalLevel))
+end
+
+local function enterLevel()
+	task.delay(0.5, function()
+		playLevelTrack()
+	end)
+
+	local stage = workspace:GetAttribute("Stage")
+
+	local gameState = {
+		Stage = stage,
+		Level = workspace:GetAttribute("Level"),
+		Souls = soulsService.Souls,
+		TotalScore = workspace:GetAttribute("TotalScore"),
+
+		critChances = weaponService.critChances,
+
+		Luck = ChanceService.luck,
+		PerkTickets = kiosk.tickets,
+
+		PerkList = giftService.AquiredGifts,
+	}
+
+	net:RemoteEvent("SaveGameState"):FireServer(gameState)
+end
+
 local function exitS2(extraSouls, level, stageBoss, miniBoss)
 	module.attemptResume("EndPause")
 
@@ -428,55 +459,38 @@ local function exitS2(extraSouls, level, stageBoss, miniBoss)
 		codexService.AddEntry("The Sewers")
 	end
 
-	if level == 5 and workspace:GetAttribute("Stage") ~= 0 then
-		MusicService.stopMusic()
-		local onBiHidden = UIService.doUiAction("BossIntro", "ShowIntro", stageBoss)
-		onBiHidden:Once(function()
-			net:RemoteEvent("SpawnBoss"):FireServer("MainBoss")
-
-			if soulsService.Souls < 3 then
-				soulsService.AddSoul(3 - soulsService.Souls)
-				UIService.doUiAction("HUD", "UpdateSouls", 3)
-			end
-		end)
-	elseif level == 2 then
-		net:RemoteEvent("SpawnBoss"):FireServer("MiniBoss")
-		if soulsService.Souls < 1 then
-			soulsService.AddSoul(1)
-			UIService.doUiAction("HUD", "UpdateSouls", 1)
-		end
-
-		MusicService.playTrack(miniBoss)
-	else
-		task.delay(0.5, function()
-			local plusStage = (workspace:GetAttribute("Stage") - 1) * 5
-			local totalLevel = plusStage + workspace:GetAttribute("Level")
-
-			MusicService.playMusic(math.floor(totalLevel))
-		end)
-
-		local stage = workspace:GetAttribute("Stage")
-		if stage == 0 then
-			stage = workspace:GetAttribute("SaveStage")
-		end
-
-		local gameState = {
-			Stage = stage,
-			Level = workspace:GetAttribute("Level"),
-			Souls = soulsService.Souls,
-			TotalScore = workspace:GetAttribute("TotalScore"),
-
-			critChances = weaponService.critChances,
-
-			Luck = ChanceService.luck,
-			PerkTickets = kiosk.tickets,
-
-			PerkList = giftService.AquiredGifts,
-		}
-
-		net:RemoteEvent("SaveGameState"):FireServer(gameState)
-		--signals.DoUiAction:Fire("Notify", "GameSaved", false)
+	if workspace:GetAttribute("IsInReq") then
+		MusicService.playTrack("Reqiuem")
 	end
+
+	task.spawn(function()
+		while workspace:GetAttribute("IsInReq") do
+			task.wait()
+		end
+
+		if level == 5 then
+			MusicService.stopMusic()
+			local onBiHidden = UIService.doUiAction("BossIntro", "ShowIntro", stageBoss)
+			onBiHidden:Once(function()
+				net:RemoteEvent("SpawnBoss"):FireServer("MainBoss")
+
+				if soulsService.Souls < 3 then
+					soulsService.AddSoul(3 - soulsService.Souls)
+					UIService.doUiAction("HUD", "UpdateSouls", 3)
+				end
+			end)
+		elseif level == 2 then
+			net:RemoteEvent("SpawnBoss"):FireServer("MiniBoss")
+			if soulsService.Souls < 1 then
+				soulsService.AddSoul(1)
+				UIService.doUiAction("HUD", "UpdateSouls", 1)
+			end
+
+			MusicService.playTrack(miniBoss)
+		else
+			enterLevel()
+		end
+	end)
 
 	net:RemoteEvent("SaveFurthestLevel"):FireServer()
 
@@ -485,6 +499,7 @@ local function exitS2(extraSouls, level, stageBoss, miniBoss)
 
 	util.tween(camera, ti, { FieldOfView = util.getSetting("Field of View").Value })
 end
+
 local function ExitSequence(levelData, level, stageBoss, miniBoss, stage, toReq: boolean?)
 	UIService.doUiAction("HUD", "HideRCoins")
 
@@ -493,16 +508,16 @@ local function ExitSequence(levelData, level, stageBoss, miniBoss, stage, toReq:
 	local extraSouls = UIService.doUiAction("LevelEnd", "ShowLevelEnd", levelData)
 	local onHidden
 
-	if level <= 5 and level ~= 2.5 and stage ~= 0 then
+	if level <= 5 and level ~= 2.5 then
 		onHidden = UIService.doUiAction("DeliveryUi", "ShowScreen", extraSouls)
 
 		onHidden:Once(function()
-			exitS2(extraSouls, level, stageBoss, miniBoss, stage)
+			exitS2(extraSouls, level, stageBoss, miniBoss)
 			UIService.doUiAction("HUD", "HideBossBar")
 		end)
 	else
 		UIService.doUiAction("DeliveryUi", "fakeScreen")
-		task.delay(1, exitS2, extraSouls, level, stageBoss, miniBoss, stage)
+		task.delay(1, exitS2, extraSouls, level, stageBoss, miniBoss)
 	end
 
 	if toReq then
@@ -592,6 +607,8 @@ local UserInputService = game:GetService("UserInputService")
 net:Connect("OpenKiosk", function()
 	UIService.doUiAction("Kiosk", "ShowScreen", soulsService.Souls)
 end)
+
+--net:Connect("EnterLevel", enterLevel)
 
 net:Connect("OpenRequiem", function()
 	UIService.doUiAction("Requiem", "ShowRequiemShop")

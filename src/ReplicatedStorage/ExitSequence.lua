@@ -105,6 +105,10 @@ module.Exit = function(player, start_time, stage_number, level_number, bossBeate
 		workspace:SetAttribute("TotalScore", workspace:GetAttribute("TotalScore") + math.floor(maxScore))
 	end
 
+	if bossBeaten == "A prayer is spoken" then
+		workspace:SetAttribute("IsInReq", true)
+	end
+
 	net:RemoteEvent("StartExitSequence")
 		:FireAllClients(
 			levelData,

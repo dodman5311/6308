@@ -759,9 +759,9 @@ function module.applyGiftChange(name)
 	elseif name == "Holy_Kevlar" then
 		addArmor(Players.LocalPlayer, 2)
 	elseif name == "Small_Magazine" then
-		Signals.AddAmmo:Fire()
+		Signals.AddAmmo:Fire(3)
 	elseif name == "Big_Magazine" then
-		Signals.AddAmmo:Fire(true)
+		Signals.AddAmmo:Fire(2)
 	elseif name == "Riflemans_Crit" then
 		weapons.critChances.AR += 1
 	elseif name == "Breachers_Crit" then

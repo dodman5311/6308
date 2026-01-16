@@ -133,7 +133,7 @@ Players.PlayerAdded:Connect(function(player: Player)
 	end)
 
 	print("Save data loaded in", dataStore.LoadGameData(player))
-	player:LoadCharacter()
+	player:LoadCharacterAsync()
 end)
 
 local function onDied(player: Player)
@@ -166,10 +166,8 @@ local function onDied(player: Player)
 	local toReq = false
 	if workspace:GetAttribute("TotalScore") >= (workspace:GetAttribute("DeathCount") + 1) * 400 then -- req check
 		toReq = true
-		mapService.CurrentStage = 0
-		mapService.CurrentLevel -= 1
 		workspace:SetAttribute("DeathCount", workspace:GetAttribute("DeathCount") + 1)
-
+		workspace:SetAttribute("IsInReq", true)
 		--dataStore.saveGameState(player, dataStore.stageState)
 	else
 		mapService.CurrentStage = 1
@@ -199,10 +197,9 @@ local function onDied(player: Player)
 	end
 
 	player.CharacterAdded:Once(function()
+		task.wait()
 		signals["ProceedToNextLevel"]:Fire(nil, true, toReq)
 	end)
-
-	--end
 
 	for _, enemy in ipairs(collectionService:GetTagged("Enemy")) do
 		enemy:Destroy()

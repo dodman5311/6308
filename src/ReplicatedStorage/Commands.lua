@@ -574,10 +574,11 @@ local commands = {
 				return {
 					{ Name = "Stage number", Options = { "_Input" } },
 					{ Name = "Level number", Options = { "_Input" } },
+					{ Name = "To Reqiuem", Options = { false, true } },
 				}
 			end,
 
-			ExecuteServer = function(_, player, stage_number, level_number)
+			ExecuteServer = function(_, player, stage_number, level_number, toReq: boolean?)
 				local stage = tonumber(stage_number)
 				local level = tonumber(level_number) - 1
 
@@ -586,7 +587,12 @@ local commands = {
 				mapService.CurrentStage = stage
 				mapService.CurrentLevel = level
 
-				require(Globals.Shared.ExitSequence).Exit(player, os.clock(), stage, level)
+				local bossBeaten
+				if toReq then
+					bossBeaten = "A prayer is spoken"
+				end
+
+				require(Globals.Shared.ExitSequence).Exit(player, os.clock(), stage, level, bossBeaten)
 			end,
 		},
 

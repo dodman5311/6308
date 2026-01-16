@@ -578,7 +578,7 @@ cant choose an option after killing stage 2 boss
 
 fix hold prompt
 
-nerf scavenger
+nerf scavenger *
 
 fix not leaving req shop at boss
 
@@ -589,3 +589,5 @@ leaving req shop and going back to req
 redesign arenas
 
 fix ambush hitboxes
+
+make laz cost more
