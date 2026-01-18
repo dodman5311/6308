@@ -431,7 +431,12 @@ local function checkRaycast(projectile, raycastDistance)
 
 	rp.FilterDescendantsInstances = filter
 	rp.FilterType = Enum.RaycastFilterType.Exclude
-	rp.CollisionGroup = "Bullet"
+
+	if projectile.Sender:IsA("Player") then
+		rp.CollisionGroup = "Bullet"
+	else
+		rp.CollisionGroup = "NpcBullet"
+	end
 
 	if projectile.Sender then
 		for _, team: Team in ipairs(Teams:GetTeams()) do
@@ -475,7 +480,7 @@ local function fireBeam(npc, damage, cframe, distance, spread, size)
 
 	local raycastParams = RaycastParams.new()
 	raycastParams.FilterDescendantsInstances = { npc }
-	raycastParams.CollisionGroup = "Bullet"
+	raycastParams.CollisionGroup = "NpcBullet"
 
 	local raycast = workspace:Spherecast(cframe.Position, size or 0.75, cframe.LookVector * distance, raycastParams)
 

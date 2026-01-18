@@ -93,6 +93,8 @@ local function showCoinCheck(frame)
 	local ti = TweenInfo.new(1)
 	local ti2 = TweenInfo.new(2)
 
+	coinsFrame.CoinRequirement.Text = (workspace:GetAttribute("LogDeathCount") + 1) * 400
+
 	task.wait(1)
 
 	coinsCheckFrame.Visible = true
@@ -108,7 +110,6 @@ local function showCoinCheck(frame)
 	end)
 	animation:OnFrameReached(18):Once(function()
 		animation:Pause()
-		coinsFrame.CoinRequirement.Text = (workspace:GetAttribute("DeathCount")) * 400
 
 		ContentProvider:PreloadAsync { coinsFrame.CoinsIcon.Image }
 		local coinAnim = UIAnimationService.PlayAnimation(coinsFrame.CoinsIcon, 0.1, true)
@@ -121,8 +122,8 @@ local function showCoinCheck(frame)
 			true
 		)
 
-		if workspace:GetAttribute("TotalScore") ~= 0 then
-			util.tween(coinCountNumber, ti2, { Value = workspace:GetAttribute("TotalScore") }, true)
+		if workspace:GetAttribute("LogTotalScore") ~= 0 then
+			util.tween(coinCountNumber, ti2, { Value = workspace:GetAttribute("LogTotalScore") }, true)
 		end
 
 		task.wait(1)
@@ -187,8 +188,6 @@ function module.ShowDeathScreen(player, ui, frame)
 
 		UIAnimationService.PlayAnimation(Requiem, 0.2, false, true).OnEnded:Once(function()
 			task.wait(4)
-
-			print("A")
 
 			sfx.EvilVoices:Stop()
 			Requiem.Visible = false

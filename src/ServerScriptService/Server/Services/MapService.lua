@@ -747,6 +747,7 @@ function module.proceedToNext(_, onlyLoadMap, toReq: boolean?)
 
 		if module.CurrentLevel > 5.5 then -- amount of levels in a stage
 			module.CurrentLevel = 1
+			module.CurrentStage += 1
 		end
 	end
 

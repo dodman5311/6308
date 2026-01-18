@@ -4,12 +4,12 @@ local upgrades = {
 			{
 				Name = "Double Shot: Tier 1",
 				Description = [[+1 Pellet]],
-				Price = 250,
+				Price = 100,
 			},
 			{
 				Name = "Double Shot: Tier 2",
 				Description = [[+0.3 Speed]],
-				Price = 100,
+				Price = 250,
 			},
 			{
 				Name = "Broad Shot",
@@ -182,7 +182,7 @@ Rockets slightly seek enemies]],
 			{
 				Name = "RIPP: Tier 2",
 				Description = [[+1 Splash Damage]],
-				Price = 500,
+				Price = 600,
 			},
 			{
 				Name = "Lazerus",
@@ -194,7 +194,7 @@ Rockets slightly seek enemies]],
 +100% Splash Range
 
 Plasma bolts now create damaging tendrils around then that deal 1 Damage per 0.1 second to any nearby enemy.]],
-				Price = 750,
+				Price = 1000,
 			},
 		},
 

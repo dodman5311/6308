@@ -573,21 +573,20 @@ compile changelog ()
 
 make drav revive when restarting run ()
 
-boss music plays when going to a boss at req shop (Worked on level 5 for some reason)
 cant choose an option after killing stage 2 boss
 
 fix hold prompt
 
 nerf scavenger *
 
-fix not leaving req shop at boss
-
 fix kicking visage
-
-leaving req shop and going back to req
 
 redesign arenas
 
 fix ambush hitboxes
 
-make laz cost more
+make laz cost more *
+
+make enemies shoot through each other
+
+FUCK MOBILE (But yeah)

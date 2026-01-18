@@ -29,6 +29,7 @@ grappleIncicatorSpring.Speed = 10
 --// Values
 local frameDelay = 0.045
 local targetEnemy = Instance.new("ObjectValue")
+local rCoinsCount = Instance.new("IntValue")
 local boss
 local rng = Random.new()
 
@@ -109,6 +110,39 @@ function module.HideRCoins(player, ui, frame)
 	frame.RCoins.Visible = false
 end
 
+function module.ShowReqExit(player, ui, frame, coinCount)
+	frame.Flash.BackgroundTransparency = 0
+
+	local ti_0 = TweenInfo.new(3, Enum.EasingStyle.Quart, Enum.EasingDirection.In)
+	local ti_1 = TweenInfo.new(2, Enum.EasingStyle.Quint, Enum.EasingDirection.InOut)
+	local ti_2 = TweenInfo.new(2)
+
+	rCoinsCount.Value = coinCount
+
+	if coinCount > 0 then
+		frame.CenterCoins.Visible = true
+		frame.CenterCoins.Coins.Image.ImageTransparency = 0
+		frame.CenterCoins.Count.TextTransparency = 0
+		frame.CenterCoins.Count.UIStroke.Transparency = 0
+	end
+
+	util.tween(frame.Flash, ti_0, { BackgroundTransparency = 1 }, false, function()
+		if coinCount == 0 then
+			return
+		end
+
+		util.tween(rCoinsCount, ti_1, { Value = 0 }, true)
+
+		util.tween(frame.CenterCoins.Coins.Image, ti_2, { ImageTransparency = 1 })
+		util.tween(frame.CenterCoins.Count, ti_2, { TextTransparency = 1 })
+		util.tween(frame.CenterCoins.Count.UIStroke, ti_2, { Transparency = 1 }, true)
+
+		frame.CenterCoins.Visible = false
+	end)
+
+	module.HideRCoins(player, ui, frame)
+end
+
 function module.Init(player, ui, frame)
 	UserInputService.MouseIconEnabled = false
 
@@ -142,6 +176,10 @@ function module.Init(player, ui, frame)
 
 	workspace:GetAttributeChangedSignal("TotalScore"):Connect(function()
 		frame.RCoins.Count.Text = workspace:GetAttribute("TotalScore")
+	end)
+
+	rCoinsCount.Changed:Connect(function(a0: number)
+		frame.CenterCoins.Count.Text = a0
 	end)
 
 	targetEnemy.Changed:Connect(function(value)
