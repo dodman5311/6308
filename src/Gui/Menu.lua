@@ -1149,7 +1149,7 @@ local function loadArsenal(frame)
 		FireDelay = workspace:GetAttribute("CleanseAndRepent_Tier") >= 3 and (0.2 / 1.25) or 0.2,
 		BulletCount = 1,
 		Crosshair = "Default",
-		Effect = "Akimbo",
+		Effect = "Ballistic",
 		Recoil = {
 			RecoilVector = Vector3.new(-1.75, 0.3, 0),
 			RandomVector = Vector3.new(0.2, 0.1, 4),

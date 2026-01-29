@@ -46,18 +46,26 @@ module.onHidden = Signal.new()
 
 local spinGifts = {
 	Clover = {
-		Icon = "rbxassetid://16422403509",
+		Icon = "rbxassetid://115754841905336",
 		Catagories = { "Luck" },
-		Desc = "You gain luck. (+1)",
+		Desc = "You gain luck. (+2)",
 		Chance = 100,
 		GoodLuck = true,
 	},
 
 	Large_Clover = {
-		Icon = "rbxassetid://16422448268",
+		Icon = "rbxassetid://83456581321322",
 		Catagories = { "Luck" },
-		Desc = "You gain a lot of luck. (+2)",
+		Desc = "You gain a lot of luck. (+4)",
 		Chance = 75,
+		GoodLuck = true,
+	},
+
+	Massive_Clover = {
+		Icon = "rbxassetid://80538442852524",
+		Catagories = { "Luck" },
+		Desc = "You gain a lot of luck. (+6)",
+		Chance = 20,
 		GoodLuck = true,
 	},
 
@@ -215,13 +223,7 @@ local DOTDRewards = {
 
 	Riflemans_Crit = spinGifts.Riflemans_Crit,
 
-	Massive_Clover = {
-		Icon = "rbxassetid://91764404178551",
-		Catagories = { "Luck" },
-		Desc = "You gain a ton of luck. (+3)",
-		Chance = 20,
-		GoodLuck = true,
-	},
+	Massive_Clover = spinGifts.Massive_Clover,
 
 	Large_Clover = spinGifts.Large_Clover,
 	Clover = spinGifts.Clover,
@@ -747,13 +749,13 @@ function module.applyGiftChange(name)
 		module.tickets += 1
 	elseif name == "Clover" then
 		codexService.AddEntry("Luck")
-		chanceService.luck += 1
+		chanceService.luck += 2
 	elseif name == "Large_Clover" then
 		codexService.AddEntry("Luck")
-		chanceService.luck += 2
+		chanceService.luck += 4
 	elseif name == "Massive_Clover" then
 		codexService.AddEntry("Luck")
-		chanceService.luck += 3
+		chanceService.luck += 6
 	elseif name == "Kevlar" then
 		addArmor(Players.LocalPlayer, 1)
 	elseif name == "Holy_Kevlar" then

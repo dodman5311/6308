@@ -87,13 +87,7 @@ local module = {
 		Heavenly_Fortune = {
 			Icon = "rbxassetid://17590259189",
 			Catagories = { "Luck" },
-			Desc = "You now have more Luck while in the air (+10 Luck)",
-		},
-
-		Unearthly_Metal = {
-			Icon = "rbxassetid://17590259063",
-			Catagories = { "Soul" },
-			Desc = "Armor now has more resistance. (+200% Armor Resistance)",
+			Desc = "You now have more Luck while in the air (+15 Luck)",
 		},
 
 		Burn_Hell = {
@@ -146,6 +140,11 @@ local module = {
 	},
 
 	Upgrades = {
+		Unearthly_Metal = {
+			Icon = "rbxassetid://17590259063",
+			Catagories = { "Soul" },
+			Desc = "Armor now has more resistance. (+200% Armor Resistance)",
+		},
 
 		Deadshot = {
 			Icon = "rbxassetid://15990088905",
@@ -264,7 +263,7 @@ local module = {
 		Dead_Bolt = {
 			Icon = "rbxassetid://119974210879654",
 			Catagories = { "Arsenal" },
-			Desc = "You can now aim with non-parrying weapons and shoot a Critical Bolt. Critical Bolts have +1 damage and +50% crit chance. (3 second cooldown. Right click to aim)",
+			Desc = "You can now aim with ballistic weapons and shoot a Critical Bolt. Critical Bolts have +1 damage and +50% crit chance. (3 second cooldown. Right click to aim)",
 		},
 
 		Daisy_Chain = {
@@ -327,11 +326,10 @@ The more charges that are used, the longer it takes to recharge.
 		Spiked_Sabatons = {
 			Icon = "rbxassetid://16873986562",
 			Catagories = { "Tactical" },
-			Desc = [[Run next to a wall while in the air to begin wallrunning. 
-When jumping off a wall, you will jump in the direction you are looking, 
-and will be given extra jump in the air.
+			Desc = [[Hold space while next to a wall, to wallrun.
+When jumping off a wall, you will be given extra jump in the air.
 
-+50% movement speed while wallrunning.]],
+While on a wall, +50% movement speed and dealing damage has a 50% chance to reset combo.]],
 		},
 
 		["Paladin's_Faith"] = {

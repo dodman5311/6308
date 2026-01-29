@@ -306,7 +306,7 @@ function module.HideEnemyHealthBar(player, ui, frame)
 	end)
 end
 
-local function updateHealthBar(health, maxHealth, bar, noAnim)
+local function updateHealthBar(health, maxHealth, bar, noAnim, isArmor)
 	local units = bar.Units
 
 	for i = #units:GetChildren() - 1, 1, -1 do
@@ -319,6 +319,20 @@ local function updateHealthBar(health, maxHealth, bar, noAnim)
 
 			unit.BarFrame.Bar.Size = UDim2.fromScale(health / maxHealth, 1)
 			continue
+		end
+
+		if health ~= math.ceil(health) then
+			if i == math.ceil(health) then
+				local _, decimal = math.modf(health)
+				if decimal == 0 then
+					decimal = 1
+				end
+				unit.Image.ImageColor3 = Color3.fromRGB(150, 0, 255):Lerp(Color3.new(1, 1, 1), decimal)
+			elseif i < math.ceil(health) then
+				unit.Image.ImageColor3 = Color3.new(1, 1, 1)
+			end
+		elseif isArmor then
+			unit.Image.ImageColor3 = Color3.new(1, 1, 1)
 		end
 
 		if i <= math.ceil(health) then
@@ -483,7 +497,7 @@ function module.UpdatePlayerHealth(_, ui, frame, health, maxHealth, isArmor)
 		end
 	end
 
-	updateHealthBar(health, maxHealth, healthBar)
+	updateHealthBar(health, maxHealth, healthBar, isArmor)
 
 	if oldHealth < health then
 		UiAnimator.PlayAnimation(healthBar, frameDelay)

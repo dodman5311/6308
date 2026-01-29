@@ -1,16 +1,16 @@
 local module = {}
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local serverStorage = game:GetService("ServerStorage")
 local debris = game:GetService("Debris")
+local serverStorage = game:GetService("ServerStorage")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
-local net = require(Globals.Packages.Net)
-local signals = require(Globals.Shared.Signals)
-local util = require(Globals.Vendor.Util)
-local promise = require(Globals.Packages.Promise)
 local acts = require(Globals.Vendor.Acts)
+local net = require(Globals.Packages.Net)
+local promise = require(Globals.Packages.Promise)
+local signals = require(Globals.Shared.Signals)
 local timer = require(Globals.Vendor.Timer)
+local util = require(Globals.Vendor.Util)
 
 local spawners = require(Globals.Services.Spawners)
 
@@ -122,7 +122,7 @@ local function runArena(encounter, unit, level, isAmbush)
 	return "Success"
 end
 
-local function endArena(gates, result, isAmbush)
+local function endArena(unit, gates, result, isAmbush)
 	if not isAmbush then
 		arenaEndEvent:FireAllClients(result)
 	end
@@ -130,6 +130,13 @@ local function endArena(gates, result, isAmbush)
 	for _, gate in ipairs(gates) do
 		local ti = TweenInfo.new(0.375, Enum.EasingStyle.Quart, Enum.EasingDirection.In)
 		util.tween(gate, ti, { CFrame = gate.CFrame * CFrame.new(0, -20, 0) })
+	end
+
+	for _, v in ipairs(unit:GetChildren()) do
+		if v.Name == "Roof" then
+			v.CanCollide = false
+			v.CanQuery = false
+		end
 	end
 end
 
@@ -151,10 +158,10 @@ local function startArena(unit, level, isAmbush)
 
 	arenaBeginEvent:FireAllClients(isAmbush)
 
-	runArenaPromise = promise.new(function(resolve, reject, onCancel)
+	runArenaPromise = promise.new(function(resolve)
 		local result = runArena(encounter, unit, level)
 		acts:removeAct("InArena")
-		resolve(gates, result, isAmbush)
+		resolve(unit, gates, result, isAmbush)
 	end)
 
 	runArenaPromise:andThen(endArena)

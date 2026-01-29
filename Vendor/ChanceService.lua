@@ -18,8 +18,6 @@ local giftService = require(Globals.Client.Services.GiftsService)
 
 local assets = ReplicatedStorage.Assets
 
-local signals = require(Globals.Signals)
-
 function module.getLuck()
 	local result = module.luck
 	if giftService.CheckGift("Rabbits_Foot") then
@@ -27,7 +25,7 @@ function module.getLuck()
 	end
 
 	if module.airluck then
-		result += 10
+		result += 15
 	end
 
 	if giftService.CheckGift("Set_Em_Up") then

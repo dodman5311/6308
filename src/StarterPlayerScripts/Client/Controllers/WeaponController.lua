@@ -355,6 +355,7 @@ local function applyUpgrades(weaponName, weaponData)
 end
 
 function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloaded)
+	module.CloseDeadBolt()
 	UIService.doUiAction("HUD", "hideReload")
 
 	lockTimer:Cancel()
@@ -486,6 +487,7 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 end
 
 local function EquipDefault(ignoreAmmo)
+	module.CloseDeadBolt()
 	UIService.doUiAction("HUD", "hideReload")
 
 	animationService:stopAnimation(viewmodel.Model, "Equip", 0)
@@ -1055,7 +1057,7 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 	end
 
 	local deadshotDamage = checkDeadshot()
-	local boringDamage = consecutiveHits >= 5 and 1 or 0
+	local boringDamage = consecutiveHits >= 10 and 1 or 0
 	local subjectPosition = subject:GetPivot().Position
 
 	local totalDamage = damage + deadshotDamage + weakspotDamage + boringDamage + siuDamage
@@ -1159,7 +1161,7 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		end
 
 		if sourceIsWeapon and source == "Trident" and subject:GetAttribute("Stun") then
-			totalDamage += 1
+			totalDamage *= 3
 		end
 
 		if wallrunning.onWall and ChanceService.checkChance(50, true) then
@@ -2543,8 +2545,16 @@ local function detectEnemy()
 	--gui.Crosshair.ImageTransparency = gui.Crosshair.Size.X.Scale - 0.5
 end
 
+local function getWeaponEffect(): string
+	if not module.currentWeapon then
+		return "Ballistic"
+	end
+
+	return weaponData.Effect
+end
+
 function module.OpenDeadBolt()
-	if deadBoltActive or not GiftsService.CheckGift("Dead_Bolt") then
+	if deadBoltActive or not GiftsService.CheckGift("Dead_Bolt") or getWeaponEffect() ~= "Ballistic" then
 		return
 	end
 	deadBoltActive = true
@@ -2863,7 +2873,7 @@ local function flyingKick()
 	end
 
 	local target = getObjectInCenter(player)
-	if not target or not player.Character then
+	if not target or target.Name == "Visage Of False Hope" or not player.Character then
 		primaryPart.AssemblyLinearVelocity = (camera.CFrame.LookVector * 75) + Vector3.new(0, 15, 0)
 		airController.change()
 		return

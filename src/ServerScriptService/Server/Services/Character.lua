@@ -238,9 +238,8 @@ net:Connect("GiftAdded", function(player, gift)
 		player.Character:SetAttribute("HasHaven", true)
 	end
 
-	local resistance = 0
-
 	local humanoid = player.Character:WaitForChild("Humanoid")
+	local resistance = humanoid:GetAttribute("Resistance")
 
 	if gift == "Tough_Shell" then
 		resistance += 1

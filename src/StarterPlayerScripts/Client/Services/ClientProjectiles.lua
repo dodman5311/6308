@@ -232,12 +232,21 @@ module.Presets = {
 		Model = "HarpoonProjectile",
 	},
 
-	Trident = {
-		Speed = 500,
+	PiercingHarpoon = {
+		Speed = 375,
 		LifeTime = 5,
 		Info = { Dropping = 0.25, Size = 2 },
+		Damage = 2,
+		Piercing = 3,
+		Model = "HarpoonProjectile",
+	},
+
+	Trident = {
+		Speed = 375,
+		LifeTime = 5,
+		Info = { Seeking = 0, SeekProgression = 0.025, Size = 0 },
 		Damage = 3,
-		Piercing = 2,
+		Piercing = 1000,
 		Model = "HarpoonProjectile",
 	},
 
@@ -329,6 +338,15 @@ module.Presets = {
 		Piercing = 0,
 		Model = "RocketProjectile",
 	},
+
+	-- Fart = {
+	-- 	Speed = 100,
+	-- 	LifeTime = 1,
+	-- 	Info = { Size = 5 },
+	-- 	Damage = 15,
+	-- 	Piercing = 0,
+	-- 	Model = "InvisibleProjectile",
+	-- },
 }
 
 --// Functions

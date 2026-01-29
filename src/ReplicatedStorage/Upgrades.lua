@@ -52,7 +52,9 @@ but they travel slower]],
 			},
 			{
 				Name = "Mega Shot",
-				Description = [[Every loaded shell is different. Mega shot fires 3 Explosive rounds, 3 Homing rounds, 3 Regular pellets, and 3 Flechettes with 3 damage]],
+				Description = [[-2 Ammo
+				
+Every loaded shell is different. Mega shot fires 3 Explosive rounds, 3 Homing rounds, 3 Regular pellets, and 3 Flechettes with 3 damage]],
 				Price = 750,
 			},
 		},
@@ -249,16 +251,15 @@ Attacking at least 0.5 second after parrying will launch the player forward]],
 			},
 			{
 				Name = "Harpoons: Tier 2",
-				Description = [[Harpoons have a 10% chance to stun enemies]],
+				Description = [[+1 Piercing]],
 				Price = 500,
 			},
 			{
 				Name = "Trident",
 				Description = [[+1 Damage
 				
-+50% Projectile Speed
-				
-Hitting stunned enemies will deal +3 damage]],
+The trident can now Parry.
+Parrying with the Trident will use up all your ammo and spawn geysers blow nearby enemies.]],
 				Price = 750,
 			},
 		},
