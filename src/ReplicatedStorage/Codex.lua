@@ -118,12 +118,12 @@ This transformation usually occurs in militants, as their lifestyle glorifies th
 	["Everlasting"] = {
 		Catagory = "Enemies",
 		Entry = [[<font color="#FF7800"><b>Shoot their heart for extra damage.</b></font>
-		
-An Everlasting is created when a weak demon is overpowered by its host's undying will to survive.
+	
+Everlastings: A rebellious cult following, formed with the single undying pillar of the Suburbs as its muse, Phillip the Everlasting.
+Despite Phillip’s opposition for such a following, everlastings define their being by Phillips path in an attempt to reach his level of wisdom and longevity.
+They adorn themselves in attire, similar to their muse, and adapt his fighting style to their own. This, to an everlasting, is perfection.
 
-The host breaks the weak demon and uses its power to strengthen their own will to survive. This results in Everlastings having vitality beyond any other possessed.
-
-Their very existence stems from their unwavering belief in not dying.]],
+“The only constant is life. The only being is Everlasting.”]],
 	},
 
 	["Paladin"] = {

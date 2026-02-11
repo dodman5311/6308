@@ -873,8 +873,13 @@ local function createFakeWeakpoint(subject, part, position)
 	newWeld.Part1 = newWeakpoint
 end
 
-local function awardKill(model, position)
-	addToCombo(1)
+local function awardKill(model: Model, position)
+	if model:HasTag("Npc") then
+		addToCombo(1)
+	else
+		ComboService.RestartTimer()
+	end
+
 	dropAmmo(position)
 	signals.AddEntry:Fire(model.Name)
 

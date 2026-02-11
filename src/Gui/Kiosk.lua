@@ -65,7 +65,7 @@ local spinGifts = {
 		Icon = "rbxassetid://80538442852524",
 		Catagories = { "Luck" },
 		Desc = "You gain a lot of luck. (+6)",
-		Chance = 20,
+		Chance = 40,
 		GoodLuck = true,
 	},
 

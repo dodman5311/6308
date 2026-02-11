@@ -16,6 +16,7 @@ local dataStore = require(script.Parent.DataStore)
 local mapService = require(Globals.Services.MapService)
 local net = require(Globals.Packages.Net)
 local signals = require(Globals.Signals)
+local spawners = require(Globals.Services.Spawners)
 local upgrades = require(Globals.Shared.Upgrades)
 
 local getBlockedNerd = net:RemoteEvent("GetBlockedNerd")
@@ -293,6 +294,14 @@ end)
 net:Handle("PurchaseUpgrade", function(player, name, price, index) -- requiem shop buy thingy WAH!
 	workspace:SetAttribute("TotalScore", workspace:GetAttribute("TotalScore") - price)
 	workspace:SetAttribute(name, index)
+
+	local plusStage = (mapService.CurrentStage - 1) * 5
+	local level = plusStage + mapService.CurrentLevel
+
+	for _, weapon in ipairs(collectionService:GetTagged("Weapon")) do
+		weapon:Destroy()
+	end
+	spawners.spawnWeapons(level)
 
 	return workspace:GetAttribute("TotalScore")
 end)
