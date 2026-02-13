@@ -18,9 +18,9 @@ local elements = {
 }
 
 local stats = {
-	SpecialChance = 10,
-	OtherStageWeaponChance = 50,
-	AmmoChance = 75,
+	SpecialChance = 100,
+	OtherStageWeaponChance = 100,
+	AmmoChance = 100,
 	MaxAmmoBoost = 50,
 	ElementalChance = 20,
 	Armor = 3,
@@ -58,8 +58,9 @@ local function GiveObjects(npc)
 	local SpawnedWeapon: Model
 	local totalLevel = workspace:GetAttribute("TotalLevel")
 
-	if checkChance:InvokeClient(player, stats.OtherStageWeaponChance, true) then
-		SpawnedWeapon = Spawners.placeNewObject(100, origin, "Weapon", nil, true)
+	local c = checkChance:InvokeClient(player, stats.OtherStageWeaponChance, true)
+	if c then
+		SpawnedWeapon = Spawners.placeNewObject(200, origin, "Weapon", nil, true)
 	else
 		SpawnedWeapon = Spawners.placeNewObject(totalLevel, origin, "Weapon", nil, true)
 	end

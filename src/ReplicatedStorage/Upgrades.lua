@@ -160,17 +160,20 @@ Rockets slightly seek enemies]],
 		["BoomCannon_Tier"] = {
 			{
 				Name = "Boom Cannon: Tier 1",
-				Description = [[+1 Speed]],
+				Description = [[Shots now have a 10% chance to ricochet to a nearby enemy]],
 				Price = 100,
 			},
 			{
 				Name = "Boom Cannon: Tier 2",
-				Description = [[Shots now have a 15% chance to ricochet to a nearby enemy]],
+				Description = [[+1 Damage]],
 				Price = 250,
 			},
 			{
 				Name = "50 Regret",
-				Description = [[x2 damage to weak points]],
+				Description = [[+1 Damage
++6 Recoil
+
+x2 damage to weak points]],
 				Price = 500,
 			},
 		},

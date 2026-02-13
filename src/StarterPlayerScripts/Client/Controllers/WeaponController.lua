@@ -17,10 +17,12 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
+local StarterPlayer = game:GetService("StarterPlayer")
 local UserInputService = game:GetService("UserInputService")
 
 --// Instances
 local DashController = require(script.Parent.DashController)
+local DestructableService = require(StarterPlayer.StarterPlayerScripts.Client.Services.DestructableService)
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local assets = Globals.Assets
 local reloadSounds = assets.Sounds.Reloading
@@ -454,7 +456,10 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 	animationService:stopAnimation(viewmodel.Model, "Reload", 0)
 	animationService:stopAnimation(viewmodel.Model, "ReloadOut", 0)
 
-	weaponData.Element = element
+	if not weaponData.Element then
+		weaponData.Element = element
+	end
+
 	weaponData.HasReloaded = hasReloaded
 
 	if element then
@@ -500,7 +505,6 @@ local function EquipDefault(ignoreAmmo)
 	--fireTimer:Complete()
 
 	if not defaultWeapon then
-		print(workspace:GetAttribute("CleanseAndRepent_Tier"))
 		if workspace:GetAttribute("CleanseAndRepent_Tier") >= 3 then
 			defaultWeapon = assets.Models["Forged Arms"]:Clone()
 		else
@@ -874,7 +878,7 @@ local function createFakeWeakpoint(subject, part, position)
 end
 
 local function awardKill(model: Model, position)
-	if model:HasTag("Npc") then
+	if model and model:HasTag("Npc") then
 		addToCombo(1)
 	else
 		ComboService.RestartTimer()
@@ -1005,6 +1009,11 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 
 	local humanoid, model = findHumanoid(subject)
 
+	if DestructableService.DetectObject(subject) then
+		DestructableService.DestroyObject(subject)
+		ComboService.RestartTimer()
+		UIService.doUiAction("HUD", "ShowHit")
+	end
 	if not humanoid then
 		return
 	end
@@ -1356,7 +1365,10 @@ function module.FireRaycast(spread, distance, direction)
 
 	local raycast = workspace:Raycast(origin, direction, raycastParams)
 
-	if not raycast or not util.checkForHumanoid(raycast.Instance) then
+	if
+		not raycast
+		or (not util.checkForHumanoid(raycast.Instance) and not DestructableService.DetectObject(raycast.Instance))
+	then
 		raycast = workspace:Spherecast(origin, 1.5, direction, raycastParams)
 	end
 
@@ -3133,7 +3145,7 @@ explosionService.explosiveHit:Connect(function(subject, preHealth, postHealth, d
 	end
 
 	if preHealth > 0 and postHealth <= 0 then -- kill awarded
-		awardKill(subject.Name, subject:GetPivot().Position)
+		awardKill(subject, subject:GetPivot().Position)
 	end
 
 	if sourceIsWeapon and source == "Concussion" and ChanceService.checkChance(15, true) then

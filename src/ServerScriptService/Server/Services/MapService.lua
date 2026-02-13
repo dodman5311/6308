@@ -4,11 +4,11 @@ local module = {
 	GeneratedAt = 0,
 }
 --// services
+local CollectionService = game:GetService("CollectionService")
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local ServerStorage = game:GetService("ServerStorage")
-local collectionService = game:GetService("CollectionService")
 local replicatedStorage = game:GetService("ReplicatedStorage")
 local serverStorage = game:GetService("ServerStorage")
 
@@ -86,7 +86,7 @@ local function doUnitFunction(functionName, unit, ...)
 end
 
 -- local function loadModules()
--- 	-- for _, unit in ipairs(collectionService:GetTagged("Unit")) do
+-- 	-- for _, unit in ipairs(CollectionService:GetTagged("Unit")) do
 -- 	-- 	local modules = unit.Modules
 -- 	-- 	local moduleTable = {}
 
@@ -192,6 +192,13 @@ local function clearMap()
 		storedMap:Destroy()
 	end
 
+	for _, object in ipairs(workspace.Destructables:GetChildren()) do
+		if object:IsA("Highlight") then
+			continue
+		end
+		object:Destroy()
+	end
+
 	blacklistedUnits = {}
 
 	for _, unit in ipairs(map:GetChildren()) do
@@ -214,11 +221,11 @@ local function clearMap()
 
 	map:ClearAllChildren()
 
-	for _, Npc in ipairs(collectionService:GetTagged("Npc")) do
+	for _, Npc in ipairs(CollectionService:GetTagged("Npc")) do
 		Npc:Destroy()
 	end
 
-	for _, weapon in ipairs(collectionService:GetTagged("Weapon")) do
+	for _, weapon in ipairs(CollectionService:GetTagged("Weapon")) do
 		weapon:Destroy()
 	end
 
@@ -384,6 +391,25 @@ local function addRandomUnit(baseLink, forInterior)
 	end
 end
 
+local function moveDestructables()
+	for _, descendant in ipairs(map:GetDescendants()) do
+		if descendant:HasTag("Destructable") then
+			descendant.Parent = workspace.Destructables
+
+			for _, part in ipairs(descendant:GetChildren()) do
+				if not part:IsA("BasePart") then
+					continue
+				end
+
+				if part.Transparency > 0 and part.Transparency < 1 then
+					replicatedStorage.Assets.SetHighlight:Clone().Parent = descendant
+					break
+				end
+			end
+		end
+	end
+end
+
 local function placeCaps()
 	for _, descendant in ipairs(map:GetDescendants()) do
 		if descendant.Name ~= "Link" then
@@ -432,7 +458,7 @@ end
 local function getFurthestCap()
 	local furthestDistance, furthestCap = 0, nil
 
-	for _, cap in ipairs(collectionService:GetTagged("Cap")) do
+	for _, cap in ipairs(CollectionService:GetTagged("Cap")) do
 		local distance = (newStart:GetPivot().Position - cap:GetPivot().Position).Magnitude
 
 		if distance <= furthestDistance then
@@ -527,7 +553,7 @@ function module.loadMap(size)
 	for _, unit in ipairs(map:GetChildren()) do
 		doUnitFunction("OnLoaded", unit)
 	end
-
+	moveDestructables()
 	module.GeneratedAt = os.clock()
 end
 
@@ -541,7 +567,7 @@ local function placeAltar()
 		return
 	end
 
-	local allCaps = collectionService:GetTagged("Cap")
+	local allCaps = CollectionService:GetTagged("Cap")
 	if #allCaps == 0 then
 		return
 	end
@@ -595,6 +621,7 @@ function module.loadLinearMap(size)
 	for _, unit in ipairs(map:GetChildren()) do
 		doUnitFunction("OnLoaded", unit)
 	end
+	moveDestructables()
 
 	module.GeneratedAt = os.clock()
 end
@@ -831,7 +858,7 @@ RunService.Heartbeat:Connect(function()
 		return
 	end
 
-	for _, damagePart in ipairs(collectionService:GetTagged("DamagePart")) do
+	for _, damagePart in ipairs(CollectionService:GetTagged("DamagePart")) do
 		if not damagePart:FindFirstAncestor("Workspace") then
 			continue
 		end
