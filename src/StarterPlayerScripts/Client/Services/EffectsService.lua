@@ -39,6 +39,10 @@ camShake:Start()
 -- Apply explosion shakes every 5 seconds:
 
 function module.emitObject(part)
+	if not part then
+		return
+	end
+
 	if part:IsA("ParticleEmitter") then
 		local emitCount = part:GetAttribute("EmitCount")
 		local emitDelay = part:GetAttribute("EmitDelay")

@@ -1106,7 +1106,7 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 			if ChanceService.checkChance(50, true) then
 				codexService.AddEntry("Elements")
 
-				if GiftsService.CheckGift("Freeze_Heaven") and ChanceService.checkChance(50, true) then
+				if GiftsService.CheckGift("Freeze_Heaven") and ChanceService.checkChance(10, true) then
 					net:RemoteEvent("Damage"):FireServer(model, 0, "Ice")
 				end
 			else
@@ -1118,11 +1118,11 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 			or source == "Default"
 			or source == "Ricoshot"
 
-		if GiftsService.CheckGift("Burn_Hell") and ChanceService.checkChance(50, true) then
+		if GiftsService.CheckGift("Burn_Hell") and ChanceService.checkChance(10, true) then
 			if not sourceIsWeapon and source ~= "ThrownWeapon" then
 				net:RemoteEvent("Damage"):FireServer(model, 1, "Fire")
 
-				if GiftsService.CheckGift("Freeze_Heaven") and ChanceService.checkChance(50, true) then
+				if GiftsService.CheckGift("Freeze_Heaven") and ChanceService.checkChance(10, true) then
 					net:RemoteEvent("Damage"):FireServer(model, 0, "Ice")
 				end
 			end
@@ -3129,11 +3129,11 @@ explosionService.explosiveHit:Connect(function(subject, preHealth, postHealth, d
 	if preHealth > 0 then
 		UIService.doUiAction("HUD", "ShowHit")
 
-		if GiftsService.CheckGift("Burn_Hell") and ChanceService.checkChance(50, true) then
+		if GiftsService.CheckGift("Burn_Hell") and ChanceService.checkChance(10, true) then
 			if not sourceIsWeapon and source ~= "ThrownWeapon" then
 				net:RemoteEvent("Damage"):FireServer(subject, 1, "Fire")
 
-				if GiftsService.CheckGift("Freeze_Heaven") and ChanceService.checkChance(50, true) then
+				if GiftsService.CheckGift("Freeze_Heaven") and ChanceService.checkChance(10, true) then
 					net:RemoteEvent("Damage"):FireServer(subject, 0, "Ice")
 				end
 			end

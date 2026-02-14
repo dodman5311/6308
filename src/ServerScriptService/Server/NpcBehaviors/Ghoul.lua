@@ -1,7 +1,7 @@
 local stats = {
 	ViewDistance = 100,
 
-	AttackDistance = 5,
+	AttackDistance = 4,
 	AttackDelay = 0.4,
 
 	NpcType = "Enemy",
@@ -13,8 +13,8 @@ local effects = ReplicatedStorage.Assets.Effects
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local animationService = require(Globals.Vendor.AnimationService)
-local util = require(Globals.Vendor.Util)
 local net = require(Globals.Packages.Net)
+local util = require(Globals.Vendor.Util)
 
 local vfx = net:RemoteEvent("ReplicateEffect")
 
@@ -39,13 +39,12 @@ local function swing(npc, distance)
 	npc.Instance.Parent = workspace
 	vfx:FireAllClients("GhoulTeleport", "Server", true, npc.Instance:GetPivot().Position)
 
-	animationService:playAnimation(npc.Instance, "Attack", Enum.AnimationPriority.Action3).Ended:Once(function()
-		if npc:GetState() == "Dead" then
+	npc.Instance.PrimaryPart.Anchored = true
+	animationService:playAnimation(npc.Instance, "Attack", Enum.AnimationPriority.Action3).Stopped:Once(function()
+		if npc:GetState() == "Dead" or npc.StatusEffects["Ice"] or npc.StatusEffects["Stun"] then
 			return
 		end
-
-		vfx:FireAllClients("GhoulTeleport", "Server", true, npc.Instance:GetPivot().Position)
-		npc.Instance.Parent = game
+		npc.Instance.PrimaryPart.Anchored = false
 	end)
 
 	util.PlaySound(npc.Instance.PrimaryPart.Attack, npc.Instance.PrimaryPart, 0.1)
@@ -84,7 +83,7 @@ local function swing(npc, distance)
 
 		table.insert(playersHit, player)
 
-		model.Humanoid:TakeDamage(3)
+		model.Humanoid:TakeDamage(5)
 	end
 
 	npc.Instance.PrimaryPart.Swing:Play()
@@ -100,7 +99,7 @@ local function attackPlayer(npc)
 	npcModel.Parent = workspace
 
 	local targetPosition = target:GetPivot()
-	local distance = 6
+	local distance = stats.AttackDistance
 	local pos = targetPosition
 		* CFrame.new(
 			rng:NextInteger(-3, 3),
@@ -109,7 +108,7 @@ local function attackPlayer(npc)
 		)
 	npcModel:PivotTo(CFrame.lookAt(pos.Position, targetPosition.Position))
 
-	swing(npc, distance + 1)
+	swing(npc, distance + 2)
 end
 
 local function runAttackTimer(npc)
@@ -126,13 +125,6 @@ local function runAttackTimer(npc)
 	AttackTimer:Run()
 end
 
-local function hide(npc)
-	task.delay(0.5, function()
-		npc.Instance.Parent = game
-		vfx:FireAllClients("GhoulTeleport", "Server", true, npc.Instance:GetPivot().Position)
-	end)
-end
-
 local function die(npc)
 	npc.Instance.PrimaryPart.Anchored = false
 end
@@ -142,11 +134,20 @@ local module = {
 		{ Function = "SearchForTarget", Parameters = { stats.ViewDistance } },
 		{ Function = "LookAtTarget", Parameters = { true } },
 		{ Function = "Custom", Parameters = { runAttackTimer } },
+
+		{ Function = "GetToDistance", Parameters = { stats.AttackDistance - 4, true } },
+		{ Function = "PlayWalkingAnimation" },
 	},
 
 	TargetFound = {
 		{ Function = "SwitchToState", Parameters = { "Attacking" } },
-		{ Function = "Custom", Parameters = { hide } },
+		{ Function = "MoveTowardsTarget" },
+		--{ Function = "Custom", Parameters = { hide } },
+	},
+
+	TargetLost = {
+		{ Function = "SwitchToState", Parameters = { "Chasing" } },
+		{ Function = "MoveTowardsTarget" },
 	},
 
 	OnSpawned = {

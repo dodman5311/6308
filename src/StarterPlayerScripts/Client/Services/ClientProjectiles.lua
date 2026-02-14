@@ -450,7 +450,7 @@ local function checkRaycast(projectile, raycastDistance)
 	rp.FilterDescendantsInstances = filter
 	rp.FilterType = Enum.RaycastFilterType.Exclude
 
-	if projectile.Sender:IsA("Player") then
+	if projectile.Sender and projectile.Sender:IsA("Player") then
 		rp.CollisionGroup = "Bullet"
 	else
 		rp.CollisionGroup = "NpcBullet"

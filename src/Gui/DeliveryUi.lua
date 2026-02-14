@@ -364,6 +364,7 @@ function module.ShowScreen(player, ui, frame, extraSouls)
 			if SoulsService.Souls == 1 then
 				SoulsService.RemoveSoul(1)
 				module.UpdateSouls(player, ui, frame, SoulsService.Souls)
+				module.showDescription(frame, { Desc = "Drav wasn't fed enough souls. (No perk awarded)" })
 			end
 
 			frame.Frame.Visible = false

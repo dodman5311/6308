@@ -321,18 +321,20 @@ local function updateHealthBar(health, maxHealth, bar, noAnim, isArmor)
 			continue
 		end
 
-		if health ~= math.ceil(health) then
-			if i == math.ceil(health) then
-				local _, decimal = math.modf(health)
-				if decimal == 0 then
-					decimal = 1
-				end
-				unit.Image.ImageColor3 = Color3.fromRGB(150, 0, 255):Lerp(Color3.new(1, 1, 1), decimal)
-			elseif i < math.ceil(health) then
+		if unit:HasTag("ArmorUnit") then
+			if health == math.ceil(health) then
 				unit.Image.ImageColor3 = Color3.new(1, 1, 1)
+			else
+				if i == math.ceil(health) then
+					local _, decimal = math.modf(health)
+					if decimal == 0 then
+						decimal = 1
+					end
+					unit.Image.ImageColor3 = Color3.fromRGB(150, 0, 255):Lerp(Color3.new(1, 1, 1), decimal)
+				elseif i < math.ceil(health) then
+					unit.Image.ImageColor3 = Color3.new(1, 1, 1)
+				end
 			end
-		elseif isArmor then
-			unit.Image.ImageColor3 = Color3.new(1, 1, 1)
 		end
 
 		if i <= math.ceil(health) then

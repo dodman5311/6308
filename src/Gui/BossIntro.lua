@@ -84,6 +84,10 @@ local function givePerk(frame, button)
 	end
 	perkDebounce = true
 
+	task.delay(2, function()
+		perkDebounce = false
+	end)
+
 	for _, buttonFrame in ipairs(frame.Choices:GetChildren()) do
 		if not buttonFrame:IsA("Frame") then
 			continue
@@ -108,8 +112,6 @@ local function givePerk(frame, button)
 		frame.Gui.Enabled = false
 
 		net:RemoteEvent("BossExit"):FireServer()
-
-		perkDebounce = true
 	end)
 end
 

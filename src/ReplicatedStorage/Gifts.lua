@@ -32,7 +32,7 @@ local module = {
 
 		Fast_Mags = {
 			Icon = "rbxassetid://16235738334",
-			Catagories = { "Tactical", "Arsenal" },
+			Catagories = { "Tactical" },
 			Desc = "Reload speed is now increased. (+20%)",
 		},
 
@@ -92,14 +92,14 @@ local module = {
 
 		Burn_Hell = {
 			Icon = "rbxassetid://18731039717",
-			Catagories = { "Arsenal", "Soul" },
-			Desc = "Any hits, not from a weapon, now has a chance to deal 1 point of fire damage - lighting the said enemy on fire. (50% chance)",
+			Catagories = { "Soul", "Arsenal" },
+			Desc = "Any hits, not from a weapon, now has a chance to deal 1 point of fire damage - lighting the said enemy on fire. (10% chance)",
 		},
 
 		Freeze_Heaven = {
 			Icon = "rbxassetid://105121369961432",
 			Catagories = { "Soul", "Tactical" },
-			Desc = "When inflicting an element, you now have a chance to freeze the enemy (50% chance)",
+			Desc = "When inflicting an element, you now have a chance to freeze the enemy (10% chance)",
 		},
 
 		Before_The_Storm = { -- ICON NEEDED
@@ -280,7 +280,7 @@ local module = {
 
 		Sierra_6308 = {
 			Icon = "rbxassetid://16442104214",
-			Catagories = { "Tactical", "Soul" },
+			Catagories = { "Soul" },
 			Desc = "Enemies will now hesitate to shoot out of fear. (15% chance to cancel a shot)",
 		},
 
