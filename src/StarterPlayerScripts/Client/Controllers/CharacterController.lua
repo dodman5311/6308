@@ -368,7 +368,7 @@ RunService.Heartbeat:Connect(function()
 		UIService.doUiAction("HUD", "hideDanger")
 	end
 
-	if playerPivot.Position.Y < -150 and workspace:GetAttribute("Stage") ~= 2 then
+	if playerPivot.Position.Y < -100 and workspace:GetAttribute("Stage") ~= 2 then
 		Player.Character:PivotTo(CFrame.new(lastOnGroundPosition))
 	end
 

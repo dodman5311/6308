@@ -199,7 +199,7 @@ x2 damage to weak points]],
 +100% Splash Range
 
 Plasma bolts now create damaging tendrils around then that deal 1 Damage per 0.1 second to any nearby enemy.]],
-				Price = 1000,
+				Price = 1250,
 			},
 		},
 

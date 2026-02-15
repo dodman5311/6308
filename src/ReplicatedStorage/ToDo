@@ -549,14 +549,11 @@ Fix dying after killing boss
 
 fix boss intro not going away on kill lap 2
 
-
 GENDER AND VOICES :D *
 
 Make lil guy -- 12
 
-Mak map assets spawn when have wallrun (Client Sided)
-
-fix armor resistance perks -- 13
+fix armor resistance perks *
 
 enable mobile button for visage perks -- 13
 
@@ -569,10 +566,19 @@ Make drav revive when restarting run ()
 
 Make fast travel for stage 2
 
-Make req shop save twice
+Make req shop save twice ()
+
+Mak map assets spawn when have wallrun (Client Sided)
 
 fix music when respawning
 
 FIX CODEX SAVING --
 
 Add voice lines (Aubrey / Val Hana)
+
+
+------ future
+
+fun bucks:
+Buy with robux.
+Qiosk's Kiosk Quests (do quests to get a small amount of fun bucks to grind for stuffs)

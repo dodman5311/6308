@@ -43,7 +43,7 @@ local showHitboxes = false
 local newStart
 local links = {}
 
-local leeway = 6
+local leeway = 12
 --local unitModules = {}
 local blacklistedUnits = {}
 
@@ -233,14 +233,20 @@ local function clearMap()
 	arenas.cancelArenas()
 end
 
+local function hideLink(link)
+	link.Transparency = 1
+	link.CanCollide = false
+	link.CanQuery = false
+	link.CanTouch = false
+	local line = link:FindFirstChild("LineHandleAdornment")
+
+	if line then
+		line:Destroy()
+	end
+end
+
 local function setLinks(baseLink, unit)
 	for _, link in ipairs(unit.Links:GetChildren()) do
-		link.Transparency = 1
-		link.CanCollide = false
-		link.CanQuery = false
-		link.CanTouch = false
-		link:FindFirstChild("LineHandleAdornment"):Destroy()
-
 		local distance = (link.Position - baseLink.Position).Magnitude
 		if distance > 0.1 then
 			continue
@@ -424,6 +430,16 @@ local function placeCaps()
 	end
 end
 
+local function hideLinks()
+	for _, descendant in ipairs(map:GetDescendants()) do
+		if descendant.Name ~= "Link" then
+			continue
+		end
+
+		hideLink(descendant)
+	end
+end
+
 --// Main function
 function module.generateUnitsForLinks()
 	for _, link in ipairs(links) do
@@ -545,6 +561,7 @@ function module.loadMap(size)
 	placeKiosk()
 
 	placeCaps()
+	hideLinks()
 	module.placeExit()
 
 	spawners.spawnEnemies(module.CurrentLevel)
@@ -600,6 +617,7 @@ function module.loadLinearMap(size)
 	placeKiosk()
 
 	placeCaps()
+	hideLinks()
 
 	--repeat
 	module.placeExit()
