@@ -1080,7 +1080,7 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 
 	totalDamage *= critMult
 
-	if weakspotDamage and source == "50 Regret" then
+	if weakspotDamage > 0 and source == "50 Regret" then
 		totalDamage *= 2
 	end
 
