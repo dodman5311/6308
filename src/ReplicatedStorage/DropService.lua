@@ -5,10 +5,10 @@ local module = {
 }
 
 --// Services
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
-local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
@@ -43,6 +43,12 @@ function module.CreateDrop(position, dropType)
 	end)
 
 	return newDrop
+end
+
+function module.ClearDrops()
+	for _, drop in ipairs(CollectionService:GetTagged("Drop")) do
+		drop:Destroy()
+	end
 end
 
 local function checkForDrops()

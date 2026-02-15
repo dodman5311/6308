@@ -1,8 +1,8 @@
 local BadgeService = game:GetService("BadgeService")
+local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local Debris = game:GetService("Debris")
 
 local assets = ReplicatedStorage.Assets
 
@@ -13,8 +13,8 @@ local animationService = require(Globals.Vendor.AnimationService)
 --local stats = {}
 local rng = Random.new()
 
-local util = require(Globals.Vendor.Util)
 local net = require(Globals.Packages.Net)
+local util = require(Globals.Vendor.Util)
 
 local mapService = require(Globals.Server.Services.MapService)
 local globalSounds = assets.Sounds.EverlastingBoss
@@ -327,7 +327,6 @@ local attacks = {
 		animationService:playAnimation(npc.Instance, "Run", Enum.AnimationPriority.Action, false, 0)
 
 		local distanceToPoint = (model:GetPivot().Position - runTo.Position).Magnitude
-
 		local runTime = os.clock()
 
 		repeat
@@ -402,6 +401,21 @@ local attacks = {
 	end,
 }
 
+local function doAttack(npc)
+	local getUnit = workspace.Map:FindFirstChild("BossRoom_1")
+	local bellChain = getUnit.BellChain
+
+	local list = attacks
+
+	if bellChain:GetAttribute("IsWeakened") then
+		list = { attacks[4] }
+	end
+
+	print(list)
+
+	list[math.random(1, #list)](npc)
+end
+
 local function runAttackTimer(npc)
 	if npc.Acts:checkAct("Run", "InAttack", "Melee") then
 		return
@@ -409,10 +423,9 @@ local function runAttackTimer(npc)
 
 	local AttackTimer = getTimer(npc, "Special")
 
-	local shuffledAttacks = util.ShuffleTable(attacks)
-
 	AttackTimer.WaitTime = rng:NextNumber(3, 6)
-	AttackTimer.Function = shuffledAttacks[math.random(1, #shuffledAttacks)]
+	AttackTimer.Function = doAttack
+
 	AttackTimer.Parameters = { npc }
 
 	AttackTimer:Run()
@@ -775,7 +788,7 @@ end
 local module = {
 	OnStep = {
 
-		{ Function = "SearchForTarget", Parameters = { 1000 } },
+		{ Function = "SearchForTarget", Parameters = { 1000 }, NotState = "NoAi" },
 		{ Function = "LookAtTarget" },
 
 		{ Function = "GetToDistance", Parameters = { 4.9, true } },

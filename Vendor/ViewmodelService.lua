@@ -15,8 +15,8 @@ local assets = ReplicatedStorage.Assets
 local camera = workspace.CurrentCamera
 
 --// Modules
-local spring = require(vendor.Spring)
 local signals = require(globals.Shared.Signals)
+local spring = require(vendor.Spring)
 
 --// Values
 local currentCameraOffset = CFrame.new()

@@ -4,6 +4,8 @@ local ServerStorage = game:GetService("ServerStorage")
 local Net = require(ReplicatedStorage.Packages.Net)
 local RequiemShopService = {}
 
+local requiredModules = {}
+
 local shop = ServerStorage.ReqiuemShop
 
 Net:RemoteEvent("EnterLevel")
@@ -20,32 +22,32 @@ local function teleportPlayers(cframe: CFrame)
 	end
 end
 
-local function runRequiemModules()
-	local modules = shop:FindFirstChild("Modules")
-	for _, module in ipairs(modules:GetChildren()) do
-		require(module).OnPlaced(shop)
+local function runRequiemModules(actionName: string)
+	for _, module in pairs(requiredModules) do
+		if not module[actionName] then
+			continue
+		end
+		module[actionName](shop)
 	end
 end
 
 function RequiemShopService:EnterShop() --isDead)
 	shop.Parent = workspace
 	local entryPart = shop:WaitForChild("EntryPart")
+	runRequiemModules("OnEntered")
 
 	workspace:SetAttribute("IsInReq", true)
 
 	teleportPlayers(entryPart.CFrame * CFrame.new(0, 2.5, 0))
-	-- if isDead then
-	-- 	task.delay(6, teleportPlayers, entryPart.CFrame * CFrame.new(0, 2.5, 0))
-	-- end
 end
 
 function RequiemShopService:GameInit()
-	runRequiemModules()
-	--Prestart Code
-end
+	local modules = shop:FindFirstChild("Modules")
+	for _, module in ipairs(modules:GetChildren()) do
+		requiredModules[module.Name] = require(module)
+	end
 
-function RequiemShopService:GameStart()
-	--Start Code
+	runRequiemModules("OnPlaced")
 end
 
 return RequiemShopService

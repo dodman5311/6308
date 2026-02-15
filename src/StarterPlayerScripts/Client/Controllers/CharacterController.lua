@@ -20,6 +20,7 @@ local sounds = assets.Sounds
 --// Modules
 local Acts = require(Globals.Vendor.Acts)
 local ChanceService = require(Globals.Vendor.ChanceService)
+local DropService = require(ReplicatedStorage.Shared.DropService)
 local MusicService = require(Globals.Client.Services.MusicService)
 local UIService = require(Globals.Client.Services.UIService)
 local ViewmodelService = require(Globals.Vendor.ViewmodelService)
@@ -108,6 +109,8 @@ local function loadSaveData(upgradeIndex, gameState)
 end
 
 function module:OnSpawn(character, humanoid)
+	DropService.ClearDrops()
+
 	task.delay(1, function()
 		UIService.doUiAction(
 			"Notify",
@@ -504,6 +507,8 @@ local function ExitSequence(levelData, level, stageBoss, miniBoss, stage, toReq:
 	UIService.doUiAction("HUD", "HideRCoins")
 
 	module.attemptPause("EndPause")
+
+	DropService.ClearDrops()
 
 	local extraSouls = UIService.doUiAction("LevelEnd", "ShowLevelEnd", levelData)
 	local onHidden

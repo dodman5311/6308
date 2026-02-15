@@ -64,8 +64,8 @@ signals.LoadSavedDataFromClient:Connect(function(upgradeIndex, gameState, gameSe
 		module.CodexEntries[entryIndex].Viewed = viewed
 	end
 
-	module.AddEntry("Cleanse & Repent", false, true)
-	module.AddEntry("The Iron Gate", false, true)
+	module.AddEntry("Cleanse & Repent", true, true)
+	module.AddEntry("The Iron Gate", true, true)
 	module.AddEntry("Info & Tips", false, true)
 end)
 
