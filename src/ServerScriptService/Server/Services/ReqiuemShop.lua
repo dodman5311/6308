@@ -2,10 +2,8 @@ local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
-local DataStore = require(script.Parent.DataStore)
 local Net = require(ReplicatedStorage.Packages.Net)
 local Spawners = require(script.Parent.Spawners)
-local Upgrades = require(ReplicatedStorage.Shared.Upgrades)
 local RequiemShopService = {}
 
 local requiredModules = {}
@@ -67,16 +65,6 @@ Net:Handle("PurchaseUpgrade", function(player, name, price, index) -- requiem sh
 
 	Spawners.spawnWeapons(level)
 	ReplicatedStorage.PurchasedUpgrade:Fire()
-
-	local upgradesList = {}
-
-	for _, category in pairs(Upgrades) do
-		for upgradeName, _ in pairs(category) do
-			upgradesList[upgradeName] = workspace:GetAttribute(upgradeName)
-		end
-	end
-
-	DataStore.SaveData(player, "ShopUpgrades", upgradesList)
 
 	return workspace:GetAttribute("TotalScore")
 end)

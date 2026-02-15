@@ -1102,16 +1102,14 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 			UIService.doUiAction("HUD", "ShowHit", critMult > 1)
 		end
 
-		if element and not chanceOverride then
-			if ChanceService.checkChance(50, true) then
-				codexService.AddEntry("Elements")
+		if ChanceService.checkChance(chanceOverride or 50, true) then
+			codexService.AddEntry("Elements")
 
-				if GiftsService.CheckGift("Freeze_Heaven") and ChanceService.checkChance(10, true) then
-					net:RemoteEvent("Damage"):FireServer(model, 0, "Ice")
-				end
-			else
-				element = nil
+			if GiftsService.CheckGift("Freeze_Heaven") and ChanceService.checkChance(10, true) then
+				net:RemoteEvent("Damage"):FireServer(model, 0, "Ice")
 			end
+		else
+			element = nil
 		end
 
 		local sourceIsWeapon = module.currentWeapon and source == module.currentWeapon.Name
@@ -1563,7 +1561,7 @@ local function fireDeadBolt(extraBullet, bulletDamage, weaponName, element)
 
 	for _ = 1, extraBullet + 1 do
 		local hitHumanoid, subject, damage =
-			module.FireBullet(bulletDamage + 1, 0, 500, nil, weaponName, element, 0, 50)
+			module.FireBullet(bulletDamage + 1, 0, 500, nil, weaponName, element, nil, 50)
 
 		addToGib(hitHumanoid, subject, damage)
 		addToConsecutive(hitHumanoid)
@@ -2827,7 +2825,7 @@ local function fireSoulFire()
 		end
 
 		table.insert(targetsHit, target)
-		module.FireBullet(0.5, 0, nil, { Instance = part, Position = part.Position }, "Burning_Souls", "SoulFire", true)
+		module.FireBullet(0.5, 0, nil, { Instance = part, Position = part.Position }, "Burning_Souls", "SoulFire", 100)
 	end
 
 	viewmodel.Model.PrimaryPart.RocketRoot.BlackFire:Emit(300)

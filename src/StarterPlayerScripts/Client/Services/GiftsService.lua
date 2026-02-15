@@ -9,7 +9,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local codexService = require(Globals.Client.Services.CodexService)
-local permaUpgradeList = require(ReplicatedStorage.Upgrades)
 local player = Players.LocalPlayer
 
 --// Modules
