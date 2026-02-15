@@ -500,7 +500,20 @@ local function exitS2(extraSouls, level, stageBoss, miniBoss)
 	camera.FieldOfView = 1000
 	local ti = TweenInfo.new(1, Enum.EasingStyle.Exponential)
 
-	util.tween(camera, ti, { FieldOfView = util.getSetting("Field of View").Value })
+	util.tween(camera, ti, { FieldOfView = util.getSetting("Field of View").Value }, false, function()
+		if not giftService.CheckGift("Spiked_Sabatons") then
+			return
+		end
+
+		for _, model in ipairs(CollectionService:GetTagged("WallrunModel")) do
+			for _, part in ipairs(model:GetChildren()) do
+				part.Transparency = 0
+				part.CanCollide = true
+				part.CanQuery = true
+				part.CanTouch = true
+			end
+		end
+	end)
 end
 
 local function ExitSequence(levelData, level, stageBoss, miniBoss, stage, toReq: boolean?)

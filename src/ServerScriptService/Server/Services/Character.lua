@@ -291,21 +291,6 @@ net:Connect("UpdatePlayerHealth", function(player, maxHealth, health, protected)
 	end
 end)
 
-net:Handle("PurchaseUpgrade", function(player, name, price, index) -- requiem shop buy thingy WAH!
-	workspace:SetAttribute("TotalScore", workspace:GetAttribute("TotalScore") - price)
-	workspace:SetAttribute(name, index)
-
-	local plusStage = (mapService.CurrentStage - 1) * 5
-	local level = plusStage + mapService.CurrentLevel
-
-	for _, weapon in ipairs(collectionService:GetTagged("Weapon")) do
-		weapon:Destroy()
-	end
-	spawners.spawnWeapons(level)
-
-	return workspace:GetAttribute("TotalScore")
-end)
-
 net:Connect("Restart", function(player)
 	local humanoid = player.Character.Humanoid
 

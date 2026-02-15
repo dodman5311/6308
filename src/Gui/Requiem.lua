@@ -132,7 +132,7 @@ local function updateTree(tree)
 		if buttonFrame:GetAttribute("Index") then
 			if buttonFrame:GetAttribute("Index") == tier then
 				setButtonState(buttonFrame, "Acquired")
-			elseif tier <= 1 then
+			elseif tier >= 1 then
 				setButtonState(buttonFrame, "Enabled")
 			else
 				setButtonState(buttonFrame, "Locked")
@@ -298,6 +298,8 @@ function module.Init(player, ui, frame)
 	end)
 
 	frame.ExitButton.MouseButton1Click:Connect(function()
+		Net:RemoteEvent("CloseReqShop"):FireServer()
+
 		module.HideRequiemShop(player, ui, frame)
 	end)
 

@@ -1277,7 +1277,7 @@ local function placeHitEffect(position)
 end
 
 local function dealGibDamage(subject)
-	if not GiftsService.CheckGift("Guts_And_Gas") and not GiftsService.CheckGift("Red_Eyes") then
+	if not GiftsService.CheckGift("Guts_And_Gas") and not GiftsService.CheckGift("Red_Eyes") or not subject then
 		return
 	end
 

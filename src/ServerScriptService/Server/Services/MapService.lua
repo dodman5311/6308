@@ -202,9 +202,9 @@ local function clearMap()
 	blacklistedUnits = {}
 
 	for _, unit in ipairs(map:GetChildren()) do
-		-- if unit.Name == "Start" or not unit:IsA("Model") then
-		-- 	continue
-		-- end
+		if unit.Name == "ReqiuemShop" then
+			continue
+		end
 
 		if unit:IsA("Model") then
 			removeLink(unit)
@@ -218,8 +218,6 @@ local function clearMap()
 	if skyBox then
 		skyBox:Destroy()
 	end
-
-	map:ClearAllChildren()
 
 	for _, Npc in ipairs(CollectionService:GetTagged("Npc")) do
 		Npc:Destroy()
@@ -755,8 +753,13 @@ local function createStoredMap()
 	end
 
 	local newStoredMap = workspace.Map:Clone() :: Model
+	if newStoredMap:FindFirstChild("ReqiuemShop") then
+		newStoredMap.ReqiuemShop:Destroy()
+	end
+
 	newStoredMap.ModelStreamingMode = Enum.ModelStreamingMode.Persistent
 	newStoredMap.Parent = replicatedStorage
+
 	return newStoredMap
 end
 
@@ -777,12 +780,6 @@ function module.proceedToNext(_, onlyLoadMap, toReq: boolean?)
 		character.Humanoid.Health = character.Humanoid.MaxHealth
 	end
 
-	print(toReq)
-
-	if toReq then
-		requiemShop:EnterShop()
-	end
-
 	if not onlyLoadMap then
 		if module.CurrentLevel == 5 or module.CurrentLevel == 2 then
 			module.CurrentLevel += 0.5
@@ -798,6 +795,13 @@ function module.proceedToNext(_, onlyLoadMap, toReq: boolean?)
 
 	if module.CurrentStage == 5 then
 		module.CurrentStage = 1
+	end
+
+	if toReq then
+		local plusStage = (module.CurrentStage - 1) * 5
+		local level = plusStage + module.CurrentLevel
+
+		requiemShop:EnterShop()
 	end
 
 	workspace:SetAttribute("Level", module.CurrentLevel)

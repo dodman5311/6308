@@ -1,7 +1,11 @@
+local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
+local DataStore = require(script.Parent.DataStore)
 local Net = require(ReplicatedStorage.Packages.Net)
+local Spawners = require(script.Parent.Spawners)
+local Upgrades = require(ReplicatedStorage.Shared.Upgrades)
 local RequiemShopService = {}
 
 local requiredModules = {}
@@ -31,8 +35,8 @@ local function runRequiemModules(actionName: string)
 	end
 end
 
-function RequiemShopService:EnterShop() --isDead)
-	shop.Parent = workspace
+function RequiemShopService:EnterShop()
+	shop.Parent = workspace.Map
 	local entryPart = shop:WaitForChild("EntryPart")
 	runRequiemModules("OnEntered")
 
@@ -49,5 +53,32 @@ function RequiemShopService:GameInit()
 
 	runRequiemModules("OnPlaced")
 end
+
+Net:Handle("PurchaseUpgrade", function(player, name, price, index) -- requiem shop buy thingy WAH!
+	workspace:SetAttribute("TotalScore", workspace:GetAttribute("TotalScore") - price)
+	workspace:SetAttribute(name, index)
+
+	local plusStage = (workspace:GetAttribute("Stage") - 1) * 5
+	local level = plusStage + workspace:GetAttribute("Level")
+
+	for _, weapon in ipairs(CollectionService:GetTagged("Weapon")) do
+		weapon:Destroy()
+	end
+
+	Spawners.spawnWeapons(level)
+	ReplicatedStorage.PurchasedUpgrade:Fire()
+
+	local upgradesList = {}
+
+	for _, category in pairs(Upgrades) do
+		for upgradeName, _ in pairs(category) do
+			upgradesList[upgradeName] = workspace:GetAttribute(upgradeName)
+		end
+	end
+
+	DataStore.SaveData(player, "ShopUpgrades", upgradesList)
+
+	return workspace:GetAttribute("TotalScore")
+end)
 
 return RequiemShopService

@@ -568,14 +568,14 @@ Make fast travel for stage 2
 
 Make req shop save twice ()
 
-Mak map assets spawn when have wallrun (Client Sided)
-
 fix music when respawning
 
 FIX CODEX SAVING --
 
-Add voice lines (Aubrey / Val Hana)
+Fix FOV issue
 
+Codex datastores are still finicky
+When respawning, the requiem shop music doesn't play
 
 ------ future
 

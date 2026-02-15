@@ -69,18 +69,6 @@ module.Exit = function(player, start_time, stage_number, level_number, bossBeate
 		arenaCount = 1
 	end
 
-	if level_number ~= 2 and level_number ~= 5 then
-		local upgradesList = {}
-
-		for _, category in pairs(upgrades) do
-			for upgradeName, _ in pairs(category) do
-				upgradesList[upgradeName] = workspace:GetAttribute(upgradeName)
-			end
-		end
-
-		dataStore.SaveData(player, "ShopUpgrades", upgradesList)
-	end
-
 	if stage_number == 0 then
 		bossBeaten = "The Requiem"
 

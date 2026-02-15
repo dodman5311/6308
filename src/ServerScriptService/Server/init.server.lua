@@ -30,6 +30,7 @@ net:RemoteEvent("LoadData")
 net:RemoteEvent("SaveData")
 net:RemoteEvent("SaveGameState")
 net:RemoteEvent("SpawnVictim")
+net:RemoteEvent("CloseReqShop")
 
 net:RemoteEvent("PauseGame")
 net:RemoteEvent("ResumeGame")
