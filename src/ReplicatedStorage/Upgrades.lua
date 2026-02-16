@@ -261,8 +261,7 @@ Attacking at least 0.5 second after parrying will launch the player forward]],
 				Name = "Trident",
 				Description = [[+1 Damage
 				
-The trident can now Parry.
-Parrying with the Trident will use up all your ammo and spawn geysers blow nearby enemies.]],
+The trident seeks enemies and has infinite piercing.]],
 				Price = 750,
 			},
 		},

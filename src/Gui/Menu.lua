@@ -115,7 +115,7 @@ local function showAttention(frame)
 			frame.Codex_Lbl.Attention.Visible = true
 		end
 
-		frame[entry.Catagory .. "_Lbl"].Attention.Visible = true
+		frame[entry.Category .. "_Lbl"].Attention.Visible = true
 
 		for _, v in ipairs(frame.Codex_Menu.CodexList:GetChildren()) do
 			if v.Name == index then
@@ -161,7 +161,7 @@ local function loadCodexCatagory(frame, catagory, setColor)
 	end
 
 	for entryName, entry in pairs(codexService.CodexEntries) do
-		if entry.Catagory ~= catagory then
+		if entry.Category ~= catagory then
 			continue
 		end
 
@@ -271,7 +271,7 @@ end
 local sortOrder = {
 	"Time",
 	"Rank",
-	"Catagory",
+	"Category",
 }
 local rankOrder = {
 	Special = 0,
@@ -300,8 +300,8 @@ local function applyPerkSorting(frame)
 		elseif sortingStyle == "Rank" then
 			local rank = button:GetAttribute("Rank")
 			button.LayoutOrder = rankOrder[rank]
-		elseif sortingStyle == "Catagory" then
-			local catagory = button:GetAttribute("Catagory")
+		elseif sortingStyle == "Category" then
+			local catagory = button:GetAttribute("Category")
 			button.LayoutOrder = catagoryOrder[catagory]
 		end
 	end
@@ -1141,7 +1141,7 @@ local function loadPerksList(frame)
 			Inferior = Color3.new(1, 1, 1),
 		}
 
-		button:SetAttribute("Catagory", giftData.Catagories[1])
+		button:SetAttribute("Category", giftData.Catagories[1])
 		button:SetAttribute("Index", index)
 
 		local enter, leave = MouseOver.MouseEnterLeaveEvent(button)
@@ -1538,7 +1538,7 @@ function module.openCodex(player, ui, frame, openToLatest)
 
 	if openToLatest and codexService.latestEntry then
 		latestEntry = codexService.CodexEntries[codexService.latestEntry]
-		currentCatagory = latestEntry.Catagory
+		currentCatagory = latestEntry.Category
 	end
 
 	loadCodexCatagory(frame, currentCatagory, true)

@@ -572,10 +572,7 @@ fix music when respawning
 
 FIX CODEX SAVING --
 
-Fix FOV issue
-
 Codex datastores are still finicky
-When respawning, the requiem shop music doesn't play
 
 ------ future
 

@@ -195,6 +195,7 @@ function module:OnSpawn(character, humanoid)
 		local stageState = net:RemoteFunction("GetStageState"):InvokeServer()
 
 		UIService.doUiAction("HUD", "ShowRCoins")
+		MusicService.playTrack("Reqiuem")
 		loadSaveData(0, stageState)
 	end
 end

@@ -246,7 +246,7 @@ module.Presets = {
 		LifeTime = 5,
 		Info = { Seeking = 0, SeekProgression = 0.025, Size = 0 },
 		Damage = 3,
-		Piercing = 1000,
+		Piercing = math.huge,
 		Model = "HarpoonProjectile",
 	},
 

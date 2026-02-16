@@ -95,6 +95,11 @@ local function attackPlayer(npc)
 		return
 	end
 
+	npc.Instance.Parent = game
+	vfx:FireAllClients("GhoulTeleport", "Server", true, npc.Instance:GetPivot().Position)
+
+	task.wait(1)
+
 	local npcModel = npc.Instance
 	npcModel.Parent = workspace
 
@@ -106,6 +111,7 @@ local function attackPlayer(npc)
 			rng:NextInteger(-1, 2),
 			rng:NextInteger(-distance * 2, -distance) --rng:NextInteger(-distance, distance)
 		)
+
 	npcModel:PivotTo(CFrame.lookAt(pos.Position, targetPosition.Position))
 
 	swing(npc, distance + 2)
@@ -118,7 +124,7 @@ local function runAttackTimer(npc)
 
 	local AttackTimer = getTimer(npc, "Attack")
 
-	AttackTimer.WaitTime = rng:NextNumber(2, 5)
+	AttackTimer.WaitTime = rng:NextNumber(3, 5)
 	AttackTimer.Function = attackPlayer
 	AttackTimer.Parameters = { npc }
 
