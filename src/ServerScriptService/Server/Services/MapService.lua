@@ -43,7 +43,7 @@ local showHitboxes = false
 local newStart
 local links = {}
 
-local leeway = 12
+local leeway = 10
 --local unitModules = {}
 local blacklistedUnits = {}
 
@@ -324,7 +324,6 @@ local function checkPlacable(baseLink, unit, unitLink)
 	for _, part in ipairs(hitboxResult) do
 		if part.Parent ~= unit and part:FindFirstAncestor(map.Name) then
 			canPlace = false
-
 			break
 		end
 	end

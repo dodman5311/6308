@@ -771,6 +771,11 @@ local function processCamera(frame)
 	end)
 end
 
+local scrollingImages = {
+	"rbxassetid://99247837182149",
+	"rbxassetid://117857629893773",
+}
+
 local function showTraveling(travelSeconds: number): boolean
 	local scene = travelingUi.Group.Scene
 	if UIAnimationService.CheckPlaying(scene.WalkingAnimation) then
@@ -787,6 +792,7 @@ local function showTraveling(travelSeconds: number): boolean
 	travelingUi.Enabled = true
 
 	Util.tween(travelingUi.Group, ti, { GroupTransparency = 0 })
+	scene.ScrollingBackground.Image = scrollingImages[workspace:GetAttribute("Stage")]
 	local scrollingTween = Util.tween(scene.ScrollingBackground, scrollingTi, { Position = UDim2.fromScale(-4, 0.5) })
 
 	task.delay(travelSeconds, function()
