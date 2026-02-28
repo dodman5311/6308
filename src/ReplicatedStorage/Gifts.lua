@@ -93,7 +93,7 @@ local module = {
 		Burn_Hell = {
 			Icon = "rbxassetid://18731039717",
 			Catagories = { "Soul", "Arsenal" },
-			Desc = "Any hits, not from a weapon, now has a chance to deal 1 point of fire damage - lighting the said enemy on fire. (10% chance)",
+			Desc = "Any hits, not from a weapon, now have a chance light the hit enemy on fire. (10% chance)",
 		},
 
 		Freeze_Heaven = {
@@ -173,7 +173,7 @@ local module = {
 		["Gambler's_Fallacy"] = {
 			Icon = "rbxassetid://17655098782",
 			Catagories = { "Luck" },
-			Desc = "Every hit on an enemy now increases your Luck by 2. Luck added by this perk is removed on a successful Luck Roll. (Can be stacked 30 times)",
+			Desc = "Every hit on an enemy now increases your Luck by 2. Luck added by this perk is removed on a successful Luck Roll. (Can be stacked 40 times)",
 		},
 
 		Echoed_Souls = {
@@ -257,7 +257,7 @@ local module = {
 		Set_Em_Up = {
 			Icon = "rbxassetid://16235430594",
 			Catagories = { "Luck" },
-			Desc = "Your combo score is now linked to your Luck. (+1 Luck per combo score, Max 30)",
+			Desc = "Your combo score is now linked to your Luck. (+1 Luck per combo score, Max 50)",
 		},
 
 		Dead_Bolt = {

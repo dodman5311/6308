@@ -7,14 +7,16 @@ local players = game:GetService("Players")
 local player = players.LocalPlayer
 
 local rs = game:GetService("RunService")
+
 local rp = RaycastParams.new()
 rp.FilterType = Enum.RaycastFilterType.Include
+rp.FilterDescendantsInstances = { workspace.Map }
 
 local airController = require(script.Parent.AirController)
 
 local acts = require(Globals.Vendor.Acts)
-local viewModel = require(Globals.Vendor.ViewmodelService)
 local animationService = require(Globals.Vendor.AnimationService)
+local viewModel = require(Globals.Vendor.ViewmodelService)
 
 local util = require(Globals.Vendor.Util)
 
@@ -30,7 +32,7 @@ local function createRaycastRig()
 	module.topAcross = CFrame.new(0, 2.5, 1)
 end
 
-local function grabLedge()
+local function grabLedge(goalCFrame)
 	if acts:checkAct("ledgeGrab") or not player.Character then
 		return
 	end
@@ -52,19 +54,17 @@ local function grabLedge()
 		primaryPart.AssemblyLinearVelocity = Vector3.zero
 		airController.cancel()
 
-		local goal = primaryPart.CFrame * module.topDown.CFrame * CFrame.new(0, 1.5, -1)
-
 		util.tween(
 			primaryPart,
 			TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
-			{ CFrame = goal },
+			{ CFrame = goalCFrame },
 			true
 		)
 		primaryPart.Anchored = false
 	end)
 end
 
-local function castRays()
+local function run()
 	if
 		not player.Character
 		or not player.Character.PrimaryPart
@@ -74,47 +74,41 @@ local function castRays()
 		return
 	end
 
-	local primaryPart = player.Character.PrimaryPart
+	local rootCFrame = player.Character:GetPivot()
+	local _, yAngle = rootCFrame:ToEulerAngles(Enum.RotationOrder.YXZ)
+	local startCF = CFrame.fromEulerAnglesYXZ(0, yAngle, 0) + rootCFrame.Position
 
-	rp.FilterDescendantsInstances = { workspace.Map }
-
-	local catchRay =
-		workspace:Spherecast(primaryPart.Position + Vector3.new(0, 1, 0), 1, primaryPart.CFrame.LookVector * 4, rp)
-
-	if not catchRay or catchRay.Instance.Transparency == 1 or not catchRay.Instance.CanCollide then
-		return
+	local frontRay = workspace:Raycast(startCF * Vector3.new(0, 2.5, 1), 7 * startCF.LookVector, rp)
+	if frontRay then
+		return false
 	end
 
-	local upRay = workspace:Spherecast(primaryPart.Position, 2, primaryPart.CFrame.UpVector * 4, rp)
+	local upRay = workspace:Raycast(startCF.Position, 4 * Vector3.yAxis, rp)
 	if upRay then
-		return
+		return false
 	end
 
-	module.topDown.WorldPosition = catchRay.Position + Vector3.new(0, 4, 0)
-	module.topDown.CFrame *= CFrame.new(0, 0, -0.05)
-
-	local downRay = workspace:Raycast(module.topDown.WorldPosition, module.topDown.CFrame.UpVector * -4.5, rp)
-	if not downRay then
-		return
+	local catchRay = workspace:Raycast(startCF.Position, 4 * startCF.LookVector, rp)
+	if not catchRay then
+		return false
 	end
 
-	local crossCheck = workspace:Spherecast(
-		(primaryPart.CFrame * CFrame.new(0, 5, 1)).Position,
-		2.5,
-		primaryPart.CFrame.LookVector * 6,
-		rp
-	)
-	if crossCheck then
-		return
-	end
+	local downOrigin = catchRay.Position + 2.5 * Vector3.yAxis + 0.05 * startCF.LookVector
+	--local downRay = workspace:Raycast(downOrigin, -3.5 * Vector3.yAxis, rp)
 
-	grabLedge()
+	local goalCF = startCF.Rotation * CFrame.new(0, 1, -0.5) + downOrigin
+
+	--instances.AlignPosition.Position = goalCF.Position
+	--instances.ControllerManager.FacingDirection = startCF.LookVector
+
+	grabLedge(goalCF)
+	return true
 end
 
 function module:OnSpawn()
 	createRaycastRig()
 end
 
-rs.Heartbeat:Connect(castRays)
+rs.Heartbeat:Connect(run) --castRays)
 
 return module

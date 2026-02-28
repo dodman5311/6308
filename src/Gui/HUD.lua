@@ -527,6 +527,12 @@ function module.DamagePulse(player, ui, frame)
 	frame.Static.ImageColor3 = Color3.new(1)
 
 	util.tween(frame.Static, ti, { ImageColor3 = Color3.new(1, 1, 1) })
+
+	if util.getSetting("Damage Feedback").Value >= 2 then
+		frame.DamageVignette.ImageTransparency = 0.5
+		util.tween(frame.DamageVignette, ti, { ImageTransparency = 1 })
+		-- play damage sfx
+	end
 end
 
 function module.ShowInvincible(player, ui, frame, showTime)

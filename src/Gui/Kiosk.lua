@@ -748,13 +748,19 @@ function module.applyGiftChange(name)
 	if name == "Perk_Ticket" then
 		module.tickets += 1
 	elseif name == "Clover" then
-		codexService.AddEntry("Luck")
+		task.spawn(function()
+			codexService.AddEntry("Luck")
+		end)
 		chanceService.luck += 2
 	elseif name == "Large_Clover" then
-		codexService.AddEntry("Luck")
+		task.spawn(function()
+			codexService.AddEntry("Luck")
+		end)
 		chanceService.luck += 4
 	elseif name == "Massive_Clover" then
-		codexService.AddEntry("Luck")
+		task.spawn(function()
+			codexService.AddEntry("Luck")
+		end)
 		chanceService.luck += 6
 	elseif name == "Kevlar" then
 		addArmor(Players.LocalPlayer, 1)

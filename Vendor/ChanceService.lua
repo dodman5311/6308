@@ -29,7 +29,7 @@ function module.getLuck()
 	end
 
 	if giftService.CheckGift("Set_Em_Up") then
-		result += math.clamp(comboService.CurrentCombo, 0, 30)
+		result += math.clamp(comboService.CurrentCombo, 0, 40)
 	end
 
 	if giftService.CheckGift("Tough_Luck") then

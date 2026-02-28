@@ -50,7 +50,9 @@ function module.AddGift(gift)
 	end
 
 	if table.find(giftData.Catagories, "Luck") then
-		codexService.AddEntry("Luck")
+		task.spawn(function()
+			codexService.AddEntry("Luck")
+		end)
 	end
 
 	UIService.doUiAction("HUD", "AddGift", giftData.Icon, gift)

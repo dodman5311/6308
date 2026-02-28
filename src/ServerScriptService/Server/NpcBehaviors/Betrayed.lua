@@ -4,6 +4,13 @@ local Globals = require(ReplicatedStorage.Shared.Globals)
 local net = require(Globals.Packages.Net)
 local util = require(Globals.Vendor.Util)
 
+local function lowerHealth(npc)
+	if not npc.Instance:FindFirstChild("Humanoid") then
+		return
+	end
+	npc.Instance.Humanoid:TakeDamage(0.05)
+end
+
 local function onSpawn(npc)
 	net:RemoteEvent("ReplicateEffect"):FireAllClients("emitObject", "Server", true, npc.Instance.Particle.Explode)
 
@@ -23,6 +30,10 @@ local function onSpawn(npc)
 end
 
 local module = {
+	OnStep = {
+		{ Function = "Custom", Parameters = { lowerHealth } },
+	},
+
 	OnSpawned = {
 		{ Function = "Custom", Parameters = { onSpawn } },
 		{ Function = "AddTag", Parameters = { "Enemy" } },

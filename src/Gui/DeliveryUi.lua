@@ -56,14 +56,14 @@ local function connectGiftButtonHover(button)
 
 	local ti = TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
 
-	button.Parent.Size = UDim2.fromScale(0.8, 0.8)
+	button.Parent.Size = UDim2.fromScale(1, 1)
 
 	enter:Connect(function()
-		util.tween(button.Parent, ti, { Size = UDim2.fromScale(0.95, 0.95) })
+		util.tween(button.Parent, ti, { Size = UDim2.fromScale(1.25, 1.25) })
 	end)
 
 	leave:Connect(function()
-		util.tween(button.Parent, ti, { Size = UDim2.fromScale(0.8, 0.8) })
+		util.tween(button.Parent, ti, { Size = UDim2.fromScale(1, 1) })
 	end)
 end
 
@@ -101,14 +101,14 @@ local function givePerk(frame, index)
 			continue
 		end
 
-		buttonFrame.Button.Active = false
+		buttonFrame.CardMain.Button.Active = false
 	end
 
 	Signals.DoUiAction:Fire("Cursor", "Toggle", false)
 
 	local ti = TweenInfo.new(0.5, Enum.EasingStyle.Quart)
 	local title = giftsToChoose[index]
-	for i = 1, 3 do
+	for i = 1, 4 do
 		if index == i then
 			continue
 		end
@@ -156,20 +156,25 @@ function module.Init(player, ui, frame)
 
 	local choices = frame.Choices
 
-	connectGiftButtonHover(choices.Card_1.Button)
-	connectGiftButtonHover(choices.Card_2.Button)
-	connectGiftButtonHover(choices.Card_3.Button)
+	connectGiftButtonHover(choices.Card_1.CardMain.Button)
+	connectGiftButtonHover(choices.Card_2.CardMain.Button)
+	connectGiftButtonHover(choices.Card_3.CardMain.Button)
+	connectGiftButtonHover(choices.Card_4.CardMain.Button)
 
-	choices.Card_1.Button.MouseButton1Click:Connect(function()
+	choices.Card_1.CardMain.Button.MouseButton1Click:Connect(function()
 		givePerk(frame, 1)
 	end)
 
-	choices.Card_2.Button.MouseButton1Click:Connect(function()
+	choices.Card_2.CardMain.Button.MouseButton1Click:Connect(function()
 		givePerk(frame, 2)
 	end)
 
-	choices.Card_3.Button.MouseButton1Click:Connect(function()
+	choices.Card_3.CardMain.Button.MouseButton1Click:Connect(function()
 		givePerk(frame, 3)
+	end)
+
+	choices.Card_4.CardMain.Button.MouseButton1Click:Connect(function()
+		givePerk(frame, 4)
 	end)
 end
 
@@ -247,7 +252,7 @@ function module.showChoices(player, ui, frame, type)
 			continue
 		end
 
-		buttonFrame.Button.Active = true
+		buttonFrame.CardMain.Button.Active = true
 	end
 
 	local ti_0 = TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
@@ -268,9 +273,10 @@ function module.showChoices(player, ui, frame, type)
 		local perk = Gifts[type][perkName]
 
 		local card = choices:FindFirstChild("Card_" .. index)
-		card.Icon.Image = perk.Icon
-		card.Title.Text = perkName
-		card.Description.Text = perk.Desc
+		local cardMain = card.CardMain
+		cardMain.Icon.Image = perk.Icon
+		cardMain.Title.Text = perkName
+		cardMain.Description.Text = perk.Desc
 		card.Visible = true
 	end
 
@@ -332,6 +338,7 @@ function module.ShowScreen(player, ui, frame, extraSouls)
 	frame.Spin1.A1.Image = ""
 	frame.Spin2.A1.Image = ""
 	frame.Spin3.A1.Image = ""
+	frame.Spin4.A1.Image = ""
 
 	util.tween(frame.Fade, ti, { BackgroundTransparency = 0 }, false, function()
 		frame.Background.Visible = true
@@ -381,7 +388,9 @@ function module.ShowScreen(player, ui, frame, extraSouls)
 		local soulsToGive = SoulsService.Souls * deliveryAmount
 
 		if deliveryAmount > 0.5 then
-			if soulsToGive >= 6 then
+			if soulsToGive >= 8 then
+				giftCount = 4
+			elseif soulsToGive >= 6 then
 				giftCount = 3
 			elseif soulsToGive >= 4 then
 				giftCount = 2
@@ -389,7 +398,9 @@ function module.ShowScreen(player, ui, frame, extraSouls)
 				giftCount = 1
 			end
 		else
-			if soulsToGive >= 3 then
+			if soulsToGive >= 4 then
+				giftCount = 4
+			elseif soulsToGive >= 3 then
 				giftCount = 3
 			elseif soulsToGive >= 2 then
 				giftCount = 2
@@ -411,13 +422,20 @@ function module.ShowScreen(player, ui, frame, extraSouls)
 			frame.Spin1.Position = UDim2.fromScale(0.375, 0)
 			frame.Spin2.Position = UDim2.fromScale(0.625, 0)
 
-			util.tween(frame.Box, ti, { Size = UDim2.fromScale(0.225, 0.263) })
+			util.tween(frame.Box, ti, { Size = UDim2.fromScale(0.25, 0.263) })
 		elseif giftCount == 3 then
 			frame.Spin1.Position = UDim2.fromScale(0.25, 0)
 			frame.Spin2.Position = UDim2.fromScale(0.5, 0)
 			frame.Spin3.Position = UDim2.fromScale(0.75, 0)
 
 			util.tween(frame.Box, ti, { Size = UDim2.fromScale(0.315, 0.263) })
+		elseif giftCount == 4 then
+			frame.Spin1.Position = UDim2.fromScale(0.125, 0)
+			frame.Spin2.Position = UDim2.fromScale(0.375, 0)
+			frame.Spin3.Position = UDim2.fromScale(0.625, 0)
+			frame.Spin4.Position = UDim2.fromScale(0.875, 0)
+
+			util.tween(frame.Box, ti, { Size = UDim2.fromScale(0.415, 0.263) })
 		else
 			frame.Spin1.Position = UDim2.fromScale(0.5, 0)
 			frame.Box.Size = UDim2.fromScale(0.148, 0.263)

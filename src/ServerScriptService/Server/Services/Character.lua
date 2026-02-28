@@ -87,26 +87,31 @@ Players.PlayerAdded:Connect(function(player: Player)
 			part.CollisionGroup = "Player"
 		end
 
-		humanoid:SetAttribute("LogHealth", humanoid.Health)
+		local logHealth = humanoid.Health
 
 		humanoid.HealthChanged:Connect(function(health)
-			local LogHealth = humanoid:GetAttribute("LogHealth")
+			local change = health - logHealth
 
-			if humanoid.Health == humanoid.MaxHealth then
-				setInvincible(player, true)
-				task.delay(1, function()
-					setInvincible(player, false)
-				end)
-			end
+			local resistance = 1 + humanoid:GetAttribute("Resistance")
+			local armor = humanoid:GetAttribute("Armor")
 
-			if health < LogHealth then
+			if health < logHealth then
 				if humanoid:GetAttribute("IsBlocking") then
-					humanoid.Health = LogHealth
+					humanoid.Health = logHealth
 					getBlockedNerd:FireClient(player)
 				end
 
 				if humanoid:GetAttribute("Invincible") then
-					humanoid.Health = LogHealth
+					humanoid.Health = logHealth
+				end
+
+				if armor > 0 then
+					humanoid.Health = logHealth
+
+					if not humanoid:GetAttribute("IsBlocking") then
+						local newArmorAmnt = armor + (change / resistance)
+						humanoid:SetAttribute("Armor", math.floor(newArmorAmnt * 100000) / 100000)
+					end
 				end
 
 				-- elseif character:GetAttribute("HasHaven") then
@@ -117,7 +122,7 @@ Players.PlayerAdded:Connect(function(player: Player)
 				-- end
 			end
 
-			humanoid:SetAttribute("LogHealth", humanoid.Health)
+			logHealth = humanoid.Health
 
 			if humanoid.Health > 0 then
 				return
@@ -126,6 +131,11 @@ Players.PlayerAdded:Connect(function(player: Player)
 			if character:GetAttribute("Protected") then
 				humanoid.Health = humanoid.MaxHealth
 				checkProtectedEvent:FireClient(player)
+
+				setInvincible(player, true)
+				task.delay(1, function()
+					setInvincible(player, false)
+				end)
 			else
 				humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, true)
 				humanoid:ChangeState(Enum.HumanoidStateType.Dead)

@@ -160,6 +160,39 @@ local recoilSpring = spring.new(Vector3.zero)
 recoilSpring.Speed = 30
 recoilSpring.Damper = 0.45
 
+local function createDamageNumber(model, dmg)
+	if not util.getSetting("Damage Numbers").Value or not model or not model.Parent then
+		return
+	end
+
+	local lifeTime = 6
+	local newPart = Instance.new("Part")
+	newPart.Transparency = 1
+	newPart.Anchored = true
+	newPart.CanCollide = false
+	newPart.CanQuery = false
+	newPart.CanTouch = false
+	newPart.Parent = workspace
+	newPart.CFrame = model:GetPivot()
+
+	local dmgUi = assets.Gui.DamageNumber:Clone()
+	dmgUi.Parent = player.PlayerGui
+	dmgUi.Adornee = newPart
+	dmgUi.ExtentsOffset = Vector3.new(rng:NextNumber(-1, 1), 4, 0)
+	dmgUi.Amnt.Text = math.round(dmg)
+
+	Debris:AddItem(dmgUi, lifeTime)
+	Debris:AddItem(newPart, lifeTime)
+
+	local ti = TweenInfo.new(lifeTime, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+	util.tween(dmgUi, ti, { ExtentsOffset = Vector3.new(dmgUi.ExtentsOffset.X, dmgUi.ExtentsOffset.Y + 3, 0) })
+	task.delay(2, function()
+		util.tween(dmgUi.Amnt, TweenInfo.new(0.5), { TextTransparency = 1, TextStrokeTransparency = 1 })
+	end)
+
+	dmgUi.Enabled = true
+end
+
 local function getObjectInCenter(_, blacklist): Model
 	local inCenter
 	local objectsOnScreen = {}
@@ -317,27 +350,6 @@ local function playVoiceLine()
 	end
 end
 
-local function createShell(shellType: string)
-	local chamber: Part = viewmodel.Model:FindFirstChild("Chamber", true)
-	if not chamber then
-		return
-	end
-	local shell: Part = assets.Effects.Shells:FindFirstChild(shellType):Clone()
-
-	shell.Parent = workspace
-	shell.CollisionGroup = "DeadBody"
-
-	shell.CFrame = chamber.CFrame
-	shell.AssemblyLinearVelocity = (chamber.CFrame * CFrame.Angles(
-		math.rad(rng:NextNumber(5, -5)),
-		math.rad(rng:NextNumber(5, -5)),
-		math.rad(rng:NextNumber(5, -5))
-	)).LookVector * 25
-	shell.AssemblyAngularVelocity = Vector3.new(0, rng:NextNumber(-45, -20), 0)
-
-	Debris:AddItem(shell, 5)
-end
-
 local function applyUpgrades(weaponName, weaponData)
 	if not weaponData["Tiers"] then
 		return
@@ -455,6 +467,9 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 
 	animationService:stopAnimation(viewmodel.Model, "Reload", 0)
 	animationService:stopAnimation(viewmodel.Model, "ReloadOut", 0)
+
+	animationService:stopAnimation(viewmodel.Model, "ForgedArmsReload", 0)
+	animationService:stopAnimation(viewmodel.Model, "ForgedArmsReloadOut", 0)
 
 	if not weaponData.Element then
 		weaponData.Element = element
@@ -1118,7 +1133,7 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 
 		if GiftsService.CheckGift("Burn_Hell") and ChanceService.checkChance(10, true) then
 			if not sourceIsWeapon and source ~= "ThrownWeapon" then
-				net:RemoteEvent("Damage"):FireServer(model, 1, "Fire")
+				net:RemoteEvent("Damage"):FireServer(model, 0, "Fire")
 
 				if GiftsService.CheckGift("Freeze_Heaven") and ChanceService.checkChance(10, true) then
 					net:RemoteEvent("Damage"):FireServer(model, 0, "Ice")
@@ -1187,14 +1202,15 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 			return
 		end
 
+		createDamageNumber(model, totalDamage)
 		if preHealth > 0 and postHealth <= 0 then -- kill awarded
 			awardKill(model, subjectPosition)
 		end
 	end)
 
 	if GiftsService.CheckGift("Gambler's_Fallacy") then
-		ChanceService.repetitionLuck = math.clamp(ChanceService.repetitionLuck + 1, 0, 30)
-		UIService.doUiAction("HUD", "UpdateGiftProgress", "Gambler's_Fallacy", ChanceService.repetitionLuck / 30)
+		ChanceService.repetitionLuck = math.clamp(ChanceService.repetitionLuck + 1, 0, 40)
+		UIService.doUiAction("HUD", "UpdateGiftProgress", "Gambler's_Fallacy", ChanceService.repetitionLuck / 40)
 	end
 
 	if GiftsService.CheckGift("Life_Steal") and soulsService.Souls <= 1 and critMult > 1 then
@@ -2175,7 +2191,7 @@ local function ThrowWeapon()
 				local humanoid = module.dealDamage(hitCframe, hit, 2, "ThrownWeapon")
 
 				if GiftsService.CheckGift("20_Sided_Die") then
-					task.delay(0.05, function()
+					task.delay(0.1, function()
 						ChanceService.luck -= 20
 					end)
 				end
@@ -3124,12 +3140,16 @@ end)
 explosionService.explosiveHit:Connect(function(subject, preHealth, postHealth, damageDelt, source)
 	local sourceIsWeapon = module.currentWeapon and source == module.currentWeapon.Name or source == "Default"
 
+	if util.getSetting("Damage Numbers") then
+		createDamageNumber(subject, damageDelt)
+	end
+
 	if preHealth > 0 then
 		UIService.doUiAction("HUD", "ShowHit")
 
 		if GiftsService.CheckGift("Burn_Hell") and ChanceService.checkChance(10, true) then
 			if not sourceIsWeapon and source ~= "ThrownWeapon" then
-				net:RemoteEvent("Damage"):FireServer(subject, 1, "Fire")
+				net:RemoteEvent("Damage"):FireServer(subject, 0, "Fire")
 
 				if GiftsService.CheckGift("Freeze_Heaven") and ChanceService.checkChance(10, true) then
 					net:RemoteEvent("Damage"):FireServer(subject, 0, "Ice")

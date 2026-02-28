@@ -294,11 +294,14 @@ local function checkPartsInHitbox(hitbox, npc)
 		local posNy = Vector3.new(subPos.X, modPos.Y, subPos.Z)
 
 		local impulseDirection = (CFrame.lookAt(posNy, modPos + Vector3.new(0, 20, 0))).LookVector -- (subject.PrimaryPart.CFrame * CFrame.Angles(math.rad(25), 0, 0)).LookVector
-		createImpulse(model, 100, impulseDirection, 0.1)
+
+		if hitbox:HasTag("Launching") then
+			createImpulse(model, 100, impulseDirection, 0.1)
+		end
 
 		if allowedGeyserDamage then
 			allowedGeyserDamage = false
-			dealDamage(npc, humanoid, 1)
+			dealDamage(npc, humanoid, 2)
 
 			task.delay(0.5, function()
 				allowedGeyserDamage = true
@@ -631,7 +634,6 @@ local moves = {
 			local upcast = workspace:Raycast(cframe.Position, CFrame.new(0, 0, 0).UpVector * 100, rp)
 
 			if upcast then
-				warn("upcast caught")
 				continue
 			end
 
@@ -709,18 +711,21 @@ local moves = {
 			end
 		end
 
-		if npc:GetState() ~= "Dead" or not npc.Instance.Parent then
-			timer.wait(6)
-		else
-			Lighting.Ambient = Color3.fromRGB(125, 125, 125)
+		for _ = 0, 6, 0.1 do
+			if npc:GetState() == "Dead" or not npc.Instance.Parent then
+				Lighting.Ambient = Color3.fromRGB(125, 125, 125)
+				break
+			end
+
+			timer.wait(0.1)
 		end
 
-		local startPos = layers:GetPivot()
+		startPos = layers:GetPivot()
 
-		for i = 0, 1, 0.001 do
+		for i = 0, 0.5, 0.001 do
 			timer.wait(0.001)
 
-			layers:PivotTo(startPos:Lerp(logPos, i))
+			layers:PivotTo(startPos:Lerp(logPos, i * 2))
 
 			if npc:GetState() == "Dead" or not npc.Instance.Parent then
 				Lighting.Ambient = Color3.fromRGB(125, 125, 125)

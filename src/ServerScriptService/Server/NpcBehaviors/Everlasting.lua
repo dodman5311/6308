@@ -1,9 +1,9 @@
 local stats = {
 	ViewDistance = 200,
-	AttackDelay = NumberRange.new(2, 6),
+	AttackDelay = NumberRange.new(2, 5),
 	MoveDelay = NumberRange.new(2, 8),
 	AttackCharge = 0.6,
-	LeadCompensation = 750,
+	LeadCompensation = 1000,
 	AttackDistance = 30,
 
 	MeleeDistance = 15,

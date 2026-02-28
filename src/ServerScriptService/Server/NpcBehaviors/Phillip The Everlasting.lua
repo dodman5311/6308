@@ -4,18 +4,18 @@ local stats = {
 
 local WALKSPEED = 12
 local BadgeService = game:GetService("BadgeService")
+local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local Debris = game:GetService("Debris")
 
 local assets = ReplicatedStorage.Assets
 local globalSounds = assets.Sounds.EverlastingBoss
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
-local util = require(Globals.Vendor.Util)
 local animationService = require(Globals.Vendor.AnimationService)
 local timer = require(Globals.Vendor.Timer)
+local util = require(Globals.Vendor.Util)
 local weakspotService = require(Globals.Vendor.WeakspotService)
 
 local net = require(Globals.Packages.Net)
@@ -183,7 +183,7 @@ local function checkRaycast(subject: Model, origin, destination)
 	rp.FilterType = Enum.RaycastFilterType.Exclude
 	rp.FilterDescendantsInstances = { subject }
 
-	local newRay = workspace:Raycast(origin, destination, rp)
+	local newRay = workspace:Spherecast(origin, 1.5, destination, rp)
 
 	if not newRay then
 		return
@@ -440,7 +440,7 @@ local function lead(npc)
 	local distance = (targetPosition - npc.Instance:GetPivot().Position).Magnitude
 
 	if npc.Acts:checkAct(false, "leading_shot") then
-		local positionToLookAt = targetPosition + targetVelocity / 3 --2.25
+		local positionToLookAt = targetPosition + targetVelocity / 2.25
 		moveTowardsPosition(npc.Instance, positionToLookAt)
 	elseif npc.Acts:checkAct(false, "leading_shot_wdistance") then
 		local positionToLookAt = targetPosition

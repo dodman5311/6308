@@ -3,8 +3,10 @@ local module = {}
 --// Services
 local CollectionService = game:GetService("CollectionService")
 local DEBRIS = game:GetService("Debris")
+local Debris = game:GetService("Debris")
 local PLAYERS = game:GetService("Players")
 local REPLICATED_STORAGE = game:GetService("ReplicatedStorage")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 
@@ -17,6 +19,7 @@ local camera = workspace.CurrentCamera
 local effects = assets.Effects
 
 local Globals = require(REPLICATED_STORAGE.Shared.Globals)
+local Timer = require(ReplicatedStorage.Vendor.Timer)
 
 --// Modules
 local cameraShaker = require(Globals.Vendor.CameraShaker)
@@ -98,6 +101,27 @@ function module.VisageFire(model, value)
 
 		barrel.Attachment.Fire.Enabled = value
 	end
+end
+
+function module.SentinelAttack(startCFrame: CFrame)
+	local newAttack = assets.Effects.SentinelArea:Clone()
+	local ti = TweenInfo.new(0.5)
+	local ti_0 = TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.InOut)
+
+	newAttack.Transparency = 1
+
+	newAttack.A0.CFrame = CFrame.new(0, 78, 0) * CFrame.Angles(math.rad(-45), 0, 0)
+	newAttack:PivotTo(startCFrame)
+	newAttack.Parent = workspace
+	util.tween(newAttack, ti, { Transparency = 0.75 })
+
+	Timer.wait(0.8)
+	newAttack.Transparency = 1
+	newAttack.Trail.Enabled = true
+	Timer.wait(0.2)
+
+	util.tween(newAttack.A0, ti_0, { CFrame = CFrame.new(0, 78, 0) * CFrame.Angles(math.rad(45), 0, 0) })
+	Debris:AddItem(newAttack, 1)
 end
 
 function module.IndicateVisageAttack(model, color)

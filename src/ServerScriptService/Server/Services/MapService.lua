@@ -43,7 +43,7 @@ local showHitboxes = false
 local newStart
 local links = {}
 
-local leeway = 10
+local leeway = 12
 --local unitModules = {}
 local blacklistedUnits = {}
 

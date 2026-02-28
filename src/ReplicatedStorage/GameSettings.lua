@@ -116,6 +116,27 @@ local settings = {
 			hud.Enabled = self.Value
 		end,
 	},
+
+	{
+		Name = "Crosshair",
+		Type = "Boolean",
+		Value = true,
+		OnChanged = function(self)
+			local hud = playerGui:WaitForChild("HUD").Frame
+
+			local crosshair = hud.CrosshairFrame
+			local lCrosshair = hud.LeftCrosshairFrame
+
+			crosshair.Visible = self.Value
+			hud.Crosshair.Visible = self.Value
+			if self.Value then
+				lCrosshair.Image.ImageTransparency = 0.65
+			else
+				lCrosshair.Image.ImageTransparency = 1
+			end
+		end,
+	},
+
 	{
 		Name = "Notifications",
 		Type = "Boolean",
@@ -125,6 +146,13 @@ local settings = {
 
 			noti.Enabled = self.Value
 		end,
+	},
+
+	{
+		Name = "Damage Numbers",
+		Type = "Boolean",
+		Value = false,
+		OnChanged = function() end,
 	},
 
 	"Gameplay",

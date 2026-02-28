@@ -58,6 +58,9 @@ module.camShake = cameraShaker.new(Enum.RenderPriority.Camera.Value + 3, ShakeCa
 module.camShake:Start()
 
 local function PlayHitEffect()
+	if util.getSetting("Damage Feedback").Value == 0 then
+		return
+	end
 	UIService.doUiAction("HUD", "DamagePulse")
 	module.camShake:Shake(cameraShaker.Presets["Hit"])
 end
@@ -481,6 +484,13 @@ local function exitS2(extraSouls, level, stageBoss, miniBoss)
 				if soulsService.Souls < 3 then
 					soulsService.AddSoul(3 - soulsService.Souls)
 					UIService.doUiAction("HUD", "UpdateSouls", 3)
+
+					UIService.doUiAction(
+						"Notify",
+						"ShowTip",
+						[[<font color="#FF7800">Here's some souls.</font> You might need it to take this guy.]],
+						true
+					)
 				end
 			end)
 		elseif level == 2 then
@@ -488,6 +498,13 @@ local function exitS2(extraSouls, level, stageBoss, miniBoss)
 			if soulsService.Souls < 1 then
 				soulsService.AddSoul(1)
 				UIService.doUiAction("HUD", "UpdateSouls", 1)
+
+				UIService.doUiAction(
+					"Notify",
+					"ShowTip",
+					[[<font color="#FF7800">Here's a soul.</font> You might need it.]],
+					true
+				)
 			end
 
 			MusicService.playTrack(miniBoss)
@@ -502,18 +519,18 @@ local function exitS2(extraSouls, level, stageBoss, miniBoss)
 	local ti = TweenInfo.new(1, Enum.EasingStyle.Exponential)
 
 	util.tween(camera, ti, { FieldOfView = util.getSetting("Field of View").Value }, false, function()
-		if not giftService.CheckGift("Spiked_Sabatons") then
-			return
-		end
+		-- if not giftService.CheckGift("Spiked_Sabatons") then
+		-- 	return
+		-- end
 
-		for _, model in ipairs(CollectionService:GetTagged("WallrunModel")) do
-			for _, part in ipairs(model:GetChildren()) do
-				part.Transparency = 0
-				part.CanCollide = true
-				part.CanQuery = true
-				part.CanTouch = true
-			end
-		end
+		-- for _, model in ipairs(CollectionService:GetTagged("WallrunModel")) do
+		-- 	for _, part in ipairs(model:GetChildren()) do
+		-- 		part.Transparency = 0
+		-- 		part.CanCollide = true
+		-- 		part.CanQuery = true
+		-- 		part.CanTouch = true
+		-- 	end
+		-- end
 	end)
 end
 

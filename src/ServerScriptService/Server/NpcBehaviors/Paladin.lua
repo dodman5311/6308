@@ -5,8 +5,8 @@ local stats = {
 	MoveDelay = NumberRange.new(2, 8),
 	AttackCooldown = 0.2,
 	ProjectileSpeed = 200,
-	AttackAmount = 4,
-	AttackDistance = 60,
+	AttackAmount = 6,
+	AttackDistance = 65,
 
 	NpcType = "Enemy",
 }
@@ -17,7 +17,7 @@ local module = {
 
 		{ Function = "SearchForTarget", Parameters = { stats.ViewDistance } },
 		{ Function = "LookAtTarget" },
-		{ Function = "LeadTarget", Parameters = { stats.ProjectileSpeed, 1 } },
+		{ Function = "LeadTarget", Parameters = { stats.ProjectileSpeed } },
 
 		{ Function = "GetToDistance", Parameters = { stats.AttackDistance, true } },
 		{ Function = "MoveAwayFromDistance", Parameters = { 25, true } },
