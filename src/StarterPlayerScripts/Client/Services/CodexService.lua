@@ -53,7 +53,7 @@ function module.AddEntry(entryIndex: string, quiet: boolean?, doNotSave: boolean
 		module.saveCurrentCodex()
 	end
 
-	UIService.doUiAction("Notify", "AddEntry", entryIndex, isImportant)
+	signals.DoUiAction:Fire("Notify", "AddEntry", entryIndex, isImportant)
 end
 
 signals.AddEntry:Connect(module.AddEntry)

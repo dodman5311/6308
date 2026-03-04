@@ -403,6 +403,30 @@ local commands = {
 			end,
 		},
 
+		Give_All_Perks = {
+			Parameters = function()
+				return {
+					{ Name = "Perk Types", Options = { "Superior", "Inferior", "All" } },
+				}
+			end,
+
+			ExecuteClient = function(_, types)
+				local GiftsService = require(Players.LocalPlayer.PlayerScripts.Client.Services.GiftsService)
+
+				if types == "All" or types == "Superior" then
+					for index, _ in pairs(gifts.Upgrades) do
+						GiftsService.AddGift(index)
+					end
+				end
+
+				if types == "All" or types == "Inferior" then
+					for index, _ in pairs(gifts.Perks) do
+						GiftsService.AddGift(index)
+					end
+				end
+			end,
+		},
+
 		Give_Inferior = {
 
 			Parameters = function()

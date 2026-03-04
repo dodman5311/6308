@@ -408,9 +408,8 @@ This includes:
 - perk activation chances,
 - Kiosk rewards,
 - Getting perk tickets from arenas,
+- Weapon Crit chances,
 etc.
-
-In rare cases, it can also decrease the chance of bad things happening.
 
 <font color="#FF7800"><b>What do the numbers mean?:</b></font>
 Positive chances increase by the % of luck acquired.

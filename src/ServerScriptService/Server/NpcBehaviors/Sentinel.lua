@@ -50,10 +50,13 @@ local function shoot(npc)
 
 	npc.Instance.Humanoid.WalkSpeed = 0
 
-	vfx:FireAllClients("SentinelAttack", "Server", true, startCF)
+	vfx:FireAllClients("SentinelAttack", "Server", true, startCF, npc.Instance.Humanoid)
 
 	Timer.wait(1)
 	task.delay(1, function()
+		if npc:GetState() == "Dead" or npc.StatusEffects["Ice"] or npc.StatusEffects["Stun"] then
+			return
+		end
 		npc.Instance.Humanoid.WalkSpeed = 16
 	end)
 	if npc:GetState() == "Dead" or npc.StatusEffects["Ice"] or npc.StatusEffects["Stun"] then
@@ -71,7 +74,7 @@ local function shoot(npc)
 	local characterYDiff = math.abs(characterPos.Y - (startCF * CFrame.new(0, 0, -distance)).Position.Y)
 	local charYAngle = startCF.LookVector:Dot(lookAtTarget.LookVector)
 
-	if charYAngle > 0.65 and characterYDiff < 2.5 then
+	if charYAngle > 0.65 and characterYDiff < 4 then
 		target.Humanoid:TakeDamage(3)
 	end
 end

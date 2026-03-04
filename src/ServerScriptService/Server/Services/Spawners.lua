@@ -413,6 +413,11 @@ net:Connect("PickupWeapon", function(player, object)
 	object:Destroy()
 end)
 
+net:Connect("SpawnWeapon", function(_, position: Vector3)
+	local totalLevel = workspace:GetAttribute("TotalLevel")
+	print(module.placeNewObject(totalLevel, CFrame.new(position), "Weapon", nil, true))
+end)
+
 net:Handle("GetEnemies", function()
 	local enemyCFrames = {}
 

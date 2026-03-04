@@ -8,7 +8,7 @@ local function lowerHealth(npc)
 	if not npc.Instance:FindFirstChild("Humanoid") then
 		return
 	end
-	npc.Instance.Humanoid:TakeDamage(0.05)
+	npc.Instance.Humanoid:TakeDamage(0.025)
 end
 
 local function onSpawn(npc)

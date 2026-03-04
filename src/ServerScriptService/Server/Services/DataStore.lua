@@ -68,8 +68,8 @@ function module.LoadGameData(player)
 
 	module.gameState = gameState
 
-	mapService.CurrentStage = gameState["Stage"] and math.clamp(gameState["Stage"], 1, math.huge) or 1
-	mapService.CurrentLevel = gameState["Level"] and math.clamp(gameState["Level"], 1, math.huge) or 1
+	mapService.CurrentStage = math.floor(gameState["Stage"] and math.clamp(gameState["Stage"], 1, math.huge) or 1)
+	mapService.CurrentLevel = math.floor(gameState["Level"] and math.clamp(gameState["Level"], 1, math.huge) or 1)
 
 	player:SetAttribute("MaxHealth", 5)
 
@@ -80,6 +80,8 @@ function module.LoadGameData(player)
 	for upgradeName, upgradeValue in pairs(upgrades) do
 		workspace:SetAttribute(upgradeName, upgradeValue)
 	end
+
+	print(mapService.CurrentLevel, mapService.CurrentStage)
 
 	mapService.proceedToNext(nil, true)
 

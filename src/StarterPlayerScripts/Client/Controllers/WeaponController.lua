@@ -1,11 +1,12 @@
 local module = {
 	defaultMagSize = 16,
+	purity = 0,
 	HasHitMachine = false,
 	critChances = {
-		AR = 0,
-		Pistol = 0,
-		Shotgun = 0,
-		Melee = 0,
+		AR = 1,
+		Pistol = 1,
+		Shotgun = 1,
+		Melee = 1,
 	},
 }
 
@@ -148,17 +149,21 @@ local currentSlot = 1
 local hitHumanoids = {}
 
 local lockTimer = weaponTimer:new("LockOn")
-local grenadeLockTimer = weaponTimer:new("LockOn")
 local lockGuis = {}
 
 local fireTimer = Timer:new("FireDelay", 0)
 local isPaused = false
 
---// Function
+local increaseFireRate = Timer:new("IncreasedFireRate", 1)
+
+local currentShields = nil
+local iSevenBlocks = 0
 
 local recoilSpring = spring.new(Vector3.zero)
 recoilSpring.Speed = 30
 recoilSpring.Damper = 0.45
+
+--// Function
 
 local function createDamageNumber(model, dmg)
 	if not util.getSetting("Damage Numbers").Value or not model or not model.Parent then
@@ -418,6 +423,11 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 	newWeapon.Parent = viewmodel.Model
 
 	weaponData = require(newWeapon.Data)
+
+	if GiftsService.CheckGift("Dead_Bolt") and weaponData.Effect == "Ballistic" then
+		UIService.doUiAction("HUD", "AssignDeadbolt", newWeapon)
+	end
+
 	applyUpgrades(weaponName, weaponData)
 
 	UIService.doUiAction("HUD", "SetCrosshair", crosshairs[weaponData.Crosshair])
@@ -506,6 +516,10 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 	acts:removeAct("Equipping")
 end
 
+local function addPurity(value: number)
+	return math.ceil((value * 0.05) * module.purity)
+end
+
 local function EquipDefault(ignoreAmmo)
 	module.CloseDeadBolt()
 	UIService.doUiAction("HUD", "hideReload")
@@ -517,7 +531,7 @@ local function EquipDefault(ignoreAmmo)
 
 	UIService.doUiAction("HUD", "SetCrosshair", crosshairs.Default, true)
 
-	--fireTimer:Complete()
+	fireTimer:Complete()
 
 	if not defaultWeapon then
 		if workspace:GetAttribute("CleanseAndRepent_Tier") >= 3 then
@@ -534,11 +548,15 @@ local function EquipDefault(ignoreAmmo)
 
 	defaultWeapon.Parent = viewmodel.Model
 
+	if GiftsService.CheckGift("Dead_Bolt") then
+		UIService.doUiAction("HUD", "AssignDeadbolt", defaultWeapon)
+	end
+
 	if ignoreAmmo then
 		return
 	end
 
-	module.UpdateAmmo(module.defaultMagSize)
+	module.UpdateAmmo(module.defaultMagSize + addPurity(module.defaultMagSize))
 	signals.WeaponEquipped:Fire("Cleanse & Repent")
 end
 
@@ -604,6 +622,8 @@ local function ReloadDefault()
 		reloadTime *= 1.2
 	end
 
+	reloadTime *= 1 + (0.05 * module.purity)
+
 	local reloadAnimationName = ""
 
 	if currentAmmo <= 0 then
@@ -645,8 +665,10 @@ local function ReloadDefault()
 		DashController.fillDashes()
 	end
 
+	module.purity = math.max(module.purity - 1, 0)
+
 	UIService.doUiAction("HUD", "reload", 0)
-	module.UpdateAmmo(module.defaultMagSize)
+	module.UpdateAmmo(module.defaultMagSize + addPurity(module.defaultMagSize))
 
 	module.UpdateSlot()
 end
@@ -756,6 +778,14 @@ local function dropAmmo(position)
 
 	local ammoDrop = dropService.CreateDrop(position, "Ammo")
 	UiAnimationService.PlayAnimation(ammoDrop.UI.Frame, 0.045, true)
+end
+
+local function dropLuck(position)
+	if not module.currentWeapon or not GiftsService.CheckGift("Field_Clover") or not ChanceService.checkChance(5) then
+		return
+	end
+
+	dropService.CreateDrop(position, "Luck")
 end
 
 local function addToCombo(amount)
@@ -900,6 +930,7 @@ local function awardKill(model: Model, position)
 	end
 
 	dropAmmo(position)
+	dropLuck(position)
 	signals.AddEntry:Fire(model.Name)
 
 	if
@@ -908,6 +939,7 @@ local function awardKill(model: Model, position)
 		and ChanceService.checkChance(10, true)
 	then
 		soulsService.DropSoul(position, 1000)
+		UIService.doUiAction("HUD", "ActivateGift", "Returned_Change")
 	end
 
 	if
@@ -916,6 +948,17 @@ local function awardKill(model: Model, position)
 		and ChanceService.checkChance(10, true)
 	then
 		dropService.CreateDrop(position, "Armor")
+		UIService.doUiAction("HUD", "ActivateGift", "Aggressive_Forgery")
+	end
+
+	if GiftsService.CheckGift("Barrel_Hunt") and ChanceService.checkChance(10, true) then
+		net:RemoteEvent("SpawnEnemy"):FireServer("ExplosiveBarrel", position)
+		UIService.doUiAction("HUD", "ActivateGift", "Barrel_Hunt")
+	end
+
+	if GiftsService.CheckGift("Lootr") and ChanceService.checkChance(5, true) then
+		net:RemoteEvent("SpawnWeapon"):FireServer(position)
+		UIService.doUiAction("HUD", "ActivateGift", "Lootr")
 	end
 end
 
@@ -966,6 +1009,7 @@ local function getCritChance(source, chanceToAdd)
 		chance = module.critChances[weaponData.Type] + chanceToAdd
 	elseif source == "Default" then
 		chance = module.critChances.Pistol + chanceToAdd
+		chance += addPurity(chance)
 	end
 
 	local critTimer = Timer:getTimer("BrickHookCritChance")
@@ -1042,6 +1086,10 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		module.HasHitMachine = true
 	end
 
+	if GiftsService.CheckGift("Strong_Arm") and source == "ThrownWeapon" and ChanceService.checkChance(30, true) then
+		damage += 1
+	end
+
 	if
 		GiftsService.CheckGift("Open_Wounds")
 		and ChanceService.checkChance(10, true)
@@ -1051,10 +1099,20 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		createFakeWeakpoint(model, subject, cframe.Position)
 	end
 
+	if GiftsService.CheckGift("Fury") and ChanceService.checkChance(40, true) and humanoid.MaxHealth > 50 then
+		damage += 1
+	end
+
 	local weakspotDamage = WeakspotService.doWeakspotHit(subject)
 	local isImmune = checkImmunity(model, source)
 
 	if weakspotDamage > 0 then
+		if GiftsService.CheckGift("Refined_Marksman") then
+			UIService.doUiAction("HUD", "ActivateGift", "Refined_Marksman")
+			UIService.doUiAction("HUD", "CooldownGift", "Refined_Marksman", 1)
+			increaseFireRate:Run()
+			increaseFireRate:Reset()
+		end
 		ComboService.RestartTimer()
 	end
 
@@ -1115,9 +1173,14 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 
 		if humanoid.Health > 0 then
 			UIService.doUiAction("HUD", "ShowHit", critMult > 1)
+
+			if GiftsService.CheckGift("Scathed_Syphon") and ChanceService.checkChance(35, true) then
+				net:RemoteEvent("Damage"):FireServer(player.Character, -1)
+				UIService.doUiAction("HUD", "ActivateGift", "Scathed_Syphon")
+			end
 		end
 
-		if ChanceService.checkChance(chanceOverride or 50, true) then
+		if element and ChanceService.checkChance(chanceOverride or 50, true) then
 			codexService.AddEntry("Elements")
 
 			if GiftsService.CheckGift("Freeze_Heaven") and ChanceService.checkChance(10, true) then
@@ -1643,6 +1706,8 @@ local function FireDefault(extraBullet)
 	local recoilVector = Vector3.new(0, 0.3, 0)
 	local recoilMagnitude = workspace:GetAttribute("CleanseAndRepent_Tier") >= 1 and 0.75 or 1
 
+	recoilMagnitude /= 1 + (0.05 * module.purity)
+
 	if defaultIndex == 0 then
 		UIService.doUiAction("HUD", "PumpCrosshair")
 		task.wait(0.03)
@@ -1689,17 +1754,20 @@ local function FireDefault(extraBullet)
 	if acts:checkAct("OverchargeActive") then
 		fireTimer.WaitTime /= 1.5
 	end
-	fireTimer:Run()
 
+	fireTimer.WaitTime /= 1 + (0.05 * module.purity)
+
+	if increaseFireRate.IsRunning then
+		fireTimer.WaitTime /= 1.15
+	end
+
+	fireTimer:Run()
 	fireTimer.OnEnded:Wait()
 
 	if currentAmmo <= 0 then
 		ReloadDefault()
 	end
 end
-
-local currentShields = nil
-local iSevenBlocks = 0
 
 local function createISevenShieldEffect()
 	if currentShields then
@@ -1903,6 +1971,9 @@ function module.Fire()
 		return
 	end
 
+	module.purity = math.max(module.purity - 1, 0)
+	UIService.doUiAction("HUD", "UpdateGiftProgress", "Untouched", module.purity / 20)
+
 	UIService.doUiAction("HUD", "PumpCrosshair")
 
 	local bulletDamage = weaponData.Damage
@@ -2075,6 +2146,11 @@ function module.Fire()
 	end
 
 	fireTimer.WaitTime = acts:checkAct("OverchargeActive") and weaponData.FireDelay / 1.5 or weaponData.FireDelay
+
+	if increaseFireRate.IsRunning then
+		fireTimer.WaitTime /= 1.15
+	end
+
 	fireTimer:Run()
 
 	fireTimer.OnEnded:Wait()
@@ -2301,6 +2377,11 @@ function module.Throw(outOfAmmo, dontSwitchToDefault)
 	)
 
 	animation.Ended:Wait()
+
+	if GiftsService.CheckGift("Untouched") then
+		module.purity = math.min(module.purity + 1, 20)
+		UIService.doUiAction("HUD", "UpdateGiftProgress", "Untouched", module.purity / 20)
+	end
 
 	if not dontSwitchToDefault then
 		EquipDefault()
@@ -2685,10 +2766,10 @@ end
 
 function module.OnDied()
 	module.critChances = {
-		AR = 0,
-		Pistol = 0,
-		Shotgun = 0,
-		Melee = 0,
+		AR = 1,
+		Pistol = 1,
+		Shotgun = 1,
+		Melee = 1,
 	}
 
 	mouseButton1Down = false
@@ -2936,6 +3017,28 @@ local function flyingKick()
 	end)
 end
 
+local coinTimer = Timer:new("CoinFlip", 30, function()
+	if ChanceService.checkChance(50) then
+		ChanceService.luck += 50
+		UIService.doUiAction("HUD", "FlipCoin", "Heads")
+		UIService.doUiAction("HUD", "ActivateGift", "Jade_Coin")
+
+		Timer.wait(5)
+		ChanceService.luck = math.max(ChanceService.luck - 50, 0)
+	else
+		task.delay(1, function()
+			addToCombo(10)
+		end)
+
+		UIService.doUiAction("HUD", "FlipCoin", "Tails")
+		UIService.doUiAction("HUD", "ActivateGift", "Jade_Coin")
+	end
+end)
+
+coinTimer.OnTimerStepped:Connect(function(progress)
+	UIService.doUiAction("HUD", "UpdateGiftProgress", "Jade_Coin", progress / coinTimer.WaitTime)
+end)
+
 UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
 	if gameProcessedEvent or isPaused then
 		return
@@ -3061,8 +3164,8 @@ RunService.Heartbeat:Connect(function()
 		acts:createTempAct("Firing", module.Fire, conditions)
 	end
 
-	if gKeyDown and GiftsService.CheckGift("Mag_Launcher") then
-		--grenadeLockOn()
+	if GiftsService.CheckGift("Jade_Coin") then
+		coinTimer:Run()
 	end
 end)
 
@@ -3119,6 +3222,8 @@ end)
 net:Connect("StartExitSequence", function()
 	mouseButton1Down = false
 end)
+
+net:Connect("AwardKill", awardKill)
 
 signals.PauseGame:Connect(function()
 	isPaused = true
@@ -3211,6 +3316,18 @@ GiftsService.OnGiftAdded:Connect(function(gift)
 		UIService.doUiAction("HUD", "ShowOvercharge", true)
 		UIService.doUiAction("HUD", "UpdateOvercharge", 1, true)
 	end
+
+	if gift == "Dead_Bolt" then
+		if module.currentWeapon and weaponData.Effect == "Ballistic" then
+			UIService.doUiAction("HUD", "AssignDeadbolt", module.currentWeapon)
+		elseif not module.currentWeapon then
+			UIService.doUiAction("HUD", "AssignDeadbolt", defaultWeapon)
+		end
+	end
+
+	if gift == "Jade_Coin" then
+		lastCoinFlip = os.clock()
+	end
 end)
 
 GiftsService.OnGiftRemoved:Connect(function(gift)
@@ -3225,6 +3342,9 @@ GiftsService.OnGiftRemoved:Connect(function(gift)
 	end
 	if gift == "Dead_Bolt" then
 		module.CloseDeadBolt()
+	end
+	if gift == "Untouched" then
+		module.purity = 0
 	end
 end)
 

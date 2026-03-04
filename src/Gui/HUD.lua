@@ -9,6 +9,7 @@ local UserInputService = game:GetService("UserInputService")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
+local UIAnimationService = require(ReplicatedStorage.Vendor.UIAnimationService)
 local camera = workspace.CurrentCamera
 
 local assets = ReplicatedStorage.Assets
@@ -827,9 +828,37 @@ end
 function module.CooldownDeadBolt(player, ui, frame, cooldownTime)
 	local deadBoltUi = frame.DeadBoltReticle
 	local ti = TweenInfo.new(cooldownTime, Enum.EasingStyle.Linear)
+	local ti_Rot = TweenInfo.new(cooldownTime / 2, Enum.EasingStyle.Linear)
 
 	deadBoltUi.Cooldown.Size = UDim2.fromScale(0, 1)
 	util.tween(deadBoltUi.Cooldown, ti, { Size = UDim2.fromScale(0.28, 1) })
+
+	local left = ui.DeadBoltIndicator.Gui.Left.Image
+	local right = ui.DeadBoltIndicator.Gui.Right.Image
+
+	left.UIGradient.Rotation = 180
+	right.UIGradient.Rotation = 180
+	left.ImageColor3 = Color3.new(1, 1, 1)
+	right.ImageColor3 = Color3.new(1, 1, 1)
+
+	util.tween(left.UIGradient, ti_Rot, { Rotation = 0 }, false, function()
+		util.tween(right.UIGradient, ti_Rot, { Rotation = 0 }, true)
+		left.ImageColor3 = Color3.fromRGB(255, 225, 0)
+		right.ImageColor3 = Color3.fromRGB(255, 225, 0)
+	end)
+end
+
+function module.AssignDeadbolt(player, ui, frame, weaponModel)
+	local firePart = weaponModel:FindFirstChild("FirePart", true)
+	print("A")
+	if not firePart then
+		return
+	end
+
+	print("YES")
+
+	ui.DeadBoltIndicator.Gui.Adornee = firePart
+	print(ui.DeadBoltIndicator.Parent, ui.DeadBoltIndicator.Adornee)
 end
 
 function module.ToggleGrappleIndicator(player, ui, frame, value)
@@ -882,6 +911,48 @@ function module.ShowSoulChanceMult(player, ui, frame, value, show)
 	frame.Flame.Visible = show
 
 	frame.Souls.Mult.Text = "X" .. math.round(value) .. " Chance"
+end
+
+function module.FlipCoin(player, ui, frame, side)
+	local newCoin = frame.CoinFlip:Clone()
+	newCoin.Parent = frame.Frame
+	newCoin.Visible = true
+
+	UIAnimationService.PlayAnimation(newCoin, 0.015, true)
+
+	util.PlaySound(sounds.CoinFlip, script)
+
+	local ti = TweenInfo.new(1)
+	local ti_0 = TweenInfo.new(0.5, Enum.EasingStyle.Circular, Enum.EasingDirection.Out, 0, true)
+	local ti_1 = TweenInfo.new(0.25, Enum.EasingStyle.Back)
+	local ti_2 = TweenInfo.new(0.15)
+	local ti_3 = TweenInfo.new(0.5)
+
+	util.tween(newCoin, ti_0, { Position = UDim2.fromScale(0.2, 0.5) })
+	util.tween(newCoin.Image, ti, { ImageTransparency = 1 }, false, function()
+		task.wait()
+
+		local t = 1
+
+		if side == "Heads" then
+			newCoin.Face.Image = "rbxassetid://105793013061150"
+			t = 5
+		else
+			newCoin.Face.Image = "rbxassetid://89390814327476"
+		end
+
+		newCoin.Position = UDim2.fromScale(0.2, 0.55)
+		util.tween(newCoin, ti_1, { Size = UDim2.fromScale(0.2, 0.2) })
+		util.tween(newCoin, ti_1, { Size = UDim2.fromScale(0.2, 0.2) })
+		util.tween(newCoin.Face, ti_2, { ImageTransparency = 0 }, true)
+		task.wait(t)
+		util.tween(newCoin.Face, ti_3, { ImageTransparency = 1 }, true)
+
+		newCoin:Destroy()
+	end)
+
+	-- combo = rbxassetid://89390814327476
+	-- luck = rbxassetid://105793013061150
 end
 
 return module

@@ -103,7 +103,7 @@ function module.VisageFire(model, value)
 	end
 end
 
-function module.SentinelAttack(startCFrame: CFrame)
+function module.SentinelAttack(startCFrame: CFrame, humanoid)
 	local newAttack = assets.Effects.SentinelArea:Clone()
 	local ti = TweenInfo.new(0.5)
 	local ti_0 = TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.InOut)
@@ -113,15 +113,21 @@ function module.SentinelAttack(startCFrame: CFrame)
 	newAttack.A0.CFrame = CFrame.new(0, 78, 0) * CFrame.Angles(math.rad(-45), 0, 0)
 	newAttack:PivotTo(startCFrame)
 	newAttack.Parent = workspace
-	util.tween(newAttack, ti, { Transparency = 0.75 })
+	Debris:AddItem(newAttack, 2)
+	util.tween(newAttack, ti, { Transparency = 0 })
 
 	Timer.wait(0.8)
+	if not humanoid or humanoid.Health <= 0 then
+		return
+	end
 	newAttack.Transparency = 1
 	newAttack.Trail.Enabled = true
 	Timer.wait(0.2)
+	if not humanoid or humanoid.Health <= 0 then
+		return
+	end
 
 	util.tween(newAttack.A0, ti_0, { CFrame = CFrame.new(0, 78, 0) * CFrame.Angles(math.rad(45), 0, 0) })
-	Debris:AddItem(newAttack, 1)
 end
 
 function module.IndicateVisageAttack(model, color)

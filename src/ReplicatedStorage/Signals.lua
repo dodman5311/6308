@@ -16,6 +16,7 @@ local signals = {
 	Jump = signal.new(),
 	Slide = signal.new(),
 	AddArmor = signal.new(),
+	AddLuck = signal.new(),
 	LoadSavedDataFromClient = signal.new(),
 	DoUiAction = signal.new(),
 }

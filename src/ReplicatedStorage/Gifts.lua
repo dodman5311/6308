@@ -137,9 +137,34 @@ local module = {
 			Catagories = { "Arsenal" },
 			Desc = "Gibbing enemies now deals 1 point of splash damage.",
 		},
+
+		Fury = { -- NEW Add @visual effect
+			Icon = "rbxassetid://71409350218402",
+			Catagories = { "Arsenal" },
+			Desc = "You now have a chance to deal +1 Damage to bosses. (40% chance)",
+		},
+
+		Strong_Arm = { -- NEW
+			Icon = "rbxassetid://71409350218402",
+			Catagories = { "Arsenal" },
+			Desc = "Thrown weapons now have a 30% chance to deal +1 damage.",
+		},
+
+		Refined_Marksman = { -- NEW
+			Icon = "rbxassetid://71409350218402",
+			Catagories = { "Arsenal" },
+			Desc = "When a weak point is hit, your fire rate will now increase by 15% for 1 second.",
+		},
+
+		Venom = { -- NEW
+			Icon = "rbxassetid://71409350218402",
+			Catagories = { "Arsenal" },
+			Desc = "Enemies afflicted with an element now take 1 damage every 5 seconds.",
+		},
 	},
 
 	Upgrades = {
+
 		Unearthly_Metal = {
 			Icon = "rbxassetid://17590259063",
 			Catagories = { "Soul" },
@@ -277,6 +302,63 @@ local module = {
 		-- 	Catagories = { "Soul" },
 		-- 	Desc = "When hit, you now gain 1 second of invincibility.",
 		-- },
+
+		Untouched = {
+			Icon = "rbxassetid://16275507396", -- NEW
+			Catagories = { "Arsenal" },
+			Desc = [[Throwing weapons now gives a stack of Purity. 
+Each stack of Purity improves all stats for Cleanse & Repent by 5%. 
+Firing a picked up weapon or reloading removes 1 stack of Purity
+(Stacks 20 times)]],
+		},
+
+		Blueberry_Currant = {
+			Icon = "rbxassetid://16275507396", -- NEW
+			Catagories = { "Arsenal" },
+			Desc = [[Taking armor damage now has a chance to create an electric explosion around you. (20% chance)]],
+		},
+
+		Barrel_Hunt = {
+			Icon = "rbxassetid://16275507396", -- NEW
+			Catagories = { "Arsenal" },
+			Desc = [[Killing an enemy has a chance to spawn a barrel on top of them. (10% chance)]],
+		},
+
+		Lootr = {
+			Icon = "rbxassetid://16275507396", -- NEW
+			Catagories = { "Tactical" },
+			Desc = [[Killing an enemy now has a chance to drop a weapon. (5% chance)]],
+		},
+
+		Over_Stocked = {
+			Icon = "rbxassetid://16275507396", -- NEW
+			Catagories = { "Tactical" },
+			Desc = [[Vending Machines have +1 use.]],
+		},
+
+		Scathed_Syphon = {
+			Icon = "rbxassetid://16275507396", -- NEW
+			Catagories = { "Soul" },
+			Desc = [[Hitting a soul afflicted enemy has a chance to heal you. (35% chance)]],
+		},
+
+		Jade_Coin = {
+			Icon = "rbxassetid://125862275635959", -- NEW
+			Catagories = { "Luck" },
+			Desc = [[Every 30 seconds, a coin will now be flipped. Heads = +50 luck for 5 seconds. Tails = +10 combo.]],
+		},
+
+		Field_Clover = { -- NEW
+			Icon = "rbxassetid://17590259063",
+			Catagories = { "Luck" },
+			Desc = "Killing enemies now have a chance to drop Luck (5% chance, unaffected by Luck)",
+		},
+
+		Go_Big = {
+			Icon = "rbxassetid://16275507396", -- NEW Add @visual effect
+			Catagories = { "Luck" },
+			Desc = [[Delivering 0 souls now gives you +50 Luck. Added Luck is removed when souls are delivered.]],
+		},
 
 		Sierra_6308 = {
 			Icon = "rbxassetid://16442104214",

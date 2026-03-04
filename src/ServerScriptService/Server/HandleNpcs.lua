@@ -21,13 +21,13 @@ local Npcs = {}
 local rng = Random.new()
 
 --// Modules
-local NpcActions = require(Globals.Server.NpcActions)
-local SimplePath = require(Globals.Packages.SimplePath)
 local Acts = require(Globals.Vendor.Acts)
-local Timer = require(Globals.Vendor.Timer)
 local AnimationService = require(Globals.Vendor.AnimationService)
-local janitor = require(Globals.Packages.Janitor)
+local NpcActions = require(Globals.Server.NpcActions)
 local Signals = require(Globals.Shared.Signals)
+local SimplePath = require(Globals.Packages.SimplePath)
+local Timer = require(Globals.Vendor.Timer)
+local janitor = require(Globals.Packages.Janitor)
 
 local net = require(Globals.Packages.Net)
 local lessHealth = false
@@ -118,7 +118,7 @@ local function doAction(action, npc, ...)
 	end
 
 	if not action["IgnoreEventParams"] then
-		for _, parameter in ipairs({ ... }) do
+		for _, parameter in ipairs { ... } do
 			table.insert(parameters, parameter)
 		end
 	end
@@ -411,7 +411,7 @@ function module.new(NPCType)
 			humanoid.Health = humanoid.MaxHealth
 		end
 
-		if moreHealth and humanoid.MaxHealth ~= 50 and self.Instance:HasTag("Enemy") then
+		if moreHealth and string.match(self.Instance.Name, "Vending") then
 			humanoid.MaxHealth += 1
 			humanoid.Health = humanoid.MaxHealth
 		end
@@ -573,38 +573,53 @@ net:Connect("ResumeGame", function()
 end)
 
 net:Connect("GiftAdded", function(_, gift)
-	if gift ~= "“Do you like hurting?”" then
-		return
-	end
+	if gift == "“Do you like hurting?”" then
+		lessHealth = true
 
-	lessHealth = true
-
-	for _, Npc in ipairs(CollectionService:GetTagged("Enemy")) do
-		local humanoid = Npc:WaitForChild("Humanoid")
-		if not humanoid then
-			continue
-		end
-
-		if humanoid.MaxHealth > 1 then
-			humanoid.MaxHealth = math.clamp(math.floor(humanoid.MaxHealth - 1), 1, math.huge)
-
-			if humanoid.Health > humanoid.MaxHealth then
-				humanoid.Health = humanoid.MaxHealth
+		for _, Npc in ipairs(CollectionService:GetTagged("Enemy")) do
+			local humanoid = Npc:WaitForChild("Humanoid")
+			if not humanoid then
+				continue
 			end
+
+			if humanoid.MaxHealth > 1 then
+				humanoid.MaxHealth = math.clamp(math.floor(humanoid.MaxHealth - 1), 1, math.huge)
+
+				if humanoid.Health > humanoid.MaxHealth then
+					humanoid.Health = humanoid.MaxHealth
+				end
+			end
+		end
+	elseif gift == "Over_Stocked" then
+		moreHealth = true
+
+		for _, Npc in ipairs(CollectionService:GetTagged("Npc")) do
+			local humanoid = Npc:WaitForChild("Humanoid")
+			if not humanoid or not string.match(Npc.Name, "Vending") then
+				continue
+			end
+
+			humanoid.MaxHealth += 1
+			humanoid.Health = humanoid.MaxHealth
 		end
 	end
 end)
 
 net:Connect("GiftRemoved", function(_, gift)
-	if gift ~= "“Do you like hurting?”" then
-		return
+	if gift == "“Do you like hurting?”" then
+		lessHealth = false
+	elseif gift == "Over_Stocked" then
+		moreHealth = false
 	end
-	lessHealth = false
 end)
 
 net:Connect("SpawnVictim", function(_, target)
 	module.new("Victim"):Spawn(target:GetPivot().Position)
 	target:Destroy()
+end)
+
+net:Connect("SpawnEnemy", function(_, enemyName: string, atPosition: Vector3)
+	module.new(enemyName):Spawn(atPosition)
 end)
 
 net:Connect("BlindEnemy", function(_, enemy)

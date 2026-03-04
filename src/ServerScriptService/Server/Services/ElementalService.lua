@@ -5,34 +5,40 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 
-local npcHandler = require(Globals.Server.HandleNpcs)
 local net = require(Globals.Packages.Net)
+local npcHandler = require(Globals.Server.HandleNpcs)
 local vfx = net:RemoteEvent("ReplicateEffect")
 local doUiAction = net:RemoteEvent("DoUiAction")
 local signals = require(Globals.Signals)
 
 net:RemoteEvent("ApplyElement")
+local awardKill = net:RemoteEvent("AwardKill")
+
+local doDamage = false
 
 local elements = require(Globals.Shared.Elements)
 
 local function runElementDamage(player, timer, npcModel, elementName)
-	if
-		player:GetAttribute("UpgradeName") ~= "Brick Oven"
-		or elementName == "Soul"
-		or npcModel:GetAttribute(elementName)
-	then
+	if not doDamage or npcModel:GetAttribute(elementName) then
 		return
 	end
 
-	local lastStepTime = 0
+	local nextTimeInTimer = 0
+
 	timer.OnTimerStepped:Connect(function(currentTimeInTimer)
-		if math.floor(currentTimeInTimer) ~= lastStepTime then
+		if nextTimeInTimer < currentTimeInTimer then
 			local humanoid = npcModel:FindFirstChild("Humanoid")
+			local position = npcModel:GetPivot().Position
+
 			humanoid:TakeDamage(1)
 			doUiAction:FireAllClients("HUD", "ShowHit")
-		end
 
-		lastStepTime = math.floor(currentTimeInTimer)
+			if humanoid.Health <= 0 then
+				awardKill:FireAllClients(npcModel, position)
+			end
+
+			nextTimeInTimer = currentTimeInTimer + 1
+		end
 	end)
 end
 
@@ -55,7 +61,6 @@ function module.applyElement(player, npcModel, elementName)
 
 	local elementTimer = npc:GetTimer(elementName)
 	elementTimer.WaitTime = element.time
-
 	runElementDamage(player, elementTimer, npcModel, elementName)
 
 	npc.Instance:SetAttribute(elementName, true)
@@ -76,6 +81,18 @@ function module.applyElement(player, npcModel, elementName)
 		vfx:FireAllClients("RemoveElementalEffect", "Server", true, elementName, npcModel)
 	end
 end
+
+net:Connect("GiftAdded", function(_, gift)
+	if gift == "Venom" then
+		doDamage = true
+	end
+end)
+
+net:Connect("GiftRemoved", function(_, gift)
+	if gift == "Venom" then
+		doDamage = false
+	end
+end)
 
 net:Connect("ApplyElement", module.applyElement)
 

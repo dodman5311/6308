@@ -8,6 +8,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local StarterGui = game:GetService("StarterGui")
+local StarterPlayer = game:GetService("StarterPlayer")
 local lighting = game:GetService("Lighting")
 
 --// Instances
@@ -27,6 +28,7 @@ local ViewmodelService = require(Globals.Vendor.ViewmodelService)
 local cameraShaker = require(Globals.Vendor.CameraShaker)
 local codexService = require(Globals.Client.Services.CodexService)
 local comboService = require(Globals.Client.Services.ComboService)
+local explosionService = require(Globals.Client.Services.ExplosionService)
 local giftService = require(Globals.Client.Services.GiftsService)
 local kiosk = require(ReplicatedStorage.Gui.Kiosk)
 local net = require(Globals.Packages.Net)
@@ -37,6 +39,7 @@ local weaponService = require(Globals.Client.Controllers.WeaponController)
 
 --// Values
 local logHealth = 0
+local logArmor = 0
 local collectedBlood = 0
 local isPaused = false
 local lastOnGroundPosition = Vector3.zero
@@ -95,10 +98,10 @@ local function loadSaveData(upgradeIndex, gameState)
 
 	weaponService.critChances = gameState["critChances"]
 		or {
-			AR = 0,
-			Pistol = 0,
-			Shotgun = 0,
-			Melee = 0,
+			AR = 1,
+			Pistol = 1,
+			Shotgun = 1,
+			Melee = 1,
 		}
 
 	ChanceService.luck = gameState["Luck"] or 0
@@ -147,6 +150,7 @@ function module:OnSpawn(character, humanoid)
 	rootPart:WaitForChild("Swimming"):Destroy()
 
 	logHealth = humanoid.Health
+	logArmor = humanoid:GetAttribute("Armor")
 
 	humanoid:GetAttributeChangedSignal("Armor"):Connect(function()
 		UIService.doUiAction(
@@ -156,6 +160,24 @@ function module:OnSpawn(character, humanoid)
 			humanoid:GetAttribute("MaxArmor"),
 			true
 		)
+
+		local armor = humanoid:GetAttribute("Armor")
+
+		if armor < logArmor and giftService.CheckGift("Blueberry_Currant") then
+			explosionService.createExplosion(
+				character:GetPivot().Position,
+				30,
+				1,
+				Player,
+				nil,
+				"Elemental",
+				"Electricity",
+				20
+			)
+			UIService.doUiAction("HUD", "ActivateGift", "Blueberry_Currant")
+		end
+
+		logArmor = armor
 	end)
 
 	humanoid.HealthChanged:Connect(function(health)
@@ -566,6 +588,11 @@ end
 signals.LoadSavedDataFromClient:Connect(loadSaveData)
 
 signals.PauseGame:Connect(function()
+	if not isPaused then
+		net:RemoteEvent("PauseGame"):FireServer()
+		isPaused = true
+	end
+
 	local character = Player.Character
 
 	if not character then
@@ -586,6 +613,11 @@ signals.PauseGame:Connect(function()
 end)
 
 signals.ResumeGame:Connect(function()
+	if isPaused then
+		net:RemoteEvent("ResumeGame"):FireServer()
+		isPaused = false
+	end
+
 	local character = Player.Character
 
 	if not character then
@@ -620,25 +652,8 @@ net:Connect("ArenaEnd", function(result)
 	UIService.doUiAction("Notify", "ArenaComplete", ChanceService.checkChance(15, true), result)
 end)
 
-signals.PauseGame:Connect(function()
-	if isPaused then
-		return
-	end
-
-	net:RemoteEvent("PauseGame"):FireServer()
-	isPaused = true
-end)
-
-signals.ResumeGame:Connect(function()
-	if not isPaused then
-		return
-	end
-
-	net:RemoteEvent("ResumeGame"):FireServer()
-	isPaused = false
-end)
-
 local UserInputService = game:GetService("UserInputService")
+local ExplosionService = require(StarterPlayer.StarterPlayerScripts.Client.Services.ExplosionService)
 
 net:Connect("OpenKiosk", function()
 	UIService.doUiAction("Kiosk", "ShowScreen", soulsService.Souls)

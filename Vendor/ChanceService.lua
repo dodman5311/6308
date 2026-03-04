@@ -12,6 +12,7 @@ local player = Players.LocalPlayer
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local Net = require(Globals.Packages.Net)
+local Signals = require(ReplicatedStorage.Shared.Signals)
 local UIService = require(Globals.Client.Services.UIService)
 local comboService = require(Globals.Client.Services.ComboService)
 local giftService = require(Globals.Client.Services.GiftsService)
@@ -99,6 +100,10 @@ function module.checkChance(chance, goodLuck, PureLuck)
 
 	return false
 end
+
+Signals.AddLuck:Connect(function()
+	module.luck += 1
+end)
 
 Net:RemoteFunction("CheckChance").OnClientInvoke = function(chance, goodLuck)
 	return module.checkChance(chance, goodLuck)
