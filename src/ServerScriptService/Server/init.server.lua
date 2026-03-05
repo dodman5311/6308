@@ -9,13 +9,6 @@ local Promise = require(Globals.Packages.Promise)
 local Signals = require(Globals.Signals)
 local net = require(Globals.Packages.Net)
 
-local allSignals = {
-	"GenerateMap",
-	"NpcHeartbeat",
-	"ProceedToNextLevel",
-	"StartArena",
-}
-
 net:RemoteEvent("ReplicateEffect")
 net:RemoteEvent("Damage")
 net:RemoteEvent("DropSoul")
@@ -57,11 +50,6 @@ end)
 net:Connect("ResumeGame", function()
 	workspace:SetAttribute("GamePaused", false)
 end)
-
-for _, signal in ipairs(allSignals) do
-	Signals:addSignal(signal)
-end
-
 local function InitModules()
 	local inits = {}
 

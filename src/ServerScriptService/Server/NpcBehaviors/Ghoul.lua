@@ -12,6 +12,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local effects = ReplicatedStorage.Assets.Effects
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
+local Timer = require(ReplicatedStorage.Vendor.Timer)
 local animationService = require(Globals.Vendor.AnimationService)
 local net = require(Globals.Packages.Net)
 local util = require(Globals.Vendor.Util)
@@ -49,7 +50,7 @@ local function swing(npc, distance)
 
 	util.PlaySound(npc.Instance.PrimaryPart.Attack, npc.Instance.PrimaryPart, 0.1)
 
-	task.wait(0.3)
+	Timer.wait(0.3)
 
 	if npc:GetState() == "Dead" or npc.StatusEffects["Ice"] or npc.StatusEffects["Stun"] then
 		return
@@ -98,7 +99,7 @@ local function attackPlayer(npc)
 	npc.Instance.Parent = game
 	vfx:FireAllClients("GhoulTeleport", "Server", true, npc.Instance:GetPivot().Position)
 
-	task.wait(1)
+	Timer.wait(1)
 
 	local npcModel = npc.Instance
 	npcModel.Parent = workspace

@@ -139,27 +139,63 @@ local module = {
 		},
 
 		Fury = { -- NEW Add @visual effect
-			Icon = "rbxassetid://71409350218402",
+			Icon = "rbxassetid://107770224135384",
 			Catagories = { "Arsenal" },
-			Desc = "You now have a chance to deal +1 Damage to bosses. (40% chance)",
+			Desc = "You now have a chance to deal +1 Damage to bosses. (50% chance)",
 		},
 
 		Strong_Arm = { -- NEW
-			Icon = "rbxassetid://71409350218402",
+			Icon = "rbxassetid://98895268978593",
 			Catagories = { "Arsenal" },
 			Desc = "Thrown weapons now have a 30% chance to deal +1 damage.",
 		},
 
 		Refined_Marksman = { -- NEW
-			Icon = "rbxassetid://71409350218402",
+			Icon = "rbxassetid://108189020578438",
 			Catagories = { "Arsenal" },
 			Desc = "When a weak point is hit, your fire rate will now increase by 15% for 1 second.",
 		},
 
 		Venom = { -- NEW
-			Icon = "rbxassetid://71409350218402",
+			Icon = "rbxassetid://89988398167332",
 			Catagories = { "Arsenal" },
 			Desc = "Enemies afflicted with an element now take 1 damage every 5 seconds.",
+		},
+
+		Gun_Point = { -- NEW Add @visual effect
+			Icon = "rbxassetid://125410874774878",
+			Catagories = { "Tactical" },
+			Desc = "You can now press “throw” after throwing a weapon, to place a fast travel point at the thrown weapon's location.",
+		},
+
+		Five_Finger_Discount = { -- NEW
+			Icon = "rbxassetid://94244295423781",
+			Catagories = { "Tactical" },
+			Desc = "When buying Qiosk's Daily Deal, there is now a chance to duplicate one of the received items. (25% chance)",
+		},
+
+		Uber_Charge = { -- NEW
+			Icon = "rbxassetid://78432246351384",
+			Catagories = { "Soul" },
+			Desc = "Killing an Electrified enemy now has a chance to drop armor. (15% chance)",
+		},
+
+		Burnt_Pizza = { -- NEW
+			Icon = "rbxassetid://85012921998215",
+			Catagories = { "Soul" },
+			Desc = "Killing a Soul afflicted enemy now has a chance to drop a soul. (5% chance)",
+		},
+
+		Lucky_Lemon = { -- NEW
+			Icon = "rbxassetid://88642284882795",
+			Catagories = { "Luck" },
+			Desc = "Killing a Soul afflicted enemy now gives +5 luck. (stacks 5 times, lasts for the entire level)",
+		},
+
+		Hollow_Health = { -- NEW
+			Icon = "rbxassetid://123774405871463",
+			Catagories = { "Soul" },
+			Desc = "When a health point is lost, it can now be recovered if no damage is taken within a short period of time. (5 seconds)",
 		},
 	},
 
@@ -216,7 +252,7 @@ local module = {
 		Life_Steal = {
 			Icon = "rbxassetid://18671291054",
 			Catagories = { "Soul" },
-			Desc = "When at 1 Soul or less, crits will now heal you.",
+			Desc = "Crits now have a chance to heal you. (35% chance)",
 		},
 
 		Open_Wounds = {
@@ -303,8 +339,8 @@ local module = {
 		-- 	Desc = "When hit, you now gain 1 second of invincibility.",
 		-- },
 
-		Untouched = {
-			Icon = "rbxassetid://16275507396", -- NEW
+		Purity = {
+			Icon = "rbxassetid://115778770388552", -- NEW
 			Catagories = { "Arsenal" },
 			Desc = [[Throwing weapons now gives a stack of Purity. 
 Each stack of Purity improves all stats for Cleanse & Repent by 5%. 
@@ -313,33 +349,33 @@ Firing a picked up weapon or reloading removes 1 stack of Purity
 		},
 
 		Blueberry_Currant = {
-			Icon = "rbxassetid://16275507396", -- NEW
+			Icon = "rbxassetid://90818851202897", -- NEW
 			Catagories = { "Arsenal" },
 			Desc = [[Taking armor damage now has a chance to create an electric explosion around you. (20% chance)]],
 		},
 
 		Barrel_Hunt = {
-			Icon = "rbxassetid://16275507396", -- NEW
+			Icon = "rbxassetid://139675312407633", -- NEW
 			Catagories = { "Arsenal" },
 			Desc = [[Killing an enemy has a chance to spawn a barrel on top of them. (10% chance)]],
 		},
 
 		Lootr = {
-			Icon = "rbxassetid://16275507396", -- NEW
+			Icon = "rbxassetid://118788050722629", -- NEW
 			Catagories = { "Tactical" },
 			Desc = [[Killing an enemy now has a chance to drop a weapon. (5% chance)]],
 		},
 
 		Over_Stocked = {
-			Icon = "rbxassetid://16275507396", -- NEW
+			Icon = "rbxassetid://74413501667673", -- NEW
 			Catagories = { "Tactical" },
 			Desc = [[Vending Machines have +1 use.]],
 		},
 
 		Scathed_Syphon = {
-			Icon = "rbxassetid://16275507396", -- NEW
+			Icon = "rbxassetid://98422611616100", -- NEW
 			Catagories = { "Soul" },
-			Desc = [[Hitting a soul afflicted enemy has a chance to heal you. (35% chance)]],
+			Desc = [[Hitting a soul afflicted enemy now heals you for 1 HP.]],
 		},
 
 		Jade_Coin = {
@@ -349,15 +385,15 @@ Firing a picked up weapon or reloading removes 1 stack of Purity
 		},
 
 		Field_Clover = { -- NEW
-			Icon = "rbxassetid://17590259063",
+			Icon = "rbxassetid://132842636191716",
 			Catagories = { "Luck" },
-			Desc = "Killing enemies now have a chance to drop Luck (5% chance, unaffected by Luck)",
+			Desc = "Killing enemies now have a chance to drop 2 Luck (5% chance, unaffected by Luck)",
 		},
 
 		Go_Big = {
-			Icon = "rbxassetid://16275507396", -- NEW Add @visual effect
+			Icon = "rbxassetid://130636991365536", -- NEW Add @visual effect
 			Catagories = { "Luck" },
-			Desc = [[Delivering 0 souls now gives you +50 Luck. Added Luck is removed when souls are delivered.]],
+			Desc = [[Delivering 0 souls now gives you +50 Luck. Added Luck is removed when souls are delivered.]], -- Every missing point of max health now gives +50 luck.
 		},
 
 		Sierra_6308 = {
@@ -488,11 +524,11 @@ If an enemy is inflicted with an element, 3 - 4 armor will drop.
 (1 second parry time, 1.5 second cooldown)]],
 		},
 
-		Ultra_Slayer = {
-			Icon = "rbxassetid://16275507396",
-			Catagories = { "Arsenal" },
-			Desc = "You can now perform a parrying punch attack. (Right click to melee)",
-		},
+		-- Ultra_Slayer = {
+		-- 	Icon = "rbxassetid://16275507396",
+		-- 	Catagories = { "Arsenal" },
+		-- 	Desc = "You can now perform a parrying punch attack. (Right click to melee)",
+		-- },
 	},
 }
 

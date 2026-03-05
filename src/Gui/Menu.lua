@@ -841,6 +841,7 @@ local mapIconIds = {
 	Exit = "16872427753",
 	Kiosk = "16874460885",
 	Start = "77987180697847",
+	GunPoint = "77987180697847",
 	Player = "125265901862813",
 	Arena = "",
 	Elite = "120818331765177",
@@ -919,6 +920,8 @@ local function loadMapIcons(frame, map)
 			table.insert(activeMapIcons, createTeleportIcon(frame, model, mapIconIds.Start))
 		elseif model.Name == "Kiosk" and model:GetAttribute("Discovered") then
 			table.insert(activeMapIcons, createTeleportIcon(frame, model, mapIconIds.Kiosk))
+		elseif model.Name == "GunPoint" then
+			table.insert(activeMapIcons, createTeleportIcon(frame, model, mapIconIds.GunPoint))
 		end
 	end
 end
@@ -1009,6 +1012,9 @@ local function loadMap(player, frame)
 				else
 					v.Color = Color3.fromRGB(255, 0, 255)
 				end
+			elseif v:FindFirstAncestor("GunPoint") then
+				v.Material = Enum.Material.Neon
+				v.Color = Color3.new(1)
 			else
 				v.Color = Color3.fromRGB(255, 200, 0)
 			end
@@ -1079,7 +1085,7 @@ local function loadMap(player, frame)
 		playerPart.CFrame = player.Character:GetPivot() * CFrame.Angles(math.rad(90), 0, 0)
 		playerPart.Parent = map
 
-		table.insert(activeMapIcons, createDisplayIcon(frame, playerPart, mapIconIds.Player, "You"))
+		--table.insert(activeMapIcons, createDisplayIcon(frame, playerPart, mapIconIds.Player, "You"))
 	end
 
 	map.Parent = viewport

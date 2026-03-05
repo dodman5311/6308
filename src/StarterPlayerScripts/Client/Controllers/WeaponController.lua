@@ -951,6 +951,27 @@ local function awardKill(model: Model, position)
 		UIService.doUiAction("HUD", "ActivateGift", "Aggressive_Forgery")
 	end
 
+	if
+		GiftsService.CheckGift("Uber_Charge")
+		and model:GetAttribute("Electricity")
+		and ChanceService.checkChance(15, true)
+	then
+		dropService.CreateDrop(position, "Armor")
+		UIService.doUiAction("HUD", "ActivateGift", "Uber_Charge")
+	end
+
+	if model:GetAttribute("Soul") then
+		if GiftsService.CheckGift("Burnt_Pizza") and ChanceService.checkChance(5, true) then
+			soulsService.DropSoul(position, 1000)
+			UIService.doUiAction("HUD", "ActivateGift", "Burnt_Pizza")
+		end
+
+		if GiftsService.CheckGift("Lucky_Lemon") then
+			ChanceService.luckyFiveStacks = math.min(ChanceService.luckyFiveStacks + 1, 5)
+			UIService.doUiAction("HUD", "ActivateGift", "Lucky_Lemon")
+		end
+	end
+
 	if GiftsService.CheckGift("Barrel_Hunt") and ChanceService.checkChance(10, true) then
 		net:RemoteEvent("SpawnEnemy"):FireServer("ExplosiveBarrel", position)
 		UIService.doUiAction("HUD", "ActivateGift", "Barrel_Hunt")
@@ -1099,7 +1120,7 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		createFakeWeakpoint(model, subject, cframe.Position)
 	end
 
-	if GiftsService.CheckGift("Fury") and ChanceService.checkChance(40, true) and humanoid.MaxHealth > 50 then
+	if GiftsService.CheckGift("Fury") and ChanceService.checkChance(50, true) and humanoid.MaxHealth > 50 then
 		damage += 1
 	end
 
@@ -1174,7 +1195,7 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		if humanoid.Health > 0 then
 			UIService.doUiAction("HUD", "ShowHit", critMult > 1)
 
-			if GiftsService.CheckGift("Scathed_Syphon") and ChanceService.checkChance(35, true) then
+			if GiftsService.CheckGift("Scathed_Syphon") then
 				net:RemoteEvent("Damage"):FireServer(player.Character, -1)
 				UIService.doUiAction("HUD", "ActivateGift", "Scathed_Syphon")
 			end
@@ -1276,7 +1297,7 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		UIService.doUiAction("HUD", "UpdateGiftProgress", "Gambler's_Fallacy", ChanceService.repetitionLuck / 40)
 	end
 
-	if GiftsService.CheckGift("Life_Steal") and soulsService.Souls <= 1 and critMult > 1 then
+	if GiftsService.CheckGift("Life_Steal") and ChanceService.checkChance(35, true) and critMult > 1 then
 		net:RemoteEvent("Damage"):FireServer(player.Character, -1)
 		UIService.doUiAction("HUD", "ActivateGift", "Life_Steal")
 	end
@@ -1972,7 +1993,7 @@ function module.Fire()
 	end
 
 	module.purity = math.max(module.purity - 1, 0)
-	UIService.doUiAction("HUD", "UpdateGiftProgress", "Untouched", module.purity / 20)
+	UIService.doUiAction("HUD", "UpdateGiftProgress", "Purity", module.purity / 20)
 
 	UIService.doUiAction("HUD", "PumpCrosshair")
 
@@ -2353,6 +2374,28 @@ function module.SwitchToSlot(slotNumber)
 end
 
 function module.Throw(outOfAmmo, dontSwitchToDefault)
+	if
+		not module.currentWeapon
+		and GiftsService.CheckGift("Gun_Point")
+		and #CollectionService:GetTagged("ThrownWeapon") > 0
+	then
+		local thrownWeapon = CollectionService:GetTagged("ThrownWeapon")[1]
+
+		local map = ReplicatedStorage:FindFirstChild("Map")
+		local gunPoint = map:FindFirstChild("GunPoint")
+
+		if not gunPoint then
+			gunPoint = ReplicatedStorage.GunPoint:Clone()
+			gunPoint.Parent = map
+		end
+
+		gunPoint:PivotTo(CFrame.new(thrownWeapon:GetPivot().Position) * CFrame.Angles(math.rad(180), 0, 0))
+	end
+
+	if not module.currentWeapon then
+		return
+	end
+
 	if not outOfAmmo and acts:checkAct("Throwing") then
 		return
 	end
@@ -2378,9 +2421,9 @@ function module.Throw(outOfAmmo, dontSwitchToDefault)
 
 	animation.Ended:Wait()
 
-	if GiftsService.CheckGift("Untouched") then
+	if GiftsService.CheckGift("Purity") then
 		module.purity = math.min(module.purity + 1, 20)
-		UIService.doUiAction("HUD", "UpdateGiftProgress", "Untouched", module.purity / 20)
+		UIService.doUiAction("HUD", "UpdateGiftProgress", "Purity", module.purity / 20)
 	end
 
 	if not dontSwitchToDefault then
@@ -2774,6 +2817,7 @@ function module.OnDied()
 
 	mouseButton1Down = false
 	overchargeValue.Value = 0
+	ChanceService.luckyFiveStacks = 0
 
 	if defaultWeapon then
 		defaultWeapon:Destroy()
@@ -3105,7 +3149,7 @@ UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
 		end
 	end
 
-	if (input.KeyCode == Enum.KeyCode.X or input.KeyCode == Enum.KeyCode.ButtonB) and module.currentWeapon then
+	if input.KeyCode == Enum.KeyCode.X or input.KeyCode == Enum.KeyCode.ButtonB then
 		module.Throw()
 	end
 
@@ -3343,7 +3387,7 @@ GiftsService.OnGiftRemoved:Connect(function(gift)
 	if gift == "Dead_Bolt" then
 		module.CloseDeadBolt()
 	end
-	if gift == "Untouched" then
+	if gift == "Purity" then
 		module.purity = 0
 	end
 end)

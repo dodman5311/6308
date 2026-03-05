@@ -461,6 +461,18 @@ function module.Init(player, ui, frame)
 		exit(frame)
 	end)
 
+	local mult = frame.DailyDeal.Deal.Mult
+
+	local startColor = Color3.fromRGB(255, 247, 0)
+	local endColor = Color3.fromRGB(0, 255, 255)
+
+	mult.TextColor3 = startColor
+	util.tween(
+		mult,
+		TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut, -1, true),
+		{ TextColor3 = endColor }
+	)
+
 	frame.UseDOTD.MouseButton1Click:Connect(function()
 		if SoulsService.Souls < dailyDealCost or dealSold then
 			return
@@ -475,6 +487,28 @@ function module.Init(player, ui, frame)
 
 		for _, giftTable in ipairs(dailyDeal) do
 			module.applyGiftChange(giftTable[1])
+		end
+
+		if GiftsService.CheckGift("Five_Finger_Discount") and chanceService.checkChance(25, true) then
+			local index = math.random(1, 4)
+			local giftTable = dailyDeal[index]
+			module.applyGiftChange(giftTable[1])
+
+			local iconImageIndex = frame.DailyDeal.Deal:FindFirstChild("A" .. index)
+
+			mult.Position = iconImageIndex.Position
+			mult.Transparency = 1
+			mult.UIStroke.Transparency = 1
+			mult.Size = UDim2.fromScale(1, 1)
+			mult.Rotation = 0
+
+			util.tween(
+				mult,
+				TweenInfo.new(0.5, Enum.EasingStyle.Back),
+				{ Size = UDim2.fromScale(0.75, 0.75), Rotation = -15, TextTransparency = 0 }
+			)
+
+			util.tween(mult.UIStroke, TweenInfo.new(0.5, Enum.EasingStyle.Back), { Transparency = 0 })
 		end
 
 		module.UpdateSouls(player, ui, frame, math.round(SoulsService.Souls))
@@ -608,6 +642,9 @@ function module.ShowScreen(player, ui, frame, playerSouls)
 	if not dealSold then
 		frame.DealSold.TextTransparency = 1
 		frame.DealSold.UIStroke.Transparency = 1
+
+		frame.DailyDeal.Deal.Mult.Transparency = 1
+		frame.DailyDeal.Deal.Mult.UIStroke.Transparency = 1
 	end
 
 	frame.DealCost.Text = "-" .. dailyDealCost

@@ -17,16 +17,22 @@ local signals = {
 	Slide = signal.new(),
 	AddArmor = signal.new(),
 	AddLuck = signal.new(),
+	AddSoul = signal.new(),
 	LoadSavedDataFromClient = signal.new(),
 	DoUiAction = signal.new(),
+
+	DoWeaponAction = signal.new(),
+	RemoveSoul = signal.new(),
+	ClearGifts = signal.new(),
+	AddAmmo = signal.new(),
+	PauseGame = signal.new(),
+	ResumeGame = signal.new(),
+	AddTicket = signal.new(),
+
+	GenerateMap = signal.new(),
+	NpcHeartbeat = signal.new(),
+	ProceedToNextLevel = signal.new(),
+	StartArena = signal.new(),
 }
-
-function signals:addSignal(index)
-	self[index] = signal.new(index)
-end
-
-function signals:removeSignal(index)
-	self[index] = nil
-end
 
 return signals

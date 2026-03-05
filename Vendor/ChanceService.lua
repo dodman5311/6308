@@ -1,6 +1,7 @@
 local module = {
 	luck = 0,
 	repetitionLuck = 0,
+	luckyFiveStacks = 0,
 	airluck = false,
 }
 local rng = Random.new()
@@ -47,6 +48,7 @@ function module.getLuck()
 		result += (humanoid.MaxHealth - humanoid.Health) * 5
 	end
 
+	result += module.luckyFiveStacks * 5
 	result += module.repetitionLuck
 
 	return result
@@ -102,7 +104,7 @@ function module.checkChance(chance, goodLuck, PureLuck)
 end
 
 Signals.AddLuck:Connect(function()
-	module.luck += 1
+	module.luck += 2
 end)
 
 Net:RemoteFunction("CheckChance").OnClientInvoke = function(chance, goodLuck)

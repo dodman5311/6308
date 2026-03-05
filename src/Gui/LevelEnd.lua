@@ -7,6 +7,7 @@ local StarterGui = game:GetService("StarterGui")
 local UserInputService = game:GetService("UserInputService")
 
 --// Instances
+local ChanceService = require(ReplicatedStorage.Vendor.ChanceService)
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local camera = workspace.CurrentCamera
 
@@ -139,6 +140,8 @@ end
 function module.Cleanup(player, ui, frame) end
 
 function module.ShowLevelEnd(player, ui, frame, levelData)
+	ChanceService.luckyFiveStacks = 0
+
 	if SoulsService.Souls == 0 and workspace:GetAttribute("Souls_Tier") >= 1 then
 		Signals.AddSoul:Fire(1)
 	end

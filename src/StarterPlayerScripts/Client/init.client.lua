@@ -11,21 +11,6 @@ local signals = require(Globals.Signals)
 
 local player = Players.LocalPlayer
 
-local allSignals = {
-	"DoWeaponAction",
-	"AddSoul",
-	"RemoveSoul",
-	"ClearGifts",
-	"AddAmmo",
-	"PauseGame",
-	"ResumeGame",
-	"AddTicket",
-}
-
-for _, signal in ipairs(allSignals) do
-	signals:addSignal(signal)
-end
-
 local function connectOnSpawn(mod, character)
 	local humanoid = character:WaitForChild("Humanoid")
 

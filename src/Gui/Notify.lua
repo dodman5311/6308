@@ -125,7 +125,7 @@ function module.ShowTip(player, ui, frame, tip: string, showOnce: boolean?, cond
 	UiAnimator.PlayAnimation(frame.TipFrame.Tip.DravIcon, 0.1, true)
 
 	util.tween(frame.TipFrame.Tip, ti, { Position = UDim2.fromScale(0, 0) })
-	task.delay(5, function()
+	task.delay(10, function()
 		util.tween(frame.TipFrame.Tip, ti, { Position = UDim2.fromScale(0, -1) })
 	end)
 end

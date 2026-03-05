@@ -9,6 +9,7 @@ local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local StarterGui = game:GetService("StarterGui")
 local StarterPlayer = game:GetService("StarterPlayer")
+local UserInputService = game:GetService("UserInputService")
 local lighting = game:GetService("Lighting")
 
 --// Instances
@@ -23,6 +24,7 @@ local Acts = require(Globals.Vendor.Acts)
 local ChanceService = require(Globals.Vendor.ChanceService)
 local DropService = require(ReplicatedStorage.Shared.DropService)
 local MusicService = require(Globals.Client.Services.MusicService)
+local Timer = require(ReplicatedStorage.Vendor.Timer)
 local UIService = require(Globals.Client.Services.UIService)
 local ViewmodelService = require(Globals.Vendor.ViewmodelService)
 local cameraShaker = require(Globals.Vendor.CameraShaker)
@@ -114,6 +116,16 @@ local function loadSaveData(upgradeIndex, gameState)
 	giftService.UpgradeIndex = upgradeIndex
 end
 
+local hollowHealthTimer = Timer:new("HollowHealth", 5, function()
+	local character = Player.Character
+	if not character then
+		return
+	end
+
+	net:RemoteEvent("Damage"):FireServer(Player.Character, -1)
+	UIService.doUiAction("HUD", "ActivateGift", "Hollow_Health")
+end)
+
 function module:OnSpawn(character, humanoid)
 	DropService.ClearDrops()
 
@@ -195,6 +207,11 @@ function module:OnSpawn(character, humanoid)
 
 			if giftService.CheckGift("Lead_Vampire") and ChanceService.checkChance(10, true) then
 				weaponService.AddAmmo(1)
+			end
+
+			if giftService.CheckGift("Hollow_Health") then
+				hollowHealthTimer:Cancel()
+				hollowHealthTimer:Run()
 			end
 
 			PlayHitEffect()
@@ -651,9 +668,6 @@ end)
 net:Connect("ArenaEnd", function(result)
 	UIService.doUiAction("Notify", "ArenaComplete", ChanceService.checkChance(15, true), result)
 end)
-
-local UserInputService = game:GetService("UserInputService")
-local ExplosionService = require(StarterPlayer.StarterPlayerScripts.Client.Services.ExplosionService)
 
 net:Connect("OpenKiosk", function()
 	UIService.doUiAction("Kiosk", "ShowScreen", soulsService.Souls)

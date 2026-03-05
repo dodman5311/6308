@@ -9,6 +9,7 @@ local UserInputService = game:GetService("UserInputService")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
+local Signals = require(ReplicatedStorage.Shared.Signals)
 local UIAnimationService = require(ReplicatedStorage.Vendor.UIAnimationService)
 local camera = workspace.CurrentCamera
 
@@ -31,6 +32,7 @@ grappleIncicatorSpring.Speed = 10
 local frameDelay = 0.045
 local targetEnemy = Instance.new("ObjectValue")
 local rCoinsCount = Instance.new("IntValue")
+local sFuckFartCount = Instance.new("IntValue")
 local boss
 local rng = Random.new()
 
@@ -112,6 +114,9 @@ function module.HideRCoins(player, ui, frame)
 end
 
 function module.ShowReqExit(player, ui, frame, coinCount)
+	local soulAdd = math.floor(coinCount / 100)
+	Signals.AddSoul:Fire(soulAdd)
+
 	frame.Flash.BackgroundTransparency = 0
 
 	local ti_0 = TweenInfo.new(3, Enum.EasingStyle.Quart, Enum.EasingDirection.In)
@@ -119,12 +124,19 @@ function module.ShowReqExit(player, ui, frame, coinCount)
 	local ti_2 = TweenInfo.new(2)
 
 	rCoinsCount.Value = coinCount
+	sFuckFartCount.Value = 0
 
 	if coinCount > 0 then
 		frame.CenterCoins.Visible = true
 		frame.CenterCoins.Coins.Image.ImageTransparency = 0
 		frame.CenterCoins.Count.TextTransparency = 0
 		frame.CenterCoins.Count.UIStroke.Transparency = 0
+
+		frame.CenterSouls.Visible = true
+		frame.CenterSouls.Image.ImageTransparency = 0
+		frame.CenterSouls.Count.TextTransparency = 0
+		frame.CenterSouls.Count.UIStroke.Transparency = 0
+		frame.CenterSouls.Position = UDim2.fromScale(0.15, 0.775)
 	end
 
 	util.tween(frame.Flash, ti_0, { BackgroundTransparency = 1 }, false, function()
@@ -132,13 +144,20 @@ function module.ShowReqExit(player, ui, frame, coinCount)
 			return
 		end
 
+		util.tween(sFuckFartCount, ti_1, { Value = soulAdd })
 		util.tween(rCoinsCount, ti_1, { Value = 0 }, true)
 
 		util.tween(frame.CenterCoins.Coins.Image, ti_2, { ImageTransparency = 1 })
 		util.tween(frame.CenterCoins.Count, ti_2, { TextTransparency = 1 })
-		util.tween(frame.CenterCoins.Count.UIStroke, ti_2, { Transparency = 1 }, true)
+		util.tween(frame.CenterCoins.Count.UIStroke, ti_2, { Transparency = 1 })
+
+		util.tween(frame.CenterSouls, ti_1, { Position = frame.Souls.Position })
+		util.tween(frame.CenterSouls.Image, ti_2, { ImageTransparency = 1 })
+		util.tween(frame.CenterSouls.Count, ti_2, { TextTransparency = 1 })
+		util.tween(frame.CenterSouls.Count.UIStroke, ti_2, { Transparency = 1 }, true)
 
 		frame.CenterCoins.Visible = false
+		frame.CenterSouls.Visible = false
 	end)
 
 	module.HideRCoins(player, ui, frame)
@@ -181,6 +200,10 @@ function module.Init(player, ui, frame)
 
 	rCoinsCount.Changed:Connect(function(a0: number)
 		frame.CenterCoins.Count.Text = a0
+	end)
+
+	sFuckFartCount.Changed:Connect(function(a0: number)
+		frame.CenterSouls.Count.Text = a0
 	end)
 
 	targetEnemy.Changed:Connect(function(value)
@@ -338,18 +361,42 @@ local function updateHealthBar(health, maxHealth, bar, noAnim, isArmor)
 			end
 		end
 
+		local healthLog = unit:FindFirstChild("HealthLog")
+
 		if i <= math.ceil(health) then
 			UiAnimator.StopAnimation(unit)
 			unit.Image.Position = UDim2.fromScale(0, 0)
 			unit:SetAttribute("IsEmpty", false)
+
+			if healthLog then
+				unit.HealthLog.Visible = false
+			end
 		elseif not unit:GetAttribute("IsEmpty") then
 			unit:SetAttribute("IsEmpty", true)
+
+			print(GiftsService.CheckGift("Hollow_Health"), healthLog)
+			if GiftsService.CheckGift("Hollow_Health") and healthLog then
+				unit.HealthLog.Visible = true
+
+				healthLog.UIGradient.Offset = Vector2.new(0, 1)
+				util.tween(
+					healthLog.UIGradient,
+					TweenInfo.new(5, Enum.EasingStyle.Linear),
+					{ Offset = Vector2.new(0, 0) },
+					false,
+					function()
+						healthLog.Visible = false
+					end
+				)
+			end
 
 			if noAnim then
 				unit.Image.Position = UDim2.fromScale(-3, -1)
 			else
 				UiAnimator.PlayAnimation(unit, frameDelay, false, true)
 			end
+		elseif healthLog then
+			unit.HealthLog.Visible = false
 		end
 	end
 end
