@@ -73,15 +73,13 @@ function module.LoadGameData(player)
 
 	player:SetAttribute("MaxHealth", 5)
 
-	workspace:SetAttribute("TotalScore", storedScore)
-	workspace:SetAttribute("StoredScore", totalScore)
+	workspace:SetAttribute("TotalScore", totalScore)
+	workspace:SetAttribute("StoredScore", storedScore)
 	workspace:SetAttribute("DeathCount", deathCount)
 
 	for upgradeName, upgradeValue in pairs(upgrades) do
 		workspace:SetAttribute(upgradeName, upgradeValue)
 	end
-
-	print(mapService.CurrentLevel, mapService.CurrentStage)
 
 	mapService.proceedToNext(nil, true)
 
@@ -90,7 +88,6 @@ function module.LoadGameData(player)
 end
 
 function module.getStageState()
-	print(module.gameState)
 	return module.gameState
 end
 
@@ -122,12 +119,6 @@ function module.saveGameState(player, gameState)
 	SaveToStore(player, storedScore, workspace:GetAttribute("StoredScore"))
 
 	print("Game saved in", os.clock() - startTime, gameState)
-
-	--if gameState.Level == 1 then
-	--SaveToStore(player, DataStoreService:GetDataStore("PlayerStageState"), gameState)
-	--module.stageState = gameState
-	--print("STAGE saved in", os.clock() - startTime, gameState)
-	--end
 
 	net:RemoteEvent("DoUiAction"):FireAllClients("Notify", "GameSaved")
 end

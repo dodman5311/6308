@@ -153,6 +153,7 @@ local function createAttackAt(npc, position, hasSound)
 	end
 
 	local effect = effects.GravityAttack:Clone()
+	effect.Area:AddTag("DamageZone")
 	npc.Janitor:Add(effect)
 	effect.Parent = workspace
 	effect:PivotTo(CFrame.new(raycast.Position) * CFrame.Angles(0, 0, math.rad(90)))
@@ -270,6 +271,8 @@ local function shootRock(npc, i)
 	local newRock = effects.RockProjectile:Clone()
 	local ti = TweenInfo.new(0.5, Enum.EasingStyle.Back)
 
+	Debris:AddItem(newRock, 3.8)
+
 	newRock.Parent = workspace
 	npc.Janitor:Add(newRock)
 	util.PlaySound(util.getRandomChild(rockUp), newRock)
@@ -280,12 +283,17 @@ local function shootRock(npc, i)
 
 	util.tween(newRock, ti, { CFrame = newRock.CFrame * CFrame.new(0, 8, 0) }, true)
 
-	newRock.ChargedLaser.Enabled = true
+	local chargedLaser = newRock and newRock:FindFirstChild("ChargedLaser")
+
+	if chargedLaser then
+		newRock.ChargedLaser.Enabled = true
+	end
 
 	timer.wait(0.8)
-	Debris:AddItem(newRock, 3)
 
-	newRock.ChargedLaser.Enabled = false
+	if chargedLaser then
+		newRock.ChargedLaser.Enabled = false
+	end
 
 	local rp = RaycastParams.new()
 	rp.FilterType = Enum.RaycastFilterType.Exclude

@@ -20,18 +20,6 @@ local viewModel = require(Globals.Vendor.ViewmodelService)
 
 local util = require(Globals.Vendor.Util)
 
-local function createRaycastRig()
-	if not player.Character then
-		return
-	end
-
-	module.topDown = Instance.new("Attachment")
-	module.topDown.Parent = player.Character.PrimaryPart
-	module.topDown.Position = Vector3.new(0, 2.5, 0)
-
-	module.topAcross = CFrame.new(0, 2.5, 1)
-end
-
 local function grabLedge(goalCFrame)
 	if acts:checkAct("ledgeGrab") or not player.Character then
 		return
@@ -98,15 +86,17 @@ local function run()
 
 	local goalCF = startCF.Rotation * CFrame.new(0, 1, -0.5) + downOrigin
 
+	local endPositionCheckRay =
+		workspace:Spherecast((goalCF * CFrame.new(0, -2.5, 0)).Position, 1, Vector3.new(0, 5, 0), rp)
+	if endPositionCheckRay then
+		return false
+	end
+
 	--instances.AlignPosition.Position = goalCF.Position
 	--instances.ControllerManager.FacingDirection = startCF.LookVector
 
 	grabLedge(goalCF)
 	return true
-end
-
-function module:OnSpawn()
-	createRaycastRig()
 end
 
 rs.Heartbeat:Connect(run) --castRays)

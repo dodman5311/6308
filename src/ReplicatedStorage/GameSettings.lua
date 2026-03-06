@@ -104,6 +104,24 @@ local settings = {
 		end,
 	},
 
+	{
+		Name = "Enemy Highlights",
+		Type = "Boolean",
+		Value = true,
+		OnChanged = function(self)
+			workspace.Enemies.Highlight.Enabled = self.Value
+		end,
+	},
+
+	{
+		Name = "Destructible Highlights",
+		Type = "Boolean",
+		Value = true,
+		OnChanged = function(self)
+			workspace.Destructables.Highlight.Enabled = self.Value
+		end,
+	},
+
 	"Interface",
 
 	{

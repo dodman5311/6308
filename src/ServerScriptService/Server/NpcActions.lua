@@ -970,6 +970,14 @@ function module.RemoveWithDelay(npc, delay, doFade)
 	end)
 end
 
+function module.DropSoul(npc, amount)
+	amount = (amount or 1)
+
+	for _ = 1, amount do
+		Net:RemoteEvent("DropSoul"):FireAllClients(npc.Instance:GetPivot().Position, 1000)
+	end
+end
+
 function module.SetLeader(npc, leader)
 	npc["Leader"] = leader
 end

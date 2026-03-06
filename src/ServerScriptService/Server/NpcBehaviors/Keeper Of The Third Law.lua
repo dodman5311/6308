@@ -411,8 +411,6 @@ local function doAttack(npc)
 		list = { attacks[4] }
 	end
 
-	print(list)
-
 	list[math.random(1, #list)](npc)
 end
 

@@ -146,7 +146,7 @@ function module.AddSoul(amount)
 	module.Souls += math.round(amount)
 	UIService.doUiAction("HUD", "UpdateSouls", module.Souls)
 
-	if GiftsService.CheckGift("Steel_Souls") and ChanceService.checkChance(20, true) then
+	if GiftsService.CheckGift("Steel_Souls") and ChanceService.checkChance(30, true) then
 		UIService.doUiAction("HUD", "ActivateGift", "Steel_Souls")
 		AddArmor(1)
 	end

@@ -69,7 +69,7 @@ local module = {
 		Steel_Souls = {
 			Icon = "rbxassetid://16466990226",
 			Catagories = { "Soul" },
-			Desc = "Souls now have a chance to give armor upon pickup. (20% chance)",
+			Desc = "Souls now have a chance to give armor upon pickup. (30% chance)",
 		},
 
 		Boring_Bullets = {
@@ -81,7 +81,7 @@ local module = {
 		Tough_Luck = {
 			Icon = "rbxassetid://17590259521",
 			Catagories = { "Luck" },
-			Desc = "Your health is now bound to Luck. The less health you have, the more Luck you have. (+5 Luck per lost HP)",
+			Desc = "Your luck is now bound to health. The less health you have, the more Luck you have. (+5 Luck per lost HP)",
 		},
 
 		Heavenly_Fortune = {
@@ -117,7 +117,7 @@ local module = {
 		["20_Sided_Die"] = {
 			Icon = "rbxassetid://98248628217405",
 			Catagories = { "Luck" },
-			Desc = "Thrown weapons now have +20 luck when hitting an enemy.",
+			Desc = "Thrown weapons now have +20 luck when hitting an enemy for 1 second.",
 		},
 
 		Returned_Change = {
@@ -129,7 +129,7 @@ local module = {
 		Lead_Vampire = {
 			Icon = "rbxassetid://130012431987895",
 			Catagories = { "Tactical" },
-			Desc = "Upon taking damage, you now have a chance to gain +1 ammo. (10% chance)",
+			Desc = "Upon taking damage, you now have a chance to gain +1 ammo. (40% chance)",
 		},
 
 		Guts_And_Gas = {
@@ -147,7 +147,7 @@ local module = {
 		Strong_Arm = { -- NEW
 			Icon = "rbxassetid://98895268978593",
 			Catagories = { "Arsenal" },
-			Desc = "Thrown weapons now have a 30% chance to deal +1 damage.",
+			Desc = "Thrown weapons now deal +1 damage.",
 		},
 
 		Refined_Marksman = { -- NEW
@@ -177,7 +177,7 @@ local module = {
 		Uber_Charge = { -- NEW
 			Icon = "rbxassetid://78432246351384",
 			Catagories = { "Soul" },
-			Desc = "Killing an Electrified enemy now has a chance to drop armor. (15% chance)",
+			Desc = "Killing an Electrified enemy now has a chance to drop armor. (25% chance)",
 		},
 
 		Burnt_Pizza = { -- NEW
@@ -252,7 +252,7 @@ local module = {
 		Life_Steal = {
 			Icon = "rbxassetid://18671291054",
 			Catagories = { "Soul" },
-			Desc = "Crits now have a chance to heal you. (35% chance)",
+			Desc = "Crits now have a chance to heal you. (20% chance)",
 		},
 
 		Open_Wounds = {
@@ -318,7 +318,7 @@ local module = {
 		Set_Em_Up = {
 			Icon = "rbxassetid://16235430594",
 			Catagories = { "Luck" },
-			Desc = "Your combo score is now linked to your Luck. (+1 Luck per combo score, Max 50)",
+			Desc = "Your Luck is now linked to your combo. (+2 Luck per combo, Max Luck 40)",
 		},
 
 		Dead_Bolt = {
@@ -340,7 +340,7 @@ local module = {
 		-- },
 
 		Purity = {
-			Icon = "rbxassetid://115778770388552", -- NEW
+			Icon = "rbxassetid://119842604938981", -- NEW
 			Catagories = { "Arsenal" },
 			Desc = [[Throwing weapons now gives a stack of Purity. 
 Each stack of Purity improves all stats for Cleanse & Repent by 5%. 
@@ -355,9 +355,9 @@ Firing a picked up weapon or reloading removes 1 stack of Purity
 		},
 
 		Barrel_Hunt = {
-			Icon = "rbxassetid://139675312407633", -- NEW
+			Icon = "rbxassetid://113200360220000", -- NEW
 			Catagories = { "Arsenal" },
-			Desc = [[Killing an enemy has a chance to spawn a barrel on top of them. (10% chance)]],
+			Desc = [[Killing an enemy has a chance to spawn a barrel on top of them. (5% chance)]],
 		},
 
 		Lootr = {
@@ -387,13 +387,13 @@ Firing a picked up weapon or reloading removes 1 stack of Purity
 		Field_Clover = { -- NEW
 			Icon = "rbxassetid://132842636191716",
 			Catagories = { "Luck" },
-			Desc = "Killing enemies now have a chance to drop 2 Luck (5% chance, unaffected by Luck)",
+			Desc = "Killing enemies now has a chance to drop 5 Luck (5% chance, unaffected by Luck)",
 		},
 
 		Go_Big = {
 			Icon = "rbxassetid://130636991365536", -- NEW Add @visual effect
 			Catagories = { "Luck" },
-			Desc = [[Delivering 0 souls now gives you +50 Luck. Added Luck is removed when souls are delivered.]], -- Every missing point of max health now gives +50 luck.
+			Desc = "Your luck is now bound to Max Health. The less Max Health you have, the more Luck you have. (+50 Luck per lost Max Health)", -- Every missing point of max health now gives +50 luck.
 		},
 
 		Sierra_6308 = {

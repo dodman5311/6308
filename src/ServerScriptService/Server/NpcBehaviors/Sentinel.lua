@@ -74,7 +74,7 @@ local function shoot(npc)
 	local characterYDiff = math.abs(characterPos.Y - (startCF * CFrame.new(0, 0, -distance)).Position.Y)
 	local charYAngle = startCF.LookVector:Dot(lookAtTarget.LookVector)
 
-	if charYAngle > 0.65 and characterYDiff < 4 then
+	if charYAngle > 0.9 and characterYDiff < 4 then
 		target.Humanoid:TakeDamage(2)
 	end
 end

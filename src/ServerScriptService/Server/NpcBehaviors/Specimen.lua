@@ -51,6 +51,7 @@ local function createAttackAt(position, hasSound)
 	end
 
 	local effect = effects.GravityAttack:Clone()
+	effect.Area:AddTag("DamageZone")
 	effect.Parent = workspace
 	effect:PivotTo(CFrame.new(raycast.Position) * CFrame.Angles(0, 0, math.rad(90)))
 

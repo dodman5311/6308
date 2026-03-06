@@ -3,6 +3,7 @@ local module = {
 	soulCost = 1,
 }
 --// Services
+local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
@@ -65,17 +66,17 @@ local function setButtonState(buttonFrame, state: "Locked" | "Disabled" | "Enabl
 		util.tween(buttonFrame.FrameImage, ti, { ImageTransparency = 0 })
 		util.tween(buttonFrame.Icon, ti, { ImageTransparency = 0, ImageColor3 = Color3.fromRGB(0, 167, 139) })
 		buttonFrame.Acquired.Visible = true
-		buttonFrame.Button.Visible = false
+		buttonFrame.Button:SetAttribute("Disabled", true)
 	elseif state == "Enabled" then
 		util.tween(buttonFrame.FrameImage, ti, { ImageTransparency = 0 })
 		util.tween(buttonFrame.Icon, ti, { ImageTransparency = 0, ImageColor3 = Color3.new(1, 1, 1) })
 		buttonFrame.Acquired.Visible = false
-		buttonFrame.Button.Visible = true
+		buttonFrame.Button:SetAttribute("Disabled", false)
 	elseif state == "Disabled" or state == "Locked" then
 		util.tween(buttonFrame.FrameImage, ti, { ImageTransparency = 0.75 })
 		util.tween(buttonFrame.Icon, ti, { ImageTransparency = 0.75, ImageColor3 = Color3.new(1, 1, 1) })
 		buttonFrame.Acquired.Visible = false
-		buttonFrame.Button.Visible = false
+		buttonFrame.Button:SetAttribute("Disabled", true)
 	end
 	buttonFrame.Locked.Visible = state == "Locked"
 end
@@ -247,6 +248,10 @@ function module.ShowRequiemShop(_, ui, frame, inMenu)
 
 		util.tween(frame.InfoBox, TweenInfo.new(0.25), { AnchorPoint = Vector2.new(x, y) })
 	end)
+
+	if UserInputService.GamepadEnabled then
+		GuiService:Select(frame.Frame)
+	end
 end
 
 function module.HideRequiemShop(_, ui, frame)
@@ -324,6 +329,9 @@ function module.Init(player, ui, frame)
 
 			local button: ImageButton = buttonFrame.Button
 			button.MouseButton1Click:Connect(function()
+				if button:GetAttribute("Disabled") then
+					return
+				end
 				-- upgrade event
 
 				if lock then

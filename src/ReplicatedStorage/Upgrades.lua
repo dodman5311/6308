@@ -198,7 +198,7 @@ x2 damage to weak points]],
 +1 Damage
 +100% Splash Range
 
-Plasma bolts now create damaging tendrils around then that deal 1 Damage per 0.1 second to any nearby enemy.]],
+Plasma bolts now create damaging tendrils around them that deal 1 Damage per 0.1 second to any nearby enemy.]],
 				Price = 1250,
 			},
 		},
@@ -388,7 +388,7 @@ Successfully parrying an attack will convert said attack into three smart sawbla
 		["Spiked_Sabatons"] = {
 			{
 				Name = "Spiked Sabatons: Tier 1",
-				Description = "+40% jump hight for the third jump.",
+				Description = "+40% jump height for the third jump.",
 				Price = 200,
 			},
 			{

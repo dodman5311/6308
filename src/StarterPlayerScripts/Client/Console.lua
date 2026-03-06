@@ -1,8 +1,8 @@
 --// Services
 local GuiService = game:GetService("GuiService")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
-local Players = game:GetService("Players")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 
@@ -12,9 +12,9 @@ local player = Players.LocalPlayer
 
 --// Modules
 local commands = require(Globals.Shared.Commands)
-local util = require(Globals.Vendor.Util)
 local net = require(Globals.Packages.Net)
 local signals = require(Globals.Signals)
+local util = require(Globals.Vendor.Util)
 
 --// Values
 
@@ -263,6 +263,10 @@ local function toggleConsole()
 end
 
 UserInputService.InputBegan:Connect(function(input, gpe)
+	if not Players:GetAttribute("CheatsEnabled") then
+		return
+	end
+
 	if input.KeyCode == Enum.KeyCode.DPadDown and (not gpe or inGui) then
 		toggleConsole()
 	end

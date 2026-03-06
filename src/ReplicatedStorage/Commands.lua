@@ -96,10 +96,14 @@ local commands = {
 				end
 				local dataStore = require(Globals.Server.Services.DataStore)
 
-				dataStore.SaveData(Player, "PlayerGameState", {})
-				dataStore.SaveData(Player, "PlayerFurthestLevel", 0)
 				dataStore.SaveData(Player, "PlayerCodex", {})
-				dataStore.SaveData(Player, "PlayerUpgradeIndex", 0)
+				dataStore.SaveData(Player, "PlayerDeathCount", 0)
+				dataStore.SaveData(Player, "PlayerFurthestLevel", 0)
+				dataStore.SaveData(Player, "PlayerGameState", {})
+				dataStore.SaveData(Player, "PlayerSettings", {})
+				dataStore.SaveData(Player, "PlayerStoredScore", 0)
+				dataStore.SaveData(Player, "PlayerTotalScore", 0)
+				dataStore.SaveData(Player, "ShopUpgrades", {})
 			end,
 		},
 	},

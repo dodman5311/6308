@@ -31,7 +31,6 @@ local net = require(Globals.Packages.Net)
 local util = require(Globals.Vendor.Util)
 
 local deliveryAmount = 0
-local goBigLuck = 0
 local giftCount = 1
 module.onHidden = Signal.new()
 
@@ -229,9 +228,6 @@ local function causeHunger(player, ui, frame)
 			return
 		end
 
-		ChanceService.luck -= goBigLuck
-		goBigLuck = 0
-
 		net:RemoteEvent("UpdatePlayerHealth"):FireServer(maxHealth + 1)
 		module.showDescription(frame, { Desc = "Drav's hunger is partially restored. (+1 Max HP)" })
 
@@ -239,17 +235,9 @@ local function causeHunger(player, ui, frame)
 	end
 
 	if maxHealth > 1 then
-		if GiftsService.CheckGift("Go_Big") then
-			ChanceService.luck += 50
-			goBigLuck += 50
-		end
-
 		net:RemoteEvent("UpdatePlayerHealth"):FireServer(maxHealth - 1)
 		module.showDescription(frame, { Desc = "Drav is starved. (-1 Max HP)" })
 	else
-		ChanceService.luck -= goBigLuck
-		goBigLuck = 0
-
 		Signals.ClearGifts:Fire()
 		GiftsService.AddGift("Drav_Is_Dead")
 		ui.HUD.Frame.Souls.Image.ImageColor3 = Color3.new(0.35, 0.35, 0.35)
@@ -304,10 +292,6 @@ function module.showChoices(player, ui, frame, type)
 end
 
 function module.ShowScreen(player, ui, frame, extraSouls)
-	if not GiftsService.CheckGift("Go_Big") then
-		goBigLuck = 0
-	end
-
 	if GiftsService.CheckGift("Drav_Is_Dead") then
 		return module.fakeScreen(player, ui, frame)
 	end
@@ -663,15 +647,9 @@ function module.TakeDelivery(player, ui, frame, gift)
 		local maxHealth = player.Character.Humanoid.MaxHealth
 		if maxHealth < player:GetAttribute("MaxHealth") then
 			if deliveryAmount == 1 then
-				ChanceService.luck -= goBigLuck
-				goBigLuck = 0
-
 				net:RemoteEvent("UpdatePlayerHealth"):FireServer(player:GetAttribute("MaxHealth"))
 				module.showDescription(frame, { Desc = "Drav's hunger is satiated. (Full Max HP)" })
 			else
-				ChanceService.luck -= goBigLuck
-				goBigLuck = 0
-
 				net:RemoteEvent("UpdatePlayerHealth"):FireServer(maxHealth + 1)
 				module.showDescription(frame, { Desc = "Drav's hunger is partially restored. (+1 Max HP)" })
 			end

@@ -277,8 +277,6 @@ local function detectHit(partHit, launchedPart)
 
 	launchedPart.Weld.Part0 = partHit
 
-	print(launchedPart.Weld.Part0, launchedPart.Weld.Part1)
-
 	sounds.GrappleHit:Play()
 
 	rope, antiGrav = startGrapple(module.c, launchedPart.Position)
@@ -346,10 +344,8 @@ local function aimArm()
 	local vm = viewModelService.viewModels[1].Model
 
 	local leftShoulder = vm.Base["Left Shoulder"]
-	local leftArm = vm["Left Arm"]
 
 	local goalCF = CFrame.lookAt(vm.Base.CFrame.Position, grapplePoint)
-
 	local goalC0 = worldCFrameRotationToC0ObjectSpace(leftShoulder, goalCF)
 
 	local x, y, z = goalC0:ToOrientation()

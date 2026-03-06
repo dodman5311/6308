@@ -20,8 +20,45 @@ local giftService = require(Globals.Client.Services.GiftsService)
 
 local assets = ReplicatedStorage.Assets
 
+local luckMods = {}
+
+function module.UpdateLuckModifier(index: string, value: number, changeType: ("Add" | "Per" | "Sub")?)
+	changeType = changeType or "Add" :: "Add" | "Per" | "Sub"
+	luckMods[index] = { Value = value, ChangeType = changeType }
+end
+
+function module.RemoveLuckModifier(index: string)
+	if luckMods[index] then
+		luckMods[index] = nil
+	end
+end
+
+local function processHealthLuck(): number
+	local addedLuck = 0
+	local character = player.Character
+	if not character then
+		return addedLuck
+	end
+
+	local humanoid = character:FindFirstChild("Humanoid")
+	if not humanoid then
+		return addedLuck
+	end
+
+	if giftService.CheckGift("Tough_Luck") then
+		addedLuck += (humanoid.MaxHealth - humanoid.Health) * 5
+	end
+
+	if giftService.CheckGift("Go_Big") then
+		addedLuck += (5 - humanoid.MaxHealth) * 50
+	end
+
+	return addedLuck
+end
+
 function module.getLuck()
 	local result = module.luck
+
 	if giftService.CheckGift("Rabbits_Foot") then
 		result += 10
 	end
@@ -31,27 +68,24 @@ function module.getLuck()
 	end
 
 	if giftService.CheckGift("Set_Em_Up") then
-		result += math.clamp(comboService.CurrentCombo, 0, 40)
+		result += math.min(comboService.CurrentCombo, 20) * 2
 	end
 
-	if giftService.CheckGift("Tough_Luck") then
-		local character = player.Character
-		if not character then
-			return
-		end
-
-		local humanoid = character:FindFirstChild("Humanoid")
-		if not humanoid then
-			return
-		end
-
-		result += (humanoid.MaxHealth - humanoid.Health) * 5
-	end
-
+	result += processHealthLuck()
 	result += module.luckyFiveStacks * 5
 	result += module.repetitionLuck
 
-	return result
+	for _, luckMod in luckMods do
+		if luckMod.ChangeType == "Add" then
+			result += luckMod.Value
+		elseif luckMod.ChangeType == "Sub" then
+			result -= luckMod.Value
+		elseif luckMod.ChangeType == "Per" then
+			result += result * (luckMod.Value / 100)
+		end
+	end
+
+	return result, module.luck
 end
 
 local function resetRepLuck(value)
@@ -104,7 +138,7 @@ function module.checkChance(chance, goodLuck, PureLuck)
 end
 
 Signals.AddLuck:Connect(function()
-	module.luck += 2
+	module.luck += 5
 end)
 
 Net:RemoteFunction("CheckChance").OnClientInvoke = function(chance, goodLuck)

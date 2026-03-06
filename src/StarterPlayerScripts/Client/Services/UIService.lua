@@ -18,8 +18,8 @@ local modulesFolder = ReplicatedStorage.Gui
 local player = players.LocalPlayer
 
 --// Modules
-local signals = require(Globals.Signals)
 local net = require(Globals.Packages.Net)
+local signals = require(Globals.Signals)
 
 --// Values
 local uiMods = {}
@@ -96,6 +96,7 @@ end
 
 starterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
 starterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)
+starterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, true)
 signals.DoUiAction:Connect(module.doUiAction)
 net:Connect("DoUiAction", module.doUiAction)
 

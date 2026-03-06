@@ -69,9 +69,15 @@ return {
 
 	Stun = {
 		time = 3,
-		enter = function() end,
+		enter = function(npc)
+			npc.Instance.PrimaryPart.Anchored = true
+		end,
 
-		exit = function() end,
+		exit = function(npc)
+			if npc.Name ~= "Visage Of False Hope" then
+				npc.Instance.PrimaryPart.Anchored = false
+			end
+		end,
 	},
 
 	SoulFire = {

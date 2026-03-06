@@ -929,8 +929,6 @@ local function awardKill(model: Model, position)
 		ComboService.RestartTimer()
 	end
 
-	dropAmmo(position)
-	dropLuck(position)
 	signals.AddEntry:Fire(model.Name)
 
 	if
@@ -941,6 +939,15 @@ local function awardKill(model: Model, position)
 		soulsService.DropSoul(position, 1000)
 		UIService.doUiAction("HUD", "ActivateGift", "Returned_Change")
 	end
+
+	local humanoid = findHumanoid(model)
+
+	if not humanoid or humanoid:HasTag("Souless") then
+		return
+	end
+
+	dropAmmo(position)
+	dropLuck(position)
 
 	if
 		GiftsService.CheckGift("Aggressive_Forgery")
@@ -954,7 +961,7 @@ local function awardKill(model: Model, position)
 	if
 		GiftsService.CheckGift("Uber_Charge")
 		and model:GetAttribute("Electricity")
-		and ChanceService.checkChance(15, true)
+		and ChanceService.checkChance(25, true)
 	then
 		dropService.CreateDrop(position, "Armor")
 		UIService.doUiAction("HUD", "ActivateGift", "Uber_Charge")
@@ -972,7 +979,7 @@ local function awardKill(model: Model, position)
 		end
 	end
 
-	if GiftsService.CheckGift("Barrel_Hunt") and ChanceService.checkChance(10, true) then
+	if GiftsService.CheckGift("Barrel_Hunt") and ChanceService.checkChance(5, true) then
 		net:RemoteEvent("SpawnEnemy"):FireServer("ExplosiveBarrel", position)
 		UIService.doUiAction("HUD", "ActivateGift", "Barrel_Hunt")
 	end
@@ -1107,7 +1114,7 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		module.HasHitMachine = true
 	end
 
-	if GiftsService.CheckGift("Strong_Arm") and source == "ThrownWeapon" and ChanceService.checkChance(30, true) then
+	if GiftsService.CheckGift("Strong_Arm") and source == "ThrownWeapon" then
 		damage += 1
 	end
 
@@ -1195,7 +1202,7 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		if humanoid.Health > 0 then
 			UIService.doUiAction("HUD", "ShowHit", critMult > 1)
 
-			if GiftsService.CheckGift("Scathed_Syphon") then
+			if GiftsService.CheckGift("Scathed_Syphon") and subject:GetAttribute("Soul") then
 				net:RemoteEvent("Damage"):FireServer(player.Character, -1)
 				UIService.doUiAction("HUD", "ActivateGift", "Scathed_Syphon")
 			end
@@ -1297,7 +1304,7 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		UIService.doUiAction("HUD", "UpdateGiftProgress", "Gambler's_Fallacy", ChanceService.repetitionLuck / 40)
 	end
 
-	if GiftsService.CheckGift("Life_Steal") and ChanceService.checkChance(35, true) and critMult > 1 then
+	if GiftsService.CheckGift("Life_Steal") and ChanceService.checkChance(20, true) and critMult > 1 then
 		net:RemoteEvent("Damage"):FireServer(player.Character, -1)
 		UIService.doUiAction("HUD", "ActivateGift", "Life_Steal")
 	end
@@ -2281,15 +2288,15 @@ local function ThrowWeapon()
 				local hitCframe = CFrame.new(hit.Position) * camera.CFrame.Rotation
 
 				if GiftsService.CheckGift("20_Sided_Die") then
-					ChanceService.luck += 20
+					ChanceService.UpdateLuckModifier("20_Sided_Die", 20)
 					UIService.doUiAction("HUD", "ActivateGift", "20_Sided_Die")
 				end
 
 				local humanoid = module.dealDamage(hitCframe, hit, 2, "ThrownWeapon")
 
 				if GiftsService.CheckGift("20_Sided_Die") then
-					task.delay(0.1, function()
-						ChanceService.luck -= 20
+					task.delay(1, function()
+						ChanceService.RemoveLuckModifier("20_Sided_Die")
 					end)
 				end
 
@@ -3046,8 +3053,6 @@ local function flyingKick()
 	local goal = cameraCFrame:Lerp(targetCFrame, percentage)
 	local damage = math.clamp(math.ceil(distanceToTarget / 5), 1, 10)
 
-	print(damage)
-
 	local ti = TweenInfo.new(0.1, Enum.EasingStyle.Linear)
 	util.tween(player.Character.PrimaryPart, ti, { CFrame = goal }, false, function()
 		local hitHumanoid, subject = module.FireBullet(damage, 0, Vector3.new(10, 10, 15), nil, "FlyingKick")
@@ -3063,12 +3068,12 @@ end
 
 local coinTimer = Timer:new("CoinFlip", 30, function()
 	if ChanceService.checkChance(50) then
-		ChanceService.luck += 50
+		ChanceService.UpdateLuckModifier("Jade_Coin", 50)
 		UIService.doUiAction("HUD", "FlipCoin", "Heads")
 		UIService.doUiAction("HUD", "ActivateGift", "Jade_Coin")
 
 		Timer.wait(5)
-		ChanceService.luck = math.max(ChanceService.luck - 50, 0)
+		ChanceService.RemoveLuckModifier("Jade_Coin")
 	else
 		task.delay(1, function()
 			addToCombo(10)
@@ -3367,10 +3372,6 @@ GiftsService.OnGiftAdded:Connect(function(gift)
 		elseif not module.currentWeapon then
 			UIService.doUiAction("HUD", "AssignDeadbolt", defaultWeapon)
 		end
-	end
-
-	if gift == "Jade_Coin" then
-		lastCoinFlip = os.clock()
 	end
 end)
 

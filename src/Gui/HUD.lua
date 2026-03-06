@@ -374,7 +374,6 @@ local function updateHealthBar(health, maxHealth, bar, noAnim, isArmor)
 		elseif not unit:GetAttribute("IsEmpty") then
 			unit:SetAttribute("IsEmpty", true)
 
-			print(GiftsService.CheckGift("Hollow_Health"), healthLog)
 			if GiftsService.CheckGift("Hollow_Health") and healthLog then
 				unit.HealthLog.Visible = true
 
@@ -897,15 +896,11 @@ end
 
 function module.AssignDeadbolt(player, ui, frame, weaponModel)
 	local firePart = weaponModel:FindFirstChild("FirePart", true)
-	print("A")
 	if not firePart then
 		return
 	end
 
-	print("YES")
-
 	ui.DeadBoltIndicator.Gui.Adornee = firePart
-	print(ui.DeadBoltIndicator.Parent, ui.DeadBoltIndicator.Adornee)
 end
 
 function module.ToggleGrappleIndicator(player, ui, frame, value)
@@ -1000,6 +995,12 @@ function module.FlipCoin(player, ui, frame, side)
 
 	-- combo = rbxassetid://89390814327476
 	-- luck = rbxassetid://105793013061150
+end
+
+function module.DoTeleportFade(player, ui, frame, fadeTime)
+	local ti = TweenInfo.new(fadeTime)
+	util.tween(frame.Fade, ti, { BackgroundTransparency = 0 }, true)
+	util.tween(frame.Fade, ti, { BackgroundTransparency = 1 })
 end
 
 return module

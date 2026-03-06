@@ -991,6 +991,10 @@ function module.resetTickets()
 	module.tickets = 0
 end
 
+function module.resetDOTD()
+	resetDOTD()
+end
+
 Signals.AddTicket:Connect(function(amount)
 	module.tickets += amount
 end)

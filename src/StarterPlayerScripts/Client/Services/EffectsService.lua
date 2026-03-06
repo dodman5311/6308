@@ -110,7 +110,7 @@ function module.SentinelAttack(startCFrame: CFrame, humanoid)
 
 	newAttack.Transparency = 1
 
-	newAttack.A0.CFrame = CFrame.new(0, 78, 0) * CFrame.Angles(math.rad(-45), 0, 0)
+	newAttack.A0.CFrame = CFrame.new(0, 78, 0) * CFrame.Angles(math.rad(-25), 0, 0)
 	newAttack:PivotTo(startCFrame)
 	newAttack.Parent = workspace
 	Debris:AddItem(newAttack, 2)
@@ -127,7 +127,7 @@ function module.SentinelAttack(startCFrame: CFrame, humanoid)
 		return
 	end
 
-	util.tween(newAttack.A0, ti_0, { CFrame = CFrame.new(0, 78, 0) * CFrame.Angles(math.rad(45), 0, 0) })
+	util.tween(newAttack.A0, ti_0, { CFrame = CFrame.new(0, 78, 0) * CFrame.Angles(math.rad(25), 0, 0) })
 end
 
 function module.IndicateVisageAttack(model, color)

@@ -633,9 +633,23 @@ function module.loadLinearMap(size)
 		spawners.SpawnMovementPoints()
 	end
 
+	local lowestUnitLevel = math.huge
+
 	for _, unit in ipairs(map:GetChildren()) do
+		if unit.Name ~= "Kiosk" then
+			local unitSize = unit:GetExtentsSize()
+			local unitPosition = unit:GetPivot().Position
+			local yLevel = unitPosition.Y - (unitSize.Y / 2)
+
+			if yLevel < lowestUnitLevel then
+				lowestUnitLevel = yLevel
+			end
+		end
+
 		doUnitFunction("OnLoaded", unit)
 	end
+	workspace:SetAttribute("TeleportYLevel", lowestUnitLevel)
+
 	moveDestructables()
 
 	module.GeneratedAt = os.clock()

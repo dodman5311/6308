@@ -60,6 +60,14 @@ local lastMouseUp = os.clock()
 
 local getEnemiesFunction = net:RemoteFunction("GetEnemies")
 
+local runInfoBox
+local menuLabels = {
+	Arsenal = 0.125,
+	Map = 0.07,
+	Settings = 0.13,
+	Codex = 0.1,
+}
+
 --// Functions
 
 local weaponIcons = {
@@ -268,6 +276,26 @@ local function setSliderToValue(barFrame, input, maxValue)
 	return value
 end
 
+local function showMenuDisplayLabel(frame, menuName: string, color: Color3)
+	local image = frame.MenuDisplayImage
+	local label = image.MenuNameLabel
+
+	label.Text = menuName
+
+	local ti = TweenInfo.new(0.1)
+	util.tween(
+		image,
+		ti,
+		{ Size = UDim2.fromScale(menuLabels[menuName], 1), Position = UDim2.fromScale(0, 0), ImageColor3 = color }
+	)
+end
+local function hideMenuDisplayLabel(frame)
+	local image = frame.MenuDisplayImage
+
+	local ti = TweenInfo.new(0.2)
+	util.tween(image, ti, { Position = UDim2.fromScale(0, -1), ImageColor3 = Color3.fromRGB(255, 255, 255) })
+end
+
 local sortOrder = {
 	"Time",
 	"Rank",
@@ -314,12 +342,14 @@ local buttonFunctions = {
 		end,
 
 		Entered = function(button, player, ui, frame)
+			showMenuDisplayLabel(frame.MenuNameDisplay, "Map", Color3.fromRGB(135, 255, 135))
 			local ti = TweenInfo.new(0.25, Enum.EasingStyle.Linear)
 
 			util.tween(frame[button.Name .. "_Lbl"], ti, { ImageColor3 = Color3.fromRGB(135, 255, 135) })
 		end,
 
 		Left = function(button, player, ui, frame)
+			hideMenuDisplayLabel(frame.MenuNameDisplay)
 			local ti = TweenInfo.new(0.25, Enum.EasingStyle.Linear)
 
 			util.tween(frame[button.Name .. "_Lbl"], ti, { ImageColor3 = Color3.fromRGB(255, 255, 255) })
@@ -332,12 +362,54 @@ local buttonFunctions = {
 		end,
 
 		Entered = function(button, player, ui, frame)
+			showMenuDisplayLabel(frame.MenuNameDisplay, "Arsenal", Color3.fromRGB(255, 135, 135))
 			local ti = TweenInfo.new(0.25, Enum.EasingStyle.Linear)
 
 			util.tween(frame[button.Name .. "_Lbl"], ti, { ImageColor3 = Color3.fromRGB(255, 135, 135) })
 		end,
 
 		Left = function(button, player, ui, frame)
+			hideMenuDisplayLabel(frame.MenuNameDisplay)
+			local ti = TweenInfo.new(0.25, Enum.EasingStyle.Linear)
+
+			util.tween(frame[button.Name .. "_Lbl"], ti, { ImageColor3 = Color3.fromRGB(255, 255, 255) })
+		end,
+	},
+
+	Settings = {
+		Action = function(button, player, ui, frame)
+			module.openSettings(player, ui, frame)
+		end,
+
+		Entered = function(button, player, ui, frame)
+			showMenuDisplayLabel(frame.MenuNameDisplay, "Settings", Color3.fromRGB(135, 153, 255))
+			local ti = TweenInfo.new(0.25, Enum.EasingStyle.Linear)
+
+			util.tween(frame[button.Name .. "_Lbl"], ti, { ImageColor3 = Color3.fromRGB(135, 153, 255) })
+		end,
+
+		Left = function(button, player, ui, frame)
+			hideMenuDisplayLabel(frame.MenuNameDisplay)
+			local ti = TweenInfo.new(0.25, Enum.EasingStyle.Linear)
+
+			util.tween(frame[button.Name .. "_Lbl"], ti, { ImageColor3 = Color3.fromRGB(255, 255, 255) })
+		end,
+	},
+
+	Codex = {
+		Action = function(button, player, ui, frame)
+			module.openCodex(player, ui, frame)
+		end,
+
+		Entered = function(button, player, ui, frame)
+			showMenuDisplayLabel(frame.MenuNameDisplay, "Codex", Color3.fromRGB(135, 255, 230))
+			local ti = TweenInfo.new(0.25, Enum.EasingStyle.Linear)
+
+			util.tween(frame[button.Name .. "_Lbl"], ti, { ImageColor3 = Color3.fromRGB(135, 255, 230) })
+		end,
+
+		Left = function(button, player, ui, frame)
+			hideMenuDisplayLabel(frame.MenuNameDisplay)
 			local ti = TweenInfo.new(0.25, Enum.EasingStyle.Linear)
 
 			util.tween(frame[button.Name .. "_Lbl"], ti, { ImageColor3 = Color3.fromRGB(255, 255, 255) })
@@ -450,42 +522,6 @@ local buttonFunctions = {
 				ti,
 				{ ImageColor3 = Color3.fromRGB(225, 170, 255), Size = UDim2.fromScale(1, 1) }
 			)
-		end,
-	},
-
-	Codex = {
-		Action = function(button, player, ui, frame)
-			module.openCodex(player, ui, frame)
-		end,
-
-		Entered = function(button, player, ui, frame)
-			local ti = TweenInfo.new(0.25, Enum.EasingStyle.Linear)
-
-			util.tween(frame[button.Name .. "_Lbl"], ti, { ImageColor3 = Color3.fromRGB(135, 255, 230) })
-		end,
-
-		Left = function(button, player, ui, frame)
-			local ti = TweenInfo.new(0.25, Enum.EasingStyle.Linear)
-
-			util.tween(frame[button.Name .. "_Lbl"], ti, { ImageColor3 = Color3.fromRGB(255, 255, 255) })
-		end,
-	},
-
-	Settings = {
-		Action = function(button, player, ui, frame)
-			module.openSettings(player, ui, frame)
-		end,
-
-		Entered = function(button, player, ui, frame)
-			local ti = TweenInfo.new(0.25, Enum.EasingStyle.Linear)
-
-			util.tween(frame[button.Name .. "_Lbl"], ti, { ImageColor3 = Color3.fromRGB(135, 153, 255) })
-		end,
-
-		Left = function(button, player, ui, frame)
-			local ti = TweenInfo.new(0.25, Enum.EasingStyle.Linear)
-
-			util.tween(frame[button.Name .. "_Lbl"], ti, { ImageColor3 = Color3.fromRGB(255, 255, 255) })
 		end,
 	},
 
@@ -1203,7 +1239,16 @@ function module.UpdateStats(_, _, frame)
 	local deaths = frame.Player_Stats.Deaths
 	local reqCost = frame.Player_Stats.RequiemCost
 
-	luck.Text = "Luck " .. ChanceService.getLuck()
+	local finalLuck, initialLuck = ChanceService.getLuck()
+
+	if initialLuck < finalLuck then
+		luck.Text = "Luck " .. initialLuck .. " + " .. finalLuck - initialLuck
+	elseif initialLuck > finalLuck then
+		luck.Text = "Luck " .. initialLuck .. " - " .. finalLuck - initialLuck
+	elseif initialLuck == finalLuck then
+		luck.Text = "Luck " .. finalLuck
+	end
+
 	deaths.Text = "Deaths " .. workspace:GetAttribute("DeathCount")
 	reqCost.Text = "Requiem Cost " .. (workspace:GetAttribute("DeathCount") + 1) * 400
 
@@ -1631,6 +1676,11 @@ function module.Open(player, ui, frame)
 
 	--GuiService.GuiNavigationEnabled = true
 
+	runInfoBox = RunService.RenderStepped:Connect(function()
+		local mousePosition = UserInputService:GetMouseLocation()
+		frame.MenuNameDisplay.Position = UDim2.fromOffset(mousePosition.X + 30, mousePosition.Y + 30)
+	end)
+
 	if UserInputService.GamepadEnabled then
 		GuiService:Select(frame.Main.Buttons)
 	end
@@ -1650,6 +1700,10 @@ function module.Close(player, _, frame)
 
 	if viewport:FindFirstChild("Map") then
 		viewport.Map:Destroy()
+	end
+
+	if runInfoBox then
+		runInfoBox:Disconnect()
 	end
 
 	characterController.attemptResume("MenuPause")

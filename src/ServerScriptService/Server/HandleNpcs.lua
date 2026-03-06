@@ -561,7 +561,7 @@ net:Connect("ResumeGame", function()
 		end
 
 		local animations = AnimationService:getLoadedAnimations(Npc.Instance)
-		if not animations or Npc.StatusEffects["Ice"] or Npc.StatusEffects["Stun"] then
+		if not animations or Npc.StatusEffects["Ice"] then
 			continue
 		end
 		for _, anim in pairs(animations) do

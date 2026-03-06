@@ -113,7 +113,9 @@ local function loadSaveData(upgradeIndex, gameState)
 		giftService.AddGift(perkName)
 	end
 
-	giftService.UpgradeIndex = upgradeIndex
+	if gameState["MaxHealth"] and Player.Character:WaitForChild("Humanoid") then
+		Player.Character.Humanoid.MaxHealth = gameState.MaxHealth
+	end
 end
 
 local hollowHealthTimer = Timer:new("HollowHealth", 5, function()
@@ -142,6 +144,7 @@ function module:OnSpawn(character, humanoid)
 	UIService.doUiAction("HUD", "Cleanup", humanoid.Health, humanoid.MaxHealth)
 
 	UIService.doUiAction("Kiosk", "resetCost")
+	UIService.doUiAction("Kiosk", "resetDOTD")
 	UIService.doUiAction("HUD", "UpdatePlayerHealth", humanoid.Health, humanoid.MaxHealth)
 	UIService.doUiAction(
 		"HUD",
@@ -205,7 +208,7 @@ function module:OnSpawn(character, humanoid)
 				UIService.doUiAction("HUD", "CooldownGift", "Haven", 1)
 			end
 
-			if giftService.CheckGift("Lead_Vampire") and ChanceService.checkChance(10, true) then
+			if giftService.CheckGift("Lead_Vampire") and ChanceService.checkChance(40, true) then
 				weaponService.AddAmmo(1)
 			end
 
@@ -348,6 +351,8 @@ mouseTarget.Changed:Connect(function(value)
 	end
 end)
 
+local teleporting = false
+
 RunService.Heartbeat:Connect(function()
 	mouseTarget.Value = mouse.Target
 
@@ -411,8 +416,14 @@ RunService.Heartbeat:Connect(function()
 		UIService.doUiAction("HUD", "hideDanger")
 	end
 
-	if playerPivot.Position.Y < -100 and workspace:GetAttribute("Stage") ~= 2 then
+	local tpPosition = workspace:GetAttribute("TeleportYLevel")
+
+	if playerPivot.Position.Y < tpPosition and not teleporting then
+		teleporting = true
+
+		UIService.doUiAction("HUD", "DoTeleportFade", 0.25)
 		Player.Character:PivotTo(CFrame.new(lastOnGroundPosition))
+		teleporting = false
 	end
 
 	local rp = RaycastParams.new()
@@ -471,6 +482,15 @@ local function enterLevel()
 
 	local stage = workspace:GetAttribute("Stage")
 
+	local maxHealth = 5
+	local character = Player.Character
+	if character then
+		local humanoid = character:FindFirstChild("Humanoid")
+		if humanoid then
+			maxHealth = humanoid.MaxHealth
+		end
+	end
+
 	local gameState = {
 		Stage = stage,
 		Level = workspace:GetAttribute("Level"),
@@ -483,6 +503,7 @@ local function enterLevel()
 		PerkTickets = kiosk.tickets,
 
 		PerkList = giftService.AquiredGifts,
+		MaxHealth = maxHealth,
 	}
 
 	net:RemoteEvent("SaveGameState"):FireServer(gameState)
@@ -680,12 +701,12 @@ net:Connect("OpenRequiem", function()
 end)
 
 UserInputService.InputBegan:Connect(function(input, gpe)
-	if gpe then
-		return
-	end
+	-- if gpe then
+	-- 	return
+	-- end
 
 	if
-		input.KeyCode == Enum.KeyCode.Tab
+		(input.KeyCode == Enum.KeyCode.Tab and not gpe)
 		or input.KeyCode == Enum.KeyCode.M
 		or input.KeyCode == Enum.KeyCode.ButtonSelect
 	then
