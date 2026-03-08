@@ -1,8 +1,8 @@
 local module = {}
 
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
-local Players = game:GetService("Players")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 
@@ -11,8 +11,8 @@ local skipGui = ReplicatedStorage.Skip:Clone()
 
 skipGui.Parent = player.PlayerGui
 
-local util = require(Globals.Vendor.Util)
 local Signal = require(Globals.Packages.Signal)
+local util = require(Globals.Vendor.Util)
 module.onSkipped = Signal.new()
 local skipEnabled = false
 

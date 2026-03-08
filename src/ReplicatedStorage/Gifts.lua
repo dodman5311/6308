@@ -387,7 +387,7 @@ Firing a picked up weapon or reloading removes 1 stack of Purity
 		Field_Clover = { -- NEW
 			Icon = "rbxassetid://132842636191716",
 			Catagories = { "Luck" },
-			Desc = "Killing enemies now has a chance to drop 5 Luck (5% chance, unaffected by Luck)",
+			Desc = "Killing enemies now has a chance to drop 1 Luck (10% chance, unaffected by Luck)",
 		},
 
 		Go_Big = {

@@ -648,7 +648,7 @@ function module.loadLinearMap(size)
 
 		doUnitFunction("OnLoaded", unit)
 	end
-	workspace:SetAttribute("TeleportYLevel", lowestUnitLevel)
+	workspace:SetAttribute("TeleportYLevel", lowestUnitLevel - 5)
 
 	moveDestructables()
 

@@ -501,7 +501,7 @@ local buttonFunctions = {
 		Action = function(button, player, ui, frame)
 			frame.Perks_Page.Visible = false
 			frame.Combat_Page.Visible = false
-			Signals.DoUiAction:Fire("Requiem", "ShowRequiemShop", true)
+			Signals.DoUiAction:Fire("Requiem", "ShowRequiemShop", "InMenu")
 		end,
 
 		Entered = function(button, player, ui, frame)
@@ -877,7 +877,7 @@ local mapIconIds = {
 	Exit = "16872427753",
 	Kiosk = "16874460885",
 	Start = "77987180697847",
-	GunPoint = "77987180697847",
+	GunPoint = "125410874774878",
 	Player = "125265901862813",
 	Arena = "",
 	Elite = "120818331765177",
@@ -1365,7 +1365,7 @@ local function loadArsenal(frame)
 	frame.Effect_Lbl.Text = gunStats.Effect
 
 	if frame.Perks_Page.Visible == false and frame.Combat_Page.Visible == false then
-		Signals.DoUiAction:Fire("Requiem", "ShowRequiemShop", true)
+		Signals.DoUiAction:Fire("Requiem", "ShowRequiemShop", "InMenu")
 	end
 end
 

@@ -130,6 +130,65 @@ function module.ShowTip(player, ui, frame, tip: string, showOnce: boolean?, cond
 	end)
 end
 
+local function editText(parent, labelName, change, val)
+	local label = parent:FindFirstChild(labelName)
+	local shadow = parent:FindFirstChild(labelName .. "Shadow")
+
+	label[change] = val
+	if change == "TextTransparency" then
+		label.UIStroke.Transparency = val
+		shadow.UIStroke.Transparency = val
+	else
+		shadow[change] = val
+	end
+end
+
+function module.ShowLevelDisplay(player, ui, frame)
+	frame.LevelDisplay.Visible = true
+
+	local stageIndex = {
+		"The Suburbs",
+		"The Sewers",
+		"The City",
+	}
+
+	local actDisplay = frame.LevelDisplay.Act
+	local actTitle = frame.LevelDisplay.ActTitle
+	local levelDisplay = frame.LevelDisplay.Level
+
+	local actDisplayShadow = frame.LevelDisplay.ActShadow
+	local actTitleShadow = frame.LevelDisplay.ActTitleShadow
+	local levelDisplayShadow = frame.LevelDisplay.LevelShadow
+
+	editText(frame.LevelDisplay, "Level", "Text", "Level " .. workspace:GetAttribute("Level"))
+	editText(frame.LevelDisplay, "Act", "Text", "Act " .. workspace:GetAttribute("Stage"))
+	editText(frame.LevelDisplay, "ActTitle", "Text", stageIndex[workspace:GetAttribute("Stage")])
+
+	editText(frame.LevelDisplay, "Level", "TextTransparency", 1)
+	editText(frame.LevelDisplay, "ActTitle", "TextTransparency", 1)
+	editText(frame.LevelDisplay, "Act", "TextTransparency", 0)
+
+	util.PlaySound(sounds.Crit, script).PlaybackSpeed = 2
+
+	task.wait(0.25)
+	editText(frame.LevelDisplay, "Level", "TextTransparency", 0)
+	util.PlaySound(sounds.Crit, script).PlaybackSpeed = 1.5
+
+	task.wait(0.25)
+	editText(frame.LevelDisplay, "ActTitle", "TextTransparency", 0)
+	util.PlaySound(sounds.Crit, script).PlaybackSpeed = 1
+	task.wait(2)
+	local ti = TweenInfo.new(4)
+	util.tween({ levelDisplay, actDisplay, actTitle }, ti, { TextTransparency = 1 })
+	util.tween(
+		{ levelDisplayShadow.UIStroke, actDisplayShadow.UIStroke, actTitleShadow.UIStroke },
+		ti,
+		{ Transparency = 1 }
+	)
+	util.tween({ levelDisplay.UIStroke, actDisplay.UIStroke, actTitle.UIStroke }, ti, { Transparency = 1 }, true)
+	frame.LevelDisplay.Visible = false
+end
+
 function module.AmbushBegun(player, ui, frame)
 	frame.Ambush.Visible = true
 

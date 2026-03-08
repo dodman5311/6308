@@ -676,10 +676,16 @@ local commands = {
 
 				local hnpcs = require(Globals.Server.HandleNpcs)
 
+				local distance = 10
+
+				if Enemy.Name == "Visage Of False Hope" then
+					distance = 50
+				end
+
 				if amount then
 					for _ = 1, amount do
 						local npc = hnpcs.new(Enemy.Name)
-						npc:Spawn(character:GetPivot() * CFrame.new(0, 1, -10))
+						npc:Spawn(character:GetPivot() * CFrame.new(0, 1, -distance))
 
 						if teamName then
 							npc:SetTeam(teamName)
@@ -687,7 +693,7 @@ local commands = {
 					end
 				else
 					local npc = hnpcs.new(Enemy.Name)
-					npc:Spawn(character:GetPivot() * CFrame.new(0, 1, -10))
+					npc:Spawn(character:GetPivot() * CFrame.new(0, 1, -distance))
 
 					if teamName then
 						npc:SetTeam(teamName)

@@ -82,6 +82,7 @@ local function setButtonState(buttonFrame, state: "Locked" | "Disabled" | "Enabl
 end
 
 local function updateTree(tree)
+	print("UPDATE")
 	local acquiredFirstIndexTree = false
 
 	for _, buttonFrame in ipairs(tree:GetDescendants()) do
@@ -152,13 +153,27 @@ local function updateTree(tree)
 	end
 end
 
+function module.updateIndexedTree(_, ui, frame)
+	for _, tree in ipairs(frame.Trees:GetChildren()) do
+		if not tree:IsA("CanvasGroup") then
+			continue
+		end
+
+		if tree.GroupTransparency < 0.5 then
+			updateTree(tree)
+		end
+	end
+end
+
 local function updateCoinBalaceUi(frame, newBalance: number)
 	frame.RCoins.Count.Text = newBalance
 end
 
-local function setTreeIndex(frame, index: number, reverse: boolean?)
+function module.setTreeIndex(_, ui, frame, index: number, reverse: boolean?, noUpdate: boolean?)
 	reverse = reverse or false
 	local ti = TweenInfo.new(0.25)
+
+	print(noUpdate)
 
 	for _, tree in ipairs(frame.Trees:GetChildren()) do
 		if not tree:IsA("CanvasGroup") then
@@ -166,7 +181,9 @@ local function setTreeIndex(frame, index: number, reverse: boolean?)
 		end
 
 		if tree.Name == upgradeIndexOrder[index] then
-			updateTree(tree)
+			if not noUpdate then
+				updateTree(tree)
+			end
 
 			local filigree = frame.Filigree:FindFirstChild(tree.Name)
 
@@ -196,7 +213,9 @@ local function setTreeIndex(frame, index: number, reverse: boolean?)
 	end
 end
 
-function module.ShowRequiemShop(_, ui, frame, inMenu)
+local isInDeathScreen = false
+
+function module.ShowRequiemShop(_, ui, frame, displayType)
 	local ti = TweenInfo.new(0.1)
 
 	frame.Fade.BackgroundTransparency = 0
@@ -205,21 +224,44 @@ function module.ShowRequiemShop(_, ui, frame, inMenu)
 
 	frame.Frame.Visible = true
 
-	if inMenu then
+	if displayType == "InMenu" or displayType == "DeathScreen" then
+		frame.ExitImage.Visible = false
+		frame.ExitButton.Visible = false
+
 		frame.Gui.DisplayOrder = 10
 		frame.Background.Visible = false
 		lock = true
 		frame.Frame.Size = UDim2.fromScale(0.9, 0.9)
 	else
+		frame.ExitImage.Visible = true
+		frame.ExitButton.Visible = true
+
 		frame.Gui.DisplayOrder = 9
 		frame.Background.Visible = true
 		lock = false
 		frame.Frame.Size = UDim2.fromScale(1, 1)
 	end
 
+	if displayType == "DeathScreen" then
+		isInDeathScreen = true
+		frame.Next.Visible = false
+		frame.Prev.Visible = false
+		frame.RCoins.Visible = false
+		frame.Background.Visible = true
+		frame.Background.BackgroundTransparency = 0.5
+		module.setTreeIndex(nil, ui, frame, currentTreeIndex, nil, true)
+	else
+		isInDeathScreen = false
+		frame.Next.Visible = true
+		frame.Prev.Visible = true
+		frame.RCoins.Visible = true
+		frame.Background.BackgroundTransparency = 0
+		module.setTreeIndex(nil, ui, frame, currentTreeIndex)
+	end
+
 	Signals.DoUiAction:Fire("Cursor", "Toggle", true, "Requiem")
 	frame.Gui.Enabled = true
-	setTreeIndex(frame, currentTreeIndex)
+
 	updateCoinBalaceUi(frame, workspace:GetAttribute("TotalScore"))
 
 	UIAnimationService.PlayAnimation(frame.RCoins.Coins, 0.1, true)
@@ -259,7 +301,7 @@ function module.HideRequiemShop(_, ui, frame)
 
 	Signals.DoUiAction:Fire("Cursor", "Toggle", false, "Requiem")
 	frame.Fade.BackgroundTransparency = 0
-	setTreeIndex(frame, 0)
+	module.setTreeIndex(nil, ui, frame, 0)
 
 	UIAnimationService.StopAnimation(frame.RCoins.Coins)
 	UIAnimationService.StopAnimation(frame.CoinIcon)
@@ -289,7 +331,7 @@ function module.Init(player, ui, frame)
 			currentTreeIndex += 1
 		end
 
-		setTreeIndex(frame, currentTreeIndex)
+		module.setTreeIndex(nil, ui, frame, currentTreeIndex)
 	end)
 
 	frame.Prev.MouseButton1Click:Connect(function()
@@ -299,7 +341,7 @@ function module.Init(player, ui, frame)
 			currentTreeIndex -= 1
 		end
 
-		setTreeIndex(frame, currentTreeIndex, true)
+		module.setTreeIndex(nil, ui, frame, currentTreeIndex, true)
 	end)
 
 	frame.ExitButton.MouseButton1Click:Connect(function()
@@ -372,6 +414,10 @@ function module.Init(player, ui, frame)
 			local enter, leave = MouseOverModule.MouseEnterLeaveEvent(button)
 
 			enter:Connect(function()
+				if isInDeathScreen then
+					return
+				end
+
 				local category = buttonFrame.Parent.Parent.Name
 				local tierName = buttonFrame.Parent.Name
 				local tierNumber = buttonFrame:GetAttribute("Index") or tonumber(buttonFrame.Name)

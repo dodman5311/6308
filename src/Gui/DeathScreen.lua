@@ -14,6 +14,7 @@ local UserInputService = game:GetService("UserInputService")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
+local Skip = require(ReplicatedStorage.Shared.Skip)
 
 local camera = workspace.CurrentCamera
 
@@ -95,24 +96,31 @@ local function showCoinCheck(frame)
 
 	coinsFrame.CoinRequirement.Text = (workspace:GetAttribute("LogDeathCount") + 1) * 400
 
-	task.wait(1)
+	local coinAnim = UIAnimationService.PlayAnimation(coinsFrame.CoinsIcon, 0.1, true)
 
-	coinsCheckFrame.Visible = true
-	coinsFrame.Visible = true
+	local animation
+	local skipped = false
+	local completed = false
 
-	ContentProvider:PreloadAsync { coinsCheckFrame.Image }
+	local step_1 = task.spawn(function()
+		task.wait(1)
 
-	local animation = UIAnimationService.PlayAnimation(coinsCheckFrame, 0.075)
-	animation:OnFrameReached(16):Once(function()
+		coinsCheckFrame.Visible = true
+		coinsFrame.Visible = true
+
+		ContentProvider:PreloadAsync { coinsCheckFrame.Image }
+
+		animation = UIAnimationService.PlayAnimation(coinsCheckFrame, 0.075)
+		animation:OnFrameReached(16):Wait()
+
 		animation:Pause()
 		task.wait(1.5)
 		animation:Resume()
-	end)
-	animation:OnFrameReached(18):Once(function()
+
+		animation:OnFrameReached(18):Wait()
 		animation:Pause()
 
 		ContentProvider:PreloadAsync { coinsFrame.CoinsIcon.Image }
-		local coinAnim = UIAnimationService.PlayAnimation(coinsFrame.CoinsIcon, 0.1, true)
 
 		util.tween(coinsFrame.CoinsIcon.Image, ti, { ImageTransparency = 0 })
 		util.tween(
@@ -126,21 +134,85 @@ local function showCoinCheck(frame)
 			util.tween(coinCountNumber, ti2, { Value = workspace:GetAttribute("LogTotalScore") }, true)
 		end
 
-		task.wait(1)
-
-		util.tween(coinsFrame.CoinsIcon.Image, ti, { ImageTransparency = 1 })
-		util.tween(
-			{ coinsFrame.Center, coinsFrame.CoinRequirement, coinsFrame.CoinsCount },
-			ti,
-			{ TextTransparency = 1 }
-		)
-
-		coinAnim:Stop()
-
-		animation:Resume()
+		Skip.hideSkip()
+		completed = true
 	end)
+
+	Skip.enableSkip(function()
+		task.cancel(step_1)
+
+		coinsCheckFrame.Visible = true
+		coinsFrame.Visible = true
+
+		coinsFrame.CoinsIcon.Image.ImageTransparency = 0
+		coinsFrame.Center.TextTransparency = 0
+		coinsFrame.CoinRequirement.TextTransparency = 0
+		coinsFrame.CoinsCount.TextTransparency = 0
+
+		if workspace:GetAttribute("LogTotalScore") ~= 0 then
+			coinCountNumber.Value = workspace:GetAttribute("LogTotalScore")
+		end
+
+		skipped = true
+		completed = true
+	end)
+
+	repeat
+		task.wait()
+	until completed
+
+	if skipped then
+		animation = UIAnimationService.PlayAnimation(coinsCheckFrame, 0.075, false, false, 18)
+		animation:Pause()
+	end
+
+	task.wait(1)
+
+	util.tween(coinsFrame.CoinsIcon.Image, ti, { ImageTransparency = 1 })
+	util.tween({ coinsFrame.Center, coinsFrame.CoinRequirement, coinsFrame.CoinsCount }, ti, { TextTransparency = 1 })
+
+	coinAnim:Stop()
+
+	if workspace:GetAttribute("LogTotalScore") < (workspace:GetAttribute("LogDeathCount") + 1) * 400 then
+		local clearThread = task.spawn(function()
+			completed = false
+			Signals.DoUiAction:Fire("Requiem", "ShowRequiemShop", "DeathScreen")
+			for i = 1, 8 do
+				local waitTime = math.abs((8 - i) / 8)
+				Signals.DoUiAction:Fire("Requiem", "setTreeIndex", i, nil, true)
+				task.wait(waitTime)
+				local sound = util.PlaySound(sounds.RCoinsSmall, script)
+				util.tween(sound, TweenInfo.new(1), { PlaybackSpeed = 0.35 })
+				Signals.DoUiAction:Fire("Requiem", "updateIndexedTree")
+				task.wait(waitTime)
+			end
+			Signals.DoUiAction:Fire("Requiem", "HideRequiemShop")
+			task.wait(2)
+			Skip.hideSkip()
+			completed = true
+		end)
+
+		Skip.enableSkip(function()
+			task.cancel(clearThread)
+			Signals.DoUiAction:Fire("Requiem", "HideRequiemShop")
+			completed = true
+		end)
+	else
+		completed = true
+	end
+
+	repeat
+		task.wait()
+	until completed
+
+	animation:Resume()
 	animation.OnEnded:Wait()
+
 	coinsCheckFrame.Visible = false
+
+	task.delay(2, function()
+		Signals.DoUiAction:Fire("Notify", "ShowLevelDisplay")
+	end)
 end
 
 function module.ShowDeathScreen(player, ui, frame)
@@ -177,8 +249,27 @@ function module.ShowDeathScreen(player, ui, frame)
 		util.tween(sfx.Scream, ti_0, { Volume = 0 })
 	end)
 
-	breakAnimation.OnEnded:Once(function()
-		HealthBroken.Visible = false
+	local function endReq()
+		sfx.EvilVoices:Stop()
+		Requiem.Visible = false
+
+		showCoinCheck(frame)
+
+		SoundService.AmbientReverb = Enum.ReverbType.NoReverb
+		util.tween(frame.Background, ti, { BackgroundTransparency = 1 }, true)
+		frame.Gui.Enabled = false
+
+		if workspace:GetAttribute("IsInReq") then
+			MusicService.playTrack("Reqiuem")
+		else
+			MusicService.playMusic()
+		end
+
+		SoundService.Music.Volume = logVolume
+		module.unlocked = false
+	end
+
+	local function showRequiem()
 		task.wait(0.8)
 
 		SoundService.AmbientReverb = Enum.ReverbType.Arena
@@ -186,21 +277,19 @@ function module.ShowDeathScreen(player, ui, frame)
 
 		task.wait(0.2)
 
-		UIAnimationService.PlayAnimation(Requiem, 0.2, false, true).OnEnded:Once(function()
-			task.wait(4)
+		UIAnimationService.PlayAnimation(Requiem, 0.2, false, true).OnEnded:Wait()
+		task.wait(4)
+		Skip.hideSkip()
+		endReq()
+	end
 
-			sfx.EvilVoices:Stop()
-			Requiem.Visible = false
+	breakAnimation.OnEnded:Once(function()
+		HealthBroken.Visible = false
+		local req = task.spawn(showRequiem)
 
-			showCoinCheck(frame)
-
-			SoundService.AmbientReverb = Enum.ReverbType.NoReverb
-			util.tween(frame.Background, ti, { BackgroundTransparency = 1 }, true)
-			frame.Gui.Enabled = false
-
-			MusicService.playMusic()
-			SoundService.Music.Volume = logVolume
-			module.unlocked = false
+		Skip.enableSkip(function()
+			task.cancel(req)
+			task.defer(endReq)
 		end)
 	end)
 end

@@ -58,7 +58,7 @@ function module.change(dash)
 
 		local rp = RaycastParams.new()
 		rp.FilterType = Enum.RaycastFilterType.Include
-		rp.FilterDescendantsInstances = { workspace.Map }
+		rp.FilterDescendantsInstances = { workspace.Map, workspace.Enemies, workspace.Destructables }
 		rp.RespectCanCollide = true
 
 		local rayCast
@@ -70,10 +70,12 @@ function module.change(dash)
 		end
 
 		if rayCast then
-			local reflectedDirection = direction
-				- (2 * direction:Dot(rayCast.Normal) * rayCast.Normal)
-					* math.clamp(primaryPart.AssemblyLinearVelocity.Magnitude / 15, 0, 25)
-			logVel = reflectedDirection
+			beat:Disconnect()
+			return
+			-- local reflectedDirection = direction
+			-- 	- (2 * direction:Dot(rayCast.Normal) * rayCast.Normal)
+			-- 		* math.clamp(primaryPart.AssemblyLinearVelocity.Magnitude / 15, 0, 25)
+			-- logVel = reflectedDirection
 		end
 
 		local v = Vector3.new(logVel.X, primaryPart.AssemblyLinearVelocity.Y, logVel.Z)

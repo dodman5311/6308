@@ -35,16 +35,16 @@ local function grabLedge(goalCFrame)
 			false,
 			0,
 			0.75,
-			0.75
+			0.85
 		)
 
 		primaryPart.Anchored = true
-		primaryPart.AssemblyLinearVelocity = Vector3.zero
-		airController.cancel()
+		--primaryPart.AssemblyLinearVelocity = Vector3.zero
+		--airController.cancel()
 
 		util.tween(
 			primaryPart,
-			TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+			TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
 			{ CFrame = goalCFrame },
 			true
 		)

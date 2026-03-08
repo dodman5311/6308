@@ -374,7 +374,7 @@ local function updateHealthBar(health, maxHealth, bar, noAnim, isArmor)
 		elseif not unit:GetAttribute("IsEmpty") then
 			unit:SetAttribute("IsEmpty", true)
 
-			if GiftsService.CheckGift("Hollow_Health") and healthLog then
+			if GiftsService.CheckGift("Hollow_Health") and healthLog and i == math.ceil(health + 1) then
 				unit.HealthLog.Visible = true
 
 				healthLog.UIGradient.Offset = Vector2.new(0, 1)

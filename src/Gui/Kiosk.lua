@@ -152,7 +152,7 @@ local spinGifts = {
 
 local DOTDRewards = {
 	Knights_Crit_Epic = {
-		Icon = "rbxassetid://71018731900051",
+		Icon = "rbxassetid://109333741889140",
 		Catagories = { "Arsenal" },
 		Desc = "You gain a chance to deal double damage with melees. (+3% chance)",
 		Chance = 20,
@@ -170,7 +170,7 @@ local DOTDRewards = {
 	Knights_Crit = spinGifts.Knights_Crit,
 
 	Breachers_Crit_Epic = {
-		Icon = "rbxassetid://75394778830247",
+		Icon = "rbxassetid://94948712486101",
 		Catagories = { "Arsenal" },
 		Desc = "You gain a chance to deal double damage with shotguns. (+3% chance)",
 		Chance = 20,
@@ -188,7 +188,7 @@ local DOTDRewards = {
 	Breachers_Crit = spinGifts.Breachers_Crit,
 
 	Gun_Slingers_Crit_Epic = {
-		Icon = "rbxassetid://81678962975610",
+		Icon = "rbxassetid://117636291914123",
 		Catagories = { "Arsenal" },
 		Desc = "You gain a chance to deal double damage with pistols. (+3% chance)",
 		Chance = 20,
@@ -206,7 +206,7 @@ local DOTDRewards = {
 	Gun_Slingers_Crit = spinGifts.Gun_Slingers_Crit,
 
 	Riflemans_Crit_Epic = {
-		Icon = "rbxassetid://117248909088054",
+		Icon = "rbxassetid://80261955519155",
 		Catagories = { "Arsenal" },
 		Desc = "You gain a chance to deal double damage with rifles. (+3% chance)",
 		Chance = 20,

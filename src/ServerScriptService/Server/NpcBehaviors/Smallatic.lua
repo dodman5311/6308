@@ -1,3 +1,8 @@
+local BadgeService = game:GetService("BadgeService")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Net = require(ReplicatedStorage.Packages.Net)
+
 local stats = {
 	ViewDistance = 100,
 
@@ -6,6 +11,16 @@ local stats = {
 
 	NpcType = "Enemy",
 }
+
+local function awardBadge()
+	for _, player in ipairs(Players:GetPlayers()) do
+		task.spawn(function()
+			if BadgeService:AwardBadge(player.UserId, 510580664798171) then
+				Net:RemoteEvent("DoUiAction"):FireAllClients("Notify", "AchievementUnlocked", 510580664798171)
+			end
+		end)
+	end
+end
 
 local module = {
 	OnStep = {
@@ -48,6 +63,7 @@ local module = {
 	},
 
 	OnDied = {
+		{ Function = "Custom", Parameters = { awardBadge } },
 		{ Function = "PlaySound", Parameters = { "Death", 50 } },
 		{ Function = "SetCollision", Parameters = { "DeadBody" } },
 		{ Function = "SwitchToState", Parameters = { "Dead" } },

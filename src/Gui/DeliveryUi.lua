@@ -157,24 +157,24 @@ function module.Init(player, ui, frame)
 
 	local choices = frame.Choices
 
-	connectGiftButtonHover(choices.Card_1.CardMain.Button)
-	connectGiftButtonHover(choices.Card_2.CardMain.Button)
-	connectGiftButtonHover(choices.Card_3.CardMain.Button)
-	connectGiftButtonHover(choices.Card_4.CardMain.Button)
+	connectGiftButtonHover(choices.Cards.Card_1.CardMain.Button)
+	connectGiftButtonHover(choices.Cards.Card_2.CardMain.Button)
+	connectGiftButtonHover(choices.Cards.Card_3.CardMain.Button)
+	connectGiftButtonHover(choices.Cards.Card_4.CardMain.Button)
 
-	choices.Card_1.CardMain.Button.MouseButton1Click:Connect(function()
+	choices.Cards.Card_1.CardMain.Button.MouseButton1Click:Connect(function()
 		givePerk(frame, 1)
 	end)
 
-	choices.Card_2.CardMain.Button.MouseButton1Click:Connect(function()
+	choices.Cards.Card_2.CardMain.Button.MouseButton1Click:Connect(function()
 		givePerk(frame, 2)
 	end)
 
-	choices.Card_3.CardMain.Button.MouseButton1Click:Connect(function()
+	choices.Cards.Card_3.CardMain.Button.MouseButton1Click:Connect(function()
 		givePerk(frame, 3)
 	end)
 
-	choices.Card_4.CardMain.Button.MouseButton1Click:Connect(function()
+	choices.Cards.Card_4.CardMain.Button.MouseButton1Click:Connect(function()
 		givePerk(frame, 4)
 	end)
 end
@@ -248,7 +248,7 @@ local function causeHunger(player, ui, frame)
 end
 
 function module.showChoices(player, ui, frame, type)
-	for _, buttonFrame in ipairs(frame.Choices:GetChildren()) do
+	for _, buttonFrame in ipairs(frame.Choices.Cards:GetChildren()) do
 		if not buttonFrame:IsA("Frame") then
 			continue
 		end
@@ -262,7 +262,7 @@ function module.showChoices(player, ui, frame, type)
 	choices.Visible = true
 	Signals.DoUiAction:Fire("Cursor", "Toggle", true)
 
-	for _, v in ipairs(choices:GetChildren()) do
+	for _, v in ipairs(choices.Cards:GetChildren()) do
 		if not v:IsA("Frame") then
 			continue
 		end
@@ -273,7 +273,7 @@ function module.showChoices(player, ui, frame, type)
 	for index, perkName in ipairs(giftsToChoose) do
 		local perk = Gifts[type][perkName]
 
-		local card = choices:FindFirstChild("Card_" .. index)
+		local card = choices.Cards:FindFirstChild("Card_" .. index)
 		local cardMain = card.CardMain
 		cardMain.Icon.Image = perk.Icon
 		cardMain.Title.Text = perkName

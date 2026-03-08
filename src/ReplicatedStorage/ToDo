@@ -578,26 +578,13 @@ add perk codex entries and codex catagory ()
 
 Add UI HUD display for level progression
 
-fix specimen rocks not dissapearing (Add debris for cleanup) *
-
-cancel timer on death jade coin ()
+Make visual effect for despawning enemies (Instant black puff with spooky sound)
 
 
+Then show piggy bank icon and removing half
 
-Player now teleports back onto the map after falling below the lowest spawned unit (with a visual fade)
-(No more falling for 5 minutes before tping back)
 
-Fixed val hana blood splatter
-Fixed piggy bank switching score and stored score
-Reduced console bloat (Fixed non loading animations)
-Fixed weird cutter visual
-Added base luck and dynamic luck seperation in Arsenal ("Luck + Dynamic Luck")
-Fixed Ledge grab clipping (Checked if the player can fit at the end of the grab)
-Fixed console not being able to leave menu or interact with the shop
-Added setting to disable enemy highlights
-Added setting to disable destructable highlights
-Fixed Specimen Attack not showing properly
-
+Make hitting a barrel with element, make the barrel elemental
 
 ------ future
 

@@ -138,7 +138,7 @@ function module.checkChance(chance, goodLuck, PureLuck)
 end
 
 Signals.AddLuck:Connect(function()
-	module.luck += 5
+	module.luck += 1
 end)
 
 Net:RemoteFunction("CheckChance").OnClientInvoke = function(chance, goodLuck)

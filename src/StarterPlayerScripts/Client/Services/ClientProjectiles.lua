@@ -634,7 +634,7 @@ local function processStep(distanceToMove, projectile: Projectile)
 					tendril.Enabled = false
 				end)
 
-				module.createFromPreset(
+				local newProjectile = module.createFromPreset(
 					CFrame.lookAt(projectilePosition, position),
 					0,
 					"Flare",
@@ -643,6 +643,8 @@ local function processStep(distanceToMove, projectile: Projectile)
 					projectile.Sender,
 					projectile.Source
 				)
+
+				newProjectile.Info = { Element = projectile.Info["Element"] }
 			end
 
 			task.delay(0.1, function()

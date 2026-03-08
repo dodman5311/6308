@@ -531,7 +531,9 @@ local function exitS2(extraSouls, level, stageBoss, miniBoss)
 	end
 
 	task.spawn(function()
+		local wasInReq = false
 		while workspace:GetAttribute("IsInReq") do
+			wasInReq = true
 			task.wait()
 		end
 
@@ -570,6 +572,9 @@ local function exitS2(extraSouls, level, stageBoss, miniBoss)
 			MusicService.playTrack(miniBoss)
 		else
 			enterLevel()
+			task.delay(wasInReq and 8 or 2, function()
+				UIService.doUiAction("Notify", "ShowLevelDisplay")
+			end)
 		end
 	end)
 

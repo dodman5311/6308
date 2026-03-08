@@ -725,13 +725,15 @@ local moves = {
 		for i = 0, 0.5, 0.001 do
 			timer.wait(0.001)
 
-			layers:PivotTo(startPos:Lerp(logPos, i * 2))
-
 			if npc:GetState() == "Dead" or not npc.Instance.Parent then
 				Lighting.Ambient = Color3.fromRGB(125, 125, 125)
-				break
+				layers:PivotTo(startPos:Lerp(logPos, i * 4))
+			else
+				layers:PivotTo(startPos:Lerp(logPos, i * 2))
 			end
 		end
+
+		layers:PivotTo(logPos)
 
 		layers.PartA.Bubbles:Stop()
 		togglePlatforms(-1)

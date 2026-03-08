@@ -310,13 +310,13 @@ function module.UpdateSlot()
 	setOtherSlot("Ammo", currentAmmo)
 end
 
-function module.UpdateAmmo(amount)
+function module.UpdateAmmo(amount, muleSwitch)
 	local ignoreAmmoTimer = Timer:getTimer("IgnoreAmmo")
 
 	if
 		amount < currentAmmo
 		and (
-			(workspace:GetAttribute("Overcharge") ~= 2 and acts:checkAct("OverchargeActive"))
+			(not muleSwitch and (workspace:GetAttribute("Overcharge") ~= 2 and acts:checkAct("OverchargeActive")))
 			or (ignoreAmmoTimer and ignoreAmmoTimer.IsRunning)
 		)
 	then
@@ -530,8 +530,6 @@ local function EquipDefault(ignoreAmmo)
 	animationService:playAnimation(viewmodel.Model, "DefaultEquip", Enum.AnimationPriority.Action3.Value, false, 0)
 
 	UIService.doUiAction("HUD", "SetCrosshair", crosshairs.Default, true)
-
-	fireTimer:Complete()
 
 	if not defaultWeapon then
 		if workspace:GetAttribute("CleanseAndRepent_Tier") >= 3 then
@@ -781,7 +779,7 @@ local function dropAmmo(position)
 end
 
 local function dropLuck(position)
-	if not module.currentWeapon or not GiftsService.CheckGift("Field_Clover") or not ChanceService.checkChance(5) then
+	if not module.currentWeapon or not GiftsService.CheckGift("Field_Clover") or not ChanceService.checkChance(10) then
 		return
 	end
 
@@ -2377,8 +2375,10 @@ function module.SwitchToSlot(slotNumber)
 		EquipDefault(true)
 	end
 
-	module.UpdateAmmo(slot.Ammo)
+	module.UpdateAmmo(slot.Ammo, true)
 end
+
+local gunPointIcon
 
 function module.Throw(outOfAmmo, dontSwitchToDefault)
 	if
@@ -2395,6 +2395,16 @@ function module.Throw(outOfAmmo, dontSwitchToDefault)
 			gunPoint = ReplicatedStorage.GunPoint:Clone()
 			gunPoint.Parent = map
 		end
+
+		if gunPointIcon then
+			gunPointIcon:Destroy()
+			gunPointIcon = nil
+		end
+
+		gunPointIcon = ReplicatedStorage.GunPointIcon:Clone()
+		gunPointIcon.Parent = workspace.Map
+		gunPointIcon:PivotTo(thrownWeapon:GetPivot())
+		util.tween(gunPointIcon.Part.Icon.ImageLabel, TweenInfo.new(0.35), { Size = UDim2.fromScale(1, 1) })
 
 		gunPoint:PivotTo(CFrame.new(thrownWeapon:GetPivot().Position) * CFrame.Angles(math.rad(180), 0, 0))
 	end
@@ -2774,6 +2784,24 @@ local function actOnAnimation(parameter)
 	end
 end
 
+local coinTimer = Timer:new("CoinFlip", 30, function()
+	if ChanceService.checkChance(50) then
+		ChanceService.UpdateLuckModifier("Jade_Coin", 50)
+		UIService.doUiAction("HUD", "FlipCoin", "Heads")
+		UIService.doUiAction("HUD", "ActivateGift", "Jade_Coin")
+
+		Timer.wait(5)
+		ChanceService.RemoveLuckModifier("Jade_Coin")
+	else
+		task.delay(1, function()
+			addToCombo(10)
+		end)
+
+		UIService.doUiAction("HUD", "FlipCoin", "Tails")
+		UIService.doUiAction("HUD", "ActivateGift", "Jade_Coin")
+	end
+end)
+
 function module:GameInit()
 	viewmodel = viewmodelService.new()
 	viewmodel:SetOffset("BaseOffset", "FromCamera", CFrame.new(0, -1.25, 0))
@@ -2815,6 +2843,8 @@ function module:OnSpawn()
 end
 
 function module.OnDied()
+	coinTimer:Cancel()
+
 	module.critChances = {
 		AR = 1,
 		Pistol = 1,
@@ -3066,24 +3096,6 @@ local function flyingKick()
 	end)
 end
 
-local coinTimer = Timer:new("CoinFlip", 30, function()
-	if ChanceService.checkChance(50) then
-		ChanceService.UpdateLuckModifier("Jade_Coin", 50)
-		UIService.doUiAction("HUD", "FlipCoin", "Heads")
-		UIService.doUiAction("HUD", "ActivateGift", "Jade_Coin")
-
-		Timer.wait(5)
-		ChanceService.RemoveLuckModifier("Jade_Coin")
-	else
-		task.delay(1, function()
-			addToCombo(10)
-		end)
-
-		UIService.doUiAction("HUD", "FlipCoin", "Tails")
-		UIService.doUiAction("HUD", "ActivateGift", "Jade_Coin")
-	end
-end)
-
 coinTimer.OnTimerStepped:Connect(function(progress)
 	UIService.doUiAction("HUD", "UpdateGiftProgress", "Jade_Coin", progress / coinTimer.WaitTime)
 end)
@@ -3301,17 +3313,20 @@ explosionService.explosiveHit:Connect(function(subject, preHealth, postHealth, d
 	if preHealth > 0 then
 		UIService.doUiAction("HUD", "ShowHit")
 
-		if GiftsService.CheckGift("Burn_Hell") and ChanceService.checkChance(10, true) then
-			if not sourceIsWeapon and source ~= "ThrownWeapon" then
-				net:RemoteEvent("Damage"):FireServer(subject, 0, "Fire")
+		if
+			GiftsService.CheckGift("Burn_Hell")
+			and ChanceService.checkChance(10, true)
+			and not sourceIsWeapon
+			and source ~= "ThrownWeapon"
+		then
+			net:RemoteEvent("Damage"):FireServer(subject, 0, "Fire")
 
-				if GiftsService.CheckGift("Freeze_Heaven") and ChanceService.checkChance(10, true) then
-					net:RemoteEvent("Damage"):FireServer(subject, 0, "Ice")
-				end
+			if GiftsService.CheckGift("Freeze_Heaven") and ChanceService.checkChance(10, true) then
+				net:RemoteEvent("Damage"):FireServer(subject, 0, "Ice")
 			end
 		end
 
-		if workspace:GetAttribute("Overcharge") >= 1 then
+		if workspace:GetAttribute("Overcharge") >= 1 and not sourceIsWeapon then
 			addToOvercharge(1)
 		end
 	end
