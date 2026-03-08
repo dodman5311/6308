@@ -238,11 +238,25 @@ local function setArmor(player, amount)
 	humanoid:SetAttribute("Armor", amount)
 end
 
+local function addArmor(player, amount)
+	local character = player.Character
+	if not character then
+		return
+	end
+
+	local humanoid = character:FindFirstChild("Humanoid")
+	if not humanoid then
+		return
+	end
+	humanoid:SetAttribute("Armor", humanoid:GetAttribute("Armor") + amount)
+end
+
 net:Connect("CheckProtected", checkProtected)
 net:Connect("SetBlocking", setBlocking)
 net:Connect("SetInvincible", addInvincibility)
 net:Connect("OnPlayerDied", onDied)
 net:Connect("SetArmor", setArmor)
+net:Connect("AddArmor", addArmor)
 
 net:Connect("GiftAdded", function(player, gift)
 	if gift == "Haven" then
@@ -305,7 +319,7 @@ net:Connect("Restart", function(player)
 	local humanoid = player.Character.Humanoid
 
 	workspace:SetAttribute("TotalScore", 0)
-	workspace:SetAttribute("StoredScore", 0)
+	--workspace:SetAttribute("StoredScore", 0)
 	humanoid:SetAttribute("Armor", 0)
 	humanoid.Health = 0
 end)

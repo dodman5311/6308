@@ -77,6 +77,18 @@ local function returnPressed(enterPressed)
 
 	fullGui.InputBox.Text = ""
 
+	if not categoryKey then
+		return warn(`Category not found`)
+	end
+
+	if not commandKey then
+		return warn(`Command not found`)
+	end
+
+	if not parameters then
+		return warn(`Parameter not found`)
+	end
+
 	for index, stringValue in ipairs(parameters) do
 		local totalParams = commands[categoryKey][commandKey].Parameters()
 		if stringValue == " " or stringValue == "" or index > #totalParams then
@@ -265,6 +277,10 @@ end
 UserInputService.InputBegan:Connect(function(input, gpe)
 	if not Players:GetAttribute("CheatsEnabled") then
 		return
+	end
+
+	if inGui and input.KeyCode == Enum.KeyCode.ButtonX then
+		returnPressed(true)
 	end
 
 	if input.KeyCode == Enum.KeyCode.DPadDown and (not gpe or inGui) then

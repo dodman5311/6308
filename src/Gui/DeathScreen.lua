@@ -173,9 +173,18 @@ local function showCoinCheck(frame)
 
 	coinAnim:Stop()
 
+	animation:Resume()
+	animation:OnFrameReached(20):Wait()
+	animation:Pause()
+
+	local coinAnimation
+
 	if workspace:GetAttribute("LogTotalScore") < (workspace:GetAttribute("LogDeathCount") + 1) * 400 then
 		local clearThread = task.spawn(function()
 			completed = false
+
+			task.wait(2)
+
 			Signals.DoUiAction:Fire("Requiem", "ShowRequiemShop", "DeathScreen")
 			for i = 1, 8 do
 				local waitTime = math.abs((8 - i) / 8)
@@ -187,7 +196,46 @@ local function showCoinCheck(frame)
 				task.wait(waitTime)
 			end
 			Signals.DoUiAction:Fire("Requiem", "HideRequiemShop")
-			task.wait(2)
+			task.wait(0.5)
+
+			local bank = frame.PiggyBank
+
+			coinAnimation = UIAnimationService.PlayAnimation(bank.Coins.Animation, 0.075, true)
+
+			bank.Coins.Animation.Image.ImageTransparency = 1
+			bank.Coins.Count.TextTransparency = 1
+			bank.Coins.Count.UIStroke.Transparency = 1
+			bank.Icon.ImageTransparency = 1
+			bank.Visible = true
+
+			local ti_b = TweenInfo.new(0.5)
+			local ti_c = TweenInfo.new(1, Enum.EasingStyle.Elastic)
+			bank.Coins.Count.Text = workspace:GetAttribute("StoredScore") * 2
+
+			util.tween({ bank.Icon, bank.Coins.Animation.Image }, ti_b, { ImageTransparency = 0 })
+			util.tween({ bank.Coins.Count.UIStroke }, ti_b, { Transparency = 0 })
+			util.tween(bank, ti_b, { BackgroundTransparency = 0.5 })
+			util.tween({ bank.Coins.Count }, ti_b, { TextTransparency = 0 }, true)
+			task.wait(1.5)
+
+			bank.Position = UDim2.fromScale(0.525, 0.5)
+
+			bank.Coins.Count.Text = workspace:GetAttribute("StoredScore")
+
+			util.tween(util.PlaySound(sounds.RCoinsSmall, script), TweenInfo.new(1), { PlaybackSpeed = 0.4 })
+			util.tween({ bank }, ti_c, { Position = UDim2.fromScale(0.5, 0.5) }, true)
+
+			task.wait(1)
+
+			util.tween({ bank.Icon, bank.Coins.Animation.Image }, ti_b, { ImageTransparency = 1 })
+			util.tween({ bank.Coins.Count }, ti_b, { TextTransparency = 1 })
+			util.tween(bank, ti_b, { BackgroundTransparency = 1 })
+			util.tween({ bank.Coins.Count.UIStroke }, ti_b, { Transparency = 1 }, true)
+
+			bank.Visible = false
+			coinAnimation:Stop()
+			coinAnimation = nil
+
 			Skip.hideSkip()
 			completed = true
 		end)
@@ -195,7 +243,11 @@ local function showCoinCheck(frame)
 		Skip.enableSkip(function()
 			task.cancel(clearThread)
 			Signals.DoUiAction:Fire("Requiem", "HideRequiemShop")
+			frame.PiggyBank.Visible = false
 			completed = true
+			if coinAnimation then
+				coinAnimation:Stop()
+			end
 		end)
 	else
 		completed = true

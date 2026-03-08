@@ -249,7 +249,7 @@ local function setBoolToValue(buttonFrame, value)
 	buttonFrame.Value.Text = tostring(value)
 end
 
-local function setSliderToValue(barFrame, input, maxValue)
+local function setSliderToValue(barFrame, input, maxValue, correctionOverride)
 	local alphaValue = 0
 
 	if typeof(input) == "number" then
@@ -260,10 +260,14 @@ local function setSliderToValue(barFrame, input, maxValue)
 		alphaValue = math.round(xPosition * 100) / 100
 	end
 
-	if alphaValue >= 0.98 then
-		alphaValue = 1
-	elseif alphaValue <= 0.02 then
-		alphaValue = 0
+	if not correctionOverride then
+		if alphaValue >= 0.98 then
+			alphaValue = 1
+		elseif alphaValue <= 0.02 then
+			alphaValue = 0
+		end
+	else
+		alphaValue = math.clamp(alphaValue, 0, 1)
 	end
 
 	--local value = alphaValue * maxValue
@@ -648,6 +652,26 @@ function module.Init(player: Player, ui, frame)
 	focusButton.MouseButton1Click:Connect(function()
 		GuiService.SelectedObject = nil
 		mapInFocus = true
+	end)
+
+	UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+		if UserInputService.GamepadEnabled and frame.Gui.Enabled then
+			if input.KeyCode == Enum.KeyCode.ButtonL1 then
+				local label: GuiButton = frame.Main.Buttons[currentMenu]
+				local nextButton = label.NextSelectionLeft
+
+				GuiService.SelectedObject = nextButton
+				buttonFunctions[nextButton.Name].Action(nextButton, player, ui, frame)
+			end
+
+			if input.KeyCode == Enum.KeyCode.ButtonR1 then
+				local label: GuiButton = frame.Main.Buttons[currentMenu]
+				local nextButton = label.NextSelectionRight
+
+				GuiService.SelectedObject = nextButton
+				buttonFunctions[nextButton.Name].Action(nextButton, player, ui, frame)
+			end
+		end
 	end)
 end
 
@@ -1480,24 +1504,25 @@ local function loadSettings(frame)
 			newSettingsButton.SelectionGained:Connect(function()
 				local position = Vector2.zero
 				inputChanged = UserInputService.InputChanged:Connect(function(input, gpe)
-					if input.KeyCode ~= Enum.KeyCode.Thumbstick2 then
+					if input.KeyCode ~= Enum.KeyCode.Thumbstick2 and input.KeyCode ~= Enum.KeyCode.Thumbstick1 then
 						return
 					end
 
-					position = input.Position
-
-					if input.Position.Magnitude > 0.25 then
+					if math.abs(input.Position.X) >= 0.2 then
 						position = input.Position
-					else
-						position = Vector2.zero
 					end
 				end)
 
 				heartbeat = RunService.Heartbeat:Connect(function(delta)
+					if math.abs(position.X) < 0.25 then
+						position = Vector2.zero
+					end
+
 					settingTable.Value = setSliderToValue(
 						barFrame,
 						barFrame.Bar.Size.X.Scale + ((position.X * 1.5) * delta),
-						settingTable.MaxValue
+						settingTable.MaxValue,
+						true
 					)
 					settingTable:OnChanged(frame)
 				end)

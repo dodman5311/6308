@@ -778,7 +778,7 @@ local function addArmor(player, amount)
 		return
 	end
 
-	net:RemoteEvent("SetArmor"):FireServer(humanoid:GetAttribute("Armor") + amount)
+	net:RemoteEvent("AddArmor"):FireServer(amount)
 end
 
 function module.applyGiftChange(name)

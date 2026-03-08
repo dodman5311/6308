@@ -706,12 +706,12 @@ net:Connect("OpenRequiem", function()
 end)
 
 UserInputService.InputBegan:Connect(function(input, gpe)
-	-- if gpe then
-	-- 	return
-	-- end
+	if not UserInputService.GamepadEnabled and gpe then
+		return
+	end
 
 	if
-		(input.KeyCode == Enum.KeyCode.Tab and not gpe)
+		input.KeyCode == Enum.KeyCode.Tab
 		or input.KeyCode == Enum.KeyCode.M
 		or input.KeyCode == Enum.KeyCode.ButtonSelect
 	then

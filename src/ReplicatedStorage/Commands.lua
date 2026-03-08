@@ -32,6 +32,10 @@ local commands = {
 			PlayersWithGodMode = {},
 
 			ExecuteServer = function(self, _, Player, Value)
+				if not Player then
+					return
+				end
+
 				if not Player.Character then
 					return Player.Name .. "'s character does not exist"
 				end
@@ -63,6 +67,9 @@ local commands = {
 			end,
 
 			ExecuteServer = function(_, _, Player, setMax, Value)
+				if not Player or not Value or not tonumber(Value) then
+					return
+				end
 				if not Player.Character then
 					return Player.Name .. "'s character does not exist"
 				end
@@ -91,7 +98,7 @@ local commands = {
 			end,
 
 			ExecuteServer = function(self, _, Player, Value)
-				if not Value then
+				if not Value or not Player then
 					return
 				end
 				local dataStore = require(Globals.Server.Services.DataStore)
@@ -122,14 +129,16 @@ local commands = {
 					return
 				end
 				workspace:SetAttribute("TotalScore", tonumber(amount))
+
+				print("coins set to " .. amount)
 			end,
 		},
 
-		Simulate_Progression = {
+		["Simulate_Progression_(Depricated)"] = {
 			Parameters = function()
 				return {
 					{ Name = "Levels Passed", Options = { "_Input" } },
-					{ Name = "Combat Level", Options = { "_Input" } },
+					{ Name = "Combat Level (1 - 5)", Options = { "_Input" } },
 				}
 			end,
 
@@ -246,6 +255,8 @@ local commands = {
 				end
 				local weapons = require(Globals.Client.Controllers.WeaponController)
 				weapons.critChances[category] = tonumber(amount)
+
+				print(category .. " crits set to " .. amount)
 			end,
 		},
 
@@ -257,7 +268,11 @@ local commands = {
 			end,
 
 			ExecuteClient = function(_, amount)
+				if not amount or not tonumber(amount) then
+					return
+				end
 				signals.DoWeaponAction:Fire("UpdateAmmo", tonumber(amount))
+				print("Ammo set to " .. amount)
 			end,
 		},
 
@@ -269,7 +284,12 @@ local commands = {
 			end,
 
 			ExecuteClient = function(_, amount)
+				if not amount or not tonumber(amount) then
+					return
+				end
+
 				signals.AddSoul:Fire(tonumber(amount))
+				print(amount .. " Souls given")
 			end,
 		},
 
@@ -281,10 +301,12 @@ local commands = {
 			end,
 
 			ExecuteClient = function(_, amount)
-				if not amount then
+				if not amount or not tonumber(amount) then
 					return
 				end
-				require(Globals.Vendor.ChanceService).luck = amount
+				require(Globals.Vendor.ChanceService).luck = tonumber(amount)
+
+				print("Luck set to " .. amount)
 			end,
 		},
 
@@ -297,9 +319,14 @@ local commands = {
 			end,
 
 			ExecuteClient = function(_, amount)
+				if not amount or not tonumber(amount) then
+					return
+				end
 				local kiosk = require(ReplicatedStorage.Gui.Kiosk)
 
-				kiosk.tickets += amount
+				kiosk.tickets += tonumber(amount)
+
+				print(amount .. " Perk Tickets given")
 			end,
 		},
 
@@ -312,32 +339,33 @@ local commands = {
 			end,
 
 			ExecuteClient = function(_, Weapon, element)
+				if not Weapon then
+					return
+				end
+
 				if element == "None" then
 					element = nil
 				end
 
 				signals.DoWeaponAction:Fire("EquipWeapon", Weapon.Name, nil, element)
+				print(Weapon.Name .. " Given")
 			end,
 		},
 
 		Complete_Codex = {
 			Parameters = function()
-				return {
-					{ Name = "Confirm", Options = { true, false } },
-				}
+				return {}
 			end,
 
-			ExecuteClient = function(_, confirm)
-				if not confirm then
-					return
-				end
-
+			ExecuteClient = function()
 				local codex = require(Globals.Shared.Codex)
 				local codexService = require(Globals.Client.Services.CodexService)
 
 				for i, _ in pairs(codex) do -- add all entries for testing
 					codexService.AddEntry(i, true)
 				end
+
+				print("All codex entries have been added")
 			end,
 		},
 
@@ -352,6 +380,9 @@ local commands = {
 			end,
 
 			ExecuteServer = function(_, _, Player, setMax, Value)
+				if not Player or not Value or not tonumber(Value) then
+					return
+				end
 				if not Player.Character then
 					return Player.Name .. "'s character does not exist"
 				end
@@ -380,6 +411,10 @@ local commands = {
 			end,
 
 			ExecuteClient = function(_, amount)
+				if not amount or not tonumber(amount) then
+					return
+				end
+
 				local GiftsService = require(Players.LocalPlayer.PlayerScripts.Client.Services.GiftsService)
 				local perkIndexes = {}
 				local upgradeIndexes = {}
@@ -404,6 +439,8 @@ local commands = {
 
 					GiftsService.AddGift(randomGift)
 				end
+
+				print(amount .. " random perk(s) given")
 			end,
 		},
 
@@ -415,6 +452,9 @@ local commands = {
 			end,
 
 			ExecuteClient = function(_, types)
+				if not types then
+					return
+				end
 				local GiftsService = require(Players.LocalPlayer.PlayerScripts.Client.Services.GiftsService)
 
 				if types == "All" or types == "Superior" then
@@ -428,6 +468,8 @@ local commands = {
 						GiftsService.AddGift(index)
 					end
 				end
+
+				print(types .. " perks given")
 			end,
 		},
 
@@ -439,9 +481,14 @@ local commands = {
 				}
 			end,
 
-			ExecuteClient = function(_, Perk)
+			ExecuteClient = function(_, perk)
+				if not perk then
+					return
+				end
 				local GiftsService = require(Players.LocalPlayer.PlayerScripts.Client.Services.GiftsService)
-				GiftsService.AddGift(Perk)
+				GiftsService.AddGift(perk)
+
+				print(perk .. " given")
 			end,
 		},
 
@@ -453,9 +500,14 @@ local commands = {
 				}
 			end,
 
-			ExecuteClient = function(_, Upgrade)
+			ExecuteClient = function(_, perk)
+				if not perk then
+					return
+				end
 				local GiftsService = require(Players.LocalPlayer.PlayerScripts.Client.Services.GiftsService)
-				GiftsService.AddGift(Upgrade)
+				GiftsService.AddGift(perk)
+
+				print(perk .. " given")
 			end,
 		},
 
@@ -467,9 +519,14 @@ local commands = {
 				}
 			end,
 
-			ExecuteClient = function(_, Special)
+			ExecuteClient = function(_, perk)
+				if not perk then
+					return
+				end
 				local GiftsService = require(Players.LocalPlayer.PlayerScripts.Client.Services.GiftsService)
-				GiftsService.AddGift(Special)
+				GiftsService.AddGift(perk)
+
+				print(perk .. " given")
 			end,
 		},
 	},
@@ -513,11 +570,17 @@ local commands = {
 			end,
 
 			ExecuteClient = function(_, sound, volume)
+				if not sound or not volume or not tonumber(volume) then
+					return
+				end
+
 				local util = require(Globals.Vendor.Util)
 
 				local soundToPlay = util.PlaySound(sound, script)
-				soundToPlay.Volume = volume
+				soundToPlay.Volume = tonumber(volume)
 				soundToPlay.Looped = false
+
+				print(sound.Name .. " played")
 			end,
 		},
 
@@ -529,7 +592,7 @@ local commands = {
 			end,
 
 			ExecuteServer = function(_, _, Player)
-				if not Player.Character then
+				if not Player or not Player.Character then
 					return
 				end
 
@@ -539,6 +602,7 @@ local commands = {
 					return
 				end
 				Player.Character:PivotTo(spawnLocation.CFrame * CFrame.new(0, 3, 0))
+				print(Player .. " teleported to spawn")
 			end,
 		},
 
@@ -552,7 +616,11 @@ local commands = {
 			end,
 
 			ExecuteServer = function(_, _, style, size)
+				if not style or not size or not tonumber(size) then
+					return
+				end
 				signals["GenerateMap"]:Fire(style, tonumber(size))
+				print("Map generated")
 			end,
 		},
 
@@ -565,6 +633,10 @@ local commands = {
 			end,
 
 			ExecuteServer = function(_, player, size, tp)
+				if not player or not player.Character or not size or not tonumber(size) then
+					return
+				end
+
 				local mapService = require(Globals.Services.MapService)
 				mapService.loadInterior(size)
 
@@ -593,6 +665,12 @@ local commands = {
 
 					enemy:Destroy()
 				end
+
+				if toClear and not clearAll then
+					print(toClear .. "s cleared")
+				else
+					print("enemiess cleared")
+				end
 			end,
 		},
 
@@ -600,13 +678,23 @@ local commands = {
 
 			Parameters = function()
 				return {
-					{ Name = "Stage number", Options = { "_Input" } },
+					{ Name = "Act number", Options = { "_Input" } },
 					{ Name = "Level number", Options = { "_Input" } },
 					{ Name = "To Reqiuem", Options = { false, true } },
 				}
 			end,
 
 			ExecuteServer = function(_, player, stage_number, level_number, toReq: boolean?)
+				if
+					not player
+					or not stage_number
+					or not tonumber(stage_number)
+					or not level_number
+					or not tonumber(level_number)
+				then
+					return
+				end
+
 				local stage = tonumber(stage_number)
 				local level = tonumber(level_number) - 1
 
@@ -634,6 +722,9 @@ local commands = {
 			end,
 
 			ExecuteClient = function(_, amnt, dist)
+				if not amnt or not dist or not tonumber(amnt) or not tonumber(dist) then
+					return
+				end
 				amnt = tonumber(amnt) or 1
 				dist = tonumber(dist) or 25
 
@@ -664,7 +755,7 @@ local commands = {
 				}
 			end,
 
-			ExecuteServer = function(_, player, Enemy, amount, teamName)
+			ExecuteServer = function(_, player, Enemy, amount: number?, teamName: string?)
 				if not Enemy then
 					return
 				end
@@ -731,16 +822,10 @@ local commands = {
 		Show_Delivery = {
 
 			Parameters = function()
-				return {
-					{ Name = "Confirm", Options = { true, false } },
-				}
+				return {}
 			end,
 
-			ExecuteClient = function(_, confirm)
-				if not confirm then
-					return
-				end
-
+			ExecuteClient = function()
 				local soulsService = require(Globals.Client.Services.SoulsService)
 				local uiService = require(Globals.Client.Services.UIService)
 				uiService.doUiAction("DeliveryUi", "ShowScreen", soulsService.Souls)
@@ -806,13 +891,10 @@ local commands = {
 		Show_Death = {
 
 			Parameters = function()
-				return {
-					{ Name = "Unlock", Options = { true, false } },
-				}
+				return {}
 			end,
 
-			ExecuteClient = function(_, unlock)
-				require(ReplicatedStorage.Gui.DeathScreen).unlocked = unlock
+			ExecuteClient = function()
 				require(Globals.Client.Services.UIService).doUiAction("DeathScreen", "ShowDeathScreen")
 			end,
 		},
@@ -820,16 +902,10 @@ local commands = {
 		Show_Kiosk = {
 
 			Parameters = function()
-				return {
-					{ Name = "Confirm", Options = { true, false } },
-				}
+				return {}
 			end,
 
-			ExecuteClient = function(_, confirm)
-				if not confirm then
-					return
-				end
-
+			ExecuteClient = function()
 				local soulsService = require(Globals.Client.Services.SoulsService)
 				local uiService = require(Globals.Client.Services.UIService)
 				uiService.doUiAction("Kiosk", "ShowScreen", soulsService.Souls)
@@ -858,51 +934,13 @@ local commands = {
 		Notify = {
 			Parameters = function()
 				return {
-					{ Name = "NotifyAction", Options = { "ArenaBegun", "ArenaComplete" } },
+					{ Name = "NotifyAction", Options = { "ArenaBegun", "ArenaComplete" } }, -- fill in
 				}
 			end,
 
 			ExecuteClient = function(_, NotifyAction)
 				local uiService = require(Globals.Client.Services.UIService)
 				uiService.doUiAction("Notify", NotifyAction)
-			end,
-		},
-	},
-
-	Settings = {
-		Screen_Effects = {
-			Parameters = function()
-				return {
-					{ Name = "Enabled", Options = { true, false } },
-				}
-			end,
-
-			ExecuteClient = function(_, value)
-				game.Players.LocalPlayer.PlayerGui.ScreenEffects.Distortions.Visible = value
-			end,
-		},
-
-		View_Bobbing = {
-			Parameters = function()
-				return {
-					{ Name = "Enabled", Options = { true, false } },
-				}
-			end,
-
-			ExecuteClient = function(_, value)
-				require(Globals.Client.Controllers.CameraController).viewBobbingEnabled = value
-			end,
-		},
-
-		Music_Volume = {
-			Parameters = function()
-				return {
-					{ Name = "Volume", Options = { "_Input" } },
-				}
-			end,
-
-			ExecuteClient = function(_, value)
-				game:GetService("SoundService").Music.Volume = value
 			end,
 		},
 	},

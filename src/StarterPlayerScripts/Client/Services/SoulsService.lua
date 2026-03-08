@@ -135,7 +135,7 @@ local function AddArmor(amount)
 		return
 	end
 
-	net:RemoteEvent("SetArmor"):FireServer(humanoid:GetAttribute("Armor") + amount)
+	net:RemoteEvent("AddArmor"):FireServer(amount)
 end
 
 function module.AddSoul(amount)

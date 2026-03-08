@@ -218,6 +218,10 @@ local isInDeathScreen = false
 function module.ShowRequiemShop(_, ui, frame, displayType)
 	local ti = TweenInfo.new(0.1)
 
+	if displayType == "DeathScreen" then
+		ti = TweenInfo.new(0.75)
+	end
+
 	frame.Fade.BackgroundTransparency = 0
 	frame.Fade.Visible = true
 	util.tween(frame.Fade, ti, { BackgroundTransparency = 1 })
