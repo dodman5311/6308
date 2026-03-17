@@ -351,7 +351,7 @@ Firing a picked up weapon or reloading removes 1 stack of Purity
 		Blueberry_Currant = {
 			Icon = "rbxassetid://90818851202897", -- NEW
 			Catagories = { "Arsenal" },
-			Desc = [[Taking armor damage now has a chance to create an electric explosion around you. (20% chance)]],
+			Desc = [[Taking armor damage now has a chance to create an electric explosion around you. (30% chance)]],
 		},
 
 		Barrel_Hunt = {

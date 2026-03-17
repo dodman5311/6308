@@ -10,7 +10,7 @@ local rs = game:GetService("RunService")
 
 local rp = RaycastParams.new()
 rp.FilterType = Enum.RaycastFilterType.Include
-rp.FilterDescendantsInstances = { workspace.Map }
+rp.FilterDescendantsInstances = { workspace:WaitForChild("Map") }
 
 local airController = require(script.Parent.AirController)
 

@@ -176,6 +176,14 @@ local settings = {
 	"Gameplay",
 
 	{
+		Name = "Aim Assist",
+		Type = "Slider",
+		MaxValue = NumberRange.new(0, 100),
+		Value = 50,
+		OnChanged = function() end,
+	},
+
+	{
 		Name = "Field of View",
 		Type = "Slider",
 		MaxValue = NumberRange.new(50, 120),

@@ -1,6 +1,7 @@
 local module = {}
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 
@@ -56,7 +57,7 @@ local function switchTrack()
 end
 
 function module.stopMusic(trackToStop)
-	if not currentPlaying or (trackToStop and currentPlaying.Name ~= trackToStop) then
+	if not currentPlaying then --or (trackToStop and currentPlaying.Name ~= trackToStop) then
 		return
 	end
 
@@ -67,8 +68,8 @@ function module.stopMusic(trackToStop)
 
 	util.tween(calm, ti, { Volume = 0 })
 	util.tween(track, ti, { Volume = 0 }, false, function()
-		calm:Stop()
 		track:Stop()
+		calm:Stop()
 	end, Enum.PlaybackState.Completed)
 end
 
@@ -81,20 +82,21 @@ function module.playMusic(level)
 
 	module.stopMusic()
 
-	currentPlaying = music:FindFirstChild(level)
+	local levelTrack = music:FindFirstChild(level)
 
-	if not currentPlaying then
+	if not levelTrack then
 		return
 	end
+	currentPlaying = levelTrack
 
 	local calm = currentPlaying:FindFirstChild("Calm") or fallBackTrack
 	local track = currentPlaying:FindFirstChild("Track")
 
-	calm:Play()
-	track:Play()
-
 	util.tween(calm, ti, { Volume = 0.25 })
 	util.tween(track, ti, { Volume = 0 })
+
+	calm:Play()
+	track:Play()
 
 	switchTrack()
 end
@@ -102,13 +104,19 @@ end
 function module.playTrack(trackName, volume)
 	module.stopMusic()
 
-	currentPlaying = music:FindFirstChild(trackName)
+	local trackToPlay = music:FindFirstChild(trackName)
+
+	if not trackToPlay then
+		return
+	end
+
+	currentPlaying = trackToPlay
 
 	local track = currentPlaying:FindFirstChild("Track")
 
 	track:Play()
 
-	track.Volume = volume or 0.5
+	util.tween(track, TweenInfo.new(0.1), { Volume = volume or 0.5 })
 end
 
 function module:OnSpawn()

@@ -48,8 +48,12 @@ local function InitModules(...)
 						return
 					end
 
+					local initData = { ... }
+
 					if mod.GameInit then
-						mod:GameInit(...)
+						task.spawn(function()
+							mod:GameInit(table.unpack(initData))
+						end)
 					end
 
 					table.insert(modules, mod)

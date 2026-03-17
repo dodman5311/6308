@@ -276,7 +276,7 @@ end
 
 function module.getRandomGiftFromLocalList(list)
 	local array = {}
-	local list = list or spinGifts
+	list = list or spinGifts
 
 	for key, gift in pairs(list) do
 		if not chanceService.checkChance(gift.Chance, gift.GoodLuck) then
@@ -287,7 +287,7 @@ function module.getRandomGiftFromLocalList(list)
 	end
 
 	if #array == 0 then
-		return
+		return "Clover", spinGifts.Clover
 	end
 
 	local selectedKey = array[math.random(1, #array)]

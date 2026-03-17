@@ -1,10 +1,10 @@
 local module = {}
 --// Services
-local REPLICATED_STORAGE = game:GetService("ReplicatedStorage")
-local SERVER_STORAGE = game:GetService("ServerStorage")
-local RUN_SERVICE = game:GetService("RunService")
-local PLAYERS = game:GetService("Players")
 local DEBRIS = game:GetService("Debris")
+local PLAYERS = game:GetService("Players")
+local REPLICATED_STORAGE = game:GetService("ReplicatedStorage")
+local RUN_SERVICE = game:GetService("RunService")
+local SERVER_STORAGE = game:GetService("ServerStorage")
 local collectionService = game:GetService("CollectionService")
 
 --// Instances
@@ -16,12 +16,12 @@ local sounds = goreEffects.Sounds
 
 local Globals = require(REPLICATED_STORAGE.Shared.Globals)
 
-local map = workspace.Map
+local map = workspace:WaitForChild("Map")
 
 --// Modules
-local util = require(Globals.Vendor.Util)
-local net = require(Globals.Packages.Net)
 local giftService = require(Globals.Client.Services.GiftsService)
+local net = require(Globals.Packages.Net)
+local util = require(Globals.Vendor.Util)
 
 local rng = Random.new()
 

@@ -261,10 +261,6 @@ local function showCoinCheck(frame)
 	animation.OnEnded:Wait()
 
 	coinsCheckFrame.Visible = false
-
-	task.delay(2, function()
-		Signals.DoUiAction:Fire("Notify", "ShowLevelDisplay")
-	end)
 end
 
 function module.ShowDeathScreen(player, ui, frame)
@@ -313,6 +309,7 @@ function module.ShowDeathScreen(player, ui, frame)
 
 		if workspace:GetAttribute("IsInReq") then
 			MusicService.playTrack("Reqiuem")
+			Signals.DoUiAction:Fire("HUD", "ShowRCoins")
 		else
 			MusicService.playMusic()
 		end

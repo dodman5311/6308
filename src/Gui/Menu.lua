@@ -921,7 +921,13 @@ local function createTeleportIcon(frame, adornee: Model, icon): MapIcons.MapIcon
 	newIcon.InteractTime = 0
 
 	newIcon.InteractCompleted:Connect(function()
-		if workspace:GetAttribute("EnemiesInCombat") > 0 then
+		if workspace:GetAttribute("EnemiesInCombat") > 0 or workspace:GetAttribute("IsInReq") then
+			if workspace:GetAttribute("IsInReq") then
+				frame.DeniedFastTravel.Text = "Cannot fast travel while in Requiem"
+			else
+				frame.DeniedFastTravel.Text = "Cannot fast travel while in combat"
+			end
+
 			util.tween(frame.DeniedFastTravel.UIStroke, TweenInfo.new(0), { Transparency = 0 })
 			util.tween(frame.DeniedFastTravel, TweenInfo.new(0), { TextTransparency = 0 }, false, function()
 				util.tween(frame.DeniedFastTravel, TweenInfo.new(2), { TextTransparency = 1 })
@@ -941,7 +947,7 @@ local function createTeleportIcon(frame, adornee: Model, icon): MapIcons.MapIcon
 
 		local teleportPart = adornee:FindFirstChild("Notice")
 		if string.match(adornee.Name, "Start") then
-			teleportPart = workspace.SpawnLocation
+			teleportPart = workspace:WaitForChild("SpawnLocation")
 		end
 		Players.LocalPlayer.Character:PivotTo(teleportPart:GetPivot())
 
@@ -1651,6 +1657,14 @@ function module.openSettings(player, ui, frame)
 	frame.Settings_Menu.Visible = true
 
 	setDownSelection(frame, frame.Settings)
+
+	if workspace:GetAttribute("IsInReq") then
+		frame.Restart.Interactable = false
+		frame.Restart.ImageColor3 = Color3.fromRGB(100, 100, 100)
+	else
+		frame.Restart.Interactable = true
+		frame.Restart.ImageColor3 = Color3.fromRGB(255, 50, 50)
+	end
 
 	local ti = TweenInfo.new(0.1, Enum.EasingStyle.Linear)
 	util.tween(frame.Settings_Menu, ti, { GroupTransparency = 0 })

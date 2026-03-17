@@ -520,95 +520,6 @@ local function addPurity(value: number)
 	return math.ceil((value * 0.05) * module.purity)
 end
 
-local function EquipDefault(ignoreAmmo)
-	module.CloseDeadBolt()
-	UIService.doUiAction("HUD", "hideReload")
-
-	animationService:stopAnimation(viewmodel.Model, "Equip", 0)
-	animationService:playAnimation(viewmodel.Model, "DefaultIdle", Enum.AnimationPriority.Core.Value, false, 0)
-
-	animationService:playAnimation(viewmodel.Model, "DefaultEquip", Enum.AnimationPriority.Action3.Value, false, 0)
-
-	UIService.doUiAction("HUD", "SetCrosshair", crosshairs.Default, true)
-
-	if not defaultWeapon then
-		if workspace:GetAttribute("CleanseAndRepent_Tier") >= 3 then
-			defaultWeapon = assets.Models["Forged Arms"]:Clone()
-		else
-			defaultWeapon = assets.Models.CleanseAndRepent:Clone()
-		end
-
-		defaultWeapon.Name = "Default"
-
-		viewmodel.Model.LeftGrip.LeftGun.Part1 = defaultWeapon.Left.GripLeft
-		viewmodel.Model.RightGrip.RightGun.Part1 = defaultWeapon.Right.Grip
-	end
-
-	defaultWeapon.Parent = viewmodel.Model
-
-	if GiftsService.CheckGift("Dead_Bolt") then
-		UIService.doUiAction("HUD", "AssignDeadbolt", defaultWeapon)
-	end
-
-	if ignoreAmmo then
-		return
-	end
-
-	module.UpdateAmmo(module.defaultMagSize + addPurity(module.defaultMagSize))
-	signals.WeaponEquipped:Fire("Cleanse & Repent")
-end
-
-local function Recoil(recoilVector, randomVector, magnitude, speed)
-	local randomizedVector = Vector3.new(
-		rng:NextNumber(recoilVector.X + -randomVector.X, recoilVector.X + randomVector.X) * 100,
-		rng:NextNumber(recoilVector.Y + -randomVector.Y, recoilVector.Y + randomVector.Y) * 100,
-		rng:NextNumber(recoilVector.Z + -randomVector.Z, recoilVector.Z + randomVector.Z) * 100
-	) * magnitude
-
-	recoilSpring.Speed = 30 * speed
-
-	recoilSpring:Impulse(randomizedVector)
-end
-
-local function showMuzzleFlash(flashPart, offset)
-	if not offset then
-		offset = CFrame.new()
-	end
-
-	for _, effect in ipairs(flashPart:GetChildren()) do
-		if not string.match(effect.Name, "FireEffect") then
-			continue
-		end
-		effect:Emit(5)
-	end
-
-	flashPart.FireLight.Enabled = true
-	task.delay(0.05, function()
-		if not flashPart.Parent then
-			return
-		end
-		flashPart.FireLight.Enabled = false
-	end)
-
-	if module.currentWeapon ~= nil then
-		return
-	end
-
-	local partClone = assets.Effects.smokePart:Clone()
-	partClone.Parent = workspace.Ignore
-	partClone.CFrame = flashPart.CFrame * offset
-	partClone.Hit.Position = Vector3.new(0, 0, -100)
-	partClone.Beam.Enabled = true
-
-	task.spawn(function()
-		for i = 0.9, 1, 0.01 do
-			task.wait(0.05)
-			partClone.Beam.Transparency = NumberSequence.new(i)
-		end
-		partClone:Destroy()
-	end)
-end
-
 local function ReloadDefault()
 	if currentAmmo >= module.defaultMagSize then
 		return
@@ -669,6 +580,101 @@ local function ReloadDefault()
 	module.UpdateAmmo(module.defaultMagSize + addPurity(module.defaultMagSize))
 
 	module.UpdateSlot()
+end
+
+local function EquipDefault(ignoreAmmo)
+	module.CloseDeadBolt()
+	UIService.doUiAction("HUD", "hideReload")
+
+	animationService:stopAnimation(viewmodel.Model, "Equip", 0)
+	animationService:playAnimation(viewmodel.Model, "DefaultIdle", Enum.AnimationPriority.Core.Value, false, 0)
+
+	animationService:playAnimation(viewmodel.Model, "DefaultEquip", Enum.AnimationPriority.Action3.Value, false, 0)
+
+	UIService.doUiAction("HUD", "SetCrosshair", crosshairs.Default, true)
+
+	if not defaultWeapon then
+		if workspace:GetAttribute("CleanseAndRepent_Tier") >= 3 then
+			defaultWeapon = assets.Models["Forged Arms"]:Clone()
+		else
+			defaultWeapon = assets.Models.CleanseAndRepent:Clone()
+		end
+
+		defaultWeapon.Name = "Default"
+
+		viewmodel.Model.LeftGrip.LeftGun.Part1 = defaultWeapon.Left.GripLeft
+		viewmodel.Model.RightGrip.RightGun.Part1 = defaultWeapon.Right.Grip
+	end
+
+	defaultWeapon.Parent = viewmodel.Model
+
+	if GiftsService.CheckGift("Dead_Bolt") then
+		UIService.doUiAction("HUD", "AssignDeadbolt", defaultWeapon)
+	end
+
+	if ignoreAmmo then
+		task.defer(function()
+			if currentAmmo <= 0 then
+				ReloadDefault()
+			end
+		end)
+
+		return
+	end
+
+	module.UpdateAmmo(module.defaultMagSize + addPurity(module.defaultMagSize))
+	signals.WeaponEquipped:Fire("Cleanse & Repent")
+end
+
+local function Recoil(recoilVector, randomVector, magnitude, speed)
+	local randomizedVector = Vector3.new(
+		rng:NextNumber(recoilVector.X + -randomVector.X, recoilVector.X + randomVector.X) * 100,
+		rng:NextNumber(recoilVector.Y + -randomVector.Y, recoilVector.Y + randomVector.Y) * 100,
+		rng:NextNumber(recoilVector.Z + -randomVector.Z, recoilVector.Z + randomVector.Z) * 100
+	) * magnitude
+
+	recoilSpring.Speed = 30 * speed
+
+	recoilSpring:Impulse(randomizedVector)
+end
+
+local function showMuzzleFlash(flashPart, offset)
+	if not offset then
+		offset = CFrame.new()
+	end
+
+	for _, effect in ipairs(flashPart:GetChildren()) do
+		if not string.match(effect.Name, "FireEffect") then
+			continue
+		end
+		effect:Emit(5)
+	end
+
+	flashPart.FireLight.Enabled = true
+	task.delay(0.05, function()
+		if not flashPart.Parent then
+			return
+		end
+		flashPart.FireLight.Enabled = false
+	end)
+
+	if module.currentWeapon ~= nil then
+		return
+	end
+
+	local partClone = assets.Effects.smokePart:Clone()
+	partClone.Parent = workspace.Ignore
+	partClone.CFrame = flashPart.CFrame * offset
+	partClone.Hit.Position = Vector3.new(0, 0, -100)
+	partClone.Beam.Enabled = true
+
+	task.spawn(function()
+		for i = 0.9, 1, 0.01 do
+			task.wait(0.05)
+			partClone.Beam.Transparency = NumberSequence.new(i)
+		end
+		partClone:Destroy()
+	end)
 end
 
 local function completeReload(magSize)
@@ -1162,7 +1168,7 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		end
 
 		if workspace:GetAttribute("Overcharge") == 3 then
-			overchargeValue.Value += 2
+			overchargeValue.Value = math.min(overchargeValue.Value + 2, MAX_OVERCHARGE)
 			UIService.doUiAction("HUD", "UpdateOvercharge", overchargeValue.Value / MAX_OVERCHARGE)
 		elseif workspace:GetAttribute("Overcharge") == 2 and acts:checkAct("OverchargeActive") then
 			module.AddAmmo(1)
@@ -1910,7 +1916,7 @@ local function LockOn()
 			module.Block()
 		end
 
-		if module.currentWeapon.Name == "I-Seven" and not ISevenBlock then
+		if module.currentWeapon and module.currentWeapon.Name == "I-Seven" and not ISevenBlock then
 			ISevenBlock = true
 			createISevenShieldEffect()
 			net:RemoteEvent("SetBlocking"):FireServer(true)
@@ -1967,10 +1973,6 @@ function module.Fire()
 		return
 	end
 
-	if acts:checkAct("IsBlocking", "Reloading") or currentAmmo == 0 then
-		return
-	end
-
 	hitHumanoids = {}
 
 	for _, v in ipairs(lockGuis) do
@@ -1994,6 +1996,10 @@ function module.Fire()
 
 	if not module.currentWeapon then
 		FireDefault(extraBullet)
+		return
+	end
+
+	if acts:checkAct("IsBlocking", "Reloading") or currentAmmo == 0 then
 		return
 	end
 
@@ -2859,6 +2865,11 @@ function module.OnDied()
 	if defaultWeapon then
 		defaultWeapon:Destroy()
 		defaultWeapon = nil
+	end
+
+	if gunPointIcon and gunPointIcon.Parent then
+		gunPointIcon:Destroy()
+		gunPointIcon = nil
 	end
 end
 

@@ -9,7 +9,7 @@ local Teams = game:GetService("Teams")
 --// Instances
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
-local map = workspace.Map
+local map = workspace:WaitForChild("Map")
 
 --// Modules
 local AnimationService = require(Globals.Vendor.AnimationService)

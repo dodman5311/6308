@@ -5,7 +5,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
-local map = workspace.Map
+local map = workspace:WaitForChild("Map")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local HandleNpcs = require(Globals.Server.HandleNpcs)

@@ -138,12 +138,34 @@ local function runCameraTilt()
 	camera.CFrame *= CFrame.new() * CFrame.Angles(0, 0, tilt)
 end
 
-local function runCamera()
+local function runAimAssist(delta)
+	local magnitude = util.getSetting("Aim Assist").Value / 50
+	if magnitude <= 0 then
+		return
+	end
+
+	local targetEnemy = player:FindFirstChild("TargetEnemy")
+
+	if not targetEnemy then
+		return
+	end
+
+	local enemy = targetEnemy.Value
+	if not enemy then
+		return
+	end
+	local targetCFrame = CFrame.lookAt(camera.CFrame.Position, enemy:GetPivot().Position)
+	camera.CFrame = camera.CFrame:Lerp(targetCFrame, delta * magnitude)
+end
+
+local function runCamera(delta)
 	runCameraSway()
 	runCameraTilt()
 
 	checkWalking()
 	calculateViewmodelWalkSway()
+
+	runAimAssist(delta)
 end
 
 function module:OnSpawn(character)

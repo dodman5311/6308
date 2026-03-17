@@ -596,12 +596,12 @@ local commands = {
 					return
 				end
 
-				local spawnLocation = workspace:FindFirstChild("SpawnLocation")
+				local spawnLocation = workspace:WaitForChild("SpawnLocation")
 
 				if not spawnLocation then
 					return
 				end
-				Player.Character:PivotTo(spawnLocation.CFrame * CFrame.new(0, 3, 0))
+				Player.Character:PivotTo(spawnLocation:GetPivot() * CFrame.new(0, 3, 0))
 				print(Player .. " teleported to spawn")
 			end,
 		},

@@ -207,13 +207,6 @@ local function onDied(player: Player)
 
 	dataStore.SaveData(player, "PlayerDeathCount", workspace:GetAttribute("DeathCount"))
 
-	local character = player.Character
-	local spawnLocation = workspace:FindFirstChild("SpawnLocation")
-
-	if spawnLocation then
-		character:PivotTo(spawnLocation.CFrame * CFrame.new(0, 3, 0))
-	end
-
 	player.CharacterAdded:Once(function()
 		task.wait()
 		signals["ProceedToNextLevel"]:Fire(nil, true, toReq)
@@ -221,6 +214,13 @@ local function onDied(player: Player)
 
 	for _, enemy in ipairs(collectionService:GetTagged("Enemy")) do
 		enemy:Destroy()
+	end
+
+	local character = player.Character
+	local spawnLocation = workspace:WaitForChild("SpawnLocation")
+
+	if spawnLocation then
+		character:PivotTo(spawnLocation:GetPivot() * CFrame.new(0, 3, 0))
 	end
 end
 

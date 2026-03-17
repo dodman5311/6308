@@ -181,13 +181,13 @@ function module:OnSpawn(character, humanoid)
 		if armor < logArmor and giftService.CheckGift("Blueberry_Currant") then
 			explosionService.createExplosion(
 				character:GetPivot().Position,
-				30,
+				35,
 				1,
 				Player,
 				nil,
 				"Elemental",
 				"Electricity",
-				20
+				30
 			)
 			UIService.doUiAction("HUD", "ActivateGift", "Blueberry_Currant")
 		end
@@ -238,9 +238,6 @@ function module:OnSpawn(character, humanoid)
 
 	if workspace:GetAttribute("IsInReq") then --workspace:GetAttribute("TotalScore") > (workspace:GetAttribute("DeathCount") + 1) * 200 and hasDied then -- req check
 		local stageState = net:RemoteFunction("GetStageState"):InvokeServer()
-
-		UIService.doUiAction("HUD", "ShowRCoins")
-		MusicService.playTrack("Reqiuem")
 		loadSaveData(0, stageState)
 	end
 end
@@ -273,6 +270,10 @@ end
 function module:OnDied()
 	kiosk.tickets = 0
 	ChanceService.luck = 0
+
+	if workspace:GetAttribute("TotalScore") >= (workspace:GetAttribute("DeathCount") + 1) * 400 then -- req check
+		workspace:SetAttribute("IsInReq", true) -- client reading
+	end
 
 	deathEffect()
 	UIService.doUiAction("HUD", "HideBossBar")
@@ -476,7 +477,7 @@ local function playLevelTrack()
 end
 
 local function enterLevel()
-	task.delay(0.5, function()
+	task.delay(1, function()
 		playLevelTrack()
 	end)
 
@@ -506,6 +507,7 @@ local function enterLevel()
 		MaxHealth = maxHealth,
 	}
 
+	comboService.ResetCombo()
 	net:RemoteEvent("SaveGameState"):FireServer(gameState)
 end
 
@@ -572,9 +574,11 @@ local function exitS2(extraSouls, level, stageBoss, miniBoss)
 			MusicService.playTrack(miniBoss)
 		else
 			enterLevel()
-			task.delay(wasInReq and 8 or 2, function()
-				UIService.doUiAction("Notify", "ShowLevelDisplay")
-			end)
+			if not wasInReq then
+				task.delay(2, function()
+					UIService.doUiAction("Notify", "ShowLevelDisplay")
+				end)
+			end
 		end
 	end)
 
@@ -597,6 +601,12 @@ local function exitS2(extraSouls, level, stageBoss, miniBoss)
 		-- 	end
 		-- end
 	end)
+
+	local gunPointIcon = workspace.Map:FindFirstChild("GunPointIcon")
+
+	if gunPointIcon then
+		gunPointIcon:Destroy()
+	end
 end
 
 local function ExitSequence(levelData, level, stageBoss, miniBoss, stage, toReq: boolean?)

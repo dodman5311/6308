@@ -25,7 +25,7 @@ local spawners = require(Globals.Services.Spawners)
 module.onLevelPassed = signal.new()
 --// instances
 
-local map = workspace.Map
+local map = workspace:WaitForChild("Map")
 local startUnit
 local units
 local caps
@@ -783,12 +783,12 @@ function module.proceedToNext(_, onlyLoadMap, toReq: boolean?)
 			continue
 		end
 
-		local spawnLocation = workspace:FindFirstChild("SpawnLocation")
+		local spawnLocation = workspace:WaitForChild("SpawnLocation")
 
 		if not spawnLocation then
 			return
 		end
-		character:PivotTo(spawnLocation.CFrame * CFrame.new(0, 3, 0))
+		character:PivotTo(spawnLocation:GetPivot() * CFrame.new(0, 3, 0))
 
 		character.Humanoid.Health = character.Humanoid.MaxHealth
 	end

@@ -30,6 +30,11 @@ end
 
 local function clearEnemiesList(enemies)
 	for _, enemy in ipairs(enemies) do
+		local humanoid = enemy:FindFirstChildOfClass("Humanoid")
+		if humanoid and humanoid.Health > 0 then
+			net:RemoteEvent("ReplicateEffect"):FireAllClients("EnemySpawned", "Server", true, enemy:GetPivot().Position)
+		end
+
 		enemy:Destroy()
 	end
 end

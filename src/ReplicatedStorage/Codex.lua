@@ -128,9 +128,7 @@ They adorn themselves in attire, similar to their muse, and adapt his fighting s
 
 	["Paladin"] = {
 		Category = "Enemies",
-		Entry = [[<font color="#FF7800"><b>After a few shots, paladins will reload. try to attack while they are reloading.
-		
-Immune to Melees.</b></font>
+		Entry = [[<font color="#FF7800"><b>After a few shots, paladins will reload. try to attack while they are reloading.</b></font>
 		
 A paladin is a host who not only has a strong relationship with their demon but was also chosen by the Iron Gate to carry out her will. They are clad in metal from the Gate and equipped with weapons of the Iron Unit.
 
@@ -165,9 +163,7 @@ They now roam the sewers, adorned with the tools of a hopeful ceremony, tolling 
 
 	["Dreadful"] = {
 		Category = "Enemies",
-		Entry = [[<font color="#FF7800"><b>Immune to melee weapons.</b></font>
-		
-The Dreadful are the result of a horrid, abhorrent demon taking over the flesh of its host. While not necessarily strong, these demons harbor a hateful will unseen by many in the land of the living.
+		Entry = [[The Dreadful are the result of a horrid, abhorrent demon taking over the flesh of its host. While not necessarily strong, these demons harbor a hateful will unseen by many in the land of the living.
 
 They infect, corrupt, and destroy the mind and body of their host, warping and combining their flesh with metal to protect their unholy form. They spew explosive bile infused with burning chemicals and a hateful intent.
 
@@ -198,9 +194,7 @@ Despite its differences, the Specimen still serves as a protector, but of the Vi
 
 	["Ghoul"] = {
 		Category = "Enemies",
-		Entry = [[<font color="#FF7800"><b>Walk backwards to avoid the ghoul's attacks. Shoot its heart for an insta kill.
-		
-Immune to all weapons except Pistols.</b></font>
+		Entry = [[<font color="#FF7800"><b>Walk backwards to avoid the ghoul's attacks. Shoot its heart for an insta kill.</b></font>
 		
 A thing of nightmares, the Ghoul is cursed to walk the fragile thread between the physical and the theoretical. 
 It holds its essence within its chest, allowing it to break through the wall of reality. At no point does the Ghoul recognize its plane of existence or its origin. It only knows that it must kill and feed on both soul and flesh to survive.
@@ -244,7 +238,7 @@ Every man, woman, and child wanted this extreme weapon for either protection or 
 
 Due to this modification, the Boom Cannon can inflict bodily harm that the Desert Eagle cannot. 
 
-This weapon quickly became a valuable commodity for combatants in the Black Age.]],
+This weapon quickly became a valuable commodity for combatants in the Iron Age.]],
 	},
 
 	["BORUS"] = {
@@ -255,14 +249,14 @@ Battle
 Operations &
 Rapid
 Urban
-Suppression
+Service-Weapon
 
 After the fall of the 1st Keeper, violence in Prima Hominum escalated. The Iron Unit evacuated the area, declaring it a "lost cause." Some Unit technology was left behind during the evacuation, placing the BORUS in civilian hands.]],
 	},
 
 	["RIPP"] = {
 		Category = "Weapons",
-		Entry = [[The R.I.P.P., created by Aztac, was initially developed to test Weaponized Unstable Plasma. This project was nicknamed "the Big Wup."
+		Entry = [[The R.I.P.P. or RIP, created by Aztac, was initially developed to test Weaponized Unstable Plasma. This project was nicknamed "the Big Wup."
 
 It began as a venture into developing a new type of weapon for the US military. The project was successful, and the Really Intuitive Plasma Pistol was submitted to the military for testing. However, the military found no need for such weaponry since it was, ironically, neither intuitive nor easy to control.
 
@@ -273,11 +267,11 @@ The project was abandoned, and the product was left in the dust. That was until 
 		Category = "Weapons",
 		Entry = [[<font color="#FF7800"><b>Hold fire to build up lock ons. Every 2 locks reduces the damage by 1.</b></font>
 		
-The I-Six has a mysterious origin, discovered around 2895 during a medicinal raid in Muerta Crista by NADA. Aztac purchased the weapon from authorities for its revolutionary automatic aiming and adversary detection technology.
+The I-Six has a mysterious origin, discovered around 2895 during a medicinal raid in Muerta Crista by NADA. Aztac purchased the weapon from authorities for its revolutionary automatic aiming and adversary detection technology. (ADT)
 
 Aztac conducted extensive research and development on the weapon, transforming it into a fully commercial product named the I-Six. Marketed as a civilian home defense weapon, it quickly gained popularity.
 
-Although the I-Six’s ability to lock onto multiple targets when the trigger is held was initially seen as dangerous and unnecessary, it became highly valued during the Black Age.
+Although the I-Six’s ability to lock onto multiple targets when the trigger is held was initially seen as dangerous and unnecessary, it became highly valued during the Iron Age.
 
 The success of the I-Six served as the foundation for Aztac's subsequent smart weapon developments.]],
 	},
@@ -288,7 +282,7 @@ The success of the I-Six served as the foundation for Aztac's subsequent smart w
 		
 Created in Japan during the Nanboku-cho period, the Katana is a single-edged masterpiece of a weapon. While it can be quite brittle, it more than compensates with its exceptional slicing prowess.
 
-Despite its lack of popularity in the Black Age, it still sees some use by dedicated swordsmen and cosplayers. 
+Despite its lack of popularity in the Iron Age, it still sees some use by dedicated swordsmen and cosplayers. 
 
 Which one are you? That question has yet to be answered.]],
 	},

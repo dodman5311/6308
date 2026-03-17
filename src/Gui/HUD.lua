@@ -3,12 +3,15 @@ local module = {}
 local CollectionService = game:GetService("CollectionService")
 local GuiService = game:GetService("GuiService")
 local Lighting = game:GetService("Lighting")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local StarterPlayer = game:GetService("StarterPlayer")
 local UserInputService = game:GetService("UserInputService")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
+local MusicService = require(Globals.Client.Services.MusicService)
 local Signals = require(ReplicatedStorage.Shared.Signals)
 local UIAnimationService = require(ReplicatedStorage.Vendor.UIAnimationService)
 local camera = workspace.CurrentCamera
@@ -31,6 +34,8 @@ grappleIncicatorSpring.Speed = 10
 --// Values
 local frameDelay = 0.045
 local targetEnemy = Instance.new("ObjectValue")
+targetEnemy.Name = "TargetEnemy"
+targetEnemy.Parent = Players.LocalPlayer
 local rCoinsCount = Instance.new("IntValue")
 local sFuckFartCount = Instance.new("IntValue")
 local boss
@@ -107,6 +112,7 @@ end
 
 function module.ShowRCoins(player, ui, frame)
 	frame.RCoins.Visible = true
+	frame.RCoins.Count.Text = workspace:GetAttribute("TotalScore")
 end
 
 function module.HideRCoins(player, ui, frame)
@@ -114,6 +120,8 @@ function module.HideRCoins(player, ui, frame)
 end
 
 function module.ShowReqExit(player, ui, frame, coinCount)
+	MusicService.playMusic()
+
 	local soulAdd = math.floor(coinCount / 100)
 	Signals.AddSoul:Fire(soulAdd)
 
@@ -137,6 +145,8 @@ function module.ShowReqExit(player, ui, frame, coinCount)
 		frame.CenterSouls.Count.TextTransparency = 0
 		frame.CenterSouls.Count.UIStroke.Transparency = 0
 		frame.CenterSouls.Position = UDim2.fromScale(0.15, 0.775)
+	else
+		Signals.DoUiAction:Fire("Notify", "ShowLevelDisplay")
 	end
 
 	util.tween(frame.Flash, ti_0, { BackgroundTransparency = 1 }, false, function()
@@ -158,6 +168,8 @@ function module.ShowReqExit(player, ui, frame, coinCount)
 
 		frame.CenterCoins.Visible = false
 		frame.CenterSouls.Visible = false
+
+		Signals.DoUiAction:Fire("Notify", "ShowLevelDisplay")
 	end)
 
 	module.HideRCoins(player, ui, frame)

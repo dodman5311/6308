@@ -196,17 +196,23 @@ end
 
 function module.ElectrifyPart(partName)
 	local model = workspace:WaitForChild(partName)
-	if not model then
+	if not model or not model.Parent then
 		return
 	end
 	local part = model.PrimaryPart
+	if not part or not part.Parent then
+		return
+	end
 
-	part.Smoke.Enabled = true
+	local electricity = part:WaitForChild("Electricity")
+	local smoke = part:WaitForChild("Smoke")
+
+	smoke.Enabled = true
 	task.wait(1.1)
-	part.Electricity.Enabled = true
+	electricity.Enabled = true
 	task.wait(5)
-	part.Electricity.Enabled = false
-	part.Smoke.Enabled = false
+	electricity.Enabled = false
+	smoke.Enabled = false
 end
 
 function module.EnemySpawned(position)

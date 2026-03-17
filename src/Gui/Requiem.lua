@@ -72,6 +72,7 @@ local function setButtonState(buttonFrame, state: "Locked" | "Disabled" | "Enabl
 		util.tween(buttonFrame.Icon, ti, { ImageTransparency = 0, ImageColor3 = Color3.new(1, 1, 1) })
 		buttonFrame.Acquired.Visible = false
 		buttonFrame.Button:SetAttribute("Disabled", false)
+		buttonFrame.Button.Interactable = true
 	elseif state == "Disabled" or state == "Locked" then
 		util.tween(buttonFrame.FrameImage, ti, { ImageTransparency = 0.75 })
 		util.tween(buttonFrame.Icon, ti, { ImageTransparency = 0.75, ImageColor3 = Color3.new(1, 1, 1) })
@@ -82,7 +83,6 @@ local function setButtonState(buttonFrame, state: "Locked" | "Disabled" | "Enabl
 end
 
 local function updateTree(tree)
-	print("UPDATE")
 	local acquiredFirstIndexTree = false
 
 	for _, buttonFrame in ipairs(tree:GetDescendants()) do
@@ -172,8 +172,6 @@ end
 function module.setTreeIndex(_, ui, frame, index: number, reverse: boolean?, noUpdate: boolean?)
 	reverse = reverse or false
 	local ti = TweenInfo.new(0.25)
-
-	print(noUpdate)
 
 	for _, tree in ipairs(frame.Trees:GetChildren()) do
 		if not tree:IsA("CanvasGroup") then
@@ -402,12 +400,14 @@ function module.Init(player, ui, frame)
 					if workspace:GetAttribute("TotalScore") >= tier.Price then
 						local newIndex = buttonFrame:GetAttribute("Index") or workspace:GetAttribute(tierName) + 1
 
+						button.Interactable = false
+						util.PlaySound(sounds.RCoins, script, 0.075).PlaybackSpeed += (newIndex / 5) + 0.25
+						util.PlaySound(sounds.RCoinsSmall, script, 0.075).PlaybackSpeed += (newIndex / 5) + 0.25
+
 						updateCoinBalaceUi(
 							frame,
 							Net:RemoteFunction("PurchaseUpgrade"):InvokeServer(tierName, tier.Price, newIndex)
 						)
-						util.PlaySound(sounds.RCoins, script, 0.075).PlaybackSpeed += (newIndex / 5) + 0.25
-						util.PlaySound(sounds.RCoinsSmall, script, 0.075).PlaybackSpeed += (newIndex / 5) + 0.25
 					else
 						util.PlaySound(sounds.Denied, script, 0.075)
 					end
