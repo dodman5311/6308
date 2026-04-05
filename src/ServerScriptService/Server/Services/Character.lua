@@ -76,8 +76,8 @@ Players.PlayerAdded:Connect(function(player: Player)
 		local humanoid: Humanoid = character:WaitForChild("Humanoid")
 		humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
 
-		humanoid.MaxHealth = player:GetAttribute("MaxHealth")
-		humanoid.Health = player:GetAttribute("MaxHealth")
+		humanoid.MaxHealth = player:GetAttribute("StartingMaxHealth")
+		humanoid.Health = player:GetAttribute("StartingMaxHealth")
 
 		for _, part in ipairs(character:GetDescendants()) do
 			if not part:IsA("BasePart") then

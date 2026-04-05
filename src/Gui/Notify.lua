@@ -144,12 +144,21 @@ local function editText(parent, labelName, change, val)
 end
 
 function module.ShowLevelDisplay(player, ui, frame)
+	if workspace:GetAttribute("Level") ~= math.round(workspace:GetAttribute("Level")) then
+		return
+	end
+
 	frame.LevelDisplay.Visible = true
 
 	local stageIndex = {
-		"The Suburbs",
-		"The Sewers",
-		"The City",
+		{ Name = "The Suburbs", Color = Color3.fromRGB(255, 65, 65) },
+		{ Name = "The Sewers", Color = Color3.fromRGB(38, 202, 131) },
+		{ Name = "The City", Color = Color3.fromRGB(35, 210, 200) },
+		{ Name = "The City", Color = Color3.fromRGB(35, 210, 200) },
+		{ Name = "The City", Color = Color3.fromRGB(35, 210, 200) },
+		{ Name = "The City", Color = Color3.fromRGB(35, 210, 200) },
+		{ Name = "The City", Color = Color3.fromRGB(35, 210, 200) },
+		{ Name = "The Testing Grounds", Color = Color3.fromRGB(255, 255, 255) },
 	}
 
 	local actDisplay = frame.LevelDisplay.Act
@@ -162,7 +171,9 @@ function module.ShowLevelDisplay(player, ui, frame)
 
 	editText(frame.LevelDisplay, "Level", "Text", "Level " .. workspace:GetAttribute("Level"))
 	editText(frame.LevelDisplay, "Act", "Text", "Act " .. workspace:GetAttribute("Stage"))
-	editText(frame.LevelDisplay, "ActTitle", "Text", stageIndex[workspace:GetAttribute("Stage")])
+
+	editText(frame.LevelDisplay, "ActTitle", "Text", stageIndex[workspace:GetAttribute("Stage")].Name)
+	frame.LevelDisplay.ActTitle.TextColor3 = stageIndex[workspace:GetAttribute("Stage")].Color
 
 	editText(frame.LevelDisplay, "Level", "TextTransparency", 1)
 	editText(frame.LevelDisplay, "ActTitle", "TextTransparency", 1)

@@ -12,6 +12,44 @@ local cameraController = require(Globals.Client.Controllers.CameraController)
 local signals = require(Globals.Signals)
 
 local settings = {
+	"Gameplay",
+
+	{
+		Name = "Aim Assist",
+		Type = "Slider",
+		MaxValue = NumberRange.new(0, 100),
+		Value = 50,
+		OnChanged = function() end,
+	},
+
+	{
+		Name = "Field of View",
+		Type = "Slider",
+		MaxValue = NumberRange.new(50, 120),
+		Value = 70,
+		OnChanged = function(self)
+			local ti = TweenInfo.new(0.5, Enum.EasingStyle.Quint)
+			require(Globals.Vendor.Util).tween(workspace.CurrentCamera, ti, { FieldOfView = self.Value })
+		end,
+	},
+
+	{
+		Name = "View Bobbing",
+		Type = "Boolean",
+		Value = true,
+		OnChanged = function(self)
+			cameraController.viewBobbingEnabled = self.Value
+		end,
+	},
+
+	{
+		Name = "Damage Feedback",
+		Type = "Slider",
+		MaxValue = NumberRange.new(0, 2),
+		Value = 2,
+		OnChanged = function(self) end,
+	},
+
 	"Audio",
 
 	{
@@ -171,44 +209,6 @@ local settings = {
 		Type = "Boolean",
 		Value = false,
 		OnChanged = function() end,
-	},
-
-	"Gameplay",
-
-	{
-		Name = "Aim Assist",
-		Type = "Slider",
-		MaxValue = NumberRange.new(0, 100),
-		Value = 50,
-		OnChanged = function() end,
-	},
-
-	{
-		Name = "Field of View",
-		Type = "Slider",
-		MaxValue = NumberRange.new(50, 120),
-		Value = 70,
-		OnChanged = function(self)
-			local ti = TweenInfo.new(0.5, Enum.EasingStyle.Quint)
-			require(Globals.Vendor.Util).tween(workspace.CurrentCamera, ti, { FieldOfView = self.Value })
-		end,
-	},
-
-	{
-		Name = "View Bobbing",
-		Type = "Boolean",
-		Value = true,
-		OnChanged = function(self)
-			cameraController.viewBobbingEnabled = self.Value
-		end,
-	},
-
-	{
-		Name = "Damage Feedback",
-		Type = "Slider",
-		MaxValue = NumberRange.new(0, 2),
-		Value = 2,
-		OnChanged = function(self) end,
 	},
 }
 

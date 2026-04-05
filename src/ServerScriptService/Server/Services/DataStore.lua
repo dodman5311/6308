@@ -72,6 +72,7 @@ function module.LoadGameData(player)
 	mapService.CurrentLevel = math.floor(gameState["Level"] and math.clamp(gameState["Level"], 1, math.huge) or 1)
 
 	player:SetAttribute("MaxHealth", 5)
+	player:SetAttribute("StartingMaxHealth", gameState["MaxHealth"] or 5)
 
 	workspace:SetAttribute("TotalScore", totalScore)
 	workspace:SetAttribute("StoredScore", storedScore)

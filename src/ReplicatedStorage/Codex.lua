@@ -107,7 +107,7 @@ Despite this betrayal, the militants remain loyal to the Iron Gate. They still b
 
 	["Divine"] = {
 		Category = "Enemies",
-		Entry = [[<font color="#FF7800"><b>Shoot their head off for extra damage.</b></font>
+		Entry = [[<font color="#FF7800"><b>Shoot their head off, when it's open, for extra damage.</b></font>
 		
 A divine occurs when a broken host finds true peace in the will of the Iron Gate. They accept their new reality and work with their demon to transcend humanity. 
 Their broken origins lead their new form to be stronger, yet still riddled with flaws and weaknesses.

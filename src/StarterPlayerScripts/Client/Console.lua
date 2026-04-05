@@ -11,6 +11,7 @@ local guiInstance = ReplicatedStorage.Console
 local player = Players.LocalPlayer
 
 --// Modules
+local Timer = require(ReplicatedStorage.Vendor.Timer)
 local commands = require(Globals.Shared.Commands)
 local net = require(Globals.Packages.Net)
 local signals = require(Globals.Signals)
@@ -274,6 +275,10 @@ local function toggleConsole()
 	UserInputService.MouseIconEnabled = inGui
 end
 
+local menuTimer = Timer:new("OpenMenu", 1, function()
+	toggleConsole()
+end)
+
 UserInputService.InputBegan:Connect(function(input, gpe)
 	if not Players:GetAttribute("CheatsEnabled") then
 		return
@@ -283,8 +288,12 @@ UserInputService.InputBegan:Connect(function(input, gpe)
 		returnPressed(true)
 	end
 
-	if input.KeyCode == Enum.KeyCode.DPadDown and (not gpe or inGui) then
-		toggleConsole()
+	if input.KeyCode == Enum.KeyCode.ButtonSelect then
+		if inGui then
+			toggleConsole()
+		else
+			menuTimer:Run()
+		end
 	end
 
 	if input.KeyCode == Enum.KeyCode.Tab and fullGui.Gui.Enabled then
@@ -297,6 +306,12 @@ UserInputService.InputBegan:Connect(function(input, gpe)
 
 	if input.KeyCode == Enum.KeyCode.Backquote or input.KeyCode == Enum.KeyCode.Tilde then
 		toggleConsole()
+	end
+end)
+
+UserInputService.InputEnded:Connect(function(input, gpe)
+	if input.KeyCode == Enum.KeyCode.ButtonSelect then
+		menuTimer:Cancel()
 	end
 end)
 

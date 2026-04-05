@@ -1,5 +1,6 @@
 local module = {}
 
+local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -10,6 +11,27 @@ local sounds = ReplicatedStorage.Assets.Sounds
 
 local util = require(Globals.Vendor.Util)
 local ComboService = RunService:IsClient() and require(Globals.Client.Services.ComboService)
+
+local function createHitEffect(effect, position)
+	local newPart = Instance.new("Part")
+
+	newPart.CanCollide = false
+	newPart.CanQuery = false
+	newPart.CanTouch = false
+
+	newPart.Anchored = true
+	newPart.Size = Vector3.one
+	newPart.Transparency = 1
+
+	local newEffect = effect:Clone()
+	newEffect.Parent = newPart
+	Debris:AddItem(newPart, newEffect.Lifetime.Max)
+
+	newPart.Parent = workspace
+	newPart.Position = position
+
+	newEffect:Emit(newEffect:GetAttribute("EmitCount"))
+end
 
 function module.doWeakspotHit(part: BasePart): number
 	if not part or part.Name ~= "Weakspot" then
@@ -23,36 +45,40 @@ function module.doWeakspotHit(part: BasePart): number
 	local spotType = part:GetAttribute("Type")
 	local Damage = part:GetAttribute("Damage")
 
+	local effect = part:FindFirstChild("Effect", true)
+	createHitEffect(effect, part.Position)
+
 	if spotType == "Destroy" then
-		for _, v in ipairs(part:GetChildren()) do
-			if v:IsA("Texture") then
-				v.Transparency = 1
-				continue
-			end
+		-- for _, v in ipairs(part:GetChildren()) do
+		-- 	if v:IsA("Texture") then
+		-- 		v.Transparency = 1
+		-- 		continue
+		-- 	end
 
-			if v:IsA("BillboardGui") then
-				v.Enabled = false
-				continue
-			end
+		-- 	if v:IsA("BillboardGui") then
+		-- 		v.Enabled = false
+		-- 		continue
+		-- 	end
 
-			if not v:IsA("BasePart") then
-				continue
-			end
+		-- 	if not v:IsA("BasePart") then
+		-- 		continue
+		-- 	end
 
-			v.CanCollide = false
-			v.CanQuery = false
-			v.CanTouch = false
-			v.Transparency = 1
-		end
+		-- 	v.CanCollide = false
+		-- 	v.CanQuery = false
+		-- 	v.CanTouch = false
+		-- 	v.Transparency = 1
+		-- end
 
-		part.CanCollide = false
-		part.CanQuery = false
-		part.CanTouch = false
-		part.Transparency = 1
+		-- part.CanCollide = false
+		-- part.CanQuery = false
+		-- part.CanTouch = false
+		-- part.Transparency = 1
 
-		if part:HasTag("OpenWound") then
-			part:RemoveTag("OpenWound")
-		end
+		-- if part:HasTag("OpenWound") then
+		-- 	part:RemoveTag("OpenWound")
+		-- end
+		part:Destroy()
 	elseif spotType == "ExplodeOnDeath" then
 		local humanoid = util.checkForHumanoid(part)
 
@@ -65,9 +91,6 @@ function module.doWeakspotHit(part: BasePart): number
 			)
 		end
 	end
-
-	local effect = part:FindFirstChild("Effect", true)
-	effect:Emit(effect:GetAttribute("EmitCount"))
 
 	if RunService:IsClient() then
 		ComboService.RestartTimer()

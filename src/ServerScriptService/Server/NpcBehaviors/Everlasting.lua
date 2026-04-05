@@ -1,5 +1,5 @@
 local stats = {
-	ViewDistance = 200,
+	ViewDistance = 100,
 	AttackDelay = NumberRange.new(2, 5),
 	MoveDelay = NumberRange.new(2, 8),
 	AttackCharge = 0.6,

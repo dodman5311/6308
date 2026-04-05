@@ -27,9 +27,21 @@ local canFear = false
 
 --// Library Functions
 
-local function getNumber(input: number | NumberRange)
+local function getNumber(input: number | NumberRange, minIsZero)
 	if typeof(input) == "NumberRange" then
-		return rng:NextNumber(input.Min, input.Max)
+		local min, max = input.Min, input.Max
+
+		if minIsZero then
+			min = 0
+		end
+
+		local numberOutput = rng:NextNumber(min, max)
+
+		if minIsZero then
+			numberOutput /= 2
+		end
+
+		return numberOutput
 	end
 
 	return input
@@ -142,7 +154,7 @@ local function getTimer(npc, timerName, waitTime, func, isAttackTimer, ...)
 	local foundTimer = npc.Timers[timerName]
 
 	if not foundTimer then
-		waitTime = getNumber(waitTime)
+		waitTime = getNumber(waitTime, isAttackTimer)
 
 		foundTimer = npc.Timer:new(timerName, waitTime, func, ...)
 		npc.Timers[timerName] = foundTimer
@@ -324,8 +336,9 @@ function module.PlayAnimation(npc, animationName, priority, noReplay, ...)
 	AnimationService:playAnimation(npc.Instance, animationName, priority, noReplay, ...)
 end
 
-function module.IndicateAttack(npc, color)
-	Net:RemoteEvent("ReplicateEffect"):FireAllClients("IndicateAttack", "Server", true, npc.Instance, color)
+function module.IndicateAttack(npc, color, indicateTime)
+	Net:RemoteEvent("ReplicateEffect")
+		:FireAllClients("IndicateAttack", "Server", true, npc.Instance, color, indicateTime)
 end
 
 local function createProjectile(speed, cframe, spread, info, modelName, sender)
@@ -336,7 +349,19 @@ local function createHitCast(npc, damage, cframe, distance, spread, size)
 	Net:RemoteEvent("CreateBeam"):FireAllClients(npc.Instance, damage, cframe, distance, spread, size)
 end
 
-function module.Shoot(npc, sender, cooldown, amount, speed, bulletCount, info, visualModel, indicateAttack, timerIndex)
+function module.Shoot(
+	npc,
+	sender,
+	cooldown,
+	amount,
+	speed,
+	bulletCount,
+	info,
+	visualModel,
+	indicateAttack,
+	func,
+	timerIndex
+)
 	cooldown = getNumber(cooldown)
 	amount = getNumber(amount)
 	speed = getNumber(speed)
@@ -348,7 +373,11 @@ function module.Shoot(npc, sender, cooldown, amount, speed, bulletCount, info, v
 
 	if indicateAttack then
 		AnimationService:playAnimation(npc.Instance, "Indicate", Enum.AnimationPriority.Action3)
-		module.IndicateAttack(npc, indicateAttack)
+		module.IndicateAttack(npc, Color3.new(1, 1, 1), indicateAttack)
+		if func then
+			func(npc, indicateAttack)
+		end
+
 		task.wait(indicateAttack)
 	end
 
@@ -542,7 +571,8 @@ function module.ShootProjectile(
 	info,
 	visualModel,
 	timerIndex,
-	indicateAttack
+	indicateAttack,
+	indicateFunction
 )
 	if npc.Instance:GetAttribute("State") ~= "Attacking" then
 		return
@@ -562,13 +592,14 @@ function module.ShootProjectile(
 		info,
 		visualModel,
 		indicateAttack,
+		indicateFunction,
 		timerIndex
 	)
 
+	AttackTimer:Run()
 	AttackTimer.OnEnded:Once(function()
 		AttackTimer.WaitTime = getNumber(shotDelay)
 	end)
-	AttackTimer:Run()
 end
 
 function module.ShootWithoutTimer(npc, cooldown, amount, speed, bulletCount, info, visualModel, indicateAttack)

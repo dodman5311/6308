@@ -767,6 +767,7 @@ UserInputService.InputEnded:Connect(function(input, gameProcessedEvent)
 	end
 end)
 
+local cameraPosition = CFrame.new()
 local function processCamera(frame)
 	local map = frame.MapViewport:FindFirstChild("Map")
 	if not map then
@@ -774,6 +775,12 @@ local function processCamera(frame)
 	end
 
 	local mapCenter = map:GetBoundingBox()
+	cameraPosition = mapCenter
+
+	local character = Players.LocalPlayer.Character
+	if character then
+		cameraPosition = character:GetPivot().Position
+	end
 
 	mapCamera.Parent = frame.Gui
 	mapCamera.CameraType = Enum.CameraType.Scriptable
@@ -821,7 +828,7 @@ local function processCamera(frame)
 		lerpedOffset = lerpedOffset:Lerp(cameraOffset, 0.1)
 		lerpedAngle = lerpedAngle:Lerp(Vector2.new(camAngleX, camAngleY), 0.25)
 
-		mapCamera.CFrame = CFrame.new(mapCenter.Position)
+		mapCamera.CFrame = CFrame.new(cameraPosition)
 			* CFrame.Angles(0, math.rad(-lerpedAngle.X), 0)
 			* CFrame.Angles(math.rad(-lerpedAngle.Y), 0, 0)
 			* lerpedOffset

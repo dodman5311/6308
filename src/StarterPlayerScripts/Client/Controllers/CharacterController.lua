@@ -113,9 +113,9 @@ local function loadSaveData(upgradeIndex, gameState)
 		giftService.AddGift(perkName)
 	end
 
-	if gameState["MaxHealth"] and Player.Character:WaitForChild("Humanoid") then
-		Player.Character.Humanoid.MaxHealth = gameState.MaxHealth
-	end
+	-- if gameState["MaxHealth"] and Player.Character:WaitForChild("Humanoid") then
+	-- 	Player.Character.Humanoid.MaxHealth = gameState.MaxHealth
+	-- end
 end
 
 local hollowHealthTimer = Timer:new("HollowHealth", 5, function()

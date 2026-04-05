@@ -153,8 +153,12 @@ function module.IndicateVisageAttack(model, color)
 	end
 end
 
-function module.IndicateAttack(model: Instance, color)
-	local ti = TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
+function module.IndicateAttack(model: Instance, color: Color3, indicateTime: number?)
+	if not model then
+		return
+	end
+	indicateTime = indicateTime or 0.5
+	local ti = TweenInfo.new(indicateTime, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
 
 	local indicateSound = model:FindFirstChild("IndicateSound", true)
 	local indicator = model:FindFirstChild("AttackIndicator", true)
@@ -179,7 +183,7 @@ function module.IndicateAttack(model: Instance, color)
 		end, Enum.PlaybackState.Completed)
 	else
 		uiAnimationService
-			.PlayAnimation(indicator.Frame, 0.5 / indicator.Frame.Image.Size.X.Scale, false, false).OnEnded
+			.PlayAnimation(indicator.Frame, indicateTime / indicator.Frame.Image.Size.X.Scale, false, false).OnEnded
 			:Once(function()
 				indicator.Enabled = false
 			end)
