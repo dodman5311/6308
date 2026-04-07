@@ -3,10 +3,11 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local AnimationService = require(ReplicatedStorage.Vendor.AnimationService)
 local Timer = require(ReplicatedStorage.Vendor.Timer)
+local Util = require(ReplicatedStorage.Vendor.Util)
 local stats = {
 	ViewDistance = 200,
 	ReactionDelay = 0,
-	AttackDelay = NumberRange.new(1.5, 3),
+	AttackDelay = NumberRange.new(1.25, 1.75),
 	MoveDelay = NumberRange.new(2, 8),
 	AttackCooldown = 4,
 	ProjectileSpeed = 200,
@@ -72,6 +73,11 @@ local function Punch(npc)
 
 	instance.PrimaryPart.Punch:Play()
 
+	local sound = Util.getRandomChild(instance.Voice.Punch)
+	if sound then
+		Util.PlaySound(sound, instance.PrimaryPart, 0.025)
+	end
+
 	local raycastParams = RaycastParams.new()
 	raycastParams.FilterDescendantsInstances = { npc }
 	raycastParams.CollisionGroup = "Npcs"
@@ -112,7 +118,7 @@ local module = {
 
 		{ Function = "SearchForTarget", Parameters = { stats.ViewDistance } },
 		{ Function = "LookAtTarget" },
-		{ Function = "LeadTarget", Parameters = { stats.ProjectileSpeed } },
+		{ Function = "LeadTarget", Parameters = { stats.ProjectileSpeed - 25 } },
 
 		{ Function = "GetToDistance", Parameters = { stats.AttackDistance, true } },
 		{ Function = "MoveAwayFromDistance", Parameters = { 25, true } },

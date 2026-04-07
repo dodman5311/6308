@@ -1,10 +1,13 @@
 local module = {}
 
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local debris = game:GetService("Debris")
 local serverStorage = game:GetService("ServerStorage")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
+local HandleNpcs = require(ServerScriptService.Server.HandleNpcs)
 local acts = require(Globals.Vendor.Acts)
 local net = require(Globals.Packages.Net)
 local promise = require(Globals.Packages.Promise)
@@ -82,6 +85,11 @@ local function runArena(encounter, unit, level, isAmbush)
 			end
 
 			net:RemoteEvent("ReplicateEffect"):FireAllClients("EnemySpawned", "Server", true, spawnCFrame.Position)
+
+			local npc = HandleNpcs:GetNpcFromModel(enemyModel)
+			if npc then
+				npc.Target.Value = Players:GetPlayers()[1]
+			end
 
 			local humanoid = enemyModel:FindFirstChildOfClass("Humanoid")
 			if not humanoid then

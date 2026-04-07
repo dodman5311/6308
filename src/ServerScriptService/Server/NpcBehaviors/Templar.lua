@@ -5,7 +5,7 @@ local stats = {
 	MoveDelay = NumberRange.new(2, 8),
 	AttackCooldown = 0.2,
 	ProjectileSpeed = 200,
-	AttackAmount = 5,
+	AttackAmount = 6,
 	AttackDistance = 65,
 	dodgeDistance = 10,
 
