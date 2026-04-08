@@ -424,6 +424,37 @@ local function resetDOTD()
 	dealSold = false
 end
 
+local function useSoul(player, ui, frame, noCost)
+	if not noCost and (SoulsService.Souls < module.soulCost * costMult) then
+		return
+	end
+
+	sfx.KioskBuy:Play()
+
+	if noCost then
+		SoulsService.RemoveSoul(module.soulCost * costMult)
+	end
+
+	frame.SelectButtons.Visible = false
+	frame.ExitButton.Visible = false
+
+	module.UpdateSouls(player, ui, frame, math.round(SoulsService.Souls))
+	--module.soulCost = math.clamp(module.soulCost + 1, 1, 25) -- ADD ONTO COST
+
+	costMult = 1
+
+	if GiftsService.CheckGift("Buy_1_Get_1") then
+		costMult = (isOther and chanceService.checkChance(30, true)) and 0 or costMult
+
+		isOther = not isOther
+	end
+
+	frame.SoulCost.Text = -module.soulCost * costMult
+
+	local chosenGift = module.chooseRandomGift(player, ui, frame)
+	module.TakeDelivery(player, ui, frame, chosenGift, true)
+end
+
 function module.Init(player, ui, frame)
 	local ti = TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut, -1, true)
 	for i = 1, 4 do
@@ -527,31 +558,7 @@ function module.Init(player, ui, frame)
 	end)
 
 	frame.UseSoul.MouseButton1Click:Connect(function()
-		if SoulsService.Souls < module.soulCost * costMult then
-			return
-		end
-
-		sfx.KioskBuy:Play()
-		SoulsService.RemoveSoul(module.soulCost * costMult)
-
-		frame.SelectButtons.Visible = false
-		frame.ExitButton.Visible = false
-
-		module.UpdateSouls(player, ui, frame, math.round(SoulsService.Souls))
-		--module.soulCost = math.clamp(module.soulCost + 1, 1, 25) -- ADD ONTO COST
-
-		costMult = 1
-
-		if GiftsService.CheckGift("Buy_1_Get_1") then
-			costMult = (isOther and chanceService.checkChance(30, true)) and 0 or costMult
-
-			isOther = not isOther
-		end
-
-		frame.SoulCost.Text = -module.soulCost * costMult
-
-		local chosenGift = module.chooseRandomGift(player, ui, frame)
-		module.TakeDelivery(player, ui, frame, chosenGift, true)
+		useSoul(player, ui, frame)
 	end)
 
 	frame.UseTicket.MouseButton1Click:Connect(function()
@@ -626,7 +633,7 @@ function module.UpdateStats(_, _, frame)
 	end
 end
 
-function module.ShowScreen(player, ui, frame, playerSouls)
+function module.ShowScreen(player, ui, frame, playerSouls, autoRun)
 	if frame.Gui.Enabled then
 		return
 	end
@@ -698,6 +705,22 @@ function module.ShowScreen(player, ui, frame, playerSouls)
 	frame.Sign.Image.Position = UDim2.fromScale(0, 0)
 	frame.SwitchFrame.Image.Position = UDim2.fromScale(0, 0)
 
+	if autoRun then
+		frame.SelectButtons.Visible = false
+		frame.ExitButton.Visible = false
+		frame.ExitImage.Visible = false
+		frame.DailyDeal.Visible = false
+		frame.Souls.Visible = false
+		frame.Tickets.Visible = false
+	else
+		frame.SelectButtons.Visible = true
+		frame.ExitButton.Visible = true
+		frame.ExitImage.Visible = true
+		frame.DailyDeal.Visible = true
+		frame.Souls.Visible = true
+		frame.Tickets.Visible = true
+	end
+
 	UiAnimator.PlayAnimation(frame.Demon, 0.125, true)
 	frame.Sign.Visible = false
 
@@ -713,6 +736,10 @@ function module.ShowScreen(player, ui, frame, playerSouls)
 
 	if UserInputService.GamepadEnabled then
 		GuiService:Select(frame.SelectButtons)
+	end
+
+	if autoRun then
+		useSoul(player, ui, frame, true)
 	end
 
 	return module.onHidden
