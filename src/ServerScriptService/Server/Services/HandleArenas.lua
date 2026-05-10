@@ -87,8 +87,8 @@ local function runArena(encounter, unit, level, isAmbush)
 			net:RemoteEvent("ReplicateEffect"):FireAllClients("EnemySpawned", "Server", true, spawnCFrame.Position)
 
 			local npc = HandleNpcs:GetNpcFromModel(enemyModel)
-			if npc then
-				npc.Target.Value = Players:GetPlayers()[1]
+			if npc and Players:GetPlayers()[1] and Players:GetPlayers()[1].Character then
+				npc.Target.Value = Players:GetPlayers()[1].Character
 			end
 
 			local humanoid = enemyModel:FindFirstChildOfClass("Humanoid")

@@ -431,7 +431,7 @@ local function useSoul(player, ui, frame, noCost)
 
 	sfx.KioskBuy:Play()
 
-	if noCost then
+	if not noCost then
 		SoulsService.RemoveSoul(module.soulCost * costMult)
 	end
 
@@ -445,7 +445,6 @@ local function useSoul(player, ui, frame, noCost)
 
 	if GiftsService.CheckGift("Buy_1_Get_1") then
 		costMult = (isOther and chanceService.checkChance(30, true)) and 0 or costMult
-
 		isOther = not isOther
 	end
 

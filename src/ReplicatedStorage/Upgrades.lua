@@ -24,17 +24,23 @@ but they travel slower]],
 		["DrillBite_Tier"] = {
 			{
 				Name = "Drill Bite: Tier 1",
-				Description = [[+3 Ammo]],
+				Description = [[+2 Ammo]],
 				Price = 250,
 			},
 			{
 				Name = "Drill Bite: Tier 2",
-				Description = [[Pellets now have a 5% chance to light enemies on fire]],
+				Description = [[+3 Ammo
+Pellets now have a 10% chance to light enemies on fire]],
 				Price = 500,
 			},
 			{
 				Name = "Wrath Guard",
-				Description = [[Wrath Guard’s parry is a stunning punch]],
+				Description = [[+10 Fire chance
+
+The parry is now a parrying punch. 
+
+Punch damage scales with enemies on fire (+5 damage per flaming enemy)
+Punching flaming enemies will drop ammo]],
 				Price = 750,
 			},
 		},

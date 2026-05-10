@@ -912,6 +912,19 @@ local commands = {
 			end,
 		},
 
+		Show_Kiosk_Auto = {
+
+			Parameters = function()
+				return {}
+			end,
+
+			ExecuteClient = function()
+				local soulsService = require(Globals.Client.Services.SoulsService)
+				local uiService = require(Globals.Client.Services.UIService)
+				uiService.doUiAction("Kiosk", "ShowScreen", soulsService.Souls, true)
+			end,
+		},
+
 		Show_Requiem_Shop = {
 
 			Parameters = function()

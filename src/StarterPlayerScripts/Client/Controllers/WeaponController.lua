@@ -1159,6 +1159,15 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		siuDamage = 1
 	end
 
+	if
+		source == "Punch"
+		and module.currentWeapon
+		and module.currentWeapon.Name == "Wrath Guard"
+		and model:GetAttribute("Fire")
+	then
+		UiAnimationService.PlayAnimation(dropService.CreateDrop(cframe.Position, "Ammo").UI.Frame, 0.045, true)
+	end
+
 	local critMult = 1
 	if ChanceService.checkChance(getCritChance(source, critChanceAddition), true) then
 		critMult = 2
@@ -2619,8 +2628,15 @@ function module.Block()
 	end
 
 	if punch then
-		module.FireBullet(1, 0, Vector3.new(5, 5, 10), nil, "Punch", "Stun", 100)
+		local damage = 1
 
+		for _, v in ipairs(CollectionService:GetTagged("Npc")) do
+			if v:GetAttribute("Fire") then
+				damage += 5
+			end
+		end
+
+		module.FireBullet(damage, 0, Vector3.new(5, 5, 12), nil, "Punch")
 		Recoil(Vector3.new(0, 0, 0), Vector3.new(0.5, 0.5, 3), 3, 1)
 	end
 

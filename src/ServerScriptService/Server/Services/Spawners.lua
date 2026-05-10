@@ -357,7 +357,7 @@ function module.SpawnBoss(bossToSpawn, unit)
 end
 
 local function placeGrapplePointAt(spawnPoint)
-	local placeAt = spawnPoint.CFrame * CFrame.new(0, 50, 0)
+	local placeAt = spawnPoint.CFrame * CFrame.new(0, 0, 0)
 
 	for _, point in ipairs(CollectionService:GetTagged("GrapplePoint")) do
 		if point:GetPivot() == placeAt then
@@ -372,7 +372,7 @@ local function placeGrapplePointAt(spawnPoint)
 end
 
 local function placeDashRefill(spawnPoint)
-	local placeAt = spawnPoint.CFrame * CFrame.new(0, 15, 0)
+	local placeAt = spawnPoint.CFrame * CFrame.new(0, 0, 0)
 
 	for _, point in ipairs(CollectionService:GetTagged("DashRefill")) do
 		if point:GetPivot() == placeAt then
@@ -387,13 +387,11 @@ local function placeDashRefill(spawnPoint)
 end
 
 function module.SpawnMovementPoints()
-	for _, link in ipairs(workspace.Map:GetDescendants()) do
-		if link.Name ~= "Link" then
-			continue
-		end
-
-		placeGrapplePointAt(link)
-		placeDashRefill(link)
+	for _, movementPoint in ipairs(CollectionService:GetTagged("GrappleSpawnPoint")) do
+		placeGrapplePointAt(movementPoint)
+	end
+	for _, movementPoint in ipairs(CollectionService:GetTagged("DashSpawnPoint")) do
+		placeDashRefill(movementPoint)
 	end
 end
 

@@ -5,7 +5,7 @@ local animationService = require(Globals.Vendor.AnimationService)
 
 return {
 	Electricity = {
-		time = 3,
+		time = 4,
 		enter = function(npc)
 			local humanoid = npc.Instance:FindFirstChild("Humanoid")
 
@@ -20,13 +20,13 @@ return {
 		end,
 	},
 	Fire = {
-		time = 4,
+		time = 5,
 		enter = function() end,
 
 		exit = function() end,
 	},
 	Ice = {
-		time = 2,
+		time = 3,
 		enter = function(npc)
 			npc.Instance.PrimaryPart.Anchored = true
 
@@ -54,14 +54,14 @@ return {
 		end,
 	},
 	Soul = {
-		time = 2.5,
+		time = 3,
 		enter = function() end,
 
 		exit = function() end,
 	},
 
 	Bile = {
-		time = 2,
+		time = 3,
 		enter = function() end,
 
 		exit = function() end,
