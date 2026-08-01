@@ -87,6 +87,7 @@ local module = {
 				1,
 				specialIndication,
 			},
+			State = "Attacking",
 		},
 
 		{ Function = "MoveRandom", Parameters = { 20, stats.MoveDelay } },

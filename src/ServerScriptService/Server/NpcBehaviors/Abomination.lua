@@ -1,11 +1,10 @@
 local stats = {
-	ViewDistance = 200,
-	AttackDelay = NumberRange.new(1, 5),
-	AltAttackDelay = NumberRange.new(5, 6),
-	MoveDelay = NumberRange.new(4, 8),
-	AttackCooldown = 0,
-	ProjectileSpeed = 400,
-	AltProjectileSpeed = 300,
+	ViewDistance = 150,
+	AttackDelay = NumberRange.new(2, 6),
+	MoveDelay = NumberRange.new(2, 7),
+	AttackCooldown = 0.25,
+	ProjectileSpeed = 150,
+	AttackAmount = 1,
 	NpcType = "Enemy",
 }
 
@@ -15,46 +14,35 @@ local module = {
 
 		{ Function = "SearchForTarget", Parameters = { stats.ViewDistance } },
 		{ Function = "LookAtTarget" },
-		{ Function = "LeadTarget", Parameters = { 400 } },
+		{ Function = "LeadTarget", Parameters = { stats.ProjectileSpeed } },
 
 		{
 			Function = "ShootProjectile",
 			Parameters = {
 				stats.AttackDelay,
 				stats.AttackCooldown,
-				1,
+				stats.AttackAmount,
 				stats.ProjectileSpeed,
 				1,
-				{},
-				"Projectile",
+				{
+					Dropping = 0.5,
+					Size = 2,
+					SplashRange = 15,
+					SplashDamage = 1,
+					SplashElement = "Fire",
+				},
+				"ThermaProjectile",
 				false,
 				0.5,
 			},
 			State = "Attacking",
 		},
 
-		{
-			Function = "ShootProjectile",
-			Parameters = {
-				stats.AltAttackDelay,
-				stats.AttackCooldown,
-				1,
-				stats.AltProjectileSpeed,
-				3,
-				{},
-				"Projectile",
-				"SpecialAttack",
-			},
-			State = "Attacking",
-		},
-
-		{ Function = "GetToDistance", Parameters = { 30, true } },
+		{ Function = "GetToDistance", Parameters = { 65, true } },
 		{ Function = "PlayWalkingAnimation" },
-		{ Function = "PlayIdleSound" },
 	},
 
 	TargetFound = {
-		{ Function = "PlaySound", Parameters = { "Notice", 10 } },
 		{ Function = "SwitchToState", Parameters = { "Attacking" } },
 		{ Function = "MoveTowardsTarget" },
 	},
@@ -65,18 +53,11 @@ local module = {
 	},
 
 	OnSpawned = {
-		{ Function = "AssignGender" },
-		{ Function = "AssignVoice" },
 		{ Function = "PlayAnimation", Parameters = { "Idle", Enum.AnimationPriority.Core } },
 		{ Function = "AddTag", Parameters = { "Enemy" } },
 	},
 
-	OnDamaged = {
-		{ Function = "PlaySound", Parameters = { "Hurt", 50 } },
-	},
-
 	OnDied = {
-		{ Function = "PlaySound", Parameters = { "Death", 75 } },
 		{ Function = "SetCollision", Parameters = { "DeadBody" } },
 		{ Function = "SwitchToState", Parameters = { "Dead" } },
 		{ Function = "Ragdoll" },

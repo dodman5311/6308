@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local StarterPlayer = game:GetService("StarterPlayer")
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local gifts = require(Globals.Shared.Gifts)
@@ -134,20 +135,154 @@ local commands = {
 			end,
 		},
 
-		["Simulate_Progression_(Depricated)"] = {
+		-- ["Simulate_Progression_(Depricated)"] = {
+		-- 	Parameters = function()
+		-- 		return {
+		-- 			{ Name = "Levels Passed", Options = { "_Input" } },
+		-- 			{ Name = "Combat Level (1 - 5)", Options = { "_Input" } },
+		-- 		}
+		-- 	end,
+
+		-- 	ExecuteClient = function(_, levelsPassed, combatLevel)
+		-- 		local GiftsService = require(Players.LocalPlayer.PlayerScripts.Client.Services.GiftsService)
+
+		-- 		local weapons = require(Globals.Client.Controllers.WeaponController)
+		-- 		local kiosk = require(ReplicatedStorage.Gui.Kiosk)
+		-- 		local chanceService = require(Globals.Vendor.ChanceService)
+
+		-- 		local perkIndexes = {}
+		-- 		local upgradeIndexes = {}
+
+		-- 		for index, _ in pairs(gifts.Perks) do
+		-- 			table.insert(perkIndexes, index)
+		-- 		end
+
+		-- 		for index, _ in pairs(gifts.Upgrades) do
+		-- 			table.insert(upgradeIndexes, index)
+		-- 		end
+
+		-- 		for level = 1, levelsPassed do
+		-- 			local isUpgrade = math.random(0, 100) <= 35
+		-- 			local randomGift
+
+		-- 			if isUpgrade then
+		-- 				randomGift = upgradeIndexes[math.random(1, #upgradeIndexes)]
+		-- 			else
+		-- 				randomGift = perkIndexes[math.random(1, #perkIndexes)]
+		-- 			end
+
+		-- 			GiftsService.AddGift(randomGift)
+
+		-- 			if level == 3 then
+		-- 				GiftsService.AddGift("Master_Scouting")
+		-- 			end
+
+		-- 			if level == 5 then
+		-- 				local r = math.random(1, 3)
+
+		-- 				if r == 1 then
+		-- 					GiftsService.AddGift("Brick_Hook")
+		-- 				elseif r == 2 then
+		-- 					GiftsService.AddGift("Righteous_Motion")
+		-- 				elseif r == 3 then
+		-- 					GiftsService.AddGift("Spiked_Sabatons")
+		-- 				end
+		-- 			end
+
+		-- 			if level == 7 then
+		-- 				GiftsService.AddGift("Overcharge")
+		-- 			end
+
+		-- 			if level == 10 then
+		-- 				local r = math.random(1, 3)
+
+		-- 				if r == 1 then
+		-- 					GiftsService.AddGift("Galvan_Gaze")
+		-- 				elseif r == 2 then
+		-- 					GiftsService.AddGift("Mag_Launcher")
+		-- 				elseif r == 3 then
+		-- 					GiftsService.AddGift("Burning_Souls")
+		-- 				end
+		-- 			end
+
+		-- 			if level == 13 then
+		-- 				GiftsService.AddGift("Maidenless")
+		-- 			end
+
+		-- 			for _ = 1, combatLevel do
+		-- 				local result = kiosk.getRandomGiftFromLocalList()
+
+		-- 				if result == "Perk_Ticket" then
+		-- 					local randomTicketGift
+
+		-- 					if math.random(0, 100) <= 25 then
+		-- 						randomTicketGift = upgradeIndexes[math.random(1, #upgradeIndexes)]
+		-- 					else
+		-- 						randomTicketGift = perkIndexes[math.random(1, #perkIndexes)]
+		-- 					end
+
+		-- 					GiftsService.AddGift(randomTicketGift)
+		-- 				elseif result == "Clover" then
+		-- 					chanceService.luck += 1
+		-- 				elseif result == "Large_Clover" then
+		-- 					chanceService.luck += 2
+		-- 				elseif result == "Riflemans_Crit" then
+		-- 					weapons.critChances.AR += 1
+		-- 				elseif result == "Breachers_Crit" then
+		-- 					weapons.critChances.Shotgun += 1
+		-- 				elseif result == "Gun_Slingers_Crit" then
+		-- 					weapons.critChances.Pistol += 1
+		-- 				elseif result == "Knights_Crit" then
+		-- 					weapons.critChances.Melee += 1
+		-- 				end
+		-- 			end
+		-- 		end
+
+		-- 		signals.AddSoul:Fire(math.random(3, 6))
+		-- 	end,
+		-- },
+
+		["Simulate_Progression"] = {
 			Parameters = function()
 				return {
-					{ Name = "Levels Passed", Options = { "_Input" } },
-					{ Name = "Combat Level (1 - 5)", Options = { "_Input" } },
+					{ Name = "Act", Options = { "_Input" } },
+					{ Name = "Level", Options = { "_Input" } },
+					{ Name = "Combat Level (1 - 10)", Options = { "_Input" } },
 				}
 			end,
 
-			ExecuteClient = function(_, levelsPassed, combatLevel)
-				local GiftsService = require(Players.LocalPlayer.PlayerScripts.Client.Services.GiftsService)
+			ExecuteServer = function(_, player, stage_number, level_number)
+				if
+					not player
+					or not stage_number
+					or not tonumber(stage_number)
+					or not level_number
+					or not tonumber(level_number)
+				then
+					return
+				end
 
-				local weapons = require(Globals.Client.Controllers.WeaponController)
-				local kiosk = require(ReplicatedStorage.Gui.Kiosk)
-				local chanceService = require(Globals.Vendor.ChanceService)
+				local stage = tonumber(stage_number)
+				local level = tonumber(level_number) - 1
+
+				local mapService = require(Globals.Services.MapService)
+
+				mapService.CurrentStage = stage
+				mapService.CurrentLevel = level
+
+				require(Globals.Shared.ExitSequence).Exit(player, os.clock(), stage, level)
+			end,
+
+			ExecuteClient = function(_, act, level, combatLevel)
+				if not act or not level or not combatLevel then
+					return
+				end
+				local GiftsService = require(Players.LocalPlayer.PlayerScripts.Client.Services.GiftsService)
+				local Signals = require(script.Parent.Signals)
+				local Kiosk = require(ReplicatedStorage.Gui.Kiosk)
+				local SoulsService = require(Globals.Client.Services.SoulsService)
+				local Net = require(ReplicatedStorage.Packages.Net)
+				local uiService = require(Globals.Client.Services.UIService)
 
 				local perkIndexes = {}
 				local upgradeIndexes = {}
@@ -160,84 +295,152 @@ local commands = {
 					table.insert(upgradeIndexes, index)
 				end
 
-				for level = 1, levelsPassed do
-					local isUpgrade = math.random(0, 100) <= 35
-					local randomGift
+				local RunStats = {
+					DealsBought = 0,
+					RollsBought = 0,
+					PerkTicketsUsed = 0,
+					EnemiesKilled = 0,
+					SoulsAwarded = 0,
+				}
 
-					if isUpgrade then
-						randomGift = upgradeIndexes[math.random(1, #upgradeIndexes)]
-					else
-						randomGift = perkIndexes[math.random(1, #perkIndexes)]
-					end
+				local coins = 0
+				local weapons = Globals.Assets.Models.Weapons:GetChildren()
 
-					GiftsService.AddGift(randomGift)
+				local selectedWeapon = weapons[math.random(1, #weapons)]
+				signals.DoWeaponAction:Fire("EquipWeapon", selectedWeapon.Name)
 
-					if level == 3 then
-						GiftsService.AddGift("Master_Scouting")
-					end
+				for cStage = 1, act do
+					local maxLevel = (cStage == act) and level or 5
 
-					if level == 5 then
-						local r = math.random(1, 3)
+					for cLevel = 1, maxLevel do -- 10 - 40 / 30 - 90
+						Kiosk.resetDOTD()
 
-						if r == 1 then
-							GiftsService.AddGift("Brick_Hook")
-						elseif r == 2 then
-							GiftsService.AddGift("Righteous_Motion")
-						elseif r == 3 then
-							GiftsService.AddGift("Spiked_Sabatons")
+						-- Kill enemies
+						local minEnemySpawnCount = cLevel * 10
+						local maxEnemySpawnCount = (cLevel + 4) * 10
+						local enemySpawnCount = math.random(minEnemySpawnCount, maxEnemySpawnCount)
+
+						RunStats.EnemiesKilled += enemySpawnCount
+
+						local maxCombo = math.random(1, math.ceil(enemySpawnCount * (combatLevel / 10)))
+						local soulCount = math.random(1, math.ceil(maxCombo * (combatLevel / 10)))
+						Signals.AddSoul:Fire(soulCount)
+						RunStats.SoulsAwarded += soulCount
+
+						local score = 200 + (maxCombo * 10)
+
+						-- Beat arenas
+						for _ = 1, math.random(0, 4) do
+							if Random.new():NextNumber(0, 100) <= 15 then
+								Signals.AddTicket:Fire(1)
+							end
 						end
-					end
 
-					if level == 7 then
-						GiftsService.AddGift("Overcharge")
-					end
-
-					if level == 10 then
-						local r = math.random(1, 3)
-
-						if r == 1 then
-							GiftsService.AddGift("Galvan_Gaze")
-						elseif r == 2 then
-							GiftsService.AddGift("Mag_Launcher")
-						elseif r == 3 then
-							GiftsService.AddGift("Burning_Souls")
+						-- Visit Kiosk
+						if Kiosk.BuyDOTD() then
+							RunStats.DealsBought += 1
 						end
-					end
 
-					if level == 13 then
-						GiftsService.AddGift("Maidenless")
-					end
+						local soulsLeft = SoulsService.Souls - math.random(4, 8)
 
-					for _ = 1, combatLevel do
-						local result = kiosk.getRandomGiftFromLocalList()
+						for _ = 1, soulsLeft do
+							local kRollName = Kiosk.getRandomGift()
+							Kiosk.applyGiftChange(kRollName)
+							SoulsService.RemoveSoul(1)
 
-						if result == "Perk_Ticket" then
-							local randomTicketGift
+							RunStats.RollsBought += 1
+						end
 
-							if math.random(0, 100) <= 25 then
-								randomTicketGift = upgradeIndexes[math.random(1, #upgradeIndexes)]
+						local categories = {
+							"Arsenal",
+							"Luck",
+							"Soul",
+							"Tactical",
+						}
+
+						for _ = 1, Kiosk.tickets do
+							RunStats.PerkTicketsUsed += 1
+
+							local categoryIndex = math.random(1, 4)
+							local perkTicketGift = Kiosk.getRandomGift(categories[categoryIndex])
+
+							GiftsService.AddGift(perkTicketGift)
+						end
+
+						Kiosk.tickets = 0
+
+						-- Visit Drav
+
+						coins += score
+						Net:RemoteEvent("SetCoins"):FireServer(coins)
+
+						if soulsLeft >= 2 then
+							local isUpgrade = math.random(0, 1) == 1
+							local randomGift
+
+							if isUpgrade then
+								randomGift = upgradeIndexes[math.random(1, #upgradeIndexes)]
 							else
-								randomTicketGift = perkIndexes[math.random(1, #perkIndexes)]
+								randomGift = perkIndexes[math.random(1, #perkIndexes)]
 							end
 
-							GiftsService.AddGift(randomTicketGift)
-						elseif result == "Clover" then
-							chanceService.luck += 1
-						elseif result == "Large_Clover" then
-							chanceService.luck += 2
-						elseif result == "Riflemans_Crit" then
-							weapons.critChances.AR += 1
-						elseif result == "Breachers_Crit" then
-							weapons.critChances.Shotgun += 1
-						elseif result == "Gun_Slingers_Crit" then
-							weapons.critChances.Pistol += 1
-						elseif result == "Knights_Crit" then
-							weapons.critChances.Melee += 1
+							GiftsService.AddGift(randomGift)
+
+							if isUpgrade then
+								SoulsService.RemoveSoul(SoulsService.Souls)
+							else
+								SoulsService.RemoveSoul(SoulsService.Souls / 2)
+							end
+						else
+							SoulsService.RemoveSoul(SoulsService.Souls)
 						end
+
+						if score >= 300 then
+							local soulAmount = math.floor((score - 300) / 100) + 1
+							Signals.AddSoul:Fire(soulAmount)
+						end
+
+						-- special perks
+
+						if cLevel == 3 then
+							if cStage == 1 then
+								GiftsService.AddGift("Master_Scouting")
+							elseif cStage == 2 then
+								GiftsService.AddGift("Overcharge")
+							elseif cStage == 3 then
+								GiftsService.AddGift("Maidenless")
+							end
+						end
+
+						if cLevel == 5 then
+							local r = math.random(1, 3)
+
+							if cStage == 1 then
+								if r == 1 then
+									GiftsService.AddGift("Brick_Hook")
+								elseif r == 2 then
+									GiftsService.AddGift("Righteous_Motion")
+								elseif r == 3 then
+									GiftsService.AddGift("Spiked_Sabatons")
+								end
+							elseif cStage == 2 then
+								if r == 1 then
+									GiftsService.AddGift("Galvan_Gaze")
+								elseif r == 2 then
+									GiftsService.AddGift("Mag_Launcher")
+								elseif r == 3 then
+									GiftsService.AddGift("Burning_Souls")
+								end
+							end
+						end
+
+						-- open requiem shop
+
+						uiService.doUiAction("Requiem", "ShowRequiemShop")
 					end
 				end
 
-				signals.AddSoul:Fire(math.random(3, 6))
+				print(RunStats)
 			end,
 		},
 

@@ -29,6 +29,7 @@ local module = {
 				0.5,
 			},
 			true,
+			State = "Attacking",
 		},
 
 		-- {

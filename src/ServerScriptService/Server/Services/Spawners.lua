@@ -87,7 +87,9 @@ local objectTypes = {
 	Enemy = {
 		SpawnChance = 100,
 		Folder = ReplicatedStorage.Enemies,
-		OnSpawn = function() end,
+		OnSpawn = function()
+			print("Enemy spawned")
+		end,
 	},
 
 	Npc = {

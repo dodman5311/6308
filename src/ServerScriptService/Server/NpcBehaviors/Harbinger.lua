@@ -29,6 +29,7 @@ local module = {
 				false,
 				0.5,
 			},
+			State = "Attacking",
 		},
 
 		{ Function = "GetToDistance", Parameters = { 50, true } },

@@ -11,7 +11,7 @@ local codex = {
 
 3. Those born of iron shall remain of iron.
 
-To uphold these laws, three keepers were chosenum, host of Galga; Elios, host of Trovet; and Deilos, host of Kan-Esmortem. Over time, more laws were added, and more keepers appointed. However, the demons of Prima Hominum grew discontent. They despised the increasing restrictions and believed the freedom of Prima Hominum was rapidly diminishing. Something had to be done.
+To uphold these laws, three keepers were Maxum, host of Galga; Elios, host of Trovet; and Deilos, host of Kan-Esmortem. Over time, more laws were added, and more keepers appointed. However, the demons of Prima Hominum grew discontent. They despised the increasing restrictions and believed the freedom of Prima Hominum was rapidly diminishing. Something had to be done.
 
 The opposing demons conspired to eliminate the keepers and abolish the laws. They united to kill the keepers, striking them down one by one, but Deilos remained. His strength and unwavering faith preserved him, allowing him to uphold the third and final law.
 
@@ -302,7 +302,7 @@ You most likely reside in the second group.]],
 
 The Mare’s Leg is a lever-action shotgun developed by Kenny "Von Dutch" Howard. This weapon is chosen for its devastating shotgun rounds, one-handed capability, and ease of aiming.
 
-The gauntlet is forged from a mixture of steel and the broken iron of the 1st Keeper’s armor. This iron was obtained after the 1st Keeper’s grave was defiled by a Pestilent seeking a holy power to cure his illness. While the divine metal did not cure the Pestilent’s illness, others found use for it in crafting nearly indestructible pieces of armor.
+The gauntlet is forged from a mixture of steel and the broken iron of the 2nd Keeper’s armor. This iron was obtained after the 2nd Keeper’s grave was defiled by a Pestilent seeking a holy power to cure his illness. While the divine metal did not cure the Pestilent’s illness, others found use for it in crafting nearly indestructible pieces of armor.
 
 Although there was not enough of this alloy to produce entire suits, there was enough to create gauntlets for minor protection. Once these gauntlets were produced, they were naturally paired with the Mare’s Leg, creating the deadly combination known as the Drill Bite.]],
 	},

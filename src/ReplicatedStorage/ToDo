@@ -596,4 +596,18 @@ Make hitting a barrel with element, make the barrel elemental
 
 fun bucks:
 Buy with robux.
-Qiosk's Kiosk Quests (do quests to get a small amount of fun bucks to grind for stuffs)
+Qiosk's Kiosk Quests (rename[Task board, bounty board?]) (do quests to get a small amount of fun bucks to grind for stuffs)
+
+Optimization options (Potato mode)
+Disable bits
+Disable explosives
+etc.
+
+Asylum : When entering a new level, a random weapon will be given
+
+Add raycast to dash to stop clipping
+Add reflection velocity when raycast hits
+Decide velocity by distance to the groud, or velocity before dashing
+
+Add elements to req shop:
+Clense & Repent are now soul afflicted

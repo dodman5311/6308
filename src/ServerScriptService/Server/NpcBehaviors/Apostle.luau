@@ -14,8 +14,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local Globals = require(ReplicatedStorage.Shared.Globals)
-local util = require(Globals.Vendor.Util)
 local net = require(Globals.Packages.Net)
+local util = require(Globals.Vendor.Util)
 local rng = Random.new()
 
 local function checkDashDirection(npc, direction)
@@ -162,6 +162,7 @@ local module = {
 				false,
 				0.5,
 			},
+			State = "Attacking",
 		},
 
 		Parameters = { 40 },

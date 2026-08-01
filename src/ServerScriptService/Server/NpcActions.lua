@@ -431,7 +431,13 @@ function module.Shoot(
 			endPosition = (castingFrame * CFrame.new(0, 0, -500)).Position
 		end
 
-		projectileCframe = CFrame.lookAt(origin.Position, endPosition)
+		local offsetAngle = CFrame.Angles(0, 0, 0)
+		if info.Dropping and npc:GetTarget() then
+			local angle = ((npc:GetTarget():GetPivot().Position - npcCframe.Position).Magnitude * info.Dropping) / 2
+			offsetAngle = CFrame.Angles(math.rad(angle), 0, 0)
+		end
+
+		projectileCframe = CFrame.lookAt(origin.Position, endPosition) * offsetAngle
 
 		for _ = 1, bulletCount do
 			createProjectile(speed, projectileCframe, bulletCount - 1, info, visualModel, sender)
@@ -574,9 +580,9 @@ function module.ShootProjectile(
 	indicateAttack,
 	indicateFunction
 )
-	if npc.Instance:GetAttribute("State") ~= "Attacking" then
-		return
-	end
+	-- if npc.Instance:GetAttribute("State") ~= "Attacking" then
+	-- 	return
+	-- end
 
 	local AttackTimer = getTimer(
 		npc,
@@ -803,6 +809,16 @@ function module.MoveInfrontOfHarbinger(npc)
 	end
 
 	local point = (npc.MindData.HarbingerToProtect:GetPivot() * CFrame.new(0, 0, -10)).Position
+
+	module.MoveTowardsPoint(npc, point, true)
+end
+
+function module.MoveToAbomination(npc)
+	if not npc.MindData.AbominationToRide then
+		return
+	end
+
+	local point = npc.MindData.AbominationToRide:GetPivot().Position
 
 	module.MoveTowardsPoint(npc, point, true)
 end

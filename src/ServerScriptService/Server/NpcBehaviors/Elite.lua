@@ -157,6 +157,7 @@ local module = {
 				0.5,
 			},
 			NotState = "Shielding",
+			State = "Attacking",
 		},
 
 		{ Function = "GetToDistance", Parameters = { 30, true }, NotState = "Shielding" },

@@ -160,6 +160,7 @@ local module = {
 				false,
 				0.5,
 			},
+			State = "Attacking",
 		},
 
 		Parameters = { stats.AttackDistance },

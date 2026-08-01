@@ -274,7 +274,7 @@ local function connectButtonHoverUnderHand(frame, button)
 	end)
 end
 
-function module.getRandomGiftFromLocalList(list)
+function getRandomGiftFromLocalList(list)
 	local array = {}
 	list = list or spinGifts
 
@@ -294,9 +294,9 @@ function module.getRandomGiftFromLocalList(list)
 	return selectedKey, list[selectedKey]
 end
 
-local function getRandomGift(catagory)
+function module.getRandomGift(catagory)
 	if not catagory then
-		return module.getRandomGiftFromLocalList()
+		return getRandomGiftFromLocalList()
 	end
 
 	local array = {}
@@ -391,7 +391,7 @@ local function showText(frame, text)
 end
 
 local function useTicket(player, frame, catagory)
-	if not getRandomGift(catagory) then
+	if not module.getRandomGift(catagory) then
 		return -- no gifts left
 	end
 
@@ -409,12 +409,12 @@ local function useTicket(player, frame, catagory)
 	module.TakeDelivery(nil, nil, frame, chosenGift)
 end
 
-local function resetDOTD()
+function module.resetDOTD()
 	dailyDeal = {}
 	local chance = 0
 
 	for _ = 1, 4 do
-		local name, gift = module.getRandomGiftFromLocalList(DOTDRewards)
+		local name, gift = getRandomGiftFromLocalList(DOTDRewards)
 		table.insert(dailyDeal, { name, gift })
 
 		chance += gift.Chance
@@ -424,7 +424,7 @@ local function resetDOTD()
 	dealSold = false
 end
 
-local function useSoul(player, ui, frame, noCost)
+function module.useSoul(player, ui, frame, noCost)
 	if not noCost and (SoulsService.Souls < module.soulCost * costMult) then
 		return
 	end
@@ -452,6 +452,21 @@ local function useSoul(player, ui, frame, noCost)
 
 	local chosenGift = module.chooseRandomGift(player, ui, frame)
 	module.TakeDelivery(player, ui, frame, chosenGift, true)
+end
+
+function module.BuyDOTD()
+	if SoulsService.Souls < dailyDealCost or dealSold then
+		return false
+	end
+
+	dealSold = true
+	SoulsService.RemoveSoul(dailyDealCost)
+
+	for _, giftTable in ipairs(dailyDeal) do
+		module.applyGiftChange(giftTable[1])
+	end
+
+	return true
 end
 
 function module.Init(player, ui, frame)
@@ -504,20 +519,13 @@ function module.Init(player, ui, frame)
 	)
 
 	frame.UseDOTD.MouseButton1Click:Connect(function()
-		if SoulsService.Souls < dailyDealCost or dealSold then
+		if module.BuyDOTD() then
 			return
 		end
 		local ti = TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
 		local ti_2 = TweenInfo.new(1, Enum.EasingStyle.Elastic)
 
-		dealSold = true
 		sfx.KioskBuy:Play()
-
-		SoulsService.RemoveSoul(dailyDealCost)
-
-		for _, giftTable in ipairs(dailyDeal) do
-			module.applyGiftChange(giftTable[1])
-		end
 
 		if GiftsService.CheckGift("Five_Finger_Discount") and chanceService.checkChance(25, true) then
 			local index = math.random(1, 4)
@@ -557,7 +565,7 @@ function module.Init(player, ui, frame)
 	end)
 
 	frame.UseSoul.MouseButton1Click:Connect(function()
-		useSoul(player, ui, frame)
+		module.useSoul(player, ui, frame)
 	end)
 
 	frame.UseTicket.MouseButton1Click:Connect(function()
@@ -638,7 +646,7 @@ function module.ShowScreen(player, ui, frame, playerSouls, autoRun)
 	end
 
 	if #dailyDeal == 0 then
-		resetDOTD()
+		module.resetDOTD()
 	end
 
 	for i = 1, 4 do -- LOAD DOTD
@@ -738,7 +746,7 @@ function module.ShowScreen(player, ui, frame, playerSouls, autoRun)
 	end
 
 	if autoRun then
-		useSoul(player, ui, frame, true)
+		module.useSoul(player, ui, frame, true)
 	end
 
 	return module.onHidden
@@ -754,7 +762,7 @@ local function loadToGiftsSlot(frame, catagory)
 			continue
 		end
 
-		local _, gift = getRandomGift(catagory)
+		local _, gift = module.getRandomGift(catagory)
 		if not gift then
 			continue
 		end
@@ -763,7 +771,7 @@ local function loadToGiftsSlot(frame, catagory)
 	end
 
 	for _ = 0, spin.Size.Y.Scale * 6 do
-		local _, gift = getRandomGift(catagory)
+		local _, gift = module.getRandomGift(catagory)
 		if not gift then
 			continue
 		end
@@ -863,7 +871,7 @@ end
 function module.chooseRandomGift(player, ui, frame, catagory)
 	frame.ExitButton.Visible = false
 
-	local name, randomGift = getRandomGift(catagory)
+	local name, randomGift = module.getRandomGift(catagory)
 
 	loadToGiftsSlot(frame, catagory)
 
@@ -1017,17 +1025,13 @@ function module.resetTickets()
 	module.tickets = 0
 end
 
-function module.resetDOTD()
-	resetDOTD()
-end
-
 Signals.AddTicket:Connect(function(amount)
 	module.tickets += amount
 end)
 
 net:Connect("StartExitSequence", function()
 	module.soulCost = math.clamp(module.soulCost - 2, 1, 25)
-	resetDOTD()
+	module.resetDOTD()
 end)
 
 return module

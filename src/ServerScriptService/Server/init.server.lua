@@ -36,6 +36,7 @@ net:RemoteEvent("OpenRequiem")
 net:RemoteEvent("SetArmor")
 net:RemoteEvent("CreateExplosion")
 net:RemoteFunction("GetSoulCount")
+net:RemoteEvent("SetCoins")
 
 net:RemoteEvent("DropArmor")
 net:RemoteEvent("PickupWeapon")
@@ -101,3 +102,7 @@ local function StartModules()
 end
 
 Promise.try(InitModules):andThenCall(StartModules):catch(warn)
+
+net:Connect("SetCoins", function(player, value)
+	workspace:SetAttribute("TotalScore", value)
+end)

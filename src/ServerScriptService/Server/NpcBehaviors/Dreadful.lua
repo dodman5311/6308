@@ -83,6 +83,7 @@ local module = {
 				"RocketProjectile",
 				0.5,
 			},
+			State = "Attacking",
 		},
 
 		{
@@ -97,6 +98,7 @@ local module = {
 				"SmartRocketProjectile",
 				"SpecialAttackSnd",
 			},
+			State = "Attacking",
 		},
 	},
 
