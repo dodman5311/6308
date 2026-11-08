@@ -15,6 +15,7 @@ local Globals = require(ReplicatedStorage.Shared.Globals)
 local Net = require(Globals.Packages.Net)
 local Signals = require(ReplicatedStorage.Shared.Signals)
 local UIService = require(Globals.Client.Services.UIService)
+local cardService = require(Globals.Client.Services.CardService)
 local comboService = require(Globals.Client.Services.ComboService)
 local giftService = require(Globals.Client.Services.GiftsService)
 
@@ -53,6 +54,9 @@ local function processHealthLuck(): number
 		addedLuck += (5 - humanoid.MaxHealth) * 50
 	end
 
+	addedLuck += giftService.CheckCardStack("10_of_Clubs")
+	addedLuck += giftService.CheckCardStack("Jack_of_Clubs") * 2
+
 	return addedLuck
 end
 
@@ -85,6 +89,8 @@ function module.getLuck()
 		end
 	end
 
+	result += cardService:CheckCardStack("Ace_of_Clubs") * (#cardService.CurrentHand * 10)
+
 	return result, module.luck
 end
 
@@ -107,6 +113,7 @@ function module.checkChance(chance, goodLuck, PureLuck)
 	end
 
 	local luck = module.getLuck() / 100 --/ 2
+	luck *= 1 + (giftService.CheckCardStack("King_of_Spades") * 0.25)
 
 	if goodLuck then
 		chance *= (1 + luck)

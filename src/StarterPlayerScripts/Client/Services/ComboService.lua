@@ -53,8 +53,11 @@ function module.AddToCombo(amount)
 	comboTimer.WaitTime = getComboTime()
 
 	module.CurrentCombo += amount
-	comboTimer:Reset()
+
 	comboTimer:Run()
+	if comboTimer:GetCurrentTime() >= 0 then
+		comboTimer:Reset()
+	end
 
 	UIService.doUiAction("HUD", "SetCombo", module.CurrentCombo)
 
@@ -79,6 +82,11 @@ end
 
 function module.RestartTimer()
 	comboTimer:Reset()
+end
+
+function module.DelayTimer(delayAmount: number)
+	module.RestartTimer()
+	comboTimer:Delay(delayAmount)
 end
 
 comboTimer.OnTimerStepped:Connect(function(currentTime)

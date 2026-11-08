@@ -110,7 +110,7 @@ local module = {
 
 		Buy_1_Get_1 = {
 			Icon = "rbxassetid://81150499590074",
-			Catagories = { "Luck" },
+			Catagories = { "Tactical" },
 			Desc = "Every other roll at the kiosk now has a 30% chance to be free.",
 		},
 
@@ -406,6 +406,12 @@ Firing a picked up weapon or reloading removes 1 stack of Purity
 			Icon = "rbxassetid://16465804087",
 			Catagories = { "Tactical" },
 			Desc = "You can now grapple onto any pickups closer than 100 studs and collect it. (E to grapple)",
+		},
+
+		The_Sleepless_Iron = {
+			Icon = "rbxassetid://90107049762868",
+			Catagories = { "Arsenal" },
+			Desc = "Nearby enemies now have a 5% chance every 0.5 seconds to be attacked by The Sleepless Iron, dealing 6 damage.",
 		},
 	},
 

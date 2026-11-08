@@ -710,12 +710,13 @@ local commands = {
 				local GiftsService = require(Players.LocalPlayer.PlayerScripts.Client.Services.GiftsService)
 				GiftsService.AddGift(perk)
 
+				print(gifts)
+
 				print(perk .. " given")
 			end,
 		},
 
 		Give_Special = {
-
 			Parameters = function()
 				return {
 					{ Name = "Perk", Options = convertToArray(gifts.Specials) },
@@ -1157,6 +1158,48 @@ local commands = {
 			ExecuteClient = function(_, NotifyAction)
 				local uiService = require(Globals.Client.Services.UIService)
 				uiService.doUiAction("Notify", NotifyAction)
+			end,
+		},
+	},
+
+	Cards = {
+		AddCard = {
+			Parameters = function()
+				local pack = require(ReplicatedStorage.PerkPacks).RoyalFlush
+				local cards = convertToArray(table.clone(pack.Superior))
+				for i, _ in pairs(pack.Inferior) do
+					table.insert(cards, i)
+				end
+
+				return {
+					{
+						Name = "Card",
+						Options = cards,
+					},
+				}
+			end,
+
+			ExecuteClient = function(_, perk)
+				if not perk then
+					return
+				end
+				local GiftsService = require(Players.LocalPlayer.PlayerScripts.Client.Services.CardService)
+				GiftsService:AddCard(perk)
+
+				print(perk .. " given")
+			end,
+		},
+
+		ClearCards = {
+			Parameters = function()
+				return {}
+			end,
+
+			ExecuteClient = function()
+				local GiftsService = require(Players.LocalPlayer.PlayerScripts.Client.Services.CardService)
+				GiftsService:ClearCards()
+
+				print("Cards Cleared")
 			end,
 		},
 	},

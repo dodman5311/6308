@@ -1298,6 +1298,11 @@ function module.UpdateStats(_, _, frame)
 
 		statLabel.Visible = crit > 0
 		statLabel.Text = statLabel.Name .. " " .. crit .. "%"
+
+		local totalCrit = weapons.getCritChance("None", 0, statLabel.Name)
+		if totalCrit > crit then
+			statLabel.Text = statLabel.Text .. " + " .. totalCrit - crit
+		end
 	end
 end
 

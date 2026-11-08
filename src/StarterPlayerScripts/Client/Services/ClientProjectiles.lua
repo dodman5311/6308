@@ -69,6 +69,15 @@ module.Presets = {
 		Model = "HeavyProjectile",
 	},
 
+	LaserBeam = {
+		Speed = 2000,
+		LifeTime = 1,
+		Info = { Size = 2 },
+		Damage = 12,
+		Piercing = 10,
+		Model = "BeamProjectile",
+	},
+
 	ElectricBolt = {
 		Speed = 2000,
 		LifeTime = 1,
@@ -337,6 +346,15 @@ module.Presets = {
 		Damage = 1,
 		Piercing = 0,
 		Model = "RocketProjectile",
+	},
+
+	SleeplessIronAttack = {
+		Speed = 160,
+		LifeTime = 0.1,
+		Info = { Size = 3 },
+		Damage = 5,
+		Piercing = 10,
+		Model = "InvisibleProjectile",
 	},
 
 	-- Fart = {

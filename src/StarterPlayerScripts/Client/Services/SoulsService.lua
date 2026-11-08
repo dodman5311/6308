@@ -10,6 +10,7 @@ local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local StarterPlayer = game:GetService("StarterPlayer")
 local TweenService = game:GetService("TweenService")
 local assets = ReplicatedStorage.Assets
 
@@ -17,6 +18,7 @@ local assets = ReplicatedStorage.Assets
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local Timer = require(ReplicatedStorage.Vendor.Timer)
 local player = Players.LocalPlayer
+local CardService = require(player.PlayerScripts.Client.Services.CardService)
 
 --// Modules
 local ChanceService = require(Globals.Vendor.ChanceService)
@@ -167,8 +169,8 @@ end
 
 --// Main //--
 
-Signals.AddArmor:Connect(function()
-	AddArmor(1)
+Signals.AddArmor:Connect(function(amount)
+	AddArmor(amount or 1)
 end)
 Signals.AddSoul:Connect(module.AddSoul)
 Signals.RemoveSoul:Connect(module.RemoveSoul)
@@ -198,6 +200,7 @@ net:Connect("CheckProtected", function()
 		end
 
 		Signals.RemoveSoul:Fire(1)
+		CardService:ClearCards()
 	end
 
 	if GiftsService.CheckGift("Unending_Fortress") and ChanceService.checkChance(25, true) then

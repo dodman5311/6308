@@ -25,6 +25,7 @@ local signals = {
 	RemoveSoul = signal.new(),
 	ClearGifts = signal.new(),
 	AddAmmo = signal.new(),
+	AddCard = signal.new(),
 	PauseGame = signal.new(),
 	ResumeGame = signal.new(),
 	AddTicket = signal.new(),

@@ -7,6 +7,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 --// Instances
+local CardService = require(script.Parent.CardService)
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local codexService = require(Globals.Client.Services.CodexService)
 local player = Players.LocalPlayer
@@ -29,6 +30,10 @@ module.OnGiftRemoved = signal.new()
 
 function module.CheckGift(giftName)
 	return table.find(module.AquiredGifts, giftName)
+end
+
+function module.CheckCardStack(cardName: string): number
+	return CardService:CheckCardStack(cardName)
 end
 
 function module.AddGift(gift)

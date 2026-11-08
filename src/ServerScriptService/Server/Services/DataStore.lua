@@ -58,6 +58,9 @@ function module.LoadGameData(player)
 	local storedScore = LoadData(player, DataStoreService:GetDataStore("PlayerStoredScore")) or 0
 	local totalScore = LoadData(player, DataStoreService:GetDataStore("PlayerTotalScore")) or 0
 
+	local inventory = LoadData(player, DataStoreService:GetDataStore("PlayerInventory")) or {}
+	print(inventory)
+
 	local upgrades = LoadData(player, DataStoreService:GetDataStore("ShopUpgrades")) or {}
 	local gameSettings = LoadData(player, DataStoreService:GetDataStore("PlayerSettings")) or {}
 	local gameState = LoadData(player, DataStoreService:GetDataStore("PlayerGameState")) or {}
@@ -84,7 +87,7 @@ function module.LoadGameData(player)
 
 	mapService.proceedToNext(nil, true)
 
-	net:RemoteEvent("LoadData"):FireClient(player, upgrades, gameState, gameSettings, codex)
+	net:RemoteEvent("LoadData"):FireClient(player, upgrades, gameState, gameSettings, codex, inventory)
 	return os.clock() - startTime
 end
 
@@ -113,8 +116,7 @@ function module.saveGameState(player, gameState)
 	local dataStore = DataStoreService:GetDataStore("PlayerGameState")
 	local storedScore = DataStoreService:GetDataStore("PlayerStoredScore")
 	local totalScore = DataStoreService:GetDataStore("PlayerTotalScore")
-	--gameState.Stage = gameState.Stage or mapService.CurrentStage
-	--gameState.Level = gameState.Level or mapService.CurrentLevel
+
 	SaveToStore(player, dataStore, gameState)
 	SaveToStore(player, totalScore, workspace:GetAttribute("TotalScore"))
 	SaveToStore(player, storedScore, workspace:GetAttribute("StoredScore"))

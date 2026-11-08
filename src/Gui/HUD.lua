@@ -1,6 +1,7 @@
 local module = {}
 --// Services
 local CollectionService = game:GetService("CollectionService")
+local Debris = game:GetService("Debris")
 local GuiService = game:GetService("GuiService")
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
@@ -433,6 +434,46 @@ local function setUpHealthBar(maxHealth, bar, unit)
 		newUnit.Parent = units
 		newUnit.Visible = true
 	end
+end
+
+function module.AddCard(player, ui, frame, cardName: string, cardIcon: string)
+	local newCard = frame.Card:Clone()
+	newCard.Parent = frame.CardHand
+	newCard.Name = cardName
+	newCard.Image = cardIcon
+
+	return newCard
+end
+
+function module.UpdateHand(player, ui, frame, hand)
+	local handFrame = frame.CardHand
+	local ti = TweenInfo.new(0.25, Enum.EasingStyle.Back)
+	local handSize = #hand
+
+	util.tween(handFrame, ti, { Size = UDim2.fromScale((math.max(0, handSize - 1) / 4) * 0.075, 0.075) })
+
+	for index, card: ImageLabel in ipairs(hand) do
+		local xPosition = math.max(0, index - 1) / math.max(1, handSize - 1)
+		local yPosition = math.abs((xPosition / 10) - 0.05) * 2
+
+		card.Visible = true
+
+		util.tween(card, ti, {
+			Position = UDim2.fromScale(math.abs(xPosition - 1), 0.5 + yPosition),
+			Rotation = ((math.abs(xPosition - 1) * 30) - 15) * (handSize / 4),
+		})
+	end
+end
+
+function module.RemoveCard(player, ui, frame, card)
+	local ti = TweenInfo.new(0.25)
+	util.tween(card, ti, {
+		Position = UDim2.fromScale(2, 1),
+		Rotation = 30,
+		ImageTransparency = 1,
+	})
+
+	Debris:AddItem(card, ti.Time)
 end
 
 function module.ShowHit(_, _, frame, crit)

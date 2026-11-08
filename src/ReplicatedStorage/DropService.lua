@@ -85,7 +85,7 @@ local function checkForDrops()
 		end
 
 		if distance <= 5 then
-			Signals["Add" .. drop:GetAttribute("DropType")]:Fire(1)
+			Signals["Add" .. drop:GetAttribute("DropType")]:Fire(drop:GetAttribute("Value") or 1)
 			drop:Destroy()
 			return
 		end

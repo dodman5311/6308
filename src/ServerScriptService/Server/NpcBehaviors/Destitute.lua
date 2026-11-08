@@ -110,7 +110,7 @@ local module = {
 		{
 			Function = "ShootProjectile",
 			Parameters = {
-				AttackDelay = NumberRange.new(2, 4),
+				NumberRange.new(2, 4),
 				0.02,
 				50,
 				75,

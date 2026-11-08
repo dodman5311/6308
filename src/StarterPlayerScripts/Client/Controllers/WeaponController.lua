@@ -24,6 +24,7 @@ local UserInputService = game:GetService("UserInputService")
 --// Instances
 local DashController = require(script.Parent.DashController)
 local DestructableService = require(StarterPlayer.StarterPlayerScripts.Client.Services.DestructableService)
+local Gifts = require(ReplicatedStorage.Shared.Gifts)
 local Globals = require(ReplicatedStorage.Shared.Globals)
 local assets = Globals.Assets
 local reloadSounds = assets.Sounds.Reloading
@@ -69,7 +70,7 @@ local net = require(Globals.Packages.Net)
 local weaponTimer = Timer:newQueue()
 local weaponReloadTimer = weaponTimer:new("WeaponReload")
 local damagePerkTimer = weaponTimer:new("DamagePerkCooldown")
-local soulChanceTimer = Timer:new("critSoulChance", 1)
+--local soulChanceTimer = Timer:new("critSoulChance", 1)
 
 local daisySubject_A
 local daisySubject_B
@@ -106,7 +107,6 @@ module.currentWeapon = nil
 local weaponData
 
 local mouseButton1Down = false
-local gKeyDown = false
 local canBlock = true
 local overchargeDebounce = false
 
@@ -428,6 +428,10 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 		UIService.doUiAction("HUD", "AssignDeadbolt", newWeapon)
 	end
 
+	if GiftsService.CheckGift("Chronos") and weaponData.Type == "Melee" and pickupType == "FromWorld" then
+		ComboService.DelayTimer(4)
+	end
+
 	applyUpgrades(weaponName, weaponData)
 
 	UIService.doUiAction("HUD", "SetCrosshair", crosshairs[weaponData.Crosshair])
@@ -468,6 +472,10 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 	if GiftsService.CheckGift("War_Drums") then
 		ammoToAdd += weaponData.Ammo * 0.75
 	end
+
+	ammoToAdd += GiftsService.CheckCardStack("10_of_Spades")
+	ammoToAdd += GiftsService.CheckCardStack("Jack_of_Spades") * 2
+	ammoToAdd += GiftsService.CheckCardStack("Queen_of_Spades") * 3
 
 	if extraAmmo then
 		ammoToAdd += weaponData.Ammo * (extraAmmo / 100)
@@ -792,6 +800,51 @@ local function dropLuck(position)
 	dropService.CreateDrop(position, "Luck")
 end
 
+local function dropCard(position)
+	local baseDropChance = 10
+	local jokerChance = 1
+	local cards = {
+		"Ace_of_Hearts",
+		"Ace_of_Diamonds",
+		"Ace_of_Clubs",
+		"Ace_of_Spades",
+		"King_of_Hearts",
+		"King_of_Diamonds",
+		"King_of_Clubs",
+		"King_of_Spades",
+		"Queen_of_Hearts",
+		"Queen_of_Diamonds",
+		"Queen_of_Clubs",
+		"Queen_of_Spades",
+		"Jack_of_Hearts",
+		"Jack_of_Diamonds",
+		"Jack_of_Clubs",
+		"Jack_of_Spades",
+		"10_of_Hearts",
+		"10_of_Diamonds",
+		"10_of_Clubs",
+		"10_of_Spades",
+	}
+
+	for _, card in pairs(cards) do
+		local chance = 0
+		if GiftsService.CheckGift(card) then
+			chance = baseDropChance
+		end
+
+		if GiftsService.CheckGift("Joker") then
+			chance += jokerChance
+		end
+
+		if chance > 0 and ChanceService.checkChance(chance) then
+			local gift = Gifts.Upgrades[card] or Gifts.Perks[card]
+			local cardDrop = dropService.CreateDrop(position, "Card")
+			cardDrop:SetAttribute("Value", card)
+			cardDrop.UI.Icon.Image = gift.Icon
+		end
+	end
+end
+
 local function addToCombo(amount)
 	ComboService.AddToCombo(amount)
 end
@@ -944,6 +997,12 @@ local function awardKill(model: Model, position)
 		UIService.doUiAction("HUD", "ActivateGift", "Returned_Change")
 	end
 
+	local QHStacks = GiftsService.CheckCardStack("Queen_of_Hearts")
+	if QHStacks > 0 then
+		UIService.doUiAction("HUD", "ShowInvincible", QHStacks * 0.25)
+		net:RemoteEvent("SetInvincible"):FireServer("Queen_of_Hearts", QHStacks * 0.25)
+	end
+
 	local humanoid = findHumanoid(model)
 
 	if not humanoid or humanoid:HasTag("Souless") then
@@ -952,6 +1011,7 @@ local function awardKill(model: Model, position)
 
 	dropAmmo(position)
 	dropLuck(position)
+	dropCard(position)
 
 	if
 		GiftsService.CheckGift("Aggressive_Forgery")
@@ -992,6 +1052,20 @@ local function awardKill(model: Model, position)
 		net:RemoteEvent("SpawnWeapon"):FireServer(position)
 		UIService.doUiAction("HUD", "ActivateGift", "Lootr")
 	end
+
+	local ASStack = GiftsService.CheckCardStack("Ace_of_Spades")
+	if ASStack > 0 then
+		local snd = util.PlaySound(assets.Sounds.RCoinsSmall, script, 0.05)
+		snd.Volume = 0.5
+		snd.PlaybackSpeed += 0.2
+		net:RemoteEvent("SetCoins"):FireServer(workspace:GetAttribute("TotalScore") + (ASStack * 5))
+	end
+
+	for _ = 1, GiftsService.CheckCardStack("Ace_of_Hearts") do
+		if ChanceService.checkChance(20, true) then
+			net:RemoteEvent("Damage"):FireServer(player.Character, -1)
+		end
+	end
 end
 
 local function checkImmunity(subject, source)
@@ -1031,7 +1105,7 @@ local function checkImmunity(subject, source)
 	end
 end
 
-local function getCritChance(source, chanceToAdd)
+function module.getCritChance(source: string?, chanceToAdd: number?, weaponTypeOverride: string?)
 	local chance = 0
 	if not chanceToAdd then
 		chanceToAdd = 0
@@ -1042,6 +1116,8 @@ local function getCritChance(source, chanceToAdd)
 	elseif source == "Default" then
 		chance = module.critChances.Pistol + chanceToAdd
 		chance += addPurity(chance)
+	elseif weaponTypeOverride then
+		chance = module.critChances[weaponTypeOverride] + chanceToAdd
 	end
 
 	local critTimer = Timer:getTimer("BrickHookCritChance")
@@ -1052,6 +1128,8 @@ local function getCritChance(source, chanceToAdd)
 	if workspace:GetAttribute("Overcharge") == 2 and acts:checkAct("OverchargeActive") then
 		chance += 35
 	end
+
+	chance += GiftsService.CheckCardStack("10_of_Diamonds") * 2
 
 	return chance
 end
@@ -1131,7 +1209,11 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		createFakeWeakpoint(model, subject, cframe.Position)
 	end
 
-	if GiftsService.CheckGift("Fury") and ChanceService.checkChance(50, true) and humanoid.MaxHealth > 50 then
+	if GiftsService.CheckGift("Acumen") and source == "Parry" then
+		module.UpdateAmmo(currentAmmo + 1)
+	end
+
+	if GiftsService.CheckGift("Fury") and humanoid.MaxHealth > 50 and ChanceService.checkChance(50, true) then
 		damage += 1
 	end
 
@@ -1169,7 +1251,7 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 	end
 
 	local critMult = 1
-	if ChanceService.checkChance(getCritChance(source, critChanceAddition), true) then
+	if ChanceService.checkChance(module.getCritChance(source, critChanceAddition), true) then
 		critMult = 2
 		util.PlaySound(assets.Sounds.Crit, script, 0.05)
 		if isHeadshot then
@@ -1182,13 +1264,37 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 		elseif workspace:GetAttribute("Overcharge") == 2 and acts:checkAct("OverchargeActive") then
 			module.AddAmmo(1)
 		end
+
+		local QCStack = GiftsService.CheckCardStack("Queen_of_Clubs")
+		if QCStack > 0 then
+			ChanceService.UpdateLuckModifier("Queen_of_Clubs", QCStack * 10)
+			Timer.delay(1, function()
+				ChanceService.RemoveLuckModifier("Queen_of_Clubs")
+			end)
+		end
+
+		local QDStack = GiftsService.CheckCardStack("Queen_of_Diamonds")
+
+		explosionService.createExplosion(
+			cframe.Position,
+			QDStack * 10,
+			QDStack,
+			player,
+			Color3.new(1, 1, 1),
+			"Queen_Of_Diamonds"
+		)
 	end
 
 	local deadshotDamage = checkDeadshot()
 	local boringDamage = consecutiveHits >= 10 and 1 or 0
 	local subjectPosition = subject:GetPivot().Position
 
-	local totalDamage = damage + deadshotDamage + weakspotDamage + boringDamage + siuDamage
+	local totalDamage = damage
+		+ deadshotDamage
+		+ weakspotDamage
+		+ boringDamage
+		+ siuDamage
+		+ GiftsService.CheckCardStack("Ace_of_Diamonds")
 
 	lastDamageSource = source
 
@@ -1345,6 +1451,12 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 				chanceOverride,
 				critChanceAddition
 			)
+		end
+	end
+
+	for _ = 1, GiftsService.CheckCardStack("King_of_Hearts") do
+		if ChanceService.checkChance(totalDamage, true) then
+			net:RemoteEvent("Damage"):FireServer(player.Character, -1)
 		end
 	end
 
@@ -1525,11 +1637,11 @@ local function createKnockback(mult)
 	airController.change()
 end
 
-function module.FireProjectile(projectileType, spread, damage, bulletIndex, element, offsetOverride)
+function module.FireProjectile(projectileType, spread, damage, bulletIndex, element, offsetOverride, source)
 	local subjectCFrame = camera.CFrame
 	local offset = Vector3.zero
 
-	if module.currentWeapon:FindFirstChild("FirePart") then
+	if module.currentWeapon and module.currentWeapon:FindFirstChild("FirePart") then
 		offset = subjectCFrame:VectorToObjectSpace(module.currentWeapon.FirePart.Position - subjectCFrame.Position)
 	end
 
@@ -1568,7 +1680,7 @@ function module.FireProjectile(projectileType, spread, damage, bulletIndex, elem
 		damage,
 		info,
 		player,
-		module.currentWeapon and module.currentWeapon.Name or "Default"
+		source or (module.currentWeapon and module.currentWeapon.Name) or "Default"
 	)
 end
 
@@ -2001,6 +2113,18 @@ function module.Fire()
 	if GiftsService.CheckGift("Loose_Cannon") and ChanceService.checkChance(5, true) then
 		UIService.doUiAction("HUD", "ActivateGift", "Loose_Cannon")
 		extraBullet = 1
+	end
+
+	for _ = 1, GiftsService.CheckCardStack("Jack_of_Diamonds") do
+		if ChanceService.checkChance(2, true) then
+			extraBullet += 1
+		end
+	end
+
+	for _ = 1, GiftsService.CheckCardStack("King_of_Diamonds") do
+		if ChanceService.checkChance(10, true) then
+			module.FireProjectile("SmartPellet", 0, 1, 0, weaponData["Element"])
+		end
 	end
 
 	if not module.currentWeapon then
@@ -2680,7 +2804,7 @@ function module.OnBlock()
 
 	if module.currentWeapon and module.currentWeapon.Name == "Bloody Mary" then
 		for _ = 1, 3 do
-			module.FireProjectile("BloodyMaryBlade", 5, parryDamage, 1)
+			module.FireProjectile("BloodyMaryBlade", 5, parryDamage, 1, nil, nil, "Parry")
 		end
 	else
 		module.FireBullet(parryDamage, 0, 300, nil, "Parry")
@@ -2775,7 +2899,7 @@ function module.OpenDeadBolt()
 	UIService.doUiAction(
 		"HUD",
 		"ShowDeadBolt",
-		getCritChance(module.currentWeapon and module.currentWeapon.Name or "Default"),
+		module.getCritChance(module.currentWeapon and module.currentWeapon.Name or "Default"),
 		module.currentWeapon and weaponData.Type
 	)
 end
@@ -2806,6 +2930,39 @@ local function actOnAnimation(parameter)
 	end
 end
 
+local function showSleeplessIronEffect(enemyModel: Model)
+	local newSleepless = assets.Effects.SleeplessIron:Clone()
+	local attackAnimation = newSleepless.Humanoid.Animator:LoadAnimation(newSleepless.Attack)
+
+	local ti = TweenInfo.new(0.1)
+
+	for _, part in ipairs(newSleepless:GetChildren()) do
+		if not part:HasTag("FadingPart") then
+			continue
+		end
+		part.Transparency = 1
+		util.tween(part, ti, { Transparency = 0 })
+	end
+
+	attackAnimation:Play(0)
+	util.PlaySound(assets.Sounds.SleeplessIron_Attack, script)
+	newSleepless:PivotTo(enemyModel:GetPivot())
+	newSleepless.Parent = workspace
+	Debris:AddItem(newSleepless, 2)
+
+	task.delay(0.4, function()
+		newSleepless.Trail.Enabled = false
+
+		for _, part in ipairs(newSleepless:GetChildren()) do
+			if not part:HasTag("FadingPart") then
+				continue
+			end
+
+			util.tween(part, ti, { Transparency = 1 })
+		end
+	end)
+end
+
 local coinTimer = Timer:new("CoinFlip", 30, function()
 	if ChanceService.checkChance(50) then
 		ChanceService.UpdateLuckModifier("Jade_Coin", 50)
@@ -2822,6 +2979,47 @@ local coinTimer = Timer:new("CoinFlip", 30, function()
 		UIService.doUiAction("HUD", "FlipCoin", "Tails")
 		UIService.doUiAction("HUD", "ActivateGift", "Jade_Coin")
 	end
+end)
+
+local sleeplessIronTimer = Timer:new("SleeplessIronAttack", 0.5, function()
+	local enemies = CollectionService:GetTagged("Enemy")
+	local enemiesInRange = {}
+
+	local range = 75
+
+	for _, enemy in ipairs(enemies) do
+		local playerPosition = player.Character:GetPivot().Position
+		local enemyPosition = enemy:GetPivot().Position
+		local distance = (playerPosition - enemyPosition).Magnitude
+
+		if distance > range then
+			continue
+		end
+
+		local humanoid = enemy:FindFirstChild("Humanoid")
+		if not humanoid or humanoid.Health <= 0 then
+			continue
+		end
+		table.insert(enemiesInRange, enemy)
+	end
+
+	if #enemiesInRange == 0 then
+		return
+	end
+
+	local randomEnemy = enemiesInRange[math.random(1, #enemiesInRange)]
+
+	if not ChanceService.checkChance(5, true) then
+		return
+	end
+	UIService.doUiAction("HUD", "ActivateGift", "The_Sleepless_Iron")
+
+	showSleeplessIronEffect(randomEnemy)
+	task.wait(0.33)
+	local enemyCFrame = randomEnemy:GetPivot()
+	local origin = CFrame.lookAt((enemyCFrame * CFrame.new(-8, 1, 0)).Position, enemyCFrame.Position)
+
+	projectileService.createFromPreset(origin, 0, "SleeplessIronAttack", 6, {}, player, "Sleepless_Iron")
 end)
 
 function module:GameInit()
@@ -3255,6 +3453,10 @@ RunService.Heartbeat:Connect(function()
 	if GiftsService.CheckGift("Jade_Coin") then
 		coinTimer:Run()
 	end
+
+	if GiftsService.CheckGift("The_Sleepless_Iron") then
+		sleeplessIronTimer:Run()
+	end
 end)
 
 net:Connect("EquipWeapon", module.EquipWeapon)
@@ -3414,6 +3616,10 @@ GiftsService.OnGiftAdded:Connect(function(gift)
 		elseif not module.currentWeapon then
 			UIService.doUiAction("HUD", "AssignDeadbolt", defaultWeapon)
 		end
+	end
+
+	if gift == "The_Sleepless_Iron" then
+		sleeplessIronTimer:Reset()
 	end
 end)
 

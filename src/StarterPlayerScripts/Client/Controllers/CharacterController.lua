@@ -23,6 +23,7 @@ local sounds = assets.Sounds
 local Acts = require(Globals.Vendor.Acts)
 local ChanceService = require(Globals.Vendor.ChanceService)
 local DropService = require(ReplicatedStorage.Shared.DropService)
+local Gifts = require(ReplicatedStorage.Shared.Gifts)
 local MusicService = require(Globals.Client.Services.MusicService)
 local Timer = require(ReplicatedStorage.Vendor.Timer)
 local UIService = require(Globals.Client.Services.UIService)
@@ -34,6 +35,7 @@ local explosionService = require(Globals.Client.Services.ExplosionService)
 local giftService = require(Globals.Client.Services.GiftsService)
 local kiosk = require(ReplicatedStorage.Gui.Kiosk)
 local net = require(Globals.Packages.Net)
+local perkPacks = require(ReplicatedStorage.PerkPacks)
 local signals = require(Globals.Signals)
 local soulsService = require(Globals.Client.Services.SoulsService)
 local util = require(Globals.Vendor.Util)
@@ -91,7 +93,7 @@ function module.attemptResume(index)
 	signals.ResumeGame:Fire()
 end
 
-local function loadSaveData(upgradeIndex, gameState)
+local function loadSaveData(upgradeIndex, gameState, gameSettings, codex, inventory)
 	if not Player.Character then
 		Player.CharacterAdded:Wait()
 	end
@@ -111,6 +113,26 @@ local function loadSaveData(upgradeIndex, gameState)
 
 	for _, perkName in ipairs(gameState["PerkList"] or {}) do
 		giftService.AddGift(perkName)
+	end
+
+	for index, value in pairs(inventory or {}) do
+		if not value then
+			continue
+		end
+
+		local perkPack = perkPacks[index]
+
+		if perkPack["Inferior"] then
+			for perkName, perkData in pairs(perkPack.Inferior) do
+				Gifts.Perks[perkName] = perkData
+			end
+		end
+
+		if perkPack["Superior"] then
+			for perkName, perkData in pairs(perkPack.Superior) do
+				Gifts.Upgrades[perkName] = perkData
+			end
+		end
 	end
 
 	-- if gameState["MaxHealth"] and Player.Character:WaitForChild("Humanoid") then
@@ -698,6 +720,11 @@ net:Connect("ArenaBegun", function(isAmbush)
 		UIService.doUiAction("Notify", "AmbushBegun")
 	else
 		UIService.doUiAction("Notify", "ArenaBegun")
+
+		local heartCards = giftService.CheckCardStack("10_of_Hearts")
+		if heartCards > 0 then
+			signals.AddArmor:Fire(heartCards)
+		end
 	end
 end)
 

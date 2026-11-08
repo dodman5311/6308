@@ -3,10 +3,10 @@ local Players = game:GetService("Players")
 local module = {}
 
 --// Services
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local collectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local collectionService = game:GetService("CollectionService")
 
 --// Instances
 local Globals = require(ReplicatedStorage.Shared.Globals)
@@ -14,16 +14,36 @@ local Assets = ReplicatedStorage.Assets
 local Effects = Assets.Effects
 
 --// Modules
-local Net = require(Globals.Packages.Net)
-local util = require(Globals.Vendor.Util)
-local signals = require(Globals.Shared.Signals)
-local signal = require(Globals.Packages.Signal)
 local CameraController = require(Globals.Client.Controllers.CameraController)
+local Net = require(Globals.Packages.Net)
 local chanceService = require(Globals.Vendor.ChanceService)
+local signal = require(Globals.Packages.Signal)
+local signals = require(Globals.Shared.Signals)
+local util = require(Globals.Vendor.Util)
 
 --// Values
 
 module.explosiveHit = signal.new()
+
+local function findHumanoid(subject)
+	local model = subject
+
+	if not subject:IsA("Model") then
+		model = subject:FindFirstAncestorOfClass("Model")
+	end
+
+	if not model then
+		return
+	end
+
+	local humanoid = model:FindFirstChildOfClass("Humanoid")
+
+	if not humanoid then
+		return
+	end
+
+	return humanoid, model
+end
 
 local function hitEnemy(subject, damage, magnitude, sender, source, element)
 	task.wait(0.05)
@@ -114,7 +134,72 @@ local elementalExplosions = {
 			local partsHit = workspace:GetPartsInPart(linger)
 
 			for _, part in ipairs(partsHit) do
-				Net:RemoteEvent("Damage"):FireServer(part, 0, "Fire")
+				Net:RemoteEvent("Damage"):FireServer(part, 1, "Fire")
+			end
+		end)
+
+		return newEffect
+	end,
+
+	Acid = function(position, size, color, sender)
+		local lightTi = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+		local newEffect = Effects.FireExplode:Clone()
+
+		Debris:AddItem(newEffect, 5)
+
+		newEffect.Center.Fire.Color = ColorSequence.new(color or Color3.fromRGB(255, 255, 255))
+
+		newEffect.Parent = workspace.Ignore
+		newEffect.Position = position
+
+		newEffect.Center.Fire:Emit(150)
+		util.tween(newEffect.Light, lightTi, { Brightness = 0 })
+
+		local rp = RaycastParams.new()
+		rp.FilterDescendantsInstances = { workspace.Map }
+		rp.FilterType = Enum.RaycastFilterType.Include
+
+		local cast = workspace:Raycast(position, CFrame.new(position + Vector3.new(0, 1, 0)).UpVector * -size, rp)
+
+		if not cast then
+			return newEffect
+		end
+
+		local linger = Effects.FireLinger:Clone()
+		Debris:AddItem(linger, 5)
+		linger.Parent = workspace
+		linger.Position = cast.Position
+		linger.Fire.Enabled = true
+
+		local beat
+		local i = 0
+
+		beat = RunService.Heartbeat:Connect(function(deltaTime)
+			if not linger or not linger.Parent then
+				beat:Disconnect()
+			end
+
+			i += deltaTime
+
+			if i >= 0.5 then
+				i = 0
+			else
+				return
+			end
+
+			local partsHit = workspace:GetPartsInPart(linger)
+
+			for _, part in ipairs(partsHit) do
+				if not sender or not sender:IsA("Player") then -- @TODO Making acid burn player!
+					local humanoid = findHumanoid(part)
+					if not humanoid or not Players:GetPlayerFromCharacter(humanoid.Parent) then
+						continue
+					end
+
+					Net:RemoteEvent("Damage"):FireServer(humanoid, 1)
+				else
+					Net:RemoteEvent("Damage"):FireServer(part, 1)
+				end
 			end
 		end)
 
@@ -172,7 +257,7 @@ function module.createExplosion(position, size, damage, sender, color, source, e
 	local effect
 
 	if element then
-		effect = elementalExplosions[element](position, size, color)
+		effect = elementalExplosions[element](position, size, color, sender)
 	else
 		effect = explodeNormal(position, size, color)
 	end
@@ -193,7 +278,7 @@ function module.createExplosion(position, size, damage, sender, color, source, e
 
 	list = collectionService:GetTagged("Npc")
 
-	if not sender or not sender:IsA("Player") then
+	if not sender or not sender:IsA("Player") then -- @TODO Making acid burn player!
 		for _, v in ipairs(Players:GetPlayers()) do
 			table.insert(list, v.Character)
 		end
