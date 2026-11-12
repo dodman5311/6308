@@ -29,6 +29,7 @@ local Timer = require(ReplicatedStorage.Vendor.Timer)
 local UIService = require(Globals.Client.Services.UIService)
 local ViewmodelService = require(Globals.Vendor.ViewmodelService)
 local cameraShaker = require(Globals.Vendor.CameraShaker)
+local cardService = require(Globals.Client.Services.CardService)
 local codexService = require(Globals.Client.Services.CodexService)
 local comboService = require(Globals.Client.Services.ComboService)
 local explosionService = require(Globals.Client.Services.ExplosionService)
@@ -111,10 +112,6 @@ local function loadSaveData(upgradeIndex, gameState, gameSettings, codex, invent
 	ChanceService.luck = gameState["Luck"] or 0
 	kiosk.tickets = gameState["PerkTickets"] or 0
 
-	for _, perkName in ipairs(gameState["PerkList"] or {}) do
-		giftService.AddGift(perkName)
-	end
-
 	for index, value in pairs(inventory or {}) do
 		if not value then
 			continue
@@ -133,6 +130,10 @@ local function loadSaveData(upgradeIndex, gameState, gameSettings, codex, invent
 				Gifts.Upgrades[perkName] = perkData
 			end
 		end
+	end
+
+	for _, perkName in ipairs(gameState["PerkList"] or {}) do
+		giftService.AddGift(perkName)
 	end
 
 	-- if gameState["MaxHealth"] and Player.Character:WaitForChild("Humanoid") then
@@ -241,7 +242,17 @@ function module:OnSpawn(character, humanoid)
 
 			PlayHitEffect()
 			local comboTier = workspace:GetAttribute("Combo_Tier")
-			comboService.ReduceCombo(comboTier >= 1 and 1 or 2)
+			local comboPenalty = comboTier >= 1 and 1 or 2
+
+			if
+				weaponService.WeaponData
+				and weaponService.WeaponData.Type == "Melee"
+				and giftService.CheckGift("Chronos")
+			then
+				comboPenalty += 1
+			end
+
+			comboService.ReduceCombo(comboPenalty)
 		end
 
 		logHealth = health
@@ -292,6 +303,7 @@ end
 function module:OnDied()
 	kiosk.tickets = 0
 	ChanceService.luck = 0
+	cardService:ClearCards()
 
 	if workspace:GetAttribute("TotalScore") >= (workspace:GetAttribute("DeathCount") + 1) * 400 then -- req check
 		workspace:SetAttribute("IsInReq", true) -- client reading

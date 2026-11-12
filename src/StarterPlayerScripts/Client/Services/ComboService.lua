@@ -12,12 +12,10 @@ local UIService = require(Globals.Client.Services.UIService)
 local giftService = require(Globals.Client.Services.GiftsService)
 local net = require(Globals.Packages.Net)
 
-local comboTimer
-
 local function resetCombo()
 	if workspace:GetAttribute("Combo_Tier") >= 3 then
 		module.CurrentCombo = math.clamp(module.CurrentCombo - 5, 0, math.huge)
-		comboTimer:Run()
+		module.ComboTimer:Run()
 	else
 		module.CurrentCombo = 0
 	end
@@ -29,10 +27,10 @@ local function resetCombo()
 	end
 end
 
-comboTimer = Timer:new("ComboTimer", module.ComboTime, resetCombo)
+module.ComboTimer = Timer:new("module.ComboTimer", module.ComboTime, resetCombo)
 
 function module.ResetCombo()
-	comboTimer:Cancel()
+	module.ComboTimer:Cancel()
 	resetCombo()
 end
 
@@ -50,13 +48,13 @@ local function getComboTime()
 end
 
 function module.AddToCombo(amount)
-	comboTimer.WaitTime = getComboTime()
+	module.ComboTimer.WaitTime = getComboTime()
 
 	module.CurrentCombo += amount
 
-	comboTimer:Run()
-	if comboTimer:GetCurrentTime() >= 0 then
-		comboTimer:Reset()
+	module.ComboTimer:Run()
+	if module.ComboTimer:GetCurrentTime() >= 0 then
+		module.ComboTimer:Reset()
 	end
 
 	UIService.doUiAction("HUD", "SetCombo", module.CurrentCombo)
@@ -81,15 +79,15 @@ function module.ReduceCombo(amount)
 end
 
 function module.RestartTimer()
-	comboTimer:Reset()
+	module.ComboTimer:Reset()
 end
 
 function module.DelayTimer(delayAmount: number)
 	module.RestartTimer()
-	comboTimer:Delay(delayAmount)
+	module.ComboTimer:Delay(delayAmount)
 end
 
-comboTimer.OnTimerStepped:Connect(function(currentTime)
+module.ComboTimer.OnTimerStepped:Connect(function(currentTime)
 	local comboTime = getComboTime()
 	UIService.fullUi.HUD.ComboBar.Size = UDim2.fromScale((comboTime - currentTime) / comboTime, 0.1)
 end)

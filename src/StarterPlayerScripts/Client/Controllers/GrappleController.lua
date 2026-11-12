@@ -226,10 +226,16 @@ local function startGrapple(c, position, item)
 
 		r = runService.RenderStepped:Connect(function()
 			if distance <= 4 or not grapplePart or not grapplePart.Parent or not item or not item.Parent then
-				Net:RemoteEvent("PickupWeapon"):FireServer(item)
+				if item and item.Parent then
+					Net:RemoteEvent("PickupWeapon"):FireServer(item)
+				elseif item:FindFirstChild("Pickup") then
+					item.Pickup:Destroy()
+				end
+
 				r:Disconnect()
 				return
 			end
+
 			i = math.clamp(i + 0.1, 0, 1)
 
 			item:PivotTo(item:GetPivot():Lerp(grapplePart.CFrame, i))

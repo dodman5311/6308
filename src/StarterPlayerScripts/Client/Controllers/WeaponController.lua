@@ -428,8 +428,10 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 		UIService.doUiAction("HUD", "AssignDeadbolt", newWeapon)
 	end
 
-	if GiftsService.CheckGift("Chronos") and weaponData.Type == "Melee" and pickupType == "FromWorld" then
-		ComboService.DelayTimer(4)
+	if GiftsService.CheckGift("Chronos") and weaponData.Type == "Melee" then
+		ComboService.ComboTimer:Pause("Chronos")
+	else
+		ComboService.ComboTimer:Resume("Chronos")
 	end
 
 	applyUpgrades(weaponName, weaponData)
@@ -476,6 +478,11 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 	ammoToAdd += GiftsService.CheckCardStack("10_of_Spades")
 	ammoToAdd += GiftsService.CheckCardStack("Jack_of_Spades") * 2
 	ammoToAdd += GiftsService.CheckCardStack("Queen_of_Spades") * 3
+
+	local KSStack = GiftsService.CheckCardStack("King_of_Spades")
+	if KSStack > 0 then
+		ComboService.AddToCombo(KSStack)
+	end
 
 	if extraAmmo then
 		ammoToAdd += weaponData.Ammo * (extraAmmo / 100)
@@ -632,6 +639,8 @@ local function EquipDefault(ignoreAmmo)
 
 	module.UpdateAmmo(module.defaultMagSize + addPurity(module.defaultMagSize))
 	signals.WeaponEquipped:Fire("Cleanse & Repent")
+
+	ComboService.ComboTimer:Resume("Chronos")
 end
 
 local function Recoil(recoilVector, randomVector, magnitude, speed)
@@ -1061,8 +1070,8 @@ local function awardKill(model: Model, position)
 		net:RemoteEvent("SetCoins"):FireServer(workspace:GetAttribute("TotalScore") + (ASStack * 5))
 	end
 
-	for _ = 1, GiftsService.CheckCardStack("Ace_of_Hearts") do
-		if ChanceService.checkChance(20, true) then
+	for _ = 1, GiftsService.CheckCardStack("Jack_of_Hearts") do
+		if ChanceService.checkChance(5, true) then
 			net:RemoteEvent("Damage"):FireServer(player.Character, -1)
 		end
 	end
@@ -2123,7 +2132,7 @@ function module.Fire()
 
 	for _ = 1, GiftsService.CheckCardStack("King_of_Diamonds") do
 		if ChanceService.checkChance(10, true) then
-			module.FireProjectile("SmartPellet", 0, 1, 0, weaponData["Element"])
+			module.FireProjectile("SmartPellet", 0, 1, 0)
 		end
 	end
 

@@ -8,6 +8,7 @@ local RunService = game:GetService("RunService")
 local Globals = require(ReplicatedStorage.Shared.Globals)
 
 local RUN_SERVICE = game:GetService("RunService")
+local Scales = require(script.Parent.Scales)
 local net = require(Globals.Packages.Net)
 local signal = require(script.signal)
 local signals = require(Globals.Shared.Signals)
@@ -26,6 +27,8 @@ export type Timer = {
 	Reset: (self: Timer) -> nil,
 	Delay: (self: Timer, amount: number) -> nil,
 	Update: (self: Timer, index: string, value: any) -> nil,
+	Pause: (self: Timer, pauseIndex: any?) -> nil,
+	Resume: (self: Timer, pauseIndex: any?) -> nil,
 	UpdateFunction: (self: Timer, func: () -> any, ...any) -> nil,
 	Cancel: (self: Timer) -> nil,
 	Destroy: (self: Timer) -> nil,
@@ -74,6 +77,7 @@ module.new = function(self, timerName, waitTime, Function, ...)
 	local queue = self
 
 	local pausedAt = 0
+	local pauseScale = Scales.new()
 
 	if not timerName then
 		timerName = #queue + 1
@@ -85,6 +89,7 @@ module.new = function(self, timerName, waitTime, Function, ...)
 
 	local timer = {
 		IsRunning = false,
+		IsPaused = false,
 		CallTime = os.clock(),
 		WaitTime = waitTime,
 		["Function"] = Function,
@@ -93,16 +98,6 @@ module.new = function(self, timerName, waitTime, Function, ...)
 
 		OnTimerStepped = signal.new(),
 	}
-
-	timer.OnPaused = pauseSignal:Connect(function()
-		isPaused = true
-		pausedAt = os.clock()
-	end)
-
-	timer.OnResumed = resumeSignal:Connect(function()
-		timer:Delay(os.clock() - pausedAt)
-		isPaused = false
-	end)
 
 	timer.OnEnded = signal.new()
 
@@ -124,6 +119,31 @@ module.new = function(self, timerName, waitTime, Function, ...)
 	function timer:Delay(amount)
 		self.CallTime += amount
 	end
+
+	function timer:Pause(index)
+		pauseScale:Add(index)
+
+		if pauseScale:Check() then
+			pausedAt = os.clock()
+			self.IsPaused = true
+		end
+	end
+	function timer:Resume(index)
+		pauseScale:Remove(index)
+
+		if not pauseScale:Check() then
+			self:Delay(os.clock() - pausedAt)
+			self.IsPaused = false
+		end
+	end
+
+	timer.OnPaused = pauseSignal:Connect(function()
+		timer:Pause("GamePause")
+	end)
+
+	timer.OnResumed = resumeSignal:Connect(function()
+		timer:Resume("GamePause")
+	end)
 
 	function timer:Update(index, value)
 		self[index] = value
@@ -249,8 +269,8 @@ end
 
 RUN_SERVICE.Heartbeat:Connect(function()
 	for _, timer in ipairs(runningTimers) do
-		if isPaused then
-			return
+		if timer.IsPaused then
+			continue
 		end
 
 		timer.OnTimerStepped:Fire(os.clock() - timer.CallTime)

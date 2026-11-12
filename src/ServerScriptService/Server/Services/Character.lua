@@ -139,6 +139,7 @@ Players.PlayerAdded:Connect(function(player: Player)
 			else
 				humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, true)
 				humanoid:ChangeState(Enum.HumanoidStateType.Dead)
+				player:SetAttribute("StartingMaxHealth", 5)
 			end
 		end)
 	end)

@@ -34,6 +34,7 @@ local MouseOver = require(Globals.Vendor.MouseOverModule)
 local Signals = require(Globals.Shared.Signals)
 local SoulsService = require(Globals.Client.Services.SoulsService)
 local acts = require(Globals.Vendor.Acts)
+local cardService = require(Globals.Client.Services.CardService)
 local characterController = require(Globals.Client.Controllers.CharacterController)
 local codexService = require(Globals.Client.Services.CodexService)
 local gameSettings = require(Globals.Shared.GameSettings)
@@ -1168,11 +1169,115 @@ local function loadMap(player, frame)
 	loadMapIcons(frame, map)
 end
 
+local function createPerkIcon(frame, index, gift, isCard: boolean?)
+	local button = frame.PerkButton:Clone()
+	button.Name = gift
+	button.Parent = frame.PerkList
+	button.Visible = true
+
+	local giftData
+
+	local perkFrame = "rbxassetid://101931562667620"
+
+	if gifts.Perks[gift] then
+		giftData = gifts.Perks[gift]
+		button:SetAttribute("Rank", "Inferior")
+	elseif gifts.Upgrades[gift] then
+		giftData = gifts.Upgrades[gift]
+		perkFrame = "rbxassetid://134687378511090"
+		button:SetAttribute("Rank", "Superior")
+	elseif gifts.Specials[gift] then
+		giftData = gifts.Specials[gift]
+		perkFrame = "rbxassetid://104412971367754"
+		button:SetAttribute("Rank", "Special")
+
+		local ti_glint = TweenInfo.new(2, Enum.EasingStyle.Quart, Enum.EasingDirection.InOut, -1, false, 0.5)
+		util.tween(button.UIGradient, ti_glint, { Offset = Vector2.new(1.5, 0) })
+	end
+
+	button.Icon.Image = giftData.Icon
+	button.Icon.ImageColor3 = Color3.new(1, 1, 1)
+	button.Image = perkFrame
+
+	local colors = {
+		Tactical = Color3.fromRGB(255, 230, 130),
+		Luck = Color3.fromRGB(135, 255, 130),
+		Arsenal = Color3.fromRGB(255, 130, 130),
+		Soul = Color3.fromRGB(0, 255, 255),
+
+		Special = Color3.new(1, 0, 1),
+		Superior = Color3.new(1, 1, 0),
+		Inferior = Color3.new(1, 1, 1),
+	}
+
+	button:SetAttribute("Category", giftData.Catagories[1])
+	button:SetAttribute("Index", index)
+
+	local enter, leave = MouseOver.MouseEnterLeaveEvent(button)
+
+	local baseColor = colors[giftData.Catagories[1]]
+	local shineColor = Color3.new(1, 1, 1)
+
+	button.UIGradient.Color = ColorSequence.new {
+		ColorSequenceKeypoint.new(0, baseColor),
+		ColorSequenceKeypoint.new(0.349, baseColor),
+		ColorSequenceKeypoint.new(0.35, shineColor),
+		ColorSequenceKeypoint.new(0.4, shineColor),
+		ColorSequenceKeypoint.new(0.401, baseColor),
+		ColorSequenceKeypoint.new(0.629, baseColor),
+		ColorSequenceKeypoint.new(0.63, shineColor),
+		ColorSequenceKeypoint.new(0.8, shineColor),
+		ColorSequenceKeypoint.new(0.801, baseColor),
+		ColorSequenceKeypoint.new(1, baseColor),
+	}
+
+	enter:Connect(function()
+		local ti = TweenInfo.new(0.2, Enum.EasingStyle.Quart)
+
+		util.tween(button.Icon, ti, { Size = UDim2.fromScale(0.75, 0.75) })
+
+		if isCard then
+			local desc = giftData.Desc
+			local pretext = string.sub(desc, (string.find(desc, ":") or 0) + 1)
+			local postText = string.sub(
+				pretext,
+				(string.find(pretext, [[)">]]) or 0) + 3,
+				(string.find(pretext, "</font>") or 0) - 1
+			)
+			frame.PerkInfo.Text = postText
+		else
+			frame.PerkInfo.Text = giftData.Desc
+		end
+
+		frame.PerkName.Text = string.gsub(gift, "_", " ")
+		frame.PerkCategory.TextColor3 = colors[giftData.Catagories[1]]
+		frame.PerkCategory.Text = table.concat(giftData.Catagories, " | ")
+		frame.PerkRank.TextColor3 = colors[button:GetAttribute("Rank")]
+		frame.PerkRank.Text = button:GetAttribute("Rank")
+		frame.PerkDisplayIcon.Image = giftData.Icon
+	end)
+
+	leave:Connect(function()
+		local ti = TweenInfo.new(0.1, Enum.EasingStyle.Quad)
+
+		util.tween(button.Icon, ti, { Size = UDim2.fromScale(0.6, 0.6) })
+	end)
+
+	return button
+end
+
 local function loadPerksList(frame)
 	local getGifts = giftService.AquiredGifts
-	local perkList = frame.PerkList
 
-	for _, button in ipairs(perkList:GetChildren()) do
+	for _, button in ipairs(frame.PerkList:GetChildren()) do
+		if not button:IsA("ImageButton") then
+			continue
+		end
+
+		button:Destroy()
+	end
+
+	for _, button in ipairs(frame.CardHand:GetChildren()) do
 		if not button:IsA("ImageButton") then
 			continue
 		end
@@ -1186,86 +1291,13 @@ local function loadPerksList(frame)
 	frame.PerkDisplayIcon.Image = ""
 
 	for index, gift in ipairs(getGifts) do
-		local button = frame.PerkButton:Clone()
-		button.Name = gift
-		button.Parent = perkList
-		button.Visible = true
+		createPerkIcon(frame, index, gift)
+	end
 
-		local giftData
-
-		local perkFrame = "rbxassetid://101931562667620"
-
-		if gifts.Perks[gift] then
-			giftData = gifts.Perks[gift]
-			button:SetAttribute("Rank", "Inferior")
-		elseif gifts.Upgrades[gift] then
-			giftData = gifts.Upgrades[gift]
-			perkFrame = "rbxassetid://134687378511090"
-			button:SetAttribute("Rank", "Superior")
-		elseif gifts.Specials[gift] then
-			giftData = gifts.Specials[gift]
-			perkFrame = "rbxassetid://104412971367754"
-			button:SetAttribute("Rank", "Special")
-
-			local ti_glint = TweenInfo.new(2, Enum.EasingStyle.Quart, Enum.EasingDirection.InOut, -1, false, 0.5)
-			util.tween(button.UIGradient, ti_glint, { Offset = Vector2.new(1.5, 0) })
-		end
-
-		button.Icon.Image = giftData.Icon
-		button.Icon.ImageColor3 = Color3.new(1, 1, 1)
-		button.Image = perkFrame
-
-		local colors = {
-			Tactical = Color3.fromRGB(255, 230, 130),
-			Luck = Color3.fromRGB(135, 255, 130),
-			Arsenal = Color3.fromRGB(255, 130, 130),
-			Soul = Color3.fromRGB(0, 255, 255),
-
-			Special = Color3.new(1, 0, 1),
-			Superior = Color3.new(1, 1, 0),
-			Inferior = Color3.new(1, 1, 1),
-		}
-
-		button:SetAttribute("Category", giftData.Catagories[1])
-		button:SetAttribute("Index", index)
-
-		local enter, leave = MouseOver.MouseEnterLeaveEvent(button)
-
-		local baseColor = colors[giftData.Catagories[1]]
-		local shineColor = Color3.new(1, 1, 1)
-
-		button.UIGradient.Color = ColorSequence.new {
-			ColorSequenceKeypoint.new(0, baseColor),
-			ColorSequenceKeypoint.new(0.349, baseColor),
-			ColorSequenceKeypoint.new(0.35, shineColor),
-			ColorSequenceKeypoint.new(0.4, shineColor),
-			ColorSequenceKeypoint.new(0.401, baseColor),
-			ColorSequenceKeypoint.new(0.629, baseColor),
-			ColorSequenceKeypoint.new(0.63, shineColor),
-			ColorSequenceKeypoint.new(0.8, shineColor),
-			ColorSequenceKeypoint.new(0.801, baseColor),
-			ColorSequenceKeypoint.new(1, baseColor),
-		}
-
-		enter:Connect(function()
-			local ti = TweenInfo.new(0.2, Enum.EasingStyle.Quart)
-
-			util.tween(button.Icon, ti, { Size = UDim2.fromScale(0.75, 0.75) })
-
-			frame.PerkInfo.Text = giftData.Desc
-			frame.PerkName.Text = string.gsub(gift, "_", " ")
-			frame.PerkCategory.TextColor3 = colors[giftData.Catagories[1]]
-			frame.PerkCategory.Text = table.concat(giftData.Catagories, " | ")
-			frame.PerkRank.TextColor3 = colors[button:GetAttribute("Rank")]
-			frame.PerkRank.Text = button:GetAttribute("Rank")
-			frame.PerkDisplayIcon.Image = giftData.Icon
-		end)
-
-		leave:Connect(function()
-			local ti = TweenInfo.new(0.1, Enum.EasingStyle.Quad)
-
-			util.tween(button.Icon, ti, { Size = UDim2.fromScale(0.6, 0.6) })
-		end)
+	for index, card in ipairs(cardService.CurrentHand) do
+		local newIcon = createPerkIcon(frame, index, card.Name, true)
+		newIcon.Parent = frame.CardHand
+		newIcon.Size = UDim2.fromScale(0.75, 0.75)
 	end
 
 	applyPerkSorting(frame)

@@ -84,6 +84,8 @@ function module.CalculateDropChance(chanceMod)
 		chance += chance * 0.1
 	end
 
+	chance += GiftsService.CheckCardStack("Ace_of_Hearts") * 5
+
 	return chance, module.currentMult
 end
 

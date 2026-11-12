@@ -42,6 +42,13 @@ function module.CreateDrop(position, dropType)
 		CollectionService:AddTag(newDrop, "Pickup")
 	end)
 
+	if newDrop:FindFirstChild("Pickup") then
+		local pickup: ProximityPrompt = newDrop.Pickup
+		pickup.Triggered:Connect(function()
+			pickup:Destroy()
+		end)
+	end
+
 	return newDrop
 end
 
@@ -49,6 +56,11 @@ function module.ClearDrops()
 	for _, drop in ipairs(CollectionService:GetTagged("Drop")) do
 		drop:Destroy()
 	end
+end
+
+local function pickupDrop(drop)
+	Signals["Add" .. drop:GetAttribute("DropType")]:Fire(drop:GetAttribute("Value") or 1)
+	drop:Destroy()
 end
 
 local function checkForDrops()
@@ -62,6 +74,10 @@ local function checkForDrops()
 	local characterPosition = characterCFrame.Position
 
 	for _, drop in ipairs(CollectionService:GetTagged("Drop")) do
+		if drop:FindFirstChild("Pickup") then
+			continue
+		end
+
 		local dropPosition = drop:GetPivot().Position
 		local distance = (dropPosition - characterPosition).Magnitude
 
@@ -85,8 +101,7 @@ local function checkForDrops()
 		end
 
 		if distance <= 5 then
-			Signals["Add" .. drop:GetAttribute("DropType")]:Fire(drop:GetAttribute("Value") or 1)
-			drop:Destroy()
+			pickupDrop(drop)
 			return
 		end
 
