@@ -104,7 +104,8 @@ local defaultWeapon
 
 local currentAmmo = module.defaultMagSize
 module.currentWeapon = nil
-local weaponData
+module.weaponData = nil
+local lastWeaponData
 
 local mouseButton1Down = false
 local canBlock = true
@@ -297,9 +298,9 @@ function module.UpdateSlot()
 	local slot = slots[currentSlot]
 
 	slot.CurrentWeapon = module.currentWeapon
-	slot.WeaponData = weaponData
-	slot.Element = weaponData and weaponData.Element
-	slot.HasReloaded = weaponData and weaponData.HasReloaded or false
+	slot.WeaponData = module.weaponData
+	slot.Element = module.weaponData and module.weaponData.Element
+	slot.HasReloaded = module.weaponData and module.weaponData.HasReloaded or false
 
 	slot.Ammo = currentAmmo -- module.currentWeapon and currentAmmo or 0
 
@@ -331,7 +332,7 @@ function module.UpdateAmmo(amount, muleSwitch)
 		GiftsService.CheckGift("Tacticool")
 		and module.currentWeapon
 		and currentAmmo == 1
-		and not weaponData.HasReloaded
+		and not module.weaponData.HasReloaded
 	then
 		UIService.doUiAction("HUD", "ToggleReloadPrompt", true)
 	else
@@ -422,21 +423,22 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 
 	newWeapon.Parent = viewmodel.Model
 
-	weaponData = require(newWeapon.Data)
+	module.weaponData = require(newWeapon.Data)
 
-	if GiftsService.CheckGift("Dead_Bolt") and weaponData.Effect == "Ballistic" then
+	if GiftsService.CheckGift("Dead_Bolt") and module.weaponData.Effect == "Ballistic" then
 		UIService.doUiAction("HUD", "AssignDeadbolt", newWeapon)
 	end
 
-	if GiftsService.CheckGift("Chronos") and weaponData.Type == "Melee" then
+	if GiftsService.CheckGift("Chronos") and module.weaponData.Effect == "Parrying" then
 		ComboService.ComboTimer:Pause("Chronos")
-	else
+	elseif ComboService.ComboTimer.IsPaused then
 		ComboService.ComboTimer:Resume("Chronos")
+		ComboService.RestartTimer()
 	end
 
-	applyUpgrades(weaponName, weaponData)
+	applyUpgrades(weaponName, module.weaponData)
 
-	UIService.doUiAction("HUD", "SetCrosshair", crosshairs[weaponData.Crosshair])
+	UIService.doUiAction("HUD", "SetCrosshair", crosshairs[module.weaponData.Crosshair])
 
 	local newM6d = Instance.new("Motor6D")
 	newM6d.Parent = newWeapon
@@ -465,14 +467,14 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 
 	animationService:playAnimation(viewmodel.Model, "Idle", Enum.AnimationPriority.Idle.Value, false, 0)
 
-	local ammoToAdd = weaponData.Ammo
+	local ammoToAdd = module.weaponData.Ammo
 
 	if GiftsService.CheckGift("Hoarder") then
-		ammoToAdd += weaponData.Ammo * 0.25
+		ammoToAdd += module.weaponData.Ammo * 0.25
 	end
 
 	if GiftsService.CheckGift("War_Drums") then
-		ammoToAdd += weaponData.Ammo * 0.75
+		ammoToAdd += module.weaponData.Ammo * 0.75
 	end
 
 	ammoToAdd += GiftsService.CheckCardStack("10_of_Spades")
@@ -485,7 +487,7 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 	end
 
 	if extraAmmo then
-		ammoToAdd += weaponData.Ammo * (extraAmmo / 100)
+		ammoToAdd += module.weaponData.Ammo * (extraAmmo / 100)
 	end
 
 	module.currentWeapon = newWeapon
@@ -496,14 +498,14 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 	animationService:stopAnimation(viewmodel.Model, "ForgedArmsReload", 0)
 	animationService:stopAnimation(viewmodel.Model, "ForgedArmsReloadOut", 0)
 
-	if not weaponData.Element then
-		weaponData.Element = element
+	if not module.weaponData.Element then
+		module.weaponData.Element = element
 	end
 
-	weaponData.HasReloaded = hasReloaded
+	module.weaponData.HasReloaded = hasReloaded
 
 	if element then
-		if weaponData.Type == "Melee" then
+		if module.weaponData.Type == "Melee" then
 			for _, effect in ipairs(assets.Effects.WeaponElements:GetChildren()) do
 				if effect.Name ~= element then
 					continue
@@ -527,7 +529,7 @@ function module.EquipWeapon(weaponName, pickupType, element, extraAmmo, hasReloa
 		module.UpdateSlot()
 	end
 
-	signals.WeaponEquipped:Fire(weaponName, weaponData["BlockTime"])
+	signals.WeaponEquipped:Fire(weaponName, module.weaponData["BlockTime"])
 	acts:removeAct("Equipping")
 end
 
@@ -640,7 +642,10 @@ local function EquipDefault(ignoreAmmo)
 	module.UpdateAmmo(module.defaultMagSize + addPurity(module.defaultMagSize))
 	signals.WeaponEquipped:Fire("Cleanse & Repent")
 
-	ComboService.ComboTimer:Resume("Chronos")
+	if ComboService.ComboTimer.IsPaused then
+		ComboService.ComboTimer:Resume("Chronos")
+		ComboService.RestartTimer()
+	end
 end
 
 local function Recoil(recoilVector, randomVector, magnitude, speed)
@@ -703,7 +708,7 @@ local function completeReload(magSize)
 	end)
 
 	assets.Sounds.Reload:Stop()
-	weaponData.HasReloaded = true
+	module.weaponData.HasReloaded = true
 
 	local ammoToSet = magSize
 
@@ -732,7 +737,7 @@ local function reload(infiniteReloads)
 		return
 	end
 
-	if weaponData.HasReloaded and not infiniteReloads then
+	if module.weaponData.HasReloaded and not infiniteReloads then
 		return
 	end
 
@@ -786,6 +791,14 @@ local function showDeadshot(position)
 	newEffect.UI.Enabled = true
 
 	UiAnimationService.PlayAnimation(newEffect.UI.Frame, 0.05, false, true)
+end
+
+local function showMeatgrinder(parent)
+	local newEffect = assets.Effects.Meatgrinder:Clone()
+	newEffect.Parent = parent
+	Debris:AddItem(newEffect, 1.5)
+
+	UiAnimationService.PlayAnimation(newEffect.Frame, 0.05, false, true)
 end
 
 local function dropAmmo(position)
@@ -944,7 +957,7 @@ local function addToConsecutive(hit)
 	then
 		-- make pistol exlusive
 
-		if not module.currentWeapon or weaponData.Type == "Pistol" then
+		if not module.currentWeapon or module.weaponData.Type == "Pistol" then
 			addToOvercharge(1)
 		else
 			if overchargeValue.Value >= MAX_OVERCHARGE then
@@ -1121,7 +1134,7 @@ function module.getCritChance(source: string?, chanceToAdd: number?, weaponTypeO
 	end
 
 	if module.currentWeapon and source == module.currentWeapon.Name then
-		chance = module.critChances[weaponData.Type] + chanceToAdd
+		chance = module.critChances[module.weaponData.Type] + chanceToAdd
 	elseif source == "Default" then
 		chance = module.critChances.Pistol + chanceToAdd
 		chance += addPurity(chance)
@@ -1220,6 +1233,28 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 
 	if GiftsService.CheckGift("Acumen") and source == "Parry" then
 		module.UpdateAmmo(currentAmmo + 1)
+	end
+
+	if GiftsService.CheckGift("Meat_Grinder") and source == "Parry" then
+		local part = subject:FindFirstChild("Head") or subject
+		showMeatgrinder(part)
+		local position = part:GetPivot()
+
+		task.delay(0.5, function()
+			local dbs = util.PlaySound(assets.Sounds.DeadBoltAim, script)
+			dbs.Volume += 2
+			dbs.PlaybackSpeed -= 0.3
+		end)
+
+		task.delay(0.75, function()
+			local boltSound = util.PlaySound(assets.Sounds.DeadBolt, script, 0.05)
+			boltSound.Volume -= 0.2
+			boltSound.PlaybackSpeed += 0.25
+
+			local origin = CFrame.lookAt((position * CFrame.new(0, 0, -1)).Position, position.Position)
+
+			projectileService.createFromPreset(origin, 0, "MeatGrinderSnipe", 1, {}, player, "Meat_Grinder")
+		end)
 	end
 
 	if GiftsService.CheckGift("Fury") and humanoid.MaxHealth > 50 and ChanceService.checkChance(50, true) then
@@ -1368,40 +1403,40 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 
 		if
 			sourceIsWeapon
-			and weaponData
-			and weaponData["FireChance"]
-			and weaponData.FireChance ~= 0
-			and ChanceService.checkChance(weaponData.FireChance, true)
+			and module.weaponData
+			and module.weaponData["FireChance"]
+			and module.weaponData.FireChance ~= 0
+			and ChanceService.checkChance(module.weaponData.FireChance, true)
 		then
 			net:RemoteEvent("Damage"):FireServer(model, 0, "Fire")
 		end
 
 		if
 			sourceIsWeapon
-			and weaponData
-			and weaponData["ElectricChance"]
-			and weaponData.ElectricChance ~= 0
-			and ChanceService.checkChance(weaponData.ElectricChance, true)
+			and module.weaponData
+			and module.weaponData["ElectricChance"]
+			and module.weaponData.ElectricChance ~= 0
+			and ChanceService.checkChance(module.weaponData.ElectricChance, true)
 		then
 			net:RemoteEvent("Damage"):FireServer(model, 0, "Electricity")
 		end
 
 		if
 			sourceIsWeapon
-			and weaponData
-			and weaponData["StunChance"]
-			and weaponData.StunChance ~= 0
-			and ChanceService.checkChance(weaponData.StunChance, true)
+			and module.weaponData
+			and module.weaponData["StunChance"]
+			and module.weaponData.StunChance ~= 0
+			and ChanceService.checkChance(module.weaponData.StunChance, true)
 		then
 			net:RemoteEvent("Damage"):FireServer(model, 0, "Stun")
 		end
 
 		if
 			sourceIsWeapon
-			and weaponData
-			and weaponData["StunChance"]
-			and weaponData.StunChance ~= 0
-			and ChanceService.checkChance(weaponData.StunChance, true)
+			and module.weaponData
+			and module.weaponData["StunChance"]
+			and module.weaponData.StunChance ~= 0
+			and ChanceService.checkChance(module.weaponData.StunChance, true)
 		then
 			net:RemoteEvent("Damage"):FireServer(model, 0, "Stun")
 		end
@@ -1548,7 +1583,7 @@ end
 
 local function checkForGibs()
 	for humanoid, data in pairs(hitHumanoids) do
-		if weaponData and weaponData.AntiGib then
+		if module.weaponData and module.weaponData.AntiGib then
 			break
 		end
 
@@ -1586,7 +1621,7 @@ local function getRecoilNumber(): number?
 		Speed = 0.75,
 	}
 	if module.currentWeapon then
-		recoil = weaponData.Recoil
+		recoil = module.weaponData.Recoil
 	end
 	return (recoil.RecoilVector.Magnitude * recoil.Magnitude) / (recoil.Speed / 2)
 end
@@ -1672,14 +1707,14 @@ function module.FireProjectile(projectileType, spread, damage, bulletIndex, elem
 	end
 
 	local locked = nil
-	if weaponData.LockedOn then
-		locked = weaponData.LockedOn[bulletIndex]
+	if module.weaponData.LockedOn then
+		locked = module.weaponData.LockedOn[bulletIndex]
 	end
 
 	local info = { Locked = locked, Element = element }
 
-	if weaponData["SplashDamage"] then
-		info.SplashDamage = weaponData.SplashDamage
+	if module.weaponData["SplashDamage"] then
+		info.SplashDamage = module.weaponData.SplashDamage
 	end
 
 	projectileService.createFromPreset(
@@ -1736,9 +1771,9 @@ function module.FireBullet(damage, spread, distance, result, source, element, ch
 		module.currentWeapon
 		and result
 		and result.Instance:FindFirstAncestorOfClass("Model")
-		and weaponData["RicochetChance"]
-		and weaponData.RicochetChance ~= 0
-		and ChanceService.checkChance(weaponData.RicochetChance, true)
+		and module.weaponData["RicochetChance"]
+		and module.weaponData.RicochetChance ~= 0
+		and ChanceService.checkChance(module.weaponData.RicochetChance, true)
 	then
 		local hit = RicoshotService.doRicoshot(
 			result.Instance:FindFirstAncestorOfClass("Model"),
@@ -2018,20 +2053,20 @@ local function destroyISevenShieldEffect()
 end
 
 local function LockOn()
-	local lockAmnt = weaponData.LockAmount
-	local lockTime = weaponData.LockIncrement
+	local lockAmnt = module.weaponData.LockAmount
+	local lockTime = module.weaponData.LockIncrement
 
-	if not weaponData["LockedOn"] then
-		weaponData.LockedOn = {}
+	if not module.weaponData["LockedOn"] then
+		module.weaponData.LockedOn = {}
 	end
 
-	if not lockTimer or lockTimer.Connection or #weaponData.LockedOn >= lockAmnt then
+	if not lockTimer or lockTimer.Connection or #module.weaponData.LockedOn >= lockAmnt then
 		return
 	end
 
 	lockTimer.WaitTime = lockTime
 	lockTimer.Function = function()
-		local target = getObjectInCenter(player, weaponData.LockedOn)
+		local target = getObjectInCenter(player, module.weaponData.LockedOn)
 		if not target then
 			return
 		end
@@ -2042,7 +2077,7 @@ local function LockOn()
 
 		UiAnimationService.PlayAnimation(newGui.Frame, 0.045, false, true)
 
-		if #weaponData.LockedOn == 0 then
+		if #module.weaponData.LockedOn == 0 then
 			module.Block()
 		end
 
@@ -2053,9 +2088,9 @@ local function LockOn()
 		end
 
 		table.insert(lockGuis, newGui)
-		table.insert(weaponData.LockedOn, target)
+		table.insert(module.weaponData.LockedOn, target)
 
-		assets.Sounds.Lock.PlaybackSpeed = (#weaponData.LockedOn + 1) / 2
+		assets.Sounds.Lock.PlaybackSpeed = (#module.weaponData.LockedOn + 1) / 2
 		assets.Sounds.Lock:Play()
 	end
 
@@ -2063,7 +2098,7 @@ local function LockOn()
 end
 
 local function grenadeLockOn()
-	-- if not weaponData["LockedOn"] then
+	-- if not module.weaponData["LockedOn"] then
 	-- 	grenadeLocks = {}
 	-- end
 
@@ -2150,13 +2185,13 @@ function module.Fire()
 
 	UIService.doUiAction("HUD", "PumpCrosshair")
 
-	local bulletDamage = weaponData.Damage
-	local bulletCount = weaponData.BulletCount
+	local bulletDamage = module.weaponData.Damage
+	local bulletCount = module.weaponData.BulletCount
 
 	bulletCount += extraBullet
 
-	if weaponData.LockedOn then
-		bulletCount = math.clamp(#weaponData.LockedOn, 1, 100)
+	if module.weaponData.LockedOn then
+		bulletCount = math.clamp(#module.weaponData.LockedOn, 1, 100)
 		bulletDamage -= math.ceil(bulletCount / 2) - 1
 		bulletDamage = math.clamp(bulletDamage, 1, math.huge)
 	end
@@ -2171,7 +2206,7 @@ function module.Fire()
 		bulletCount += 2
 	end
 
-	local maxDistance = weaponData.MaxDistance or 500
+	local maxDistance = module.weaponData.MaxDistance or 500
 
 	if module.currentWeapon.Name == "Shagan" and os.clock() - lastBlockTime <= 1 then
 		maxDistance = 65
@@ -2190,26 +2225,32 @@ function module.Fire()
 	createKnockback(getRecoilNumber())
 
 	if deadBoltActive then
-		fireDeadBolt(extraBullet, bulletDamage, module.currentWeapon.Name, weaponData["Element"])
+		fireDeadBolt(extraBullet, bulletDamage, module.currentWeapon.Name, module.weaponData["Element"])
 	else
 		for index = 1, bulletCount do
 			local spread = index == 1 and 0 or index
 
 			if module.currentWeapon.Name == "Mega Shot" and spread ~= 0 then
 				if index <= 4 then
-					module.FireProjectile("Rocket", spread, 1, index, weaponData["Element"])
+					module.FireProjectile("Rocket", spread, 1, index, module.weaponData["Element"])
 					continue
 				elseif index <= 7 then
-					module.FireProjectile("SmartPellet", spread, 1, index, weaponData["Element"])
+					module.FireProjectile("SmartPellet", spread, 1, index, module.weaponData["Element"])
 					continue
 				elseif index <= 10 then
-					module.FireProjectile("ShotgunProjectile", spread, 1, index, weaponData["Element"])
+					module.FireProjectile("ShotgunProjectile", spread, 1, index, module.weaponData["Element"])
 					continue
 				end
 			end
 
-			if weaponData.Projectile then
-				module.FireProjectile(weaponData.Projectile, spread, bulletDamage, index, weaponData["Element"])
+			if module.weaponData.Projectile then
+				module.FireProjectile(
+					module.weaponData.Projectile,
+					spread,
+					bulletDamage,
+					index,
+					module.weaponData["Element"]
+				)
 				continue
 			end
 
@@ -2219,7 +2260,7 @@ function module.Fire()
 				maxDistance,
 				nil,
 				module.currentWeapon.Name,
-				weaponData["Element"]
+				module.weaponData["Element"]
 			)
 
 			addToGib(hitHumanoid, subject, damage)
@@ -2227,8 +2268,8 @@ function module.Fire()
 		end
 	end
 
-	if weaponData.LockedOn then
-		weaponData.LockedOn = {}
+	if module.weaponData.LockedOn then
+		module.weaponData.LockedOn = {}
 	end
 
 	checkForGibs()
@@ -2294,10 +2335,10 @@ function module.Fire()
 
 	if not deadBoltActive then
 		Recoil(
-			weaponData.Recoil.RecoilVector,
-			weaponData.Recoil.RandomVector,
-			weaponData.Recoil.Magnitude,
-			weaponData.Recoil.Speed
+			module.weaponData.Recoil.RecoilVector,
+			module.weaponData.Recoil.RandomVector,
+			module.weaponData.Recoil.Magnitude,
+			module.weaponData.Recoil.Speed
 		)
 	end
 
@@ -2319,7 +2360,8 @@ function module.Fire()
 		return
 	end
 
-	fireTimer.WaitTime = acts:checkAct("OverchargeActive") and weaponData.FireDelay / 1.5 or weaponData.FireDelay
+	fireTimer.WaitTime = acts:checkAct("OverchargeActive") and module.weaponData.FireDelay / 1.5
+		or module.weaponData.FireDelay
 
 	if increaseFireRate.IsRunning then
 		fireTimer.WaitTime /= 1.15
@@ -2723,13 +2765,13 @@ function module.Block()
 		or (module.currentWeapon and module.currentWeapon.Name == "Wrath Guard")
 	if
 		not canBlock
-		or not punch and (not module.currentWeapon or not weaponData.BlockTime)
+		or not punch and (not module.currentWeapon or not module.weaponData.BlockTime)
 		or acts:checkAct("IsBlocking")
 	then
 		return
 	end
 
-	local blockTime = punch and 0.5 or weaponData.BlockTime
+	local blockTime = punch and 0.5 or module.weaponData.BlockTime
 
 	acts:createAct("IsBlocking")
 	canBlock = false
@@ -2792,9 +2834,9 @@ end
 function module.OnBlock()
 	if
 		module.currentWeapon
-		and weaponData.BlockTime
-		and weaponData.ParryAmmoChance
-		and ChanceService.checkChance(weaponData.ParryAmmoChance, true)
+		and module.weaponData.BlockTime
+		and module.weaponData.ParryAmmoChance
+		and ChanceService.checkChance(module.weaponData.ParryAmmoChance, true)
 	then
 		module.UpdateAmmo(currentAmmo + 1)
 	end
@@ -2877,7 +2919,7 @@ local function getWeaponEffect(): string
 		return "Ballistic"
 	end
 
-	return weaponData.Effect
+	return module.weaponData.Effect
 end
 
 function module.OpenDeadBolt()
@@ -2909,7 +2951,7 @@ function module.OpenDeadBolt()
 		"HUD",
 		"ShowDeadBolt",
 		module.getCritChance(module.currentWeapon and module.currentWeapon.Name or "Default"),
-		module.currentWeapon and weaponData.Type
+		module.currentWeapon and module.weaponData.Type
 	)
 end
 
@@ -3109,7 +3151,7 @@ local function switchWeapon()
 end
 
 local function releaseTrigger(gpe)
-	if module.currentWeapon and weaponData["LockAmount"] and not gpe and mouseButton1Down then
+	if module.currentWeapon and module.weaponData["LockAmount"] and not gpe and mouseButton1Down then
 		local conditions = acts.Condition.blacklist("Reloading", "Throwing")
 		task.spawn(acts.createTempAct, acts, "Firing", module.Fire, conditions)
 	end
@@ -3344,7 +3386,7 @@ UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
 	end
 
 	if input.UserInputType == Enum.UserInputType.MouseButton2 or input.KeyCode == Enum.KeyCode.ButtonL2 then
-		if not module.Block() and not (module.currentWeapon and weaponData.BlockTime) then
+		if not module.Block() and not (module.currentWeapon and module.weaponData.BlockTime) then
 			module.OpenDeadBolt()
 		end
 	end
@@ -3450,7 +3492,7 @@ end)
 
 RunService.Heartbeat:Connect(function()
 	if mouseButton1Down and not isPaused then
-		if module.currentWeapon and weaponData["LockAmount"] then
+		if module.currentWeapon and module.weaponData["LockAmount"] then
 			LockOn()
 			return
 		end
@@ -3508,7 +3550,7 @@ signals.AddAmmo:Connect(function(mult)
 	local baseAmmo
 
 	if module.currentWeapon then
-		baseAmmo = weaponData.Ammo
+		baseAmmo = module.weaponData.Ammo
 	else
 		baseAmmo = 16
 	end
@@ -3592,7 +3634,7 @@ net:Connect("ArenaBegun", function()
 
 	UIService.doUiAction("HUD", "ActivateGift", "Before_The_Storm")
 
-	if weaponData then
+	if module.weaponData then
 		local defWeapon = assets.Models.Weapons:FindFirstChild(module.currentWeapon.Name)
 		local defWeaponData = require(defWeapon.Data)
 		local magSize = defWeaponData.Ammo
@@ -3620,7 +3662,7 @@ GiftsService.OnGiftAdded:Connect(function(gift)
 	end
 
 	if gift == "Dead_Bolt" then
-		if module.currentWeapon and weaponData.Effect == "Ballistic" then
+		if module.currentWeapon and module.weaponData.Effect == "Ballistic" then
 			UIService.doUiAction("HUD", "AssignDeadbolt", module.currentWeapon)
 		elseif not module.currentWeapon then
 			UIService.doUiAction("HUD", "AssignDeadbolt", defaultWeapon)

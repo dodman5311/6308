@@ -321,6 +321,15 @@ module.Presets = {
 		Model = "RocketProjectile",
 	},
 
+	MeatGrinderSnipe = {
+		Speed = 200,
+		LifeTime = 1,
+		Info = { Size = 2, SplashRange = 20, SplashDamage = 1 },
+		Damage = 1,
+		Piercing = 0,
+		Model = "InvisibleProjectile",
+	},
+
 	FastRocket = {
 		Speed = 600,
 		LifeTime = 10,

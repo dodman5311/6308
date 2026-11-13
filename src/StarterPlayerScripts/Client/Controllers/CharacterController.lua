@@ -245,12 +245,14 @@ function module:OnSpawn(character, humanoid)
 			local comboPenalty = comboTier >= 1 and 1 or 2
 
 			if
-				weaponService.WeaponData
-				and weaponService.WeaponData.Type == "Melee"
+				weaponService.weaponData
+				and weaponService.weaponData.Effect == "Parrying"
 				and giftService.CheckGift("Chronos")
 			then
 				comboPenalty += 1
 			end
+
+			print(comboPenalty)
 
 			comboService.ReduceCombo(comboPenalty)
 		end

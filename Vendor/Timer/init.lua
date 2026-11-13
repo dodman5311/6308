@@ -122,20 +122,21 @@ module.new = function(self, timerName, waitTime, Function, ...)
 
 	function timer:Pause(index)
 		pauseScale:Add(index)
-
-		if pauseScale:Check() then
-			pausedAt = os.clock()
-			self.IsPaused = true
-		end
 	end
 	function timer:Resume(index)
 		pauseScale:Remove(index)
-
-		if not pauseScale:Check() then
-			self:Delay(os.clock() - pausedAt)
-			self.IsPaused = false
-		end
 	end
+
+	pauseScale.Changed:Connect(function(pause: boolean)
+		if pause then
+			pausedAt = os.clock()
+			timer.IsPaused = true
+		else
+			timer:Delay(os.clock() - pausedAt)
+			timer.IsPaused = false
+			print("Paused", timer.IsPaused)
+		end
+	end)
 
 	timer.OnPaused = pauseSignal:Connect(function()
 		timer:Pause("GamePause")
