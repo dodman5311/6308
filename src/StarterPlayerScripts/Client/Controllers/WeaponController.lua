@@ -1319,14 +1319,16 @@ function module.dealDamage(cframe, subject, damage, source, element, chanceOverr
 
 		local QDStack = GiftsService.CheckCardStack("Queen_of_Diamonds")
 
-		explosionService.createExplosion(
-			cframe.Position,
-			QDStack * 10,
-			QDStack,
-			player,
-			Color3.new(1, 1, 1),
-			"Queen_Of_Diamonds"
-		)
+		if QDStack > 0 then
+			explosionService.createExplosion(
+				cframe.Position,
+				QDStack * 10,
+				QDStack,
+				player,
+				Color3.new(1, 1, 1),
+				"Queen_Of_Diamonds"
+			)
+		end
 	end
 
 	local deadshotDamage = checkDeadshot()
@@ -2365,6 +2367,10 @@ function module.Fire()
 
 	if increaseFireRate.IsRunning then
 		fireTimer.WaitTime /= 1.15
+	end
+
+	if GiftsService.CheckGift("Swordsmanship") and module.weaponData and module.weaponData.Type == "Melee" then
+		fireTimer.WaitTime /= 1.2
 	end
 
 	fireTimer:Run()
@@ -3580,6 +3586,32 @@ signals.ResumeGame:Connect(function()
 
 	for _, anim in pairs(animationService:getLoadedAnimations(viewmodel.Model)) do
 		anim:AdjustSpeed(1)
+	end
+end)
+
+signals.GrabSurroundingEnemies:Connect(function()
+	for _, enemy in ipairs(CollectionService:GetTagged("Enemy")) do
+		local playerPosition = player.Character:GetPivot().Position
+		local enemyPosition = enemy:GetPivot().Position
+		local distance = (playerPosition - enemyPosition).Magnitude
+
+		if distance > 75 then
+			continue
+		end
+
+		local humanoid = enemy:FindFirstChild("Humanoid")
+		if not humanoid or humanoid.Health <= 0 then
+			continue
+		end
+
+		module.dealDamage(enemy:GetPivot(), enemy, 0, "Psychotherapy", "Grab", 100)
+		local newHand = assets.Effects.GrabHand:Clone()
+		newHand.Parent = workspace
+		newHand:PivotTo(enemy:GetPivot() * CFrame.new(0, -5, 0))
+
+		util.tween(newHand.Hand, TweenInfo.new(0.25), { Position = newHand.Hand.Position + Vector3.new(0, 5, 0) })
+
+		Debris:AddItem(newHand, 5)
 	end
 end)
 

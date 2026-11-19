@@ -21,6 +21,8 @@ local signals = {
 	LoadSavedDataFromClient = signal.new(),
 	DoUiAction = signal.new(),
 
+	GrabSurroundingEnemies = signal.new(),
+
 	DoWeaponAction = signal.new(),
 	RemoveSoul = signal.new(),
 	ClearGifts = signal.new(),

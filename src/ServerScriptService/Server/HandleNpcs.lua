@@ -555,6 +555,7 @@ net:Connect("ResumeGame", function()
 			and Npc.Instance.PrimaryPart
 			and not Npc.StatusEffects["Ice"]
 			and not Npc.StatusEffects["Stun"]
+			and not Npc.StatusEffects["Grab"]
 			and not Npc.Instance:HasTag("IsAnchored")
 		then
 			Npc.Instance.PrimaryPart.Anchored = false

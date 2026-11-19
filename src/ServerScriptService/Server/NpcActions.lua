@@ -530,9 +530,13 @@ local function swing(npc, distance, stopMovement)
 
 	--AnimationService:stopAnimation(npc.Instance, "Attack", 0)
 	local animation = AnimationService:playAnimation(npc.Instance, "Attack", Enum.AnimationPriority.Action3)
+
 	if animation and stopMovement then
 		npc.Instance.PrimaryPart.Anchored = true
 		animation.Stopped:Once(function()
+			if npc.StatusEffects["Ice"] or npc.StatusEffects["Stun"] or npc.StatusEffects["Grab"] then
+				return
+			end
 			npc.Instance.PrimaryPart.Anchored = false
 		end)
 	end

@@ -375,6 +375,7 @@ function module.RemoveElementalEffect(elementName, npcModel)
 
 	for _, particle in ipairs(element:GetChildren()) do
 		if not particle:IsA("ParticleEmitter") then
+			particle:Destroy()
 			continue
 		end
 

@@ -33,7 +33,12 @@ end
 local rng = Random.new()
 
 local function swing(npc, distance)
-	if npc:GetState() == "Dead" or npc.StatusEffects["Ice"] or npc.StatusEffects["Stun"] then
+	if
+		npc:GetState() == "Dead"
+		or npc.StatusEffects["Ice"]
+		or npc.StatusEffects["Stun"]
+		or npc.StatusEffects["Grab"]
+	then
 		return
 	end
 
@@ -42,7 +47,12 @@ local function swing(npc, distance)
 
 	npc.Instance.PrimaryPart.Anchored = true
 	animationService:playAnimation(npc.Instance, "Attack", Enum.AnimationPriority.Action3).Stopped:Once(function()
-		if npc:GetState() == "Dead" or npc.StatusEffects["Ice"] or npc.StatusEffects["Stun"] then
+		if
+			npc:GetState() == "Dead"
+			or npc.StatusEffects["Ice"]
+			or npc.StatusEffects["Stun"]
+			or npc.StatusEffects["Grab"]
+		then
 			return
 		end
 		npc.Instance.PrimaryPart.Anchored = false
@@ -52,7 +62,12 @@ local function swing(npc, distance)
 
 	Timer.wait(0.3)
 
-	if npc:GetState() == "Dead" or npc.StatusEffects["Ice"] or npc.StatusEffects["Stun"] then
+	if
+		npc:GetState() == "Dead"
+		or npc.StatusEffects["Ice"]
+		or npc.StatusEffects["Stun"]
+		or npc.StatusEffects["Grab"]
+	then
 		return
 	end
 

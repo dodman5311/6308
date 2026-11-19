@@ -80,6 +80,19 @@ return {
 		end,
 	},
 
+	Grab = {
+		time = 5,
+		enter = function(npc)
+			npc.Instance.PrimaryPart.Anchored = true
+		end,
+
+		exit = function(npc)
+			if npc.Name ~= "Visage Of False Hope" then
+				npc.Instance.PrimaryPart.Anchored = false
+			end
+		end,
+	},
+
 	SoulFire = {
 		time = 3,
 		enter = function() end,

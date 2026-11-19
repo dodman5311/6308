@@ -252,8 +252,6 @@ function module:OnSpawn(character, humanoid)
 				comboPenalty += 1
 			end
 
-			print(comboPenalty)
-
 			comboService.ReduceCombo(comboPenalty)
 		end
 

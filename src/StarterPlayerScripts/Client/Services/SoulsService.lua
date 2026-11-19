@@ -210,6 +210,12 @@ net:Connect("CheckProtected", function()
 		net:RemoteEvent("SetArmor"):FireServer(5)
 	end
 
+	if GiftsService.CheckGift("Psychotherapy") then
+		print("BALLS")
+		UIService.doUiAction("HUD", "ActivateGift", "Psychotherapy")
+		Signals.GrabSurroundingEnemies:Fire()
+	end
+
 	checkIronWill()
 end)
 
